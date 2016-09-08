@@ -2,6 +2,7 @@
     "dependencies": {
         "leaflet": "^0.7.0",
 	"async": "*",
-        "xmlhttprequest": "*"
+        "xmlhttprequest": "*",
+        "mocha": "*"
     }
 }
