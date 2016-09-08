@@ -245,10 +245,7 @@ Overpass.prototype._overpass_handle_result = function(context, err, results) {
       continue;
     }
 
-    if(id in this.overpass_elements)
-      this.overpass_elements[id].set_data(el, context.todo_requests[id]);
-    else
-      this.overpass_elements[id] = this.create_osm_object(el, context.todo_requests[id]);
+    this.create_or_update_osm_object(el, context.todo_requests[id]);
 
     var members = this.overpass_elements[id].member_ids();
     for(var j = 0; j < members.length; j++) {
@@ -392,9 +389,24 @@ Overpass.prototype.abort_all_requests = function() {
   this.overpass_requests = [];
 }
 
-Overpass.prototype.create_osm_object = function(el, request) {
-  console.log('create', el);
-  return el;
+Overpass.prototype.create_or_update_osm_object = function(el, request) {
+  var id = el.type.substr(0, 1) + el.id;
+  var ob = null;
+
+  if(id in this.overpass_elements)
+    ob = this.overpass_elements[id];
+  else if(el.type == 'relation')
+    var ob = new OverpassRelation(id);
+  else if(el.type == 'way')
+    var ob = new OverpassWay(id);
+  else if(el.type == 'node')
+    var ob = new OverpassNode(id);
+  else
+    var ob = new OverpassObject(id);
+
+  ob.update_data(el, request);
+
+  this.overpass_elements[id] = ob;
 }
 
 function overpass_regexp_escape(s) {
@@ -452,6 +464,11 @@ function _overpass_process_query_bbox_grep(elements, bbox) {
 
   return ret;
 }
+
+OverpassObject = require('./OverpassObject')
+OverpassNode = require('./OverpassNode')
+OverpassWay = require('./OverpassWay')
+OverpassRelation = require('./OverpassRelation')
 
 if(typeof module != 'undefined' && module.exports)
   module.exports = Overpass
