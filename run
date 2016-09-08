@@ -1,0 +1,13 @@
+#!/usr/bin/nodejs
+
+var Overpass = require('./src/Overpass');
+
+var overpass = new Overpass('https://www.overpass-api.de/api/interpreter');
+overpass.get(['r910885'], { properties: Overpass.ID_ONLY | Overpass.BBOX | Overpass.TAGS },
+  function(err, result, index) {
+    console.log(err, result);
+  },
+  function(err) {
+    console.log('finish');
+  }
+);
