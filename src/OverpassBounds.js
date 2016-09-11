@@ -1,10 +1,18 @@
 function OverpassBounds(bounds) {
   if(bounds instanceof OverpassBounds) {
-    this.bounds = bounds.bounds
+    this.bounds = {}
+    for(var k in bounds.bounds)
+      this.bounds[k] = bounds.bounds[k]
+
     return
   }
 
-  this.bounds = bounds;
+  if('bounds' in bounds)
+    bounds = bounds.bounds
+
+  this.bounds = {}
+  for(var k in bounds)
+    this.bounds[k] = bounds[k]
 
   if(this.bounds.lat) {
     this.bounds.minlat = this.bounds.lat
@@ -29,6 +37,10 @@ function OverpassBounds(bounds) {
     this.bounds.minlon = this.bounds.maxlon
     this.bounds.maxlon = h
   }
+
+  for(var k in this.bounds)
+    if(['minlon', 'minlat', 'maxlon', 'maxlat'].indexOf(k) == -1)
+      delete(this.bounds[k])
 }
 
 OverpassBounds.prototype.intersects = function(other) {
