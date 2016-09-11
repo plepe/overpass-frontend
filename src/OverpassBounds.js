@@ -65,5 +65,12 @@ OverpassBounds.prototype.toBBoxString = function() {
          this.bounds.maxlat
 }
 
+OverpassBounds.prototype.diagonal_length = function() {
+  var dlat = this.bounds.maxlat - this.bounds.minlat
+  var dlon = this.bounds.maxlon - this.bounds.minlon
+
+  return d = Math.sqrt(dlat * dlat + dlon * dlon)
+}
+
 if(typeof module != 'undefined' && module.exports)
   module.exports = OverpassBounds

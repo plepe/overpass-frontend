@@ -106,4 +106,26 @@ describe('OverpassBounds', function() {
     done()
   })
 
+  it('diagonal_length', function(done) {
+    assert.equal(
+      0,
+      bounds4.diagonal_length()
+    )
+
+    assert.equal(
+      1.4142135623730951,
+      bounds1.diagonal_length()
+    )
+
+    assert.equal(
+      2.126411898010358,
+      bounds2.diagonal_length()
+    )
+
+    assert.equal(
+      1.4142135623730951,
+      bounds3.diagonal_length()
+    )
+  })
+
 })
