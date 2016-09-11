@@ -126,6 +126,26 @@ describe('OverpassBounds', function() {
       1.4142135623730951,
       bounds3.diagonal_length()
     )
+
+    done()
+  })
+
+  it('get_center', function(done) {
+    assert.deepEqual({
+        lat: 48.5,
+        lon: 16.5
+      },
+      bounds1.get_center()
+    )
+
+    assert.deepEqual({
+        lat: 48.1,
+        lon: 16.1
+      },
+      bounds4.get_center()
+    )
+
+    done()
   })
 
 })

@@ -72,5 +72,15 @@ OverpassBounds.prototype.diagonal_length = function() {
   return d = Math.sqrt(dlat * dlat + dlon * dlon)
 }
 
+OverpassBounds.prototype.get_center = function() {
+  var dlat = this.bounds.maxlat - this.bounds.minlat
+  var dlon = this.bounds.maxlon - this.bounds.minlon
+
+  return {
+    lat: this.bounds.minlat + dlat / 2,
+    lon: this.bounds.minlon + dlon / 2
+  }
+}
+
 if(typeof module != 'undefined' && module.exports)
   module.exports = OverpassBounds
