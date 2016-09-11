@@ -16,13 +16,13 @@ describe('OverpassBounds', function() {
     )
 
     bounds2 = new OverpassBounds({
-      minlat: 46,
+      minlat: 45.1234,
       minlon: 16,
       maxlat: 47,
       maxlon: 17
     })
     assert.deepEqual(
-      {"minlat":46,"minlon":16,"maxlat":47,"maxlon":17},
+      {"minlat":45.1234,"minlon":16,"maxlat":47,"maxlon":17},
       bounds2.bounds
     )
 
@@ -76,6 +76,16 @@ describe('OverpassBounds', function() {
     assert.equal(true, bounds1.intersects(bounds5))
     assert.equal(false, bounds2.intersects(bounds5))
     assert.equal(true, bounds3.intersects(bounds5))
+
+    done()
+  })
+
+  it('to_tile', function(done) {
+    var b = bounds2.to_tile()
+    assert.deepEqual(
+      {"minlat":45.1,"minlon":16,"maxlat":47,"maxlon":17},
+      b.bounds
+    )
 
     done()
   })

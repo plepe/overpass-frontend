@@ -49,5 +49,14 @@ OverpassBounds.prototype.intersects = function(other) {
   return true;
 }
 
+OverpassBounds.prototype.to_tile = function() {
+  return new OverpassBounds({
+    minlat: Math.floor(this.bounds.minlat * 10) / 10,
+    minlon: Math.floor(this.bounds.minlon * 10) / 10,
+    maxlat: Math.ceil(this.bounds.maxlat * 10) / 10,
+    maxlon: Math.ceil(this.bounds.maxlon * 10) / 10
+  })
+}
+
 if(typeof module != 'undefined' && module.exports)
   module.exports = OverpassBounds
