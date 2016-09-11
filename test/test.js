@@ -179,3 +179,62 @@ describe('Overpass get', function() {
     // TODO: Missing!
   })
 })
+
+describe('Overpass objects structure', function() {
+  describe('Node', function() {
+    it('Overpass.BBOX', function(done) {
+      overpass.removeFromCache('n3037893169')
+      overpass.get('n3037893169', { properties: Overpass.BBOX },
+        function(err, result, index) {
+          assert.deepEqual({
+	    "maxlat": 48.1984802,
+	    "maxlon": 16.3384675,
+	    "minlat": 48.1984802,
+	    "minlon": 16.3384675
+          }, result.bounds.bounds)
+        },
+        function(err) {
+          done()
+        }
+      )
+    })
+  })
+
+  describe('Way', function() {
+    it('Overpass.BBOX', function(done) {
+      overpass.removeFromCache('w299709373')
+      overpass.get('w299709373', { properties: Overpass.BBOX },
+        function(err, result, index) {
+          assert.deepEqual({
+	    "maxlat": 48.1996439,
+	    "maxlon": 16.3386136,
+	    "minlat": 48.1983024,
+	    "minlon": 16.3380308
+          }, result.bounds.bounds)
+        },
+        function(err) {
+          done()
+        }
+      )
+    })
+  })
+
+  describe('Relation', function() {
+    it('Overpass.BBOX', function(done) {
+      overpass.removeFromCache('r1980077')
+      overpass.get('r1980077', { properties: Overpass.BBOX },
+        function(err, result, index) {
+          assert.deepEqual({
+	    "maxlat": 48.1987724,
+	    "maxlon": 16.3390104,
+	    "minlat": 48.1982148,
+	    "minlon": 16.3380726
+          }, result.bounds.bounds)
+        },
+        function(err) {
+          done()
+        }
+      )
+    })
+  })
+})

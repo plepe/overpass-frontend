@@ -1,5 +1,6 @@
 var util = require('util')
 var OverpassObject = require('./OverpassObject')
+var OverpassBounds = require('./OverpassBounds')
 
 util.inherits(OverpassNode, OverpassObject)
 function OverpassNode() {
@@ -25,11 +26,8 @@ OverpassNode.prototype.update_data = function(data, request) {
       lon: data.lon
     };
 
-//    this.bounds = L.latLngBounds(
-//        L.latLng(data.lat, data.lon),
-//        L.latLng(data.lat, data.lon)
-//      );
-//    this.center = L.latLng(data.lat, data.lon);
+    this.bounds = new OverpassBounds(data)
+    this.center = this.bounds.getCenter()
   }
 
   this.constructor.super_.prototype.update_data.call(this, data, request)

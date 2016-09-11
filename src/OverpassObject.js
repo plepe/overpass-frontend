@@ -1,4 +1,5 @@
 var Overpass = require('./Overpass')
+var OverpassBounds = require('./OverpassBounds')
 
 function OverpassObject() {
   this.data = {};
@@ -10,7 +11,6 @@ OverpassObject.prototype.member_ids = function() {
 }
 
 OverpassObject.prototype.update_data = function(data, request) {
-  console.log(request)
   if(typeof this.id == 'undefined') {
     this.id = data.type.substr(0, 1) + data.id;
     this.type = data.type;
@@ -21,14 +21,12 @@ OverpassObject.prototype.update_data = function(data, request) {
     this.data[k] = data[k];
 
   if(data.bounds) {
-//    this.bounds = L.latLngBounds(
-//      L.latLng(data.bounds.minlat, data.bounds.minlon),
-//      L.latLng(data.bounds.maxlat, data.bounds.maxlon)
-//    );
-    //this.center = this.bounds.getCenter();
+    this.bounds = new OverpassBounds(data.bounds)
+    this.center = this.bounds.getCenter();
   }
   else if(data.center) {
-    // this.bounds = L.latLng(data.center.lat, data.center.lon);
+    this.bounds = new OverpassBounds(data.center)
+    this.center = this.bounds.getCenter();
   }
 
   if(request.options.bbox) {
