@@ -390,6 +390,15 @@ Overpass.prototype.abort_all_requests = function() {
   this.overpass_requests = [];
 }
 
+Overpass.prototype.removeFromCache = function(ids) {
+  if(typeof ids == 'string')
+    ids = [ ids ]
+
+  for(var i = 0; i < ids.length; i++) {
+    delete(this.overpass_elements[ids[i]])
+  }
+}
+
 Overpass.prototype.create_or_update_osm_object = function(el, request) {
   var id = el.type.substr(0, 1) + el.id;
   var ob = null;

@@ -175,5 +175,7 @@ describe('Overpass get', function() {
       )
     })
   })
-
+  describe('removeFromCache()', function() {
+    // TODO: Missing!
+  })
 })
