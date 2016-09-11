@@ -69,6 +69,16 @@ describe('OverpassBounds', function() {
     done()
   })
 
+  it('create from Overpass API response node', function(done) {
+    var b = new OverpassBounds({ type: 'node', id: 3037893168, lat: 48.1984633, lon: 16.3384871 })
+    assert.deepEqual(
+      {"minlat":48.1984633,"minlon":16.3384871,"maxlat":48.1984633,"maxlon":16.3384871},
+      b.bounds
+    )
+
+    done()
+  })
+
   it('intersects', function(done) {
     assert.equal(false, bounds1.intersects(bounds2))
     assert.equal(true, bounds1.intersects(bounds3))
