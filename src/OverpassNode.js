@@ -9,11 +9,12 @@ function OverpassNode() {
 OverpassNode.prototype.GeoJSON = function() {
   return {
     type: 'Feature',
+    id: this.type + '/' + this.osm_id,
     geometry: {
       type: 'Point',
       coordinates: [ this.geometry.lon, this.geometry.lat ]
     },
-    properties: this.tags
+    properties: this.GeoJSONProperties()
   };
 }
 

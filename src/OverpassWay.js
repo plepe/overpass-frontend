@@ -42,11 +42,12 @@ OverpassWay.prototype.GeoJSON = function() {
 
   return {
     type: 'Feature',
+    id: this.type + '/' + this.osm_id,
     geometry: {
       type: 'LineString',
       coordinates: coordinates
     },
-    properties: this.tags
+    properties: this.GeoJSONProperties()
   };
 }
 

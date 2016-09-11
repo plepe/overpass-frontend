@@ -46,6 +46,7 @@ describe('Overpass get', function() {
 
           assert.deepEqual({
 	    "type": "Feature",
+	    "id": "node/3037893169",
 	    "geometry": {
 	      "type": "Point",
 	      "coordinates": [ 16.3384675, 48.1984802 ]
@@ -54,7 +55,13 @@ describe('Overpass get', function() {
 	      "amenity": "bench",
 	      "backrest": "yes",
 	      "material": "wood",
-	      "source": "survey"
+	      "source": "survey",
+	      "@changeset": 24967165,
+	      "@id": "node/3037893169",
+	      "@timestamp": "2014-08-23T23:04:34Z",
+	      "@uid": 770238,
+	      "@user": "Kevin Kofler",
+	      "@version": 1
 	    }
 	  },
           geojson);
@@ -72,6 +79,7 @@ describe('Overpass get', function() {
 
           assert.deepEqual({
 	    "type": "Feature",
+	    "id": "way/146678749",
 	    "geometry": {
 	      "type": "LineString",
 	      "coordinates": [
@@ -88,7 +96,13 @@ describe('Overpass get', function() {
 	      "maxspeed": "30",
 	      "name": "Stollgasse",
 	      "oneway": "yes",
-	      "source:maxspeed": "AT:zone:30"
+	      "source:maxspeed": "AT:zone:30",
+	      "@changeset": 18574192,
+	      "@id": "way/146678749",
+	      "@timestamp": "2013-10-27T20:43:03Z",
+	      "@uid": 1066249,
+	      "@user": "Railjet",
+	      "@version": 5
 	    }
 	  },
           geojson);
