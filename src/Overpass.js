@@ -2,6 +2,8 @@ if(typeof require != 'undefined') {
   var weight_sort = require('./weight_sort')
   var async = require('async')
   var http_load = require('./http_load')
+  var OverpassBounds = require('./OverpassBounds')
+  var keys = Object.keys || require('object-keys')
 }
 
 function Overpass(url, options) {
@@ -81,7 +83,7 @@ Overpass.prototype._overpass_process = function() {
 
   if(this.overpass_requests[0].type == 'bbox_query') {
     var request = this.overpass_requests.splice(0, 1);
-    return _overpass_process_query(request[0]);
+    return this._overpass_process_query(request[0]);
   }
 
   for(var j = 0; j < this.overpass_requests.length; j++) {
@@ -275,31 +277,33 @@ Overpass.prototype._overpass_handle_result = function(context, err, results) {
  * @param {L.latLngBounds} bounds - A Leaflet Bounds object, e.g. from map.getBounds()
  * @param {object} options
  * @param {number} [options.priority=0] - Priority for loading these objects. The lower the sooner they will be requested.
- * @param {boolean} [options.order_approx_route_length=false] - Order objects by approximate route length (calculated from the bbox diagonal)
+ * @param {boolean} [options.order_approx_route_length=false] - Order objects by approximate route length (calculated from the bounding box diagonal)
  * @param {boolean} [options.call_ordered=false] - When set to true, the function feature_callback will be called in some particular order (e.g. from order_approx_route_length).
  * @param {function} feature_callback Will be called for each object in the order of the IDs in parameter 'ids'. Will be passed: 1. err (if an error occured, otherwise null), 2. the object or null.
  * @param {function} final_callback Will be called after the last feature. Will be passed: 1. err (if an error occured, otherwise null).
  */
-Overpass.prototype.bbox_query = function(query, bbox, options, feature_callback, final_callback) {
+Overpass.prototype.bbox_query = function(query, bounds, options, feature_callback, final_callback) {
   var ret = [];
 
-  var bbox_options = {
+  var bounds_options = {
     properties: Overpass.ID_ONLY | Overpass.BBOX,
     order_approx_route_length: options.order_approx_route_length
   };
 
-  var tile_bounds = bounds_to_tile(bbox);
+  bounds = new OverpassBounds(bounds)
+
+  var tile_bounds = bounds.to_tile();
   var cache_id = tile_bounds.toBBoxString();
 
   // check if we have a result for this tile
   if(query in this.overpass_bbox_query_cache) {
     if(cache_id in this.overpass_bbox_query_cache[query]) {
-      var todo = _overpass_process_query_bbox_grep(this.overpass_bbox_query_cache[query][cache_id], bbox);
+      var todo = _overpass_process_query_bbox_grep(this.overpass_bbox_query_cache[query][cache_id], bounds);
 
       if(options.order_approx_route_length)
         todo = weight_sort(todo);
 
-      return this.get(array_keys(todo), options, feature_callback, final_callback);
+      return this.get(keys(todo), options, feature_callback, final_callback);
     }
   }
   else {
@@ -309,10 +313,10 @@ Overpass.prototype.bbox_query = function(query, bbox, options, feature_callback,
   this.overpass_requests.push({
     type: 'bbox_query',
     query: query,
-    bbox: bbox,
-    tile_bbox: tile_bounds,
+    bounds: bounds,
+    tile_bounds: tile_bounds,
     cache_id: cache_id,
-    options: bbox_options,
+    options: bounds_options,
     get_options: options,
     priority: 'priority' in options ? options.priority : 0,
     feature_callback: feature_callback,
@@ -325,7 +329,7 @@ Overpass.prototype.bbox_query = function(query, bbox, options, feature_callback,
 }
 
 Overpass.prototype._overpass_process_query = function(request) {
-  var bbox_string = request.tile_bbox.toBBoxString();
+  var bbox_string = request.tile_bounds.toBBoxString();
   bbox_string = bbox_string.split(/,/);
   bbox_string = bbox_string[1] + ',' + bbox_string[0] + ',' +
                 bbox_string[3] + ',' + bbox_string[2];
@@ -354,24 +358,21 @@ Overpass.prototype._overpass_handle_process_query = function(context, err, resul
     var el = results.elements[i];
     var id = el.type.substr(0, 1) + el.id;
 
-    var ob_bbox = L.latLngBounds(
-      L.latLng(el.bounds.minlat, el.bounds.minlon),
-      L.latLng(el.bounds.maxlat, el.bounds.maxlon)
-    );
-    var approx_route_length = bounds_diagonal_px_length(ob_bbox);
+    var ob_bbox = new OverpassBounds(el)
+    var approx_route_length = ob_bbox.diagonal_length(ob_bbox);
 
     this.overpass_bbox_query_cache[request.query][request.cache_id][id] = {
-      bbox: ob_bbox,
+      bounds: ob_bbox,
       approx_route_length: approx_route_length
     };
   }
 
-  var todo = this._overpass_process_query_bbox_grep(this.overpass_bbox_query_cache[request.query][request.cache_id], request.bbox);
+  var todo = _overpass_process_query_bbox_grep(this.overpass_bbox_query_cache[request.query][request.cache_id], request.bounds);
 
   if(request.options.order_approx_route_length)
     todo = weight_sort(todo, 'approx_route_length');
 
-  this.get(array_keys(todo), request.get_options, request.feature_callback, request.final_callback);
+  this.get(keys(todo), request.get_options, request.feature_callback, request.final_callback);
 
   this.overpass_request_active = false;
 
@@ -458,7 +459,7 @@ function _overpass_process_query_bbox_grep(elements, bbox) {
   var ret = {};
 
   for(var id in elements) {
-    if(bbox.intersects(elements[id].bbox))
+    if(bbox.intersects(elements[id].bounds))
       ret[id] = elements[id];
   }
 

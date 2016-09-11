@@ -3,6 +3,7 @@
         "leaflet": "^0.7.0",
 	"async": "*",
         "xmlhttprequest": "*",
-        "mocha": "*"
+        "mocha": "*",
+        "object-keys": "*"
     }
 }
