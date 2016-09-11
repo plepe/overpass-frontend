@@ -79,7 +79,7 @@ describe('OverpassBounds', function() {
     done()
   })
 
-  it('intersects', function(done) {
+  it('intersects()', function(done) {
     assert.equal(false, bounds1.intersects(bounds2))
     assert.equal(true, bounds1.intersects(bounds3))
     assert.equal(true, bounds1.intersects(bounds4))
@@ -90,8 +90,8 @@ describe('OverpassBounds', function() {
     done()
   })
 
-  it('to_tile', function(done) {
-    var b = bounds2.to_tile()
+  it('toTile()', function(done) {
+    var b = bounds2.toTile()
     assert.deepEqual(
       {"minlat":45.1,"minlon":16,"maxlat":47,"maxlon":17},
       b.bounds
@@ -100,7 +100,7 @@ describe('OverpassBounds', function() {
     done()
   })
 
-  it('toBBoxString', function(done) {
+  it('toBBoxString()', function(done) {
     var b = bounds2.toBBoxString()
     assert.deepEqual(
       '16,45.1234,17,47',
@@ -116,43 +116,43 @@ describe('OverpassBounds', function() {
     done()
   })
 
-  it('diagonal_length', function(done) {
+  it('diagonalLength()', function(done) {
     assert.equal(
       0,
-      bounds4.diagonal_length()
+      bounds4.diagonalLength()
     )
 
     assert.equal(
       1.4142135623730951,
-      bounds1.diagonal_length()
+      bounds1.diagonalLength()
     )
 
     assert.equal(
       2.126411898010358,
-      bounds2.diagonal_length()
+      bounds2.diagonalLength()
     )
 
     assert.equal(
       1.4142135623730951,
-      bounds3.diagonal_length()
+      bounds3.diagonalLength()
     )
 
     done()
   })
 
-  it('get_center', function(done) {
+  it('getCenter()', function(done) {
     assert.deepEqual({
         lat: 48.5,
         lon: 16.5
       },
-      bounds1.get_center()
+      bounds1.getCenter()
     )
 
     assert.deepEqual({
         lat: 48.1,
         lon: 16.1
       },
-      bounds4.get_center()
+      bounds4.getCenter()
     )
 
     done()

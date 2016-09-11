@@ -61,7 +61,7 @@ OverpassBounds.prototype.intersects = function(other) {
   return true;
 }
 
-OverpassBounds.prototype.to_tile = function() {
+OverpassBounds.prototype.toTile = function() {
   return new OverpassBounds({
     minlat: Math.floor(this.bounds.minlat * 10) / 10,
     minlon: Math.floor(this.bounds.minlon * 10) / 10,
@@ -77,14 +77,14 @@ OverpassBounds.prototype.toBBoxString = function() {
          this.bounds.maxlat
 }
 
-OverpassBounds.prototype.diagonal_length = function() {
+OverpassBounds.prototype.diagonalLength = function() {
   var dlat = this.bounds.maxlat - this.bounds.minlat
   var dlon = this.bounds.maxlon - this.bounds.minlon
 
   return d = Math.sqrt(dlat * dlat + dlon * dlon)
 }
 
-OverpassBounds.prototype.get_center = function() {
+OverpassBounds.prototype.getCenter = function() {
   var dlat = this.bounds.maxlat - this.bounds.minlat
   var dlon = this.bounds.maxlon - this.bounds.minlon
 

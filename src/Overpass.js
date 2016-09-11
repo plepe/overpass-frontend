@@ -292,7 +292,7 @@ Overpass.prototype.bbox_query = function(query, bounds, options, feature_callbac
 
   bounds = new OverpassBounds(bounds)
 
-  var tile_bounds = bounds.to_tile();
+  var tile_bounds = bounds.toTile();
   var cache_id = tile_bounds.toBBoxString();
 
   // check if we have a result for this tile
@@ -359,7 +359,7 @@ Overpass.prototype._overpass_handle_process_query = function(context, err, resul
     var id = el.type.substr(0, 1) + el.id;
 
     var ob_bbox = new OverpassBounds(el)
-    var approx_route_length = ob_bbox.diagonal_length(ob_bbox);
+    var approx_route_length = ob_bbox.diagonalLength(ob_bbox);
 
     this.overpass_bbox_query_cache[request.query][request.cache_id][id] = {
       bounds: ob_bbox,
