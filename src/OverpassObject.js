@@ -71,4 +71,12 @@ OverpassObject.prototype.title = function() {
   return this.tags.name || this.tags.operator || this.tags.ref;
 }
 
+OverpassObject.prototype.GeoJSON = function() {
+  return {
+    type: 'Feature',
+    geometry: null,
+    properties: this.tags
+  };
+}
+
 module.exports = OverpassObject
