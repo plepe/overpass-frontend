@@ -5,6 +5,10 @@ function OverpassObject() {
   this.properties = 0;
 }
 
+OverpassObject.prototype.member_ids = function() {
+  return [];
+}
+
 OverpassObject.prototype.update_data = function(data, request) {
   console.log(request)
   if(typeof this.id == 'undefined') {
