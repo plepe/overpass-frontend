@@ -58,5 +58,12 @@ OverpassBounds.prototype.to_tile = function() {
   })
 }
 
+OverpassBounds.prototype.toBBoxString = function() {
+  return this.bounds.minlon + ',' +
+         this.bounds.minlat + ',' +
+         this.bounds.maxlon + ',' +
+         this.bounds.maxlat
+}
+
 if(typeof module != 'undefined' && module.exports)
   module.exports = OverpassBounds

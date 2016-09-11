@@ -90,4 +90,20 @@ describe('OverpassBounds', function() {
     done()
   })
 
+  it('toBBoxString', function(done) {
+    var b = bounds2.toBBoxString()
+    assert.deepEqual(
+      '16,45.1234,17,47',
+      b
+    )
+
+    var b = bounds4.toBBoxString()
+    assert.deepEqual(
+      '16.1,48.1,16.1,48.1',
+      b
+    )
+
+    done()
+  })
+
 })
