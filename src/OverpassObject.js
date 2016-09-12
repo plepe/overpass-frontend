@@ -1,5 +1,5 @@
 var Overpass = require('./Overpass')
-var OverpassBounds = require('./OverpassBounds')
+var BoundingBox = require('boundingbox')
 
 function OverpassObject() {
   this.data = {};
@@ -21,11 +21,11 @@ OverpassObject.prototype.update_data = function(data, request) {
     this.data[k] = data[k];
 
   if(data.bounds) {
-    this.bounds = new OverpassBounds(data.bounds)
+    this.bounds = new BoundingBox(data.bounds)
     this.center = this.bounds.getCenter();
   }
   else if(data.center) {
-    this.bounds = new OverpassBounds(data.center)
+    this.bounds = new BoundingBox(data.center)
     this.center = this.bounds.getCenter();
   }
 

@@ -1,6 +1,6 @@
 var util = require('util')
 var OverpassObject = require('./OverpassObject')
-var OverpassBounds = require('./OverpassBounds')
+var BoundingBox = require('boundingbox')
 
 util.inherits(OverpassNode, OverpassObject)
 function OverpassNode() {
@@ -26,7 +26,7 @@ OverpassNode.prototype.update_data = function(data, request) {
       lon: data.lon
     };
 
-    this.bounds = new OverpassBounds(data)
+    this.bounds = new BoundingBox(data)
     this.center = this.bounds.getCenter()
   }
 

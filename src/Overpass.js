@@ -2,7 +2,7 @@ if(typeof require != 'undefined') {
   var weight_sort = require('./weight_sort')
   var async = require('async')
   var http_load = require('./http_load')
-  var OverpassBounds = require('./OverpassBounds')
+  var BoundingBox = require('boundingbox')
   var keys = Object.keys || require('object-keys')
 }
 
@@ -290,7 +290,7 @@ Overpass.prototype.bbox_query = function(query, bounds, options, feature_callbac
     order_approx_route_length: options.order_approx_route_length
   };
 
-  bounds = new OverpassBounds(bounds)
+  bounds = new BoundingBox(bounds)
 
   var tile_bounds = bounds.toTile();
   var cache_id = tile_bounds.toBBoxString();
@@ -358,7 +358,7 @@ Overpass.prototype._overpass_handle_process_query = function(context, err, resul
     var el = results.elements[i];
     var id = el.type.substr(0, 1) + el.id;
 
-    var ob_bbox = new OverpassBounds(el)
+    var ob_bbox = new BoundingBox(el)
     var approx_route_length = ob_bbox.diagonalLength(ob_bbox);
 
     this.overpass_bbox_query_cache[request.query][request.cache_id][id] = {

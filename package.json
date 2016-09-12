@@ -4,6 +4,7 @@
 	"async": "*",
         "xmlhttprequest": "*",
         "mocha": "*",
-        "object-keys": "*"
+        "object-keys": "*",
+        "boundingbox": "*"
     }
 }
