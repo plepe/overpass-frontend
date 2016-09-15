@@ -182,6 +182,63 @@ describe('Overpass get', function() {
 
 describe('Overpass objects structure', function() {
   describe('Node', function() {
+    it('Overpass.ID_ONLY', function(done) {
+      overpass.removeFromCache('n3037893169')
+      overpass.get('n3037893169', { properties: Overpass.ID_ONLY },
+        function(err, result, index) {
+          assert.equal('n3037893169', result.id)
+          assert.equal(3037893169, result.osm_id)
+          assert.equal('node', result.type)
+        },
+        function(err) {
+          done()
+        }
+      )
+    })
+    it('Overpass.TAGS', function(done) {
+      overpass.removeFromCache('n3037893169')
+      overpass.get('n3037893169', { properties: Overpass.TAGS },
+        function(err, result, index) {
+          assert.deepEqual({
+            "amenity": "bench",
+            "backrest": "yes",
+            "material": "wood",
+            "source": "survey"
+          }, result.tags)
+        },
+        function(err) {
+          done()
+        }
+      )
+    })
+    it('Overpass.META', function(done) {
+      overpass.removeFromCache('n3037893169')
+      overpass.get('n3037893169', { properties: Overpass.META },
+        function(err, result, index) {
+          assert.deepEqual({
+	    "changeset": 24967165,
+	    "timestamp": "2014-08-23T23:04:34Z",
+	    "uid": 770238,
+	    "user": "Kevin Kofler",
+	    "version": 1
+          }, result.meta)
+        },
+        function(err) {
+          done()
+        }
+      )
+    })
+    it('Overpass.MEMBERS', function(done) {
+      overpass.removeFromCache('n3037893169')
+      overpass.get('n3037893169', { properties: Overpass.MEMBERS },
+        function(err, result, index) {
+          assert.deepEqual([], result.member_ids())
+        },
+        function(err) {
+          done()
+        }
+      )
+    })
     it('Overpass.BBOX', function(done) {
       overpass.removeFromCache('n3037893169')
       overpass.get('n3037893169', { properties: Overpass.BBOX },
@@ -192,6 +249,77 @@ describe('Overpass objects structure', function() {
 	    "minlat": 48.1984802,
 	    "minlon": 16.3384675
           }, result.bounds.bounds)
+	  // TODO: knowledge of internal structure of BoundingBox necessary?
+        },
+        function(err) {
+          done()
+        }
+      )
+    })
+    it('Overpass.GEOM', function(done) {
+      overpass.removeFromCache('n3037893169')
+      overpass.get('n3037893169', { properties: Overpass.GEOM },
+        function(err, result, index) {
+          assert.deepEqual({
+	    "lat": 48.1984802,
+	    "lon": 16.3384675
+          }, result.geometry)
+        },
+        function(err) {
+          done()
+        }
+      )
+    })
+    it('Overpass.CENTER', function(done) {
+      overpass.removeFromCache('n3037893169')
+      overpass.get('n3037893169', { properties: Overpass.CENTER },
+        function(err, result, index) {
+          assert.deepEqual({
+	    "lat": 48.1984802,
+	    "lon": 16.3384675
+          }, result.center)
+        },
+        function(err) {
+          done()
+        }
+      )
+    })
+    it('Overpass.ALL', function(done) {
+      overpass.removeFromCache('n3037893169')
+      overpass.get('n3037893169', { properties: Overpass.ALL },
+        function(err, result, index) {
+          assert.equal('n3037893169', result.id)
+          assert.equal(3037893169, result.osm_id)
+          assert.equal('node', result.type)
+          assert.deepEqual({
+            "amenity": "bench",
+            "backrest": "yes",
+            "material": "wood",
+            "source": "survey"
+          }, result.tags)
+          assert.deepEqual({
+	    "changeset": 24967165,
+	    "timestamp": "2014-08-23T23:04:34Z",
+	    "uid": 770238,
+	    "user": "Kevin Kofler",
+	    "version": 1
+          }, result.meta)
+          assert.deepEqual([], result.member_ids())
+          assert.deepEqual({
+	    "maxlat": 48.1984802,
+	    "maxlon": 16.3384675,
+	    "minlat": 48.1984802,
+	    "minlon": 16.3384675
+          }, result.bounds.bounds)
+	  // TODO: knowledge of internal structure of BoundingBox necessary?
+          assert.deepEqual({
+	    "lat": 48.1984802,
+	    "lon": 16.3384675
+          }, result.geometry)
+          assert.deepEqual({
+	    "lat": 48.1984802,
+	    "lon": 16.3384675
+          }, result.center)
         },
         function(err) {
           done()
