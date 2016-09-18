@@ -14,6 +14,9 @@ OverpassRelation.prototype.member_ids = function() {
   if(this._member_ids)
     return this._member_ids;
 
+  if(typeof this.data.members == 'undefined')
+    return null
+
   this._member_ids = [];
   for(var i = 0; i < this.data.members.length; i++) {
     var member = this.data.members[i];

@@ -250,7 +250,7 @@ Overpass.prototype._overpass_handle_result = function(context, err, results) {
     this.create_or_update_osm_object(el, context.todo_requests[id]);
 
     var members = this.overpass_elements[id].member_ids();
-    for(var j = 0; j < members.length; j++) {
+    if(members) for(var j = 0; j < members.length; j++) {
       if(!(members[j] in this.overpass_elements_member_of))
         this.overpass_elements_member_of[members[j]] = [ this.overpass_elements[id] ];
       else
