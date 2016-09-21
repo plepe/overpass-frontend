@@ -1,0 +1,4 @@
+.*.swp
+/test/conf.json
+/test/data/
+/node_modules/
