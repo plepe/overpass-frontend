@@ -180,6 +180,58 @@ describe('Overpass get', function() {
   })
 })
 
+describe('Overpass query by id with bbox option', function() {
+  it('First call', function(done) {
+    var query = [ 'w299709373', 'w299709375', 'w4583442', 'w299704585', 'n2832485845', 'n3037893162' ]
+    var expected = [ 'w299709373', 'w299709375', 'n3037893162' ]
+    var index_outside_bbox = [ 2, 3, 4, 5 ]
+    var bbox = {
+            minlon: 16.3384616,
+            minlat: 48.1990347,
+            maxlon: 16.3386118,
+            maxlat: 48.1991437
+          }
+
+    overpass.get(query.concat([]), { properties: Overpass.ALL, bbox: bbox },
+        function(err, result, index) {
+          if (result === false && index_outside_bbox.indexOf(index) == -1)
+              assert(false, 'Index ' + index + ' should return a valid result (' + query[index] + ')')
+
+          if(result !== false && expected.indexOf(result.id) == -1)
+            assert(false, 'Returning object ' + result.id + ' which should not be returned')
+        },
+        function(err) {
+          done()
+        }
+    )
+  })
+
+  it('Second call', function(done) {
+    var query = [ 'w299709373', 'w299709375', 'w4583442', 'w299704585', 'n2832485845', 'n3037882439', 'n3037893162' ]
+    var expected = [ 'w299709375', 'w299704585' ]
+    var index_outside_bbox = [ 0, 2, 4, 5, 6 ]
+    var bbox = {
+            minlat: 48.1996955,
+            minlon: 16.3381572,
+            maxlat: 48.1998337,
+            maxlon: 16.3382651
+          }
+
+    overpass.get(query.concat([]), { properties: Overpass.ALL, bbox: bbox },
+        function(err, result, index) {
+          if (result === false && index_outside_bbox.indexOf(index) == -1)
+              assert(false, 'Index ' + index + ' should return a valid result (' + query[index] + ')')
+
+          if(result !== false && expected.indexOf(result.id) == -1)
+            assert(false, 'Returning object ' + result.id + ' which should not be returned')
+        },
+        function(err) {
+          done()
+        }
+    )
+  })
+})
+
 describe('Overpass objects structure', function() {
   describe('Node', function() {
     it('Overpass.ID_ONLY', function(done) {

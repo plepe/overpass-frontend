@@ -46,7 +46,7 @@ Overpass.prototype.get = function(ids, options, feature_callback, final_callback
       delete(this.overpass_elements[ids[i]]);
 
   if(options.bbox) {
-    var bbox = convert_to_turf(options.bbox);
+    options.bbox = new BoundingBox(options.bbox);
   }
 
   this.overpass_requests.push({
@@ -112,6 +112,14 @@ Overpass.prototype._overpass_process = function() {
       if(ids[i] in this.overpass_elements) {
         var ob = this.overpass_elements[ids[i]];
         var ready = true;
+
+        // for bbox option, if object is (partly) loaded, but outside call
+        // feature_callback with 'false'
+        if(request.options.bbox && ob.bounds && !request.options.bbox.intersects(ob.bounds)) {
+          todo_callbacks.push([ request.feature_callback, false, i ]);
+          request.ids[i] = null;
+          continue;
+        }
 
         // not fully loaded
         if((ob !== false && ob !== null) && (request.options.properties & ob.properties) != request.options.properties) {
@@ -179,8 +187,8 @@ Overpass.prototype._overpass_process = function() {
     if(node_query != '') {
       query += '((' + node_query + ');)->.n;\n';
       if(bbox_query)
-        query += 'node.n' + bbox_query + ';\n';
-      query += 'out ' + out_options + ';\n';
+        query += '(node.n; - node.n' + bbox_query + '->.n);\nout ids bb qt;\n';
+      query += '.n out ' + out_options + ';\n';
     }
 
     if(way_query != '') {
@@ -229,25 +237,26 @@ Overpass.prototype._overpass_handle_result = function(context, err, results) {
   for(var i = 0; i < results.elements.length; i++) {
     var el = results.elements[i];
     var id = el.type.substr(0, 1) + el.id;
+    var request = context.todo_requests[id];
 
     // bounding box only result -> save to overpass_elements with bounds only
-    if((el.type == 'relation' && !('members' in el)) ||
-       (el.type == 'way' && !('geometry' in el))) {
-      var bbox_request = {
-        options: {
-          properties: Overpass.BBOX
-        }
-      };
+    if(request.options.bbox) {
+      var el_bbox = new BoundingBox(el)
 
-      if(id in this.overpass_elements)
-        this.overpass_elements[id].set_data(el, bbox_request);
-      else
-        this.overpass_elements[id] = this.create_osm_object(el, bbox_request);
+      if(!request.options.bbox.intersects(el_bbox)) {
+        var bbox_request = {
+          options: {
+            properties: Overpass.BBOX
+          }
+        };
 
-      continue;
+        this.create_or_update_osm_object(el, bbox_request);
+
+        continue;
+      }
     }
 
-    this.create_or_update_osm_object(el, context.todo_requests[id]);
+    this.create_or_update_osm_object(el, request);
 
     var members = this.overpass_elements[id].member_ids();
     if(members) for(var j = 0; j < members.length; j++) {
