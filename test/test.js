@@ -182,9 +182,9 @@ describe('Overpass get', function() {
 
 describe('Overpass query by id with bbox option', function() {
   it('First call', function(done) {
-    var query = [ 'w299709373', 'w299709375', 'w4583442', 'w299704585', 'n2832485845', 'n3037893162' ]
-    var expected = [ 'w299709373', 'w299709375', 'n3037893162' ]
-    var index_outside_bbox = [ 2, 3, 4, 5 ]
+    var query = [ 'w299709373', 'w299709375', 'w4583442', 'w299704585', 'n2832485845', 'n3037893162', 'r20313', 'r3636229', 'r3311614' ]
+    var expected = [ 'w299709373', 'w299709375', 'n3037893162', 'r3636229', 'r20313' ]
+    var index_outside_bbox = [ 2, 3, 4, 5, 8 ]
     var bbox = {
             minlon: 16.3384616,
             minlat: 48.1990347,
@@ -410,6 +410,20 @@ describe('Overpass objects structure', function() {
 	    "minlat": 48.1982148,
 	    "minlon": 16.3380726
           }, result.bounds.bounds)
+        },
+        function(err) {
+          done()
+        }
+      )
+    })
+  })
+
+  describe('Special objects', function() {
+    it('Relation without bounds -> bounds is undefined', function(done) {
+      overpass.removeFromCache('r20313')
+      overpass.get('r20313', { properties: Overpass.ALL },
+        function(err, result, index) {
+          assert.equal(undefined, result.bounds)
         },
         function(err) {
           done()
