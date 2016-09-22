@@ -1,5 +1,5 @@
 if(typeof require != 'undefined') {
-  var weight_sort = require('./weight_sort')
+  var weight_sort = require('weight-sort')
   var async = require('async')
   var http_load = require('./http_load')
   var BoundingBox = require('boundingbox')
