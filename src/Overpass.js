@@ -491,3 +491,5 @@ OverpassRelation = require('./OverpassRelation')
 
 if(typeof module != 'undefined' && module.exports)
   module.exports = Overpass
+if(typeof window != 'undefined')
+  window.Overpass = Overpass
