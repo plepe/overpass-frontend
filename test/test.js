@@ -4,6 +4,7 @@ var conf = JSON.parse(fs.readFileSync('test/conf.json', 'utf8'));
 var assert = require('assert')
 
 var Overpass = require('../src/Overpass')
+var BoundingBox = require('boundingbox')
 var overpass = new Overpass(conf.url)
 
 
@@ -378,6 +379,30 @@ describe('Overpass objects structure', function() {
         }
       )
     })
+
+    it('method isVisible()', function (done) {
+      overpass.get('n3037893169', { properties: Overpass.BBOX },
+        function (err, result, index) {
+          assert.equal(true, result.isVisible(new BoundingBox({
+              minlat: 48.198,
+              maxlat: 48.199,
+              minlon: 16.338,
+              maxlon: 16.339
+            }
+          )))
+          assert.equal(false, result.isVisible(new BoundingBox({
+              minlat: 48.197,
+              maxlat: 48.198,
+              minlon: 16.338,
+              maxlon: 16.339
+            }
+          )))
+        },
+        function (err) {
+          done()
+        }
+      )
+    })
   })
 
   describe('Way', function() {
@@ -393,6 +418,30 @@ describe('Overpass objects structure', function() {
           }, result.bounds.bounds)
         },
         function(err) {
+          done()
+        }
+      )
+    })
+
+    it('method isVisible()', function (done) {
+      overpass.get('w299709373', { properties: Overpass.BBOX },
+        function (err, result, index) {
+          assert.equal(true, result.isVisible(new BoundingBox({
+              minlat: 48.198,
+              maxlat: 48.199,
+              minlon: 16.338,
+              maxlon: 16.339
+            }
+          )))
+          assert.equal(false, result.isVisible(new BoundingBox({
+              minlat: 48.197,
+              maxlat: 48.198,
+              minlon: 16.338,
+              maxlon: 16.339
+            }
+          )))
+        },
+        function (err) {
           done()
         }
       )
@@ -416,6 +465,30 @@ describe('Overpass objects structure', function() {
         }
       )
     })
+
+    it('method isVisible()', function (done) {
+      overpass.get('r1980077', { properties: Overpass.BBOX },
+        function (err, result, index) {
+          assert.equal(true, result.isVisible(new BoundingBox({
+              minlat: 48.198,
+              maxlat: 48.199,
+              minlon: 16.338,
+              maxlon: 16.339
+            }
+          )))
+          assert.equal(false, result.isVisible(new BoundingBox({
+              minlat: 48.197,
+              maxlat: 48.198,
+              minlon: 16.338,
+              maxlon: 16.339
+            }
+          )))
+        },
+        function (err) {
+          done()
+        }
+      )
+    })
   })
 
   describe('Special objects', function() {
@@ -426,6 +499,30 @@ describe('Overpass objects structure', function() {
           assert.equal(undefined, result.bounds)
         },
         function(err) {
+          done()
+        }
+      )
+    })
+
+    it('method isVisible()', function (done) {
+      overpass.get('r20313', { properties: Overpass.BBOX },
+        function (err, result, index) {
+          assert.equal(null, result.isVisible(new BoundingBox({
+              minlat: 48.198,
+              maxlat: 48.199,
+              minlon: 16.338,
+              maxlon: 16.339
+            }
+          )))
+          assert.equal(null, result.isVisible(new BoundingBox({
+              minlat: 48.197,
+              maxlat: 48.198,
+              minlon: 16.338,
+              maxlon: 16.339
+            }
+          )))
+        },
+        function (err) {
           done()
         }
       )

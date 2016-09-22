@@ -93,4 +93,11 @@ OverpassObject.prototype.GeoJSONProperties = function() {
   return ret;
 }
 
+OverpassObject.prototype.isVisible = function(bbox) {
+  if(!this.bounds)
+    return null
+
+  return bbox.intersects(this.bounds)
+}
+
 module.exports = OverpassObject
