@@ -15,7 +15,8 @@
   "devDependencies": {
     "leaflet": "^0.7.0",
     "mocha": "*",
-    "browserify": "*"
+    "browserify": "*",
+    "escape-html": "*"
   },
   "scripts": {
     "test": "mocha",
