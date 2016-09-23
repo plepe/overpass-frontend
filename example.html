@@ -42,11 +42,12 @@ function check_update_map () {
   overpass.bbox_query('node[natural=tree];', bounds, {},
     function (err, ob) {
       if (!ob.feature) {
-        ob.feature = L.circle(ob.geometry, 3, {
+        ob.feature = L.circleMarker(ob.geometry, {
           color: 'red',
           fillColor: 'red',
           fillOpacity: 0.1,
-          weight: 1
+          weight: 1,
+          radius: 6
         })
         ob.feature.bindPopup('<pre>' + escapeHtml(JSON.stringify(ob.GeoJSON(), null, '  ')) + '</pre>')
       }
