@@ -69,3 +69,24 @@ Options:
 
 ## Overpass.abort_all()
 Abort all currently running requests. For each request the final callback will be called with the error 'abort'. The currently running server request will be finished and the data loaded into the cache, but no feature callbacks will be called.
+
+# OverpassObject: OverpassNode, OverpassWay, OverpassRelation
+Passed to the feature_callback function.
+## OverpassObject.leafletFeature(options)
+Returns a feature for adding to a Leaflet based map. As options all Path resp. Marker options are available, additionally:
+
+* nodeType: if the feature (or a relation member) is a node, create one of the following Layers: 'CircleMarker' (default), 'Circle', 'Marker'.
+* radius: if nodeType is 'Circle' or 'CircleMarker', use this value as radius.
+
+If the geometry is not available (e.g. it has not been loaded), will return `null`.
+
+Example:
+```js
+function(err, ob) { // feature_callback function
+  ob.leafletFeature({
+    nodeType: 'CircleMarker',
+    radius: 6,
+    fillColor: 'red'
+  }).addTo(map)
+}
+```

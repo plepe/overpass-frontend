@@ -33,4 +33,16 @@ OverpassNode.prototype.update_data = function(data, request) {
   this.constructor.super_.prototype.update_data.call(this, data, request)
 }
 
+OverpassNode.prototype.leafletFeature = function(options) {
+  switch(options.nodeType) {
+    case 'Marker':
+      return L.marker(this.geometry, options)
+    case 'Circle':
+      return L.circle(this.geometry, options.radius, options)
+    case 'CircleMarker':
+    default:
+      return L.circleMarker(this.geometry, options)
+  }
+}
+
 module.exports = OverpassNode

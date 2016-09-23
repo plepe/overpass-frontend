@@ -51,4 +51,15 @@ OverpassWay.prototype.GeoJSON = function() {
   };
 }
 
+OverpassWay.prototype.leafletFeature = function(options) {
+  if(!this.geometry)
+    return null
+
+  if(this.geometry[this.geometry.length - 1].lat == this.geometry[0].lat &&
+     this.geometry[this.geometry.length - 1].lon == this.geometry[0].lon)
+    return L.polygon(this.geometry, options)
+
+  return L.polyline(this.geometry, options)
+}
+
 module.exports = OverpassWay

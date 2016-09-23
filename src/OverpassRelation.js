@@ -27,4 +27,49 @@ OverpassRelation.prototype.member_ids = function() {
   return this._member_ids;
 }
 
+OverpassRelation.prototype.leafletFeature = function(options) {
+  if(!this.data.members)
+    return null
+
+  var features = []
+
+  for(var i = 0; i < this.data.members.length; i++) {
+    var member = this.data.members[i]
+
+    switch(member.type) {
+      case 'node':
+        switch(options.nodeType) {
+          case 'Marker':
+            var feature = L.marker(member, options)
+            break
+          case 'Circle':
+            var feature = L.circle(member, options.radius, options)
+            break
+          case 'CircleMarker':
+          default:
+            var feature = L.circleMarker(member, options)
+        }
+
+        features.push(feature)
+        break
+
+      case 'way':
+        if(member.geometry[member.geometry.length - 1].lat == member.geometry[0].lat &&
+           member.geometry[member.geometry.length - 1].lon == member.geometry[0].lon)
+          var feature = L.polygon(member.geometry, options)
+        else
+          var feature = L.polyline(member.geometry, options)
+
+        features.push(feature)
+        break
+
+      case 'relation':
+      default:
+        break
+    }
+  }
+
+  return L.featureGroup(features)
+}
+
 module.exports = OverpassRelation

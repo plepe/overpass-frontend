@@ -39,10 +39,14 @@ function check_update_map () {
   overpass.abort_all_requests()
 
   // Query all trees in the current view
-  overpass.bbox_query('node[natural=tree];', bounds, {},
+  overpass.bbox_query('node[natural=tree];', bounds,
+    {
+      properties: Overpass.ALL
+    },
     function (err, ob) {
       if (!ob.feature) {
-        ob.feature = L.circleMarker(ob.geometry, {
+        ob.feature = ob.leafletFeature({
+          nodeType: 'CircleMarker',
           color: 'red',
           fillColor: 'red',
           fillOpacity: 0.1,

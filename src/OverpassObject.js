@@ -100,4 +100,8 @@ OverpassObject.prototype.isVisible = function(bbox) {
   return bbox.intersects(this.bounds)
 }
 
+OverpassObject.prototype.leafletFeature = function(options) {
+  return null
+}
+
 module.exports = OverpassObject
