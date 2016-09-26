@@ -9,7 +9,11 @@ if(typeof require != 'undefined') {
 function Overpass(url, options) {
   this.url = url
   this.options = {
-    effort_per_query: 1024
+    effort_per_request: 1000,
+    effort_node: 1,
+    effort_way: 4,
+    effort_relation: 64,
+    time_gap: 10
   }
   for(var k in options)
     this.options[k] = options[k]
@@ -142,7 +146,7 @@ Overpass.prototype._overpass_process = function() {
         continue;
 
       // too much data - delay for next iteration
-      if(effort >= this.options.effort_per_query)
+      if(effort >= this.options.effort_per_request)
         continue;
 
       if(request.options.bbox) {

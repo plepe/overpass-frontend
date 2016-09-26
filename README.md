@@ -21,8 +21,11 @@ Options:
 
 | Option  | Type   | Description
 | ------- | ------ | ------------
-|         |        |
-
+| effort_per_request | number | To avoid huge requests to the Overpass API, the request will be split into smaller chunks. This value defines, at which effort the request will be sent. Default: 1000.
+| effort_node | number | The effort for request a node. Default: 1.
+| effort_way | number | The effort for request a way. Default: 4.
+| effort_relation | number | The effort for request a relation. Default: 64.
+| time_gap | number (ms) | A short time gap between two requests to the Overpass API. Default: 10 milliseconds.
 
 ## Overpass.get(ids, options, feature_callback, final_callback)
 Get a list of OpenStreetMap objects from Overpass API.
