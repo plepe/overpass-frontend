@@ -34,7 +34,7 @@ OverpassNode.prototype.update_data = function(data, request) {
 }
 
 OverpassNode.prototype.leafletFeature = function(options) {
-  switch(options.nodeType) {
+  switch('nodeType in options' ? options.nodeType : null) {
     case 'Marker':
       return L.marker(this.geometry, options)
     case 'Circle':
