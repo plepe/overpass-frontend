@@ -9,7 +9,7 @@ $env = array();
 $pipes = array();
 $cwd = getcwd();
 
-$process = proc_open('osm3s_query --db-dir=data/', $descriptorspec, $pipes, $cwd, $env);
+$process = proc_open('osm3s_query --concise --db-dir=data/', $descriptorspec, $pipes, $cwd, $env);
 
 if (is_resource($process)) {
     // $pipes now looks like this:
@@ -20,10 +20,43 @@ if (is_resource($process)) {
     fwrite($pipes[0], file_get_contents("php://input"));
     fclose($pipes[0]);
 
-    echo stream_get_contents($pipes[1]);
+    $content = stream_get_contents($pipes[1]);
     fclose($pipes[1]);
+
+    $error_stream = stream_get_contents($pipes[2]);
+    fclose($pipes[2]);
 
     // It is important that you close any pipes before calling
     // proc_close in order to avoid a deadlock
     $return_value = proc_close($process);
+
+    if ($error_stream === '') {
+      print $content;
+    }
+    else {
+      Header("HTTP/1.1 400 Bad Request");
+
+      print <<<EOT
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" lang="en"/>
+  <title>OSM3S Response</title>
+</head>
+<body>
+
+<p>The data included in this document is from www.openstreetmap.org. The data is made available under
+ ODbL.</p>
+EOT;
+
+foreach(explode("\n", $error_stream) as $l)
+  print "<p><strong style=\"color:#FF0000\">Error</strong>: {$l}</p>\n";
+
+print <<<EOT
+</body>
+</html>
+EOT;
+    }
 }
