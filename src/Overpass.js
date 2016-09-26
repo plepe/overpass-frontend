@@ -350,12 +350,14 @@ Overpass.prototype._overpass_process_query = function(request) {
     request: request
   };
 
-  http_load(
-    this.url,
-    null,
-    '[out:json]' + query_options + ';\n' + query + '\nout ' + overpass_out_options(request.options) + ';',
-    this._overpass_handle_process_query.bind(this, context)
-  );
+  setTimeout(function() {
+    http_load(
+      this.url,
+      null,
+      '[out:json]' + query_options + ';\n' + query + '\nout ' + overpass_out_options(request.options) + ';',
+      this._overpass_handle_process_query.bind(this, context)
+    );
+  }.bind(this), this.options.time_gap);
 }
 
 Overpass.prototype._overpass_handle_process_query = function(context, err, results) {
