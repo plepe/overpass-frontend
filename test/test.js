@@ -635,7 +635,7 @@ describe('Overpass objects structure', function() {
         }
       )
 
-      assert('OverpassRequest', req.constructor.name)
+      assert.equal('OverpassRequest', req.constructor.name)
     })
   })
 })
