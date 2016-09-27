@@ -2,6 +2,7 @@ if(typeof require != 'undefined') {
   var weight_sort = require('weight-sort')
   var async = require('async')
   var http_load = require('./http_load')
+  var remove_null_entries = require('./remove_null_entries')
   var BoundingBox = require('boundingbox')
   var keys = Object.keys || require('object-keys')
 }
@@ -64,6 +65,7 @@ Overpass.prototype.get = function(ids, options, feature_callback, final_callback
 
   this.overpass_requests.push(request)
 
+  this.overpass_requests = remove_null_entries(this.overpass_requests)
   this.overpass_requests = weight_sort(this.overpass_requests, 'priority');
 
   this._overpass_process();
@@ -222,9 +224,7 @@ Overpass.prototype._overpass_process = function() {
     }
   });
 
-  var p;
-  while((p = this.overpass_requests.indexOf(null)) != -1)
-    this.overpass_requests.splice(p, 1);
+  remove_null_entries(this.overpass_requests)
 
   if(query == '') {
     this.overpass_request_active = false;
@@ -364,6 +364,7 @@ Overpass.prototype.bbox_query = function(query, bounds, options, feature_callbac
 
   this.overpass_requests.push(request)
 
+  remove_null_entries(this.overpass_requests)
   this.overpass_requests = weight_sort(this.overpass_requests, 'priority');
 
   this._overpass_process();
