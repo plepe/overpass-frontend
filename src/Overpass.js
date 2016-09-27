@@ -238,6 +238,28 @@ Overpass.prototype._overpass_process = function() {
 }
 
 Overpass.prototype._overpass_handle_result = function(context, err, results) {
+  var request = context.request;
+
+  if(err) {
+    var done = []
+
+    for(var k in context.todo_requests) {
+      var request = context.todo_requests[k]
+
+      if(done.indexOf(request) == -1) {
+        // call final_callback for the request
+        request.final_callback(err)
+        // remove current request
+        this.overpass_requests[this.overpass_requests.indexOf(request)] = null
+        // we already handled this request
+        done.push(request)
+      }
+    }
+
+    this.overpass_request_active = false;
+    return
+  }
+
   for(var i = 0; i < results.elements.length; i++) {
     var el = results.elements[i];
     var id = el.type.substr(0, 1) + el.id;
@@ -366,6 +388,16 @@ Overpass.prototype._overpass_process_query = function(request) {
 
 Overpass.prototype._overpass_handle_process_query = function(context, err, results) {
   var request = context.request;
+
+  if(err) {
+    // call final_callback for the request
+    request.final_callback(err)
+    // remove current request
+    this.overpass_requests[this.overpass_requests.indexOf(request)] = null
+
+    this.overpass_request_active = false;
+    return
+  }
 
   this.overpass_bbox_query_cache[request.query][request.cache_id] = {};
 

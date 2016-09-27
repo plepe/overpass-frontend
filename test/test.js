@@ -528,4 +528,97 @@ describe('Overpass objects structure', function() {
       )
     })
   })
+
+  /*
+  describe('Serial requests', function() {
+    it('x', function (done) {
+      overpass.bbox_query(
+        'node[amenity=bench];',
+        {
+          minlon: 16.3384616,
+          minlat: 48.1990347,
+          maxlon: 16.3386118,
+          maxlat: 48.1991437
+        },
+        {
+          properties: Overpass.ID_ONLY
+        },
+        function(err, result, index) {
+        },
+        function(err) {
+        }
+      )
+      overpass.bbox_query(
+        'node[amenity=restaurant];',
+        {
+          minlon: 16.3384616,
+          minlat: 48.1990347,
+          maxlon: 16.3386118,
+          maxlat: 48.1991437
+        },
+        {
+          properties: Overpass.ID_ONLY
+        },
+        function(err, result, index) {
+        },
+        function(err) {
+          done()
+        }
+      )
+    })
+  })
+  */
+
+  describe('Error handling', function() {
+    it('Illegal bbox_query', function (done) {
+      overpass.bbox_query(
+        'node[amenity=bench]',
+        {
+          minlon: 16.3384616,
+          minlat: 48.1990347,
+          maxlon: 16.3386118,
+          maxlat: 48.1991437
+        },
+        {
+          properties: Overpass.ID_ONLY
+        },
+        function(err, result, index) {
+          assert(false, 'Query wrong, feature_callback should not be called')
+        },
+        function(err) {
+          if(err === null)
+            done('Query wrong, should not be successful')
+
+          else if(err == "line 3: parse error: ';' expected - 'out' found.\n\n")
+            done()
+
+          else
+            done('Wrong error message: ' + err)
+        }
+      )
+    })
+
+    it('Illegal ID', function (done) {
+      overpass.get([ 'na' ],
+        {
+          properties: Overpass.ID_ONLY
+        },
+        function(err, result, index) {
+          assert(false, 'Query wrong, feature_callback should not be called')
+        },
+        function(err) {
+          if(err === null)
+            done('Query wrong, should not be successful')
+
+          else if(err == "line 2: parse error: Unknown query clause\n" +
+            "line 2: parse error: ')' expected - 'a' found.\n" +
+            "line 2: parse error: An empty query is not allowed\n\n")
+            done()
+
+          else
+            done('Wrong error message: ' + err)
+        }
+      )
+    })
+  })
 })
