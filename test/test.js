@@ -621,4 +621,21 @@ describe('Overpass objects structure', function() {
       )
     })
   })
+
+  describe('OverpassRequest', function() {
+    it('get() should return OverpassRequest object', function (done) {
+      var req = overpass.get([ 'n3037893169' ],
+        {
+          properties: Overpass.ID_ONLY
+        },
+        function(err, result, index) {
+        },
+        function(err) {
+          done()
+        }
+      )
+
+      assert('OverpassRequest', req.constructor.name)
+    })
+  })
 })

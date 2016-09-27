@@ -48,6 +48,8 @@ Options:
 | bbox    | L.latLngBounds | Only include objects which intersect the given bbox. The feature_callback will be called anyway, but boolean false will be passed.
 | properties | bit array | Which properties of the features should be downloaded: OVERPASS_ID_ONLY, OVERPASS_BBOX, OVERPASS_TAGS, OVERPASS_GEOM, OVERPASS_META. Combine by binary OR: ``OVERPASS_ID | OVERPASS_BBOX``. Default: ``OVERPASS_BBOX | OVERPASS_TAGS | OVERPASS_MEMBERS``
 
+Returns an OverpassRequest object.
+
 ## Overpass.bbox_query(query, bbox, options, feature_callback, final_callback)
 Run the specified query in the specified bounding box.
 
@@ -69,6 +71,8 @@ Options:
 | call_ordered | boolean | When set to true, the function feature_callback will be called in some particular order (e.g. from order_approx_route_length).
 | properties | bit array | Which properties of the features should be downloaded: OVERPASS_ID_ONLY, OVERPASS_BBOX, OVERPASS_TAGS, OVERPASS_GEOM, OVERPASS_META. Combine by binary OR: ``OVERPASS_ID | OVERPASS_BBOX``. Default: ``OVERPASS_BBOX | OVERPASS_TAGS | OVERPASS_MEMBERS``
 | order_approx_route_length | boolean | Order objects by approximate route length (calculated from the diagonal of the bounding box)
+
+Returns an OverpassRequest object.
 
 ## Overpass.abort_all()
 Abort all currently running requests. For each request the final callback will be called with the error 'abort'. The currently running server request will be finished and the data loaded into the cache, but no feature callbacks will be called.
@@ -93,3 +97,6 @@ function(err, ob) { // feature_callback function
   }).addTo(map)
 }
 ```
+
+# OverpassRequest
+An object describing a request to the Overpass API.

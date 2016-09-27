@@ -53,18 +53,22 @@ Overpass.prototype.get = function(ids, options, feature_callback, final_callback
     options.bbox = new BoundingBox(options.bbox);
   }
 
-  this.overpass_requests.push({
+  var request = new OverpassRequest(this, {
     type: 'get',
     ids: ids,
     options: options,
     priority: 'priority' in options ? options.priority : 0,
     feature_callback: feature_callback,
     final_callback: final_callback
-  });
+  })
+
+  this.overpass_requests.push(request)
 
   this.overpass_requests = weight_sort(this.overpass_requests, 'priority');
 
   this._overpass_process();
+
+  return request
 }
 
 Overpass.prototype._overpass_process = function() {
@@ -345,7 +349,7 @@ Overpass.prototype.bbox_query = function(query, bounds, options, feature_callbac
     this.overpass_bbox_query_cache[query] = {};
   }
 
-  this.overpass_requests.push({
+  var request = new OverpassRequest(this, {
     type: 'bbox_query',
     query: query,
     bounds: bounds,
@@ -356,11 +360,15 @@ Overpass.prototype.bbox_query = function(query, bounds, options, feature_callbac
     priority: 'priority' in options ? options.priority : 0,
     feature_callback: feature_callback,
     final_callback: final_callback
-  });
+  })
+
+  this.overpass_requests.push(request)
 
   this.overpass_requests = weight_sort(this.overpass_requests, 'priority');
 
   this._overpass_process();
+
+  return request
 }
 
 Overpass.prototype._overpass_process_query = function(request) {
@@ -526,6 +534,7 @@ OverpassObject = require('./OverpassObject')
 OverpassNode = require('./OverpassNode')
 OverpassWay = require('./OverpassWay')
 OverpassRelation = require('./OverpassRelation')
+OverpassRequest = require('./OverpassRequest')
 
 if(typeof module != 'undefined' && module.exports)
   module.exports = Overpass
