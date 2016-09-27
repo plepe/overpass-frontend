@@ -5,9 +5,37 @@ if(typeof require != 'undefined') {
 function http_load(url, get_param, post_param, callback) {
   var req = new XMLHttpRequest();
   req.onreadystatechange = function() {
-    if(req.readyState == 4 && req.status == 200) {
-      var data = JSON.parse(req.responseText);
-      callback(null, data);
+    var data = null
+    var err = null
+
+    if(req.readyState == 4) {
+      if(req.status == 200) {
+        try {
+          data = JSON.parse(req.responseText)
+        }
+        catch (err) {
+          // err already set
+        }
+
+        callback(err, data)
+      }
+      else {
+        try {
+          err = JSON.parse(req.responseText)
+        }
+        catch (err) {
+          var lines = req.responseText.split(/\n/)
+          var err = ''
+
+          for (var i = 0; i < lines.length; i++) {
+            var m
+            if (m = lines[i].match(/<p><strong style="color:#FF0000">Error<\/strong>: (.*)<\/p>/))
+              err += m[1] + '\n'
+          }
+
+          callback(err, null)
+        }
+      }
     }
   }
 
