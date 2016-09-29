@@ -1,5 +1,5 @@
 if(typeof require != 'undefined') {
-  var weight_sort = require('weight-sort')
+  var weightSort = require('weight-sort')
   var async = require('async')
   var http_load = require('./http_load')
   var remove_null_entries = require('./remove_null_entries')
@@ -66,7 +66,7 @@ Overpass.prototype.get = function(ids, options, feature_callback, final_callback
   this.overpass_requests.push(request)
 
   this.overpass_requests = remove_null_entries(this.overpass_requests)
-  this.overpass_requests = weight_sort(this.overpass_requests, 'priority');
+  this.overpass_requests = weightSort(this.overpass_requests, 'priority');
 
   this._overpass_process();
 
@@ -340,7 +340,7 @@ Overpass.prototype.bbox_query = function(query, bounds, options, feature_callbac
       var todo = _overpass_process_query_bbox_grep(this.overpass_bbox_query_cache[query][cache_id], bounds);
 
       if(options.order_approx_route_length)
-        todo = weight_sort(todo);
+        todo = weightSort(todo);
 
       return this.get(keys(todo), options, feature_callback, final_callback);
     }
@@ -365,7 +365,7 @@ Overpass.prototype.bbox_query = function(query, bounds, options, feature_callbac
   this.overpass_requests.push(request)
 
   remove_null_entries(this.overpass_requests)
-  this.overpass_requests = weight_sort(this.overpass_requests, 'priority');
+  this.overpass_requests = weightSort(this.overpass_requests, 'priority');
 
   this._overpass_process();
 
@@ -426,7 +426,7 @@ Overpass.prototype._overpass_handle_process_query = function(context, err, resul
   var todo = _overpass_process_query_bbox_grep(this.overpass_bbox_query_cache[request.query][request.cache_id], request.bounds);
 
   if(request.options.order_approx_route_length)
-    todo = weight_sort(todo, 'approx_route_length');
+    todo = weightSort(todo, 'approx_route_length');
 
   this.get(keys(todo), request.get_options, request.feature_callback, request.final_callback);
 
