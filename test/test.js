@@ -120,7 +120,7 @@ describe('Overpass get', function() {
       var found = []
       var expected = [ 'n3037893162', 'n3037893163', 'n3037893164' ]
 
-      overpass.bbox_query(
+      overpass.BBoxQuery(
         'node[amenity=bench];',
         {
           minlon: 16.3384616,
@@ -150,7 +150,7 @@ describe('Overpass get', function() {
       var found = []
       var expected = [ 'w299709373', 'w299709375' ]
 
-      overpass.bbox_query(
+      overpass.BBoxQuery(
         'way[highway=footway];',
         {
           minlon: 16.3384616,
@@ -532,7 +532,7 @@ describe('Overpass objects structure', function() {
   /*
   describe('Serial requests', function() {
     it('x', function (done) {
-      overpass.bbox_query(
+      overpass.BBoxQuery(
         'node[amenity=bench];',
         {
           minlon: 16.3384616,
@@ -548,7 +548,7 @@ describe('Overpass objects structure', function() {
         function(err) {
         }
       )
-      overpass.bbox_query(
+      overpass.BBoxQuery(
         'node[amenity=restaurant];',
         {
           minlon: 16.3384616,
@@ -570,8 +570,8 @@ describe('Overpass objects structure', function() {
   */
 
   describe('Error handling', function() {
-    it('Illegal bbox_query', function (done) {
-      overpass.bbox_query(
+    it('Illegal BBoxQuery', function (done) {
+      overpass.BBoxQuery(
         'node[amenity=bench]',
         {
           minlon: 16.3384616,

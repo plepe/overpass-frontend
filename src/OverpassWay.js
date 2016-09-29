@@ -1,44 +1,52 @@
 var util = require('util')
 var OverpassObject = require('./OverpassObject')
 
+// so that the linter does not complain
+if (typeof L === 'undefined') {
+  var L
+}
+
 util.inherits(OverpassWay, OverpassObject)
-function OverpassWay() {
-  OverpassObject.call(this);
+function OverpassWay () {
+  OverpassObject.call(this)
 }
 
-OverpassWay.prototype.update_data = function(data, request) {
-  if(data.nodes) {
-    this.nodes = data.nodes;
+OverpassWay.prototype.updateData = function (data, request) {
+  if (data.nodes) {
+    this.nodes = data.nodes
   }
 
-  if(data.geometry) {
-    this.geometry = data.geometry;
+  if (data.geometry) {
+    this.geometry = data.geometry
   }
 
-  this.constructor.super_.prototype.update_data.call(this, data, request)
+  this.constructor.super_.prototype.updateData.call(this, data, request)
 }
 
-OverpassWay.prototype.member_ids = function() {
-  if(this._member_ids)
-    return this._member_ids;
-
-  if(!this.nodes)
-    return null;
-
-  this._member_ids = [];
-  for(var i = 0; i < this.nodes.length; i++) {
-    var member = this.nodes[i];
-
-    this._member_ids.push('n' + member);
+OverpassWay.prototype.member_ids = function () {
+  if (this._member_ids) {
+    return this._member_ids
   }
 
-  return this._member_ids;
+  if (!this.nodes) {
+    return null
+  }
+
+  this._member_ids = []
+  for (var i = 0; i < this.nodes.length; i++) {
+    var member = this.nodes[i]
+
+    this._member_ids.push('n' + member)
+  }
+
+  return this._member_ids
 }
 
-OverpassWay.prototype.GeoJSON = function() {
-  var coordinates = [];
-  for(var i = 0; i < this.geometry.length; i++)
-    coordinates.push([ this.geometry[i].lon, this.geometry[i].lat ]);
+OverpassWay.prototype.GeoJSON = function () {
+  var coordinates = []
+  for (var i = 0; i < this.geometry.length; i++) {
+    coordinates.push([ this.geometry[i].lon, this.geometry[i].lat ])
+  }
 
   return {
     type: 'Feature',
@@ -48,16 +56,18 @@ OverpassWay.prototype.GeoJSON = function() {
       coordinates: coordinates
     },
     properties: this.GeoJSONProperties()
-  };
+  }
 }
 
-OverpassWay.prototype.leafletFeature = function(options) {
-  if(!this.geometry)
+OverpassWay.prototype.leafletFeature = function (options) {
+  if (!this.geometry) {
     return null
+  }
 
-  if(this.geometry[this.geometry.length - 1].lat == this.geometry[0].lat &&
-     this.geometry[this.geometry.length - 1].lon == this.geometry[0].lon)
+  if (this.geometry[this.geometry.length - 1].lat === this.geometry[0].lat &&
+     this.geometry[this.geometry.length - 1].lon === this.geometry[0].lon) {
     return L.polygon(this.geometry, options)
+  }
 
   return L.polyline(this.geometry, options)
 }

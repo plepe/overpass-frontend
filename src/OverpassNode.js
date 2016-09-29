@@ -2,12 +2,17 @@ var util = require('util')
 var OverpassObject = require('./OverpassObject')
 var BoundingBox = require('boundingbox')
 
-util.inherits(OverpassNode, OverpassObject)
-function OverpassNode() {
-  OverpassObject.call(this);
+// so that the linter does not complain
+if (typeof L === 'undefined') {
+  var L
 }
 
-OverpassNode.prototype.GeoJSON = function() {
+util.inherits(OverpassNode, OverpassObject)
+function OverpassNode () {
+  OverpassObject.call(this)
+}
+
+OverpassNode.prototype.GeoJSON = function () {
   return {
     type: 'Feature',
     id: this.type + '/' + this.osm_id,
@@ -16,25 +21,25 @@ OverpassNode.prototype.GeoJSON = function() {
       coordinates: [ this.geometry.lon, this.geometry.lat ]
     },
     properties: this.GeoJSONProperties()
-  };
+  }
 }
 
-OverpassNode.prototype.update_data = function(data, request) {
-  if(data.lat) {
+OverpassNode.prototype.updateData = function (data, request) {
+  if (data.lat) {
     this.geometry = {
       lat: data.lat,
       lon: data.lon
-    };
+    }
 
     this.bounds = new BoundingBox(data)
     this.center = this.bounds.getCenter()
   }
 
-  this.constructor.super_.prototype.update_data.call(this, data, request)
+  this.constructor.super_.prototype.updateData.call(this, data, request)
 }
 
-OverpassNode.prototype.leafletFeature = function(options) {
-  switch('nodeType in options' ? options.nodeType : null) {
+OverpassNode.prototype.leafletFeature = function (options) {
+  switch ('nodeType' in options ? options.nodeType : null) {
     case 'Marker':
       return L.marker(this.geometry, options)
     case 'Circle':
