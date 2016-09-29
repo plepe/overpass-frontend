@@ -2,11 +2,11 @@
 A JavaScript (NodeJS/Browser) library to easily access data from OpenStreetMap via Overpass API. The objects can directly be used with LeafletJS or exported to GeoJSON. Data will be cached locally, optionally by using LocalStorage (or similar).
 
 # API
-## Overpass(url, options)
+## OverpassFrontend(url, options)
 The constructor for accessing the Overpass API.
 
 ```js
-var overpass = new Overpass('//overpass-api.de/api/', {
+var overpassFrontend = new OverpassFrontend('//overpass-api.de/api/', {
 });
 ```
 
@@ -27,7 +27,7 @@ Options:
 | effortRelation | number | The effort for request a relation. Default: 64.
 | timeGap | number (ms) | A short time gap between two requests to the Overpass API. Default: 10 milliseconds.
 
-## Overpass.get(ids, options, featureCallback, finalCallback)
+## OverpassFrontend.get(ids, options, featureCallback, finalCallback)
 Get a list of OpenStreetMap objects from Overpass API.
 
 Parameters:
@@ -50,7 +50,7 @@ Options:
 
 Returns an OverpassRequest object.
 
-## Overpass.BBoxQuery(query, bbox, options, featureCallback, finalCallback)
+## OverpassFrontend.BBoxQuery(query, bbox, options, featureCallback, finalCallback)
 Run the specified query in the specified bounding box.
 
 Parameters:
@@ -74,7 +74,7 @@ Options:
 
 Returns an OverpassRequest object.
 
-## Overpass.abortAllRequests()
+## OverpassFrontend.abortAllRequests()
 Abort all currently running requests. For each request the final callback will be called with the error 'abort'. The currently running server request will be finished and the data loaded into the cache, but no feature callbacks will be called.
 
 # OverpassObject: OverpassNode, OverpassWay, OverpassRelation

@@ -3,15 +3,15 @@ var conf = JSON.parse(fs.readFileSync('test/conf.json', 'utf8'));
 
 var assert = require('assert')
 
-var Overpass = require('../src/Overpass')
+var OverpassFrontend = require('../src/OverpassFrontend')
 var BoundingBox = require('boundingbox')
-var overpass = new Overpass(conf.url)
+var overpassFrontend = new OverpassFrontend(conf.url)
 
 
 describe('Overpass get', function() {
   describe('single id', function() {
     it('should return an existing relation', function(done) {
-      overpass.get('r910885', { properties: Overpass.ALL },
+      overpassFrontend.get('r910885', { properties: OverpassFrontend.ALL },
         function(err, result, index) {
           if(err)
             done(err)
@@ -26,7 +26,7 @@ describe('Overpass get', function() {
     })
 
     it('should return null for a missing object', function(done) {
-      overpass.get('r32', { properties: Overpass.ALL },
+      overpassFrontend.get('r32', { properties: OverpassFrontend.ALL },
         function(err, result, index) {
           if(result !== null) {
             done('r32 should not exist!')
@@ -40,7 +40,7 @@ describe('Overpass get', function() {
 
   describe('GeoJSON', function() {
     it('node', function(done) {
-      overpass.get('n3037893169', { properties: Overpass.ALL },
+      overpassFrontend.get('n3037893169', { properties: OverpassFrontend.ALL },
         function(err, result, index) {
 	  var geojson = result.GeoJSON();
           //console.log(JSON.stringify(geojson, null, '  '))
@@ -74,7 +74,7 @@ describe('Overpass get', function() {
     })
 
     it('way', function(done) {
-      overpass.get('w146678749', { properties: Overpass.ALL },
+      overpassFrontend.get('w146678749', { properties: OverpassFrontend.ALL },
         function(err, result, index) {
 	  var geojson = result.GeoJSON();
 
@@ -120,7 +120,7 @@ describe('Overpass get', function() {
       var found = []
       var expected = [ 'n3037893162', 'n3037893163', 'n3037893164' ]
 
-      overpass.BBoxQuery(
+      overpassFrontend.BBoxQuery(
         'node[amenity=bench];',
         {
           minlon: 16.3384616,
@@ -129,7 +129,7 @@ describe('Overpass get', function() {
           maxlat: 48.1991437
         },
         {
-          properties: Overpass.ID_ONLY
+          properties: OverpassFrontend.ID_ONLY
         },
         function(err, result, index) {
           found.push(result.id)
@@ -150,7 +150,7 @@ describe('Overpass get', function() {
       var found = []
       var expected = [ 'w299709373', 'w299709375' ]
 
-      overpass.BBoxQuery(
+      overpassFrontend.BBoxQuery(
         'way[highway=footway];',
         {
           minlon: 16.3384616,
@@ -159,7 +159,7 @@ describe('Overpass get', function() {
           maxlat: 48.1991437
         },
         {
-          properties: Overpass.ID_ONLY
+          properties: OverpassFrontend.ID_ONLY
         },
         function(err, result, index) {
           found.push(result.id)
@@ -193,7 +193,7 @@ describe('Overpass query by id with bbox option', function() {
             maxlat: 48.1991437
           }
 
-    overpass.get(query.concat([]), { properties: Overpass.ALL, bbox: bbox },
+    overpassFrontend.get(query.concat([]), { properties: OverpassFrontend.ALL, bbox: bbox },
         function(err, result, index) {
           if (result === false && index_outside_bbox.indexOf(index) == -1)
               assert(false, 'Index ' + index + ' should return a valid result (' + query[index] + ')')
@@ -218,7 +218,7 @@ describe('Overpass query by id with bbox option', function() {
             maxlon: 16.3382651
           }
 
-    overpass.get(query.concat([]), { properties: Overpass.ALL, bbox: bbox },
+    overpassFrontend.get(query.concat([]), { properties: OverpassFrontend.ALL, bbox: bbox },
         function(err, result, index) {
           if (result === false && index_outside_bbox.indexOf(index) == -1)
               assert(false, 'Index ' + index + ' should return a valid result (' + query[index] + ')')
@@ -236,8 +236,8 @@ describe('Overpass query by id with bbox option', function() {
 describe('Overpass objects structure', function() {
   describe('Node', function() {
     it('Overpass.ID_ONLY', function(done) {
-      overpass.removeFromCache('n3037893169')
-      overpass.get('n3037893169', { properties: Overpass.ID_ONLY },
+      overpassFrontend.removeFromCache('n3037893169')
+      overpassFrontend.get('n3037893169', { properties: OverpassFrontend.ID_ONLY },
         function(err, result, index) {
           assert.equal('n3037893169', result.id)
           assert.equal(3037893169, result.osm_id)
@@ -249,8 +249,8 @@ describe('Overpass objects structure', function() {
       )
     })
     it('Overpass.TAGS', function(done) {
-      overpass.removeFromCache('n3037893169')
-      overpass.get('n3037893169', { properties: Overpass.TAGS },
+      overpassFrontend.removeFromCache('n3037893169')
+      overpassFrontend.get('n3037893169', { properties: OverpassFrontend.TAGS },
         function(err, result, index) {
           assert.deepEqual({
             "amenity": "bench",
@@ -265,8 +265,8 @@ describe('Overpass objects structure', function() {
       )
     })
     it('Overpass.META', function(done) {
-      overpass.removeFromCache('n3037893169')
-      overpass.get('n3037893169', { properties: Overpass.META },
+      overpassFrontend.removeFromCache('n3037893169')
+      overpassFrontend.get('n3037893169', { properties: OverpassFrontend.META },
         function(err, result, index) {
           assert.deepEqual({
 	    "changeset": 24967165,
@@ -282,8 +282,8 @@ describe('Overpass objects structure', function() {
       )
     })
     it('Overpass.MEMBERS', function(done) {
-      overpass.removeFromCache('n3037893169')
-      overpass.get('n3037893169', { properties: Overpass.MEMBERS },
+      overpassFrontend.removeFromCache('n3037893169')
+      overpassFrontend.get('n3037893169', { properties: OverpassFrontend.MEMBERS },
         function(err, result, index) {
           assert.deepEqual([], result.member_ids())
         },
@@ -293,8 +293,8 @@ describe('Overpass objects structure', function() {
       )
     })
     it('Overpass.BBOX', function(done) {
-      overpass.removeFromCache('n3037893169')
-      overpass.get('n3037893169', { properties: Overpass.BBOX },
+      overpassFrontend.removeFromCache('n3037893169')
+      overpassFrontend.get('n3037893169', { properties: OverpassFrontend.BBOX },
         function(err, result, index) {
           assert.deepEqual({
 	    "maxlat": 48.1984802,
@@ -310,8 +310,8 @@ describe('Overpass objects structure', function() {
       )
     })
     it('Overpass.GEOM', function(done) {
-      overpass.removeFromCache('n3037893169')
-      overpass.get('n3037893169', { properties: Overpass.GEOM },
+      overpassFrontend.removeFromCache('n3037893169')
+      overpassFrontend.get('n3037893169', { properties: OverpassFrontend.GEOM },
         function(err, result, index) {
           assert.deepEqual({
 	    "lat": 48.1984802,
@@ -324,8 +324,8 @@ describe('Overpass objects structure', function() {
       )
     })
     it('Overpass.CENTER', function(done) {
-      overpass.removeFromCache('n3037893169')
-      overpass.get('n3037893169', { properties: Overpass.CENTER },
+      overpassFrontend.removeFromCache('n3037893169')
+      overpassFrontend.get('n3037893169', { properties: OverpassFrontend.CENTER },
         function(err, result, index) {
           assert.deepEqual({
 	    "lat": 48.1984802,
@@ -338,8 +338,8 @@ describe('Overpass objects structure', function() {
       )
     })
     it('Overpass.ALL', function(done) {
-      overpass.removeFromCache('n3037893169')
-      overpass.get('n3037893169', { properties: Overpass.ALL },
+      overpassFrontend.removeFromCache('n3037893169')
+      overpassFrontend.get('n3037893169', { properties: OverpassFrontend.ALL },
         function(err, result, index) {
           assert.equal('n3037893169', result.id)
           assert.equal(3037893169, result.osm_id)
@@ -381,7 +381,7 @@ describe('Overpass objects structure', function() {
     })
 
     it('method isVisible()', function (done) {
-      overpass.get('n3037893169', { properties: Overpass.BBOX },
+      overpassFrontend.get('n3037893169', { properties: OverpassFrontend.BBOX },
         function (err, result, index) {
           assert.equal(true, result.isVisible(new BoundingBox({
               minlat: 48.198,
@@ -407,8 +407,8 @@ describe('Overpass objects structure', function() {
 
   describe('Way', function() {
     it('Overpass.BBOX', function(done) {
-      overpass.removeFromCache('w299709373')
-      overpass.get('w299709373', { properties: Overpass.BBOX },
+      overpassFrontend.removeFromCache('w299709373')
+      overpassFrontend.get('w299709373', { properties: OverpassFrontend.BBOX },
         function(err, result, index) {
           assert.deepEqual({
 	    "maxlat": 48.1996439,
@@ -424,7 +424,7 @@ describe('Overpass objects structure', function() {
     })
 
     it('method isVisible()', function (done) {
-      overpass.get('w299709373', { properties: Overpass.BBOX },
+      overpassFrontend.get('w299709373', { properties: OverpassFrontend.BBOX },
         function (err, result, index) {
           assert.equal(true, result.isVisible(new BoundingBox({
               minlat: 48.198,
@@ -450,8 +450,8 @@ describe('Overpass objects structure', function() {
 
   describe('Relation', function() {
     it('Overpass.BBOX', function(done) {
-      overpass.removeFromCache('r1980077')
-      overpass.get('r1980077', { properties: Overpass.BBOX },
+      overpassFrontend.removeFromCache('r1980077')
+      overpassFrontend.get('r1980077', { properties: OverpassFrontend.BBOX },
         function(err, result, index) {
           assert.deepEqual({
 	    "maxlat": 48.1987724,
@@ -467,7 +467,7 @@ describe('Overpass objects structure', function() {
     })
 
     it('method isVisible()', function (done) {
-      overpass.get('r1980077', { properties: Overpass.BBOX },
+      overpassFrontend.get('r1980077', { properties: OverpassFrontend.BBOX },
         function (err, result, index) {
           assert.equal(true, result.isVisible(new BoundingBox({
               minlat: 48.198,
@@ -493,8 +493,8 @@ describe('Overpass objects structure', function() {
 
   describe('Special objects', function() {
     it('Relation without bounds -> bounds is undefined', function(done) {
-      overpass.removeFromCache('r20313')
-      overpass.get('r20313', { properties: Overpass.ALL },
+      overpassFrontend.removeFromCache('r20313')
+      overpassFrontend.get('r20313', { properties: OverpassFrontend.ALL },
         function(err, result, index) {
           assert.equal(undefined, result.bounds)
         },
@@ -505,7 +505,7 @@ describe('Overpass objects structure', function() {
     })
 
     it('method isVisible()', function (done) {
-      overpass.get('r20313', { properties: Overpass.BBOX },
+      overpassFrontend.get('r20313', { properties: OverpassFrontend.BBOX },
         function (err, result, index) {
           assert.equal(null, result.isVisible(new BoundingBox({
               minlat: 48.198,
@@ -541,7 +541,7 @@ describe('Overpass objects structure', function() {
           maxlat: 48.1991437
         },
         {
-          properties: Overpass.ID_ONLY
+          properties: OverpassFrontend.ID_ONLY
         },
         function(err, result, index) {
         },
@@ -557,7 +557,7 @@ describe('Overpass objects structure', function() {
           maxlat: 48.1991437
         },
         {
-          properties: Overpass.ID_ONLY
+          properties: OverpassFrontend.ID_ONLY
         },
         function(err, result, index) {
         },
@@ -571,7 +571,7 @@ describe('Overpass objects structure', function() {
 
   describe('Error handling', function() {
     it('Illegal BBoxQuery', function (done) {
-      overpass.BBoxQuery(
+      overpassFrontend.BBoxQuery(
         'node[amenity=bench]',
         {
           minlon: 16.3384616,
@@ -580,7 +580,7 @@ describe('Overpass objects structure', function() {
           maxlat: 48.1991437
         },
         {
-          properties: Overpass.ID_ONLY
+          properties: OverpassFrontend.ID_ONLY
         },
         function(err, result, index) {
           assert(false, 'Query wrong, feature_callback should not be called')
@@ -599,9 +599,9 @@ describe('Overpass objects structure', function() {
     })
 
     it('Illegal ID', function (done) {
-      overpass.get([ 'na' ],
+      overpassFrontend.get([ 'na' ],
         {
-          properties: Overpass.ID_ONLY
+          properties: OverpassFrontend.ID_ONLY
         },
         function(err, result, index) {
           assert(false, 'Query wrong, feature_callback should not be called')
@@ -624,9 +624,9 @@ describe('Overpass objects structure', function() {
 
   describe('OverpassRequest', function() {
     it('get() should return OverpassRequest object', function (done) {
-      var req = overpass.get([ 'n3037893169' ],
+      var req = overpassFrontend.get([ 'n3037893169' ],
         {
-          properties: Overpass.ID_ONLY
+          properties: OverpassFrontend.ID_ONLY
         },
         function(err, result, index) {
         },

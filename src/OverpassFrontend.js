@@ -14,7 +14,7 @@ if (typeof require !== 'undefined') {
   var OverpassRequest = require('./OverpassRequest')
 }
 
-function Overpass (url, options) {
+function OverpassFrontend (url, options) {
   this.url = url
   this.options = {
     effortPerRequest: 1000,
@@ -36,17 +36,17 @@ function Overpass (url, options) {
 }
 
 // Defines
-Overpass.ID_ONLY = 0
-Overpass.TAGS = 1
-Overpass.META = 2
-Overpass.MEMBERS = 4
-Overpass.BBOX = 8
-Overpass.GEOM = 16
-Overpass.CENTER = 32
-Overpass.ALL = 63
-Overpass.DEFAULT = 13
+OverpassFrontend.ID_ONLY = 0
+OverpassFrontend.TAGS = 1
+OverpassFrontend.META = 2
+OverpassFrontend.MEMBERS = 4
+OverpassFrontend.BBOX = 8
+OverpassFrontend.GEOM = 16
+OverpassFrontend.CENTER = 32
+OverpassFrontend.ALL = 63
+OverpassFrontend.DEFAULT = 13
 
-Overpass.prototype.get = function (ids, options, featureCallback, finalCallback) {
+OverpassFrontend.prototype.get = function (ids, options, featureCallback, finalCallback) {
   if (typeof ids === 'string') {
     ids = [ ids ]
   }
@@ -54,7 +54,7 @@ Overpass.prototype.get = function (ids, options, featureCallback, finalCallback)
     options = {}
   }
   if (typeof options.properties === 'undefined') {
-    options.properties = Overpass.DEFAULT
+    options.properties = OverpassFrontend.DEFAULT
   }
 
   for (var i = 0; i < ids.length; i++) {
@@ -86,7 +86,7 @@ Overpass.prototype.get = function (ids, options, featureCallback, finalCallback)
   return request
 }
 
-Overpass.prototype._overpass_process = function () {
+OverpassFrontend.prototype._overpass_process = function () {
   if (this.overpassRequestActive) {
     return
   }
@@ -183,7 +183,7 @@ Overpass.prototype._overpass_process = function () {
       if (request.options.bbox) {
         // check if we already know the bbox of the element; if yes, don't try
         // to load object if it does not intersect bounds
-        if (ids[i] in this.overpassElements && (this.overpassElements[ids[i]].properties & Overpass.BBOX)) {
+        if (ids[i] in this.overpassElements && (this.overpassElements[ids[i]].properties & OverpassFrontend.BBOX)) {
           if (!request.options.bbox.intersects(this.overpassElements[ids[i]].bounds)) {
             continue
           }
@@ -270,7 +270,7 @@ Overpass.prototype._overpass_process = function () {
   }.bind(this), this.options.timeGap)
 }
 
-Overpass.prototype._overpass_handle_result = function (context, err, results) {
+OverpassFrontend.prototype._overpass_handle_result = function (context, err, results) {
   var el
   var id
 
@@ -306,7 +306,7 @@ Overpass.prototype._overpass_handle_result = function (context, err, results) {
       if (!request.options.bbox.intersects(elBBox)) {
         var BBoxRequest = {
           options: {
-            properties: Overpass.BBOX
+            properties: OverpassFrontend.BBOX
           }
         }
 
@@ -355,9 +355,9 @@ Overpass.prototype._overpass_handle_result = function (context, err, results) {
  * @param {function} featureCallback Will be called for each object in the order of the IDs in parameter 'ids'. Will be passed: 1. err (if an error occured, otherwise null), 2. the object or null.
  * @param {function} finalCallback Will be called after the last feature. Will be passed: 1. err (if an error occured, otherwise null).
  */
-Overpass.prototype.BBoxQuery = function (query, bounds, options, featureCallback, finalCallback) {
+OverpassFrontend.prototype.BBoxQuery = function (query, bounds, options, featureCallback, finalCallback) {
   var boundsOptions = {
-    properties: Overpass.ID_ONLY | Overpass.BBOX,
+    properties: OverpassFrontend.ID_ONLY | OverpassFrontend.BBOX,
     orderApproxRouteLength: options.orderApproxRouteLength
   }
 
@@ -404,7 +404,7 @@ Overpass.prototype.BBoxQuery = function (query, bounds, options, featureCallback
   return request
 }
 
-Overpass.prototype._overpass_process_query = function (request) {
+OverpassFrontend.prototype._overpass_process_query = function (request) {
   var BBoxString = request.tileBounds.toBBoxString()
   BBoxString = BBoxString.split(/,/)
   BBoxString = BBoxString[1] + ',' + BBoxString[0] + ',' +
@@ -427,7 +427,7 @@ Overpass.prototype._overpass_process_query = function (request) {
   }.bind(this), this.options.timeGap)
 }
 
-Overpass.prototype._overpass_handle_process_query = function (context, err, results) {
+OverpassFrontend.prototype._overpass_handle_process_query = function (context, err, results) {
   var request = context.request
 
   if (err) {
@@ -468,7 +468,7 @@ Overpass.prototype._overpass_handle_process_query = function (context, err, resu
   this._overpass_process()
 }
 
-Overpass.prototype.abortAllRequests = function () {
+OverpassFrontend.prototype.abortAllRequests = function () {
   for (var j = 0; j < this.overpassRequests.length; j++) {
     if (this.overpassRequests[j] === null) {
       continue
@@ -480,7 +480,7 @@ Overpass.prototype.abortAllRequests = function () {
   this.overpassRequests = []
 }
 
-Overpass.prototype.removeFromCache = function (ids) {
+OverpassFrontend.prototype.removeFromCache = function (ids) {
   if (typeof ids === 'string') {
     ids = [ ids ]
   }
@@ -490,7 +490,7 @@ Overpass.prototype.removeFromCache = function (ids) {
   }
 }
 
-Overpass.prototype.createOrUpdateOSMObject = function (el, request) {
+OverpassFrontend.prototype.createOrUpdateOSMObject = function (el, request) {
   var id = el.type.substr(0, 1) + el.id
   var ob = null
 
@@ -531,25 +531,25 @@ function overpassRegexpEscape (s) {
 function overpassOutOptions (options) {
   var outOptions = ''
 
-  if (options.properties & Overpass.META) {
+  if (options.properties & OverpassFrontend.META) {
     outOptions += 'meta '
-  } else if (options.properties & Overpass.TAGS) {
-    if (options.properties & Overpass.MEMBERS) {
+  } else if (options.properties & OverpassFrontend.TAGS) {
+    if (options.properties & OverpassFrontend.MEMBERS) {
       outOptions += 'body '
     } else {
       outOptions += 'tags '
     }
-  } else if (options.properties & Overpass.MEMBERS) {
+  } else if (options.properties & OverpassFrontend.MEMBERS) {
     outOptions += 'skel '
   } else {
     outOptions += 'ids '
   }
 
-  if (options.properties & Overpass.GEOM) {
+  if (options.properties & OverpassFrontend.GEOM) {
     outOptions += 'geom '
-  } else if (options.properties & Overpass.BBOX) {
+  } else if (options.properties & OverpassFrontend.BBOX) {
     outOptions += 'bb '
-  } else if (options.properties & Overpass.CENTER) {
+  } else if (options.properties & OverpassFrontend.CENTER) {
     outOptions += 'center '
   }
 
@@ -571,8 +571,8 @@ function _overpassProcessQueryBBoxGrep (elements, bbox) {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = Overpass
+  module.exports = OverpassFrontend
 }
 if (typeof window !== 'undefined') {
-  window.Overpass = Overpass
+  window.OverpassFrontend = OverpassFrontend
 }

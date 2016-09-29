@@ -1,5 +1,5 @@
-var Overpass = require('./Overpass')
 var BoundingBox = require('boundingbox')
+var OverpassFrontend = require('./OverpassFrontend')
 
 function OverpassObject () {
   this.data = {}
@@ -33,13 +33,13 @@ OverpassObject.prototype.updateData = function (data, request) {
     if (!this.bounds || request.options.bbox.intersects(this.bounds)) {
       this.properties = this.properties | request.options.properties
     } else {
-      this.properties = this.properties | Overpass.BBOX | Overpass.CENTER
+      this.properties = this.properties | OverpassFrontend.BBOX | OverpassFrontend.CENTER
     }
   } else {
     this.properties = this.properties | request.options.properties
   }
 
-  if (request.options.properties & Overpass.TAGS) {
+  if (request.options.properties & OverpassFrontend.TAGS) {
     if (typeof data.tags === 'undefined') {
       this.tags = {}
     } else {
