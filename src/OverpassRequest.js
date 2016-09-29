@@ -6,4 +6,8 @@ function OverpassRequest (overpass, data) {
   }
 }
 
+OverpassRequest.prototype.abort = function () {
+  return this.overpass.abortRequest(this)
+}
+
 module.exports = OverpassRequest

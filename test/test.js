@@ -747,5 +747,40 @@ describe('Overpass objects structure', function() {
 
       assert.equal('OverpassRequest', req.constructor.name)
     })
+
+    it('abort() should abort request', function (done) {
+      var req = overpassFrontend.get([ 'n3037893161' ],
+        {
+          properties: OverpassFrontend.ID_ONLY
+        },
+        function(err, result, index) {
+          assert(false, 'Should not call feature_callback, as request gets aborted.')
+        },
+        function(err) {
+          assert.equal('abort', err)
+          done()
+        }
+      )
+
+      req.abort()
+    })
+
+    it('abort() should abort request (even when object has already been loaded)', function (done) {
+      var req = overpassFrontend.get([ 'n3037893169' ],
+        {
+          properties: OverpassFrontend.ID_ONLY
+        },
+        function(err, result, index) {
+          assert(false, 'Should not call feature_callback, as request gets aborted.')
+        },
+        function(err) {
+          assert.equal('abort', err)
+          done()
+        }
+      )
+
+      req.abort()
+    })
+
   })
 })
