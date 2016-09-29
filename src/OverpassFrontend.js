@@ -511,8 +511,8 @@ OverpassFrontend.prototype.createOrUpdateOSMObject = function (el, request) {
   this.overpassElements[id] = ob
 }
 
-function overpassRegexpEscape (s) {
-  return s.replace('\\', '\\\\')
+OverpassFrontend.prototype.regexpEscape = function (str) {
+  return str.replace('\\', '\\\\')
        .replace('.', '\\.')
        .replace('|', '\\|')
        .replace('[', '\\[')

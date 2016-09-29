@@ -74,6 +74,14 @@ Options:
 
 Returns an OverpassRequest object.
 
+## OverpassFrontend.regexpEscape(str)
+Escape a string for usage in a regular expression to the Overpass API.
+
+Example:
+```js
+overpassFrontend.regexpEscape('bank+atm') // 'bank\+atm'
+```
+
 ## OverpassFrontend.abortAllRequests()
 Abort all currently running requests. For each request the final callback will be called with the error 'abort'. The currently running server request will be finished and the data loaded into the cache, but no feature callbacks will be called.
 

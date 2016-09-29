@@ -622,6 +622,17 @@ describe('Overpass objects structure', function() {
     })
   })
 
+  describe('OverpassFrontend, misc functions', function() {
+    it('regexpEscape()', function() {
+      var input = 'bank+atm'
+      var expected = 'bank\\+atm'
+
+      assert.equal(expected, overpassFrontend.regexpEscape(input))
+
+      return true
+    })
+  })
+
   describe('OverpassRequest', function() {
     it('get() should return OverpassRequest object', function (done) {
       var req = overpassFrontend.get([ 'n3037893169' ],
