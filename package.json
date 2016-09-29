@@ -1,17 +1,17 @@
 {
-  "dependencies": {
-    "async": "*",
-    "xmlhttprequest": "*",
-    "object-keys": "*",
-    "boundingbox": "*",
-    "weight-sort": "*"
-  },
   "name": "overpass-frontend",
   "description": "A JavaScript (NodeJS/Browser) library to easily access data from OpenStreetMap via Overpass API. The objects can directly be used with LeafletJS or exported to GeoJSON. Data will be cached locally, optionally by using LocalStorage (or similar).",
   "version": "0.0.1",
   "main": "src/Overpass.js",
   "directories": {
     "test": "test"
+  },
+  "dependencies": {
+    "async": "*",
+    "xmlhttprequest": "*",
+    "object-keys": "*",
+    "boundingbox": "*",
+    "weight-sort": "*"
   },
   "devDependencies": {
     "leaflet": "^0.7.0",
@@ -26,17 +26,17 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/plepe/OverpassFrontend.git"
+    "url": "git+https://github.com/plepe/overpass-frontend.git"
   },
   "keywords": [
     "OpenStreetMap",
     "OSM",
     "Overpass"
   ],
-  "author": "Stephan Bösch-Plepelits",
+  "author": "Stephan Bösch-Plepelits <skunk@xover.mud.at>",
   "license": "GPL-3.0",
   "bugs": {
-    "url": "https://github.com/plepe/OverpassFrontend/issues"
+    "url": "https://github.com/plepe/overpass-frontend/issues"
   },
-  "homepage": "https://github.com/plepe/OverpassFrontend#readme"
+  "homepage": "https://github.com/plepe/overpass-frontend#readme"
 }
