@@ -1,11 +1,8 @@
+/* global L:false */
+
 var util = require('util')
 var OverpassObject = require('./OverpassObject')
 var BoundingBox = require('boundingbox')
-
-// so that the linter does not complain
-if (typeof L === 'undefined') {
-  var L
-}
 
 util.inherits(OverpassNode, OverpassObject)
 function OverpassNode () {

@@ -1,10 +1,7 @@
+/* global L:false */
+
 var util = require('util')
 var OverpassObject = require('./OverpassObject')
-
-// so that the linter does not complain
-if (typeof L === 'undefined') {
-  var L
-}
 
 util.inherits(OverpassRelation, OverpassObject)
 function OverpassRelation () {
