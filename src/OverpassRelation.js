@@ -47,7 +47,7 @@ OverpassRelation.prototype.leafletFeature = function (options) {
 
     switch (member.type) {
       case 'node':
-        switch (options.nodeType) {
+        switch (options.nodeFeature) {
           case 'Marker':
             feature = L.marker(member, options)
             break

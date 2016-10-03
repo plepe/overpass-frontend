@@ -90,8 +90,8 @@ Passed to the featureCallback function.
 ## OverpassObject.leafletFeature(options)
 Returns a feature for adding to a Leaflet based map. As options all Path resp. Marker options are available, additionally:
 
-* nodeType: if the feature (or a relation member) is a node, create one of the following Layers: 'CircleMarker' (default), 'Circle', 'Marker'.
-* radius: if nodeType is 'Circle' or 'CircleMarker', use this value as radius.
+* nodeFeature: if the feature (or a relation member) is a node, create one of the following Layers: 'CircleMarker' (default), 'Circle', 'Marker'.
+* radius: if nodeFeature is 'Circle' or 'CircleMarker', use this value as radius.
 
 If the geometry is not available (e.g. it has not been loaded), will return `null`.
 
@@ -99,7 +99,7 @@ Example:
 ```js
 function(err, ob) { // featureCallback function
   ob.leafletFeature({
-    nodeType: 'CircleMarker',
+    nodeFeature: 'CircleMarker',
     radius: 6,
     fillColor: 'red'
   }).addTo(map)

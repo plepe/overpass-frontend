@@ -46,7 +46,7 @@ function check_update_map () {
     function (err, ob) {
       if (!ob.feature) {
         ob.feature = ob.leafletFeature({
-          nodeType: 'CircleMarker',
+          nodeFeature: 'CircleMarker',
           color: 'red',
           fillColor: 'red',
           fillOpacity: 0.1,
