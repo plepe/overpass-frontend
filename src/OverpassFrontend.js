@@ -32,7 +32,6 @@ function OverpassFrontend (url, options) {
   this.overpassTiles = {}
   this.overpassRequests = []
   this.overpassRequestActive = false
-  this.overpassBBoxQueryCache = {}
 }
 
 // Defines
@@ -363,30 +362,10 @@ OverpassFrontend.prototype.BBoxQuery = function (query, bounds, options, feature
 
   bounds = new BoundingBox(bounds)
 
-  var tileBounds = bounds.toTile()
-  var cacheId = tileBounds.toBBoxString()
-
-  // check if we have a result for this tile
-  if (query in this.overpassBBoxQueryCache) {
-    if (cacheId in this.overpassBBoxQueryCache[query]) {
-      var todo = _overpassProcessQueryBBoxGrep(this.overpassBBoxQueryCache[query][cacheId], bounds)
-
-      if (options.orderApproxRouteLength) {
-        todo = weightSort(todo)
-      }
-
-      return this.get(keys(todo), options, featureCallback, finalCallback)
-    }
-  } else {
-    this.overpassBBoxQueryCache[query] = {}
-  }
-
   var request = new OverpassRequest(this, {
     type: 'BBoxQuery',
     query: query,
     bounds: bounds,
-    tileBounds: tileBounds,
-    cacheId: cacheId,
     options: boundsOptions,
     get_options: options,
     priority: 'priority' in options ? options.priority : 0,
@@ -405,7 +384,7 @@ OverpassFrontend.prototype.BBoxQuery = function (query, bounds, options, feature
 }
 
 OverpassFrontend.prototype._overpass_process_query = function (request) {
-  var BBoxString = request.tileBounds.toBBoxString()
+  var BBoxString = request.bounds.toBBoxString()
   BBoxString = BBoxString.split(/,/)
   BBoxString = BBoxString[1] + ',' + BBoxString[0] + ',' +
                 BBoxString[3] + ',' + BBoxString[2]
@@ -429,6 +408,7 @@ OverpassFrontend.prototype._overpass_process_query = function (request) {
 
 OverpassFrontend.prototype._overpass_handle_process_query = function (context, err, results) {
   var request = context.request
+  var todo = {}
 
   if (err) {
     // call finalCallback for the request
@@ -440,8 +420,6 @@ OverpassFrontend.prototype._overpass_handle_process_query = function (context, e
     return
   }
 
-  this.overpassBBoxQueryCache[request.query][request.cacheId] = {}
-
   for (var i = 0; i < results.elements.length; i++) {
     var el = results.elements[i]
     var id = el.type.substr(0, 1) + el.id
@@ -449,13 +427,11 @@ OverpassFrontend.prototype._overpass_handle_process_query = function (context, e
     var obBBox = new BoundingBox(el)
     var approxRouteLength = obBBox.diagonalLength(obBBox)
 
-    this.overpassBBoxQueryCache[request.query][request.cacheId][id] = {
+    todo[id] = {
       bounds: obBBox,
       approxRouteLength: approxRouteLength
     }
   }
-
-  var todo = _overpassProcessQueryBBoxGrep(this.overpassBBoxQueryCache[request.query][request.cacheId], request.bounds)
 
   if (request.options.orderApproxRouteLength) {
     todo = weightSort(todo, 'approxRouteLength')
@@ -556,18 +532,6 @@ function overpassOutOptions (options) {
   outOptions += 'qt'
 
   return outOptions
-}
-
-function _overpassProcessQueryBBoxGrep (elements, bbox) {
-  var ret = {}
-
-  for (var id in elements) {
-    if (bbox.intersects(elements[id].bounds)) {
-      ret[id] = elements[id]
-    }
-  }
-
-  return ret
 }
 
 if (typeof module !== 'undefined' && module.exports) {
