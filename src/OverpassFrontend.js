@@ -357,6 +357,14 @@ OverpassFrontend.prototype._overpass_handle_result = function (context, err, res
 OverpassFrontend.prototype.BBoxQuery = function (query, bounds, options, featureCallback, finalCallback) {
   bounds = new BoundingBox(bounds)
 
+  if (options === null) {
+    options = {}
+  }
+  if (typeof options.properties === 'undefined') {
+    options.properties = OverpassFrontend.DEFAULT
+  }
+  options.properties |= OverpassFrontend.BBOX
+
   var request = new OverpassRequest(this, {
     type: 'BBoxQuery',
     query: query,
