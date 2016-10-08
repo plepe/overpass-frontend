@@ -355,19 +355,13 @@ OverpassFrontend.prototype._overpass_handle_result = function (context, err, res
  * @param {function} finalCallback Will be called after the last feature. Will be passed: 1. err (if an error occured, otherwise null).
  */
 OverpassFrontend.prototype.BBoxQuery = function (query, bounds, options, featureCallback, finalCallback) {
-  var boundsOptions = {
-    properties: OverpassFrontend.ID_ONLY | OverpassFrontend.BBOX,
-    orderApproxRouteLength: options.orderApproxRouteLength
-  }
-
   bounds = new BoundingBox(bounds)
 
   var request = new OverpassRequest(this, {
     type: 'BBoxQuery',
     query: query,
     bounds: bounds,
-    options: boundsOptions,
-    get_options: options,
+    options: options,
     priority: 'priority' in options ? options.priority : 0,
     featureCallback: featureCallback,
     finalCallback: finalCallback
@@ -428,6 +422,8 @@ OverpassFrontend.prototype._overpass_handle_process_query = function (context, e
     var obBBox = new BoundingBox(el)
     var approxRouteLength = obBBox.diagonalLength(obBBox)
 
+    this.createOrUpdateOSMObject(el, request)
+
     todo[id] = {
       bounds: obBBox,
       approxRouteLength: approxRouteLength
@@ -438,8 +434,21 @@ OverpassFrontend.prototype._overpass_handle_process_query = function (context, e
     todo = weightSort(todo, 'approxRouteLength')
   }
 
-  this.get(keys(todo), request.get_options, request.featureCallback, request.finalCallback)
+  var todoCallbacks = []
+  for (var k in todo) {
+    todoCallbacks.push([ request.featureCallback, this.overpassElements[k] ])
+  }
+  todoCallbacks.push([ request.finalCallback, null ])
 
+  async.setImmediate(function () {
+    for (var i = 0; i < todoCallbacks.length; i++) {
+      var c = todoCallbacks[i]
+
+      c[0](null, c[1])
+    }
+  })
+
+  this.overpassRequests[this.overpassRequests.indexOf(request)] = null
   this.overpassRequestActive = false
 
   this._overpass_process()
