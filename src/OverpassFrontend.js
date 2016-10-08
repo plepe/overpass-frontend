@@ -390,17 +390,18 @@ OverpassFrontend.prototype._overpass_process_query = function (request) {
                 BBoxString[3] + ',' + BBoxString[2]
 
   var queryOptions = '[bbox:' + BBoxString + ']'
-  var query = request.query
 
   var context = {
     request: request
   }
 
+  var query = '[out:json]' + queryOptions + ';\n' + request.query + '\nout ' + overpassOutOptions(request.options) + ';'
+
   setTimeout(function () {
     httpLoad(
       this.url,
       null,
-      '[out:json]' + queryOptions + ';\n' + query + '\nout ' + overpassOutOptions(request.options) + ';',
+      query,
       this._overpass_handle_process_query.bind(this, context)
     )
   }.bind(this), this.options.timeGap)
