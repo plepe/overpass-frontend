@@ -3,6 +3,7 @@ if (typeof require !== 'undefined') {
   var async = require('async')
   var BoundingBox = require('boundingbox')
   var keys = Object.keys || require('object-keys')
+  var Quadtree = require('quadtree-lookup')
 
   var httpLoad = require('./httpLoad')
   var removeNullEntries = require('./removeNullEntries')
@@ -32,6 +33,7 @@ function OverpassFrontend (url, options) {
   this.overpassTiles = {}
   this.overpassRequests = []
   this.overpassRequestActive = false
+  this.overpassBBoxQueryElements = {}
 }
 
 // Defines
@@ -375,6 +377,22 @@ OverpassFrontend.prototype.BBoxQuery = function (query, bounds, options, feature
     finalCallback: finalCallback
   })
 
+  if (request.query in this.overpassBBoxQueryElements) {
+    // if we already have cached objects, check if we have immediate results
+    var quadtreeBounds = toQuadtreeLookupBox(request.bounds)
+
+    var items = this.overpassBBoxQueryElements[request.query].queryRange(quadtreeBounds)
+    // TODO: do something with 'items'
+  } else {
+    // otherwise initialize cache
+    this.overpassBBoxQueryElements[request.query] = new Quadtree.Quadtree(
+      new Quadtree.Box(
+        new Quadtree.Point(-90, -180),
+        new Quadtree.Point(90, 180)
+      )
+    )
+  }
+
   this.overpassRequests.push(request)
 
   removeNullEntries(this.overpassRequests)
@@ -436,6 +454,8 @@ OverpassFrontend.prototype._handleBBoxQueryResult = function (context, err, resu
       bounds: obBBox,
       approxRouteLength: approxRouteLength
     }
+
+    this.overpassBBoxQueryElements[request.query].insert(toQuadtreeLookupBox(obBBox), id)
   }
 
   if (request.options.orderApproxRouteLength) {
@@ -550,6 +570,13 @@ function overpassOutOptions (options) {
   outOptions += 'qt'
 
   return outOptions
+}
+
+function toQuadtreeLookupBox (boundingbox) {
+  return new Quadtree.Box(
+    new Quadtree.Point(boundingbox.bounds.minlat, boundingbox.bounds.minlon),
+    new Quadtree.Point(boundingbox.bounds.maxlat, boundingbox.bounds.maxlon)
+  )
 }
 
 if (typeof module !== 'undefined' && module.exports) {

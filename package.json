@@ -11,7 +11,8 @@
     "xmlhttprequest": "*",
     "object-keys": "*",
     "boundingbox": "*",
-    "weight-sort": "*"
+    "weight-sort": "*",
+    "quadtree-lookup": "https://github.com/petrbrzek/quadtree-lookup"
   },
   "devDependencies": {
     "browserify": "*",
