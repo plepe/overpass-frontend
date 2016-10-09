@@ -12,7 +12,9 @@
     "object-keys": "*",
     "boundingbox": "*",
     "weight-sort": "*",
-    "quadtree-lookup": "https://github.com/petrbrzek/quadtree-lookup"
+    "quadtree-lookup": "https://github.com/petrbrzek/quadtree-lookup",
+    "turf-difference": "*",
+    "turf-union": "*"
   },
   "devDependencies": {
     "browserify": "*",

@@ -4,6 +4,10 @@ if (typeof require !== 'undefined') {
   var BoundingBox = require('boundingbox')
   var keys = Object.keys || require('object-keys')
   var Quadtree = require('quadtree-lookup')
+  var turf = {
+    difference: require('turf-difference'),
+    union: require('turf-union')
+  }
 
   var httpLoad = require('./httpLoad')
   var removeNullEntries = require('./removeNullEntries')
@@ -34,6 +38,7 @@ function OverpassFrontend (url, options) {
   this.overpassRequests = []
   this.overpassRequestActive = false
   this.overpassBBoxQueryElements = {}
+  this.overpassBBoxQueryRequested = {}
 }
 
 // Defines
@@ -376,6 +381,7 @@ OverpassFrontend.prototype.BBoxQuery = function (query, bounds, options, feature
     // if we already have cached objects, check if we have immediate results
     var quadtreeBounds = toQuadtreeLookupBox(request.bounds)
     var todoCallbacks = []
+    var done = false
 
     var items = this.overpassBBoxQueryElements[request.query].queryRange(quadtreeBounds)
     // TODO: do something with 'items'
@@ -393,8 +399,23 @@ OverpassFrontend.prototype.BBoxQuery = function (query, bounds, options, feature
       }
     }
 
+    // check if we need to call Overpass API (whole area known?)
+    var toRequest = request.bounds.toGeoJSON()
+    var remainingBounds = turf.difference(toRequest, this.overpassBBoxQueryRequested[request.query])
+
+    if (remainingBounds === undefined) {
+      todoCallbacks.push([ request.finalCallback, null, null ])
+      done = true
+    } else {
+      this.overpassBBoxQueryRequested[request.query] = turf.union(toRequest, this.overpassBBoxQueryRequested[request.query])
+    }
+
     callCallbacks(todoCallbacks)
     todoCallbacks = []
+
+    if (done) {
+      return request
+    }
   } else {
     // otherwise initialize cache
     this.overpassBBoxQueryElements[request.query] = new Quadtree.Quadtree(
@@ -403,6 +424,8 @@ OverpassFrontend.prototype.BBoxQuery = function (query, bounds, options, feature
         new Quadtree.Point(90, 180)
       )
     )
+
+    this.overpassBBoxQueryRequested[request.query] = request.bounds.toGeoJSON()
   }
 
   this.overpassRequests.push(request)
