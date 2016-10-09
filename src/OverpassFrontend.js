@@ -246,13 +246,7 @@ OverpassFrontend.prototype._overpassProcess = function () {
     }
   }
 
-  async.setImmediate(function () {
-    for (var i = 0; i < todoCallbacks.length; i++) {
-      var c = todoCallbacks[i]
-
-      c[0](null, c[1], c[2])
-    }
-  })
+  callCallbacks(todoCallbacks)
 
   removeNullEntries(this.overpassRequests)
 
@@ -464,17 +458,11 @@ OverpassFrontend.prototype._handleBBoxQueryResult = function (context, err, resu
 
   var todoCallbacks = []
   for (var k in todo) {
-    todoCallbacks.push([ request.featureCallback, this.overpassElements[k] ])
+    todoCallbacks.push([ request.featureCallback, this.overpassElements[k], null ])
   }
-  todoCallbacks.push([ request.finalCallback, null ])
+  todoCallbacks.push([ request.finalCallback, null, null ])
 
-  async.setImmediate(function () {
-    for (var i = 0; i < todoCallbacks.length; i++) {
-      var c = todoCallbacks[i]
-
-      c[0](null, c[1])
-    }
-  })
+  callCallbacks(todoCallbacks)
 
   this.overpassRequests[this.overpassRequests.indexOf(request)] = null
   this.overpassRequestActive = false
@@ -577,6 +565,16 @@ function toQuadtreeLookupBox (boundingbox) {
     new Quadtree.Point(boundingbox.bounds.minlat, boundingbox.bounds.minlon),
     new Quadtree.Point(boundingbox.bounds.maxlat, boundingbox.bounds.maxlon)
   )
+}
+
+function callCallbacks (todoCallbacks) {
+  async.setImmediate(function () {
+    for (var i = 0; i < todoCallbacks.length; i++) {
+      var c = todoCallbacks[i]
+
+      c[0](null, c[1], c[2])
+    }
+  })
 }
 
 if (typeof module !== 'undefined' && module.exports) {
