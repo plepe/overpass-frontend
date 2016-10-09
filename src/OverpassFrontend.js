@@ -367,6 +367,7 @@ OverpassFrontend.prototype.BBoxQuery = function (query, bounds, options, feature
     bounds: bounds,
     options: options,
     priority: 'priority' in options ? options.priority : 0,
+    doneFeatures: {},
     featureCallback: featureCallback,
     finalCallback: finalCallback
   })
@@ -374,9 +375,26 @@ OverpassFrontend.prototype.BBoxQuery = function (query, bounds, options, feature
   if (request.query in this.overpassBBoxQueryElements) {
     // if we already have cached objects, check if we have immediate results
     var quadtreeBounds = toQuadtreeLookupBox(request.bounds)
+    var todoCallbacks = []
 
     var items = this.overpassBBoxQueryElements[request.query].queryRange(quadtreeBounds)
     // TODO: do something with 'items'
+
+    for (var i = 0; i < items.length; i++) {
+      var id = items[i].value
+      var ob = this.overpassElements[id]
+
+      if ((request.options.properties & ob.properties) === request.options.properties) {
+        request.doneFeatures[id] = ob
+
+        if (!options.orderApproxRouteLength) {
+          todoCallbacks.push([ request.featureCallback, ob, null ])
+        }
+      }
+    }
+
+    callCallbacks(todoCallbacks)
+    todoCallbacks = []
   } else {
     // otherwise initialize cache
     this.overpassBBoxQueryElements[request.query] = new Quadtree.Quadtree(
@@ -409,7 +427,28 @@ OverpassFrontend.prototype._processBBoxQuery = function (request) {
     request: request
   }
 
-  var query = '[out:json]' + queryOptions + ';\n' + request.query + '\nout ' + overpassOutOptions(request.options) + ';'
+  var query = '[out:json]' + queryOptions + ';\n(' + request.query + ')->.result;\n'
+
+  var queryRemoveDoneFeatures = ''
+  var countRemoveDoneFeatures = 0
+  for (var id in request.doneFeatures) {
+    var ob = request.doneFeatures[id]
+
+    if (countRemoveDoneFeatures % 1000 === 999) {
+      query += '(' + queryRemoveDoneFeatures + ')->.done;\n'
+      queryRemoveDoneFeatures = '.done;'
+    }
+
+    queryRemoveDoneFeatures += ob.type + '(' + ob.osm_id + ');'
+    countRemoveDoneFeatures++
+  }
+
+  if (countRemoveDoneFeatures) {
+    query += '(' + queryRemoveDoneFeatures + ')->.done;\n'
+    query += '(.result; - .done);\n'
+  }
+
+  query += 'out ' + overpassOutOptions(request.options) + ';'
 
   setTimeout(function () {
     httpLoad(
@@ -453,6 +492,13 @@ OverpassFrontend.prototype._handleBBoxQueryResult = function (context, err, resu
   }
 
   if (request.options.orderApproxRouteLength) {
+    for (id in this.doneFeatures) {
+      todo[id] = {
+        bounds: this.doneFeatures[id].bounds,
+        approxRouteLength: this.doneFeatures[id].bounds.diagonalLength()
+      }
+    }
+
     todo = weightSort(todo, 'approxRouteLength')
   }
 
