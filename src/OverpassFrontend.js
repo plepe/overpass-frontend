@@ -370,6 +370,7 @@ OverpassFrontend.prototype.BBoxQuery = function (query, bounds, options, feature
     type: 'BBoxQuery',
     query: query,
     bounds: bounds,
+    remainingBounds: bounds,
     options: options,
     priority: 'priority' in options ? options.priority : 0,
     doneFeatures: {},
@@ -407,6 +408,7 @@ OverpassFrontend.prototype.BBoxQuery = function (query, bounds, options, feature
       todoCallbacks.push([ request.finalCallback, null, null ])
       done = true
     } else {
+      request.remainingBounds = new BoundingBox(remainingBounds)
       this.overpassBBoxQueryRequested[request.query] = turf.union(toRequest, this.overpassBBoxQueryRequested[request.query])
     }
 
@@ -439,7 +441,7 @@ OverpassFrontend.prototype.BBoxQuery = function (query, bounds, options, feature
 }
 
 OverpassFrontend.prototype._processBBoxQuery = function (request) {
-  var BBoxString = request.bounds.toBBoxString()
+  var BBoxString = request.remainingBounds.toBBoxString()
   BBoxString = BBoxString.split(/,/)
   BBoxString = BBoxString[1] + ',' + BBoxString[0] + ',' +
                 BBoxString[3] + ',' + BBoxString[2]
