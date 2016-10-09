@@ -80,12 +80,12 @@ OverpassFrontend.prototype.get = function (ids, options, featureCallback, finalC
   this.overpassRequests = removeNullEntries(this.overpassRequests)
   this.overpassRequests = weightSort(this.overpassRequests, 'priority')
 
-  this._overpass_process()
+  this._overpassProcess()
 
   return request
 }
 
-OverpassFrontend.prototype._overpass_process = function () {
+OverpassFrontend.prototype._overpassProcess = function () {
   if (this.overpassRequestActive) {
     return
   }
@@ -107,7 +107,7 @@ OverpassFrontend.prototype._overpass_process = function () {
 
   if (this.overpassRequests[0].type === 'BBoxQuery') {
     request = this.overpassRequests.splice(0, 1)
-    return this._overpass_process_query(request[0])
+    return this._processBBoxQuery(request[0])
   }
 
   for (var j = 0; j < this.overpassRequests.length; j++) {
@@ -264,12 +264,12 @@ OverpassFrontend.prototype._overpass_process = function () {
       this.url,
       null,
       '[out:json];\n' + query,
-      this._overpass_handle_result.bind(this, context)
+      this._handleGetResult.bind(this, context)
     )
   }.bind(this), this.options.timeGap)
 }
 
-OverpassFrontend.prototype._overpass_handle_result = function (context, err, results) {
+OverpassFrontend.prototype._handleGetResult = function (context, err, results) {
   var el
   var id
 
@@ -341,7 +341,7 @@ OverpassFrontend.prototype._overpass_handle_result = function (context, err, res
 
   this.overpassRequestActive = false
 
-  this._overpass_process()
+  this._overpassProcess()
 }
 
 /**
@@ -380,12 +380,12 @@ OverpassFrontend.prototype.BBoxQuery = function (query, bounds, options, feature
   removeNullEntries(this.overpassRequests)
   this.overpassRequests = weightSort(this.overpassRequests, 'priority')
 
-  this._overpass_process()
+  this._overpassProcess()
 
   return request
 }
 
-OverpassFrontend.prototype._overpass_process_query = function (request) {
+OverpassFrontend.prototype._processBBoxQuery = function (request) {
   var BBoxString = request.bounds.toBBoxString()
   BBoxString = BBoxString.split(/,/)
   BBoxString = BBoxString[1] + ',' + BBoxString[0] + ',' +
@@ -404,12 +404,12 @@ OverpassFrontend.prototype._overpass_process_query = function (request) {
       this.url,
       null,
       query,
-      this._overpass_handle_process_query.bind(this, context)
+      this._handleBBoxQueryResult.bind(this, context)
     )
   }.bind(this), this.options.timeGap)
 }
 
-OverpassFrontend.prototype._overpass_handle_process_query = function (context, err, results) {
+OverpassFrontend.prototype._handleBBoxQueryResult = function (context, err, results) {
   var request = context.request
   var todo = {}
 
@@ -459,7 +459,7 @@ OverpassFrontend.prototype._overpass_handle_process_query = function (context, e
   this.overpassRequests[this.overpassRequests.indexOf(request)] = null
   this.overpassRequestActive = false
 
-  this._overpass_process()
+  this._overpassProcess()
 }
 
 OverpassFrontend.prototype.abortAllRequests = function () {
