@@ -146,14 +146,14 @@ describe('Overpass get', function() {
       )
     })
 
-    it('should return a list of way features', function(done) {
+    it('should return a list of node features (2nd try, partly cached)', function(done) {
       var found = []
-      var expected = [ 'w299709373', 'w299709375' ]
+      var expected = [ 'n3037893162', 'n3037893163', 'n3037893164', 'n3037893159', 'n3037893160' ]
 
       overpassFrontend.BBoxQuery(
-        'way[highway=footway];',
+        'node[amenity=bench];',
         {
-          minlon: 16.3384616,
+          minlon: 16.3382616,
           minlat: 48.1990347,
           maxlon: 16.3386118,
           maxlat: 48.1991437
@@ -175,6 +175,102 @@ describe('Overpass get', function() {
         }
       )
     })
+
+    it('should return a list of way features', function(done) {
+      var found = []
+      var expected = [ 'w299709373' ]
+      var might = [ 'w299709375' ] // correct, if only bbox check is used
+
+      overpassFrontend.BBoxQuery(
+        'way[highway=footway];',
+        {
+          minlon: 16.3384616,
+          minlat: 48.1990347,
+          maxlon: 16.3386118,
+          maxlat: 48.1991437
+        },
+        {
+          properties: OverpassFrontend.ID_ONLY
+        },
+        function(err, result, index) {
+          found.push(result.id)
+
+          if(expected.indexOf(result.id) === -1 &&
+             might.indexOf(result.id) !== -1)
+            assert(false, 'Object ' + result.id + ' should not be found!')
+        },
+        function(err) {
+          if(found.length != expected.length)
+            assert(false, 'Wrong count of objects found!')
+
+          done()
+        }
+      )
+    })
+
+    it('should return a list of way features (2nd try, partly cached)', function(done) {
+      var found = []
+      var expected = [ 'w299709373', 'w299709375' ]
+
+      overpassFrontend.BBoxQuery(
+        'way[highway=footway];',
+        {
+          minlon: 16.3382616,
+          minlat: 48.1990347,
+          maxlon: 16.3386118,
+          maxlat: 48.1991437
+        },
+        {
+          properties: OverpassFrontend.ID_ONLY
+        },
+        function(err, result, index) {
+          found.push(result.id)
+
+          if(expected.indexOf(result.id) == -1)
+            assert(false, 'Object ' + result.id + ' should not be found!')
+        },
+        function(err) {
+          if(found.length != expected.length)
+            assert(false, 'Wrong count of objects found!')
+
+          done()
+        }
+      )
+    })
+
+    it('should return a list of way features (3rd try, fully cached)', function(done) {
+      var expectedFound = []
+      var expected = [ 'w299709373' ]
+      var might = [ 'w299709375' ] // correct, if only bbox check is used
+
+      overpassFrontend.BBoxQuery(
+        'way[highway=footway];',
+        {
+          minlon: 16.3384616,
+          minlat: 48.1990347,
+          maxlon: 16.3386118,
+          maxlat: 48.1991437
+        },
+        {
+          properties: OverpassFrontend.ID_ONLY
+        },
+        function(err, result, index) {
+          if(expected.indexOf(result.id) !== -1)
+            expectedFound.push(result.id)
+
+          if(expected.indexOf(result.id) === -1 &&
+             might.indexOf(result.id) === -1)
+            assert(false, 'Object ' + result.id + ' should not be found!')
+        },
+        function(err) {
+          if(expectedFound.length != expected.length)
+            assert(false, 'Wrong count of objects found!')
+
+          done()
+        }
+      )
+    })
+
   })
   describe('removeFromCache()', function() {
     // TODO: Missing!

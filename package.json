@@ -11,7 +11,10 @@
     "xmlhttprequest": "*",
     "object-keys": "*",
     "boundingbox": "*",
-    "weight-sort": "*"
+    "weight-sort": "*",
+    "quadtree-lookup": "https://github.com/petrbrzek/quadtree-lookup",
+    "turf-difference": "*",
+    "turf-union": "*"
   },
   "devDependencies": {
     "browserify": "*",
