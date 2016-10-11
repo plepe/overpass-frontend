@@ -83,9 +83,6 @@ OverpassFrontend.prototype.get = function (ids, options, featureCallback, finalC
 
   this.overpassRequests.push(request)
 
-  this.overpassRequests = removeNullEntries(this.overpassRequests)
-  this.overpassRequests = weightSort(this.overpassRequests, 'priority')
-
   this._overpassProcess()
 
   return request
@@ -95,6 +92,9 @@ OverpassFrontend.prototype._overpassProcess = function () {
   if (this.overpassRequestActive) {
     return
   }
+
+  this.overpassRequests = removeNullEntries(this.overpassRequests)
+  this.overpassRequests = weightSort(this.overpassRequests, 'priority')
 
   if (!this.overpassRequests.length) {
     return
@@ -251,8 +251,6 @@ OverpassFrontend.prototype._overpassProcess = function () {
   }
 
   callCallbacks(todoCallbacks)
-
-  removeNullEntries(this.overpassRequests)
 
   if (query === '') {
     this.overpassRequestActive = false
@@ -430,9 +428,6 @@ OverpassFrontend.prototype.BBoxQuery = function (query, bounds, options, feature
   }
 
   this.overpassRequests.push(request)
-
-  removeNullEntries(this.overpassRequests)
-  this.overpassRequests = weightSort(this.overpassRequests, 'priority')
 
   this._overpassProcess()
 
