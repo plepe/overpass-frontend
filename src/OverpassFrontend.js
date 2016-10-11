@@ -2,7 +2,6 @@ if (typeof require !== 'undefined') {
   var weightSort = require('weight-sort')
   var async = require('async')
   var BoundingBox = require('boundingbox')
-  var keys = Object.keys || require('object-keys')
   var Quadtree = require('quadtree-lookup')
   var turf = {
     difference: require('turf-difference'),

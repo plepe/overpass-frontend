@@ -9,7 +9,6 @@
   "dependencies": {
     "async": "*",
     "xmlhttprequest": "*",
-    "object-keys": "*",
     "boundingbox": "*",
     "weight-sort": "*",
     "quadtree-lookup": "https://github.com/petrbrzek/quadtree-lookup",
