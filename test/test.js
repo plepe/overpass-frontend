@@ -668,7 +668,7 @@ describe('Overpass objects structure', function() {
   describe('Error handling', function() {
     it('Illegal BBoxQuery', function (done) {
       overpassFrontend.BBoxQuery(
-        'node[amenity=bench]',
+        'node[amenity=bench',
         {
           minlon: 16.3384616,
           minlat: 48.1990347,
@@ -685,7 +685,10 @@ describe('Overpass objects structure', function() {
           if(err === null)
             done('Query wrong, should not be successful')
 
-          else if(err == "line 3: parse error: ';' expected - 'out' found.\n\n")
+          else if(err == "line 2: parse error: ']' expected - ')' found.\n" +
+            "line 4: parse error: Unexpected end of input.\n" +
+            "line 4: parse error: Unexpected end of input.\n" +
+            "line 4: parse error: Unexpected end of input.\n\n")
             done()
 
           else
