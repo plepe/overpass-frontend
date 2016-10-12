@@ -163,9 +163,9 @@ OverpassFrontend.prototype._overpassProcess = function () {
           ready = false
         }
 
-        // if callOrdered is set in options maybe defer calling featureCallback
-        if ((!('callOrdered' in request.options) ||
-           (request.options.callOrdered && allFoundUntilNow)) && ready) {
+        // if sort is set in options maybe defer calling featureCallback
+        if ((!('sort' in request.options) ||
+           (request.options.sort && allFoundUntilNow)) && ready) {
           todoCallbacks.push([ request.featureCallback, ob, i ])
           request.ids[i] = null
         }
@@ -350,7 +350,7 @@ OverpassFrontend.prototype._handleGetResult = function (context, err, results) {
  * @param {object} options
  * @param {number} [options.priority=0] - Priority for loading these objects. The lower the sooner they will be requested.
  * @param {boolean} [options.orderApproxRouteLength=false] - Order objects by approximate route length (calculated from the bounding box diagonal)
- * @param {boolean} [options.callOrdered=false] - When set to true, the function featureCallback will be called in some particular order (e.g. from orderApproxRouteLength).
+ * @param {boolean} [options.sort=false] - When set to true, the function featureCallback will be called in some particular order (e.g. from orderApproxRouteLength).
  * @param {function} featureCallback Will be called for each object in the order of the IDs in parameter 'ids'. Will be passed: 1. err (if an error occured, otherwise null), 2. the object or null.
  * @param {function} finalCallback Will be called after the last feature. Will be passed: 1. err (if an error occured, otherwise null).
  */

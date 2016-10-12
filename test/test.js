@@ -37,14 +37,14 @@ describe('Overpass get', function() {
         })
     })
 
-    it('option "ordered": should return ordered by id (even when cached)', function(done) {
+    it('option "sort": should return ordered by id (even when cached)', function(done) {
       var items = [ 'n3037893169', 'r910885', 'w146678749' ]
       var lastIndex = null
 
       overpassFrontend.get(
         items,
         {
-          callOrdered: true,
+          sort: true,
           properties: OverpassFrontend.ID_ONLY
         },
         function(err, result, index) {

@@ -44,7 +44,7 @@ Options:
 | Option  | Type   | Description
 | ------- | ------ | ------------
 | priority | number | Priority for loading these objects. The lower the sooner they will be requested. Default: 0
-| callOrdered | boolean | When set to true, the function featureCallback will be called in the order of the array ids. Default: false.
+| sort | boolean | When set to true, the function featureCallback will be called in the order of the array ids. Default: false.
 | bbox    | L.latLngBounds | Only include objects which intersect the given bbox. The featureCallback will be called anyway, but boolean false will be passed.
 | properties | bit array | Which properties of the features should be downloaded: OVERPASS_ID_ONLY, OVERPASS_BBOX, OVERPASS_TAGS, OVERPASS_GEOM, OVERPASS_META. Combine by binary OR: ``OVERPASS_ID | OVERPASS_BBOX``. Default: ``OVERPASS_BBOX | OVERPASS_TAGS | OVERPASS_MEMBERS``
 
@@ -68,7 +68,7 @@ Options:
 | Option  | Type   | Description
 | ------- | ------ | ------------
 | priority | number | Priority for loading these objects. The lower the sooner they will be requested. Default: 0
-| callOrdered | boolean | When set to true, the function featureCallback will be called in some particular order (e.g. from orderApproxRouteLength).
+| sort | boolean | When set to true, the function featureCallback will be called in some particular order (e.g. from orderApproxRouteLength).
 | properties | bit array | Which properties of the features should be downloaded: OVERPASS_ID_ONLY, OVERPASS_BBOX, OVERPASS_TAGS, OVERPASS_GEOM, OVERPASS_META. Combine by binary OR: ``OVERPASS_ID | OVERPASS_BBOX``. Default: ``OVERPASS_BBOX | OVERPASS_TAGS | OVERPASS_MEMBERS``
 | orderApproxRouteLength | boolean | Order objects by approximate route length (calculated from the diagonal of the bounding box)
 
