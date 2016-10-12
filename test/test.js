@@ -36,6 +36,47 @@ describe('Overpass get', function() {
           done(err);
         })
     })
+
+    it('option "ordered": should return ordered by id (even when cached)', function(done) {
+      var items = [ 'n3037893169', 'r910885', 'w146678749' ]
+      var lastIndex = null
+
+      overpassFrontend.get(
+        items,
+        {
+          callOrdered: true,
+          properties: OverpassFrontend.ID_ONLY
+        },
+        function(err, result, index) {
+          if (err) {
+            assert(false, 'Error: ' + err)
+          }
+
+          var p = items.indexOf(result.id)
+          if (p === -1) {
+            assert(false, 'Object ' + result.id + ' should not be found')
+          }
+
+          if (p !== index) {
+            assert(false, 'Object ' + result.id + ': wrong index!')
+          }
+
+          if (lastIndex === null) {
+            if (index !== 0) {
+              assert(false, 'Object ' + result.id + ' (Index ' + index + '): should not be first element')
+            }
+          } else {
+            if (index !== lastIndex + 1) {
+              assert(false, 'Object ' + result.id + ' (Index ' + index + '): should not come after ' + lastIndex)
+            }
+          }
+          lastIndex = index
+        },
+        function(err) {
+          done(err)
+        })
+    })
+
   })
 
   describe('GeoJSON', function() {
@@ -270,7 +311,6 @@ describe('Overpass get', function() {
         }
       )
     })
-
   })
   describe('removeFromCache()', function() {
     // TODO: Missing!
