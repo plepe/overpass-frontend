@@ -38,7 +38,7 @@ describe('Overpass get', function() {
     })
 
     it('option "sort": should return ordered by id (even when cached)', function(done) {
-      var items = [ 'n3037893169', 'r910885', 'w146678749' ]
+      var items = [ 'r910885', 'n3037893169', 'r910885', 'w146678749' ]
       var lastIndex = null
 
       overpassFrontend.get(
@@ -57,7 +57,7 @@ describe('Overpass get', function() {
             assert(false, 'Object ' + result.id + ' should not be found')
           }
 
-          if (p !== index) {
+          if (items[index] !== result.id) {
             assert(false, 'Object ' + result.id + ': wrong index ' + index + '!')
           }
 
