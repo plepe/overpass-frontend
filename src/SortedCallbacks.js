@@ -1,4 +1,5 @@
 var async = require('async')
+var weightSort = require('weight-sort')
 
 function SortedCallbacks (options, featureCallback, finalCallback) {
   this.list = []
@@ -15,7 +16,8 @@ function SortedCallbacks (options, featureCallback, finalCallback) {
 SortedCallbacks.prototype.next = function (err, feature, index) {
   this.list[index] = {
     err: err,
-    feature: feature
+    feature: feature,
+    index: index
   }
 
   if ((this.options.sort === false) ||
@@ -29,6 +31,18 @@ SortedCallbacks.prototype.next = function (err, feature, index) {
 }
 
 SortedCallbacks.prototype.final = function (err) {
+  if (this.options.sort === 'BBoxDiagonalLength') {
+    for (var i = 0; i < this.list.length; i++) {
+      var feature = this.list[i].feature
+
+      if (feature && feature.bounds) {
+        this.list[i].weight = feature.bounds.diagonalLength()
+      }
+    }
+
+    this.list = weightSort(this.list)
+  }
+
   async.setImmediate(function () {
     for (var i = this.lastIndex + 1; i < this.list.length; i++) {
       this.featureCallback(this.list[i].err, this.list[i].feature, i)

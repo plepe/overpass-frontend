@@ -79,6 +79,48 @@ describe('Overpass get', function() {
         })
     })
 
+    it('option "sort"="BBoxDiagonalLength"', function(done) {
+      var items = [ 'w125586435', 'w299696929', 'w174711686', 'w247954720' ]
+      var expected = [ 'w247954720', 'w174711686', 'w125586435', 'w299696929' ]
+      var lastIndex = null
+
+      overpassFrontend.get(
+        items,
+        {
+          sort: 'BBoxDiagonalLength',
+          properties: OverpassFrontend.BBOX
+        },
+        function(err, result, index) {
+          if (err) {
+            assert(false, 'Error: ' + err)
+          }
+
+          var p = expected.indexOf(result.id)
+          if (p === -1) {
+            assert(false, 'Object ' + result.id + ' should not be found')
+          }
+
+          if (expected[index] !== result.id) {
+            assert(false, 'Object ' + result.id + ': wrong index ' + index + '!')
+          }
+
+          if (lastIndex === null) {
+            if (index !== 0) {
+              assert(false, 'Object ' + result.id + ' (Index ' + index + '): should not be first element')
+            }
+          } else {
+            if (index !== lastIndex + 1) {
+              assert(false, 'Object ' + result.id + ' (Index ' + index + '): should not come after ' + lastIndex)
+            }
+          }
+          lastIndex = index
+        },
+        function(err) {
+          assert.equal(expected.length, lastIndex + 1, 'Should return ' + expected.length + ' elements')
+
+          done(err)
+        })
+    })
   })
 
   describe('GeoJSON', function() {
