@@ -58,7 +58,7 @@ describe('Overpass get', function() {
           }
 
           if (p !== index) {
-            assert(false, 'Object ' + result.id + ': wrong index!')
+            assert(false, 'Object ' + result.id + ': wrong index ' + index + '!')
           }
 
           if (lastIndex === null) {
@@ -73,6 +73,8 @@ describe('Overpass get', function() {
           lastIndex = index
         },
         function(err) {
+          assert.equal(items.length, lastIndex + 1, 'Should return ' + items.length + ' elements')
+
           done(err)
         })
     })
