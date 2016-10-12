@@ -400,15 +400,17 @@ OverpassFrontend.prototype.BBoxQuery = function (query, bounds, options, feature
     }
 
     // check if we need to call Overpass API (whole area known?)
-    var toRequest = request.bounds.toGeoJSON()
-    var remainingBounds = turf.difference(toRequest, this.overpassBBoxQueryRequested[request.query])
+    var remainingBounds = request.bounds
+    if (this.overpassBBoxQueryRequested[request.query] !== null) {
+      var toRequest = request.bounds.toGeoJSON()
+      remainingBounds = turf.difference(toRequest, this.overpassBBoxQueryRequested[request.query])
+    }
 
     if (remainingBounds === undefined) {
       todoCallbacks.push([ request.finalCallback, null, null ])
       done = true
     } else {
       request.remainingBounds = new BoundingBox(remainingBounds)
-      this.overpassBBoxQueryRequested[request.query] = turf.union(toRequest, this.overpassBBoxQueryRequested[request.query])
     }
 
     callCallbacks(todoCallbacks)
@@ -426,7 +428,7 @@ OverpassFrontend.prototype.BBoxQuery = function (query, bounds, options, feature
       )
     )
 
-    this.overpassBBoxQueryRequested[request.query] = request.bounds.toGeoJSON()
+    this.overpassBBoxQueryRequested[request.query] = null
   }
 
   this.overpassRequests.push(request)
@@ -496,6 +498,13 @@ OverpassFrontend.prototype._handleBBoxQueryResult = function (context, err, resu
     this.overpassRequestActive = false
 
     return
+  }
+
+  var toRequest = request.remainingBounds.toGeoJSON()
+  if (this.overpassBBoxQueryRequested[request.query] === null) {
+    this.overpassBBoxQueryRequested[request.query] = toRequest
+  } else {
+    this.overpassBBoxQueryRequested[request.query] = turf.union(toRequest, this.overpassBBoxQueryRequested[request.query])
   }
 
   for (var i = 0; i < results.elements.length; i++) {
