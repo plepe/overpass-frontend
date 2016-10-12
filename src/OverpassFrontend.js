@@ -10,6 +10,7 @@ if (typeof require !== 'undefined') {
 
   var httpLoad = require('./httpLoad')
   var removeNullEntries = require('./removeNullEntries')
+  var SortedCallbacks = require('./SortedCallbacks')
 
   var OverpassObject = require('./OverpassObject')
   var OverpassNode = require('./OverpassNode')
@@ -80,6 +81,12 @@ OverpassFrontend.prototype.get = function (ids, options, featureCallback, finalC
     featureCallback: featureCallback,
     finalCallback: finalCallback
   })
+
+  if (request.options.sort) {
+    var callbacks = new SortedCallbacks(request.options, request.featureCallback, request.finalCallback)
+    request.featureCallback = callbacks.next.bind(callbacks)
+    request.finalCallback = callbacks.final.bind(callbacks)
+  }
 
   this.overpassRequests.push(request)
 
@@ -376,6 +383,12 @@ OverpassFrontend.prototype.BBoxQuery = function (query, bounds, options, feature
     featureCallback: featureCallback,
     finalCallback: finalCallback
   })
+
+  if (request.options.sort) {
+    var callbacks = new SortedCallbacks(request.options, request.featureCallback, request.finalCallback)
+    request.featureCallback = callbacks.next.bind(callbacks)
+    request.finalCallback = callbacks.final.bind(callbacks)
+  }
 
   if (request.query in this.overpassBBoxQueryElements) {
     // if we already have cached objects, check if we have immediate results
