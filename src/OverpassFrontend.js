@@ -74,7 +74,7 @@ OverpassFrontend.prototype.get = function (ids, options, featureCallback, finalC
 
   var request = new OverpassRequest(this, {
     type: 'get',
-    ids: ids,
+    ids: ids.concat([]),
     options: options,
     priority: 'priority' in options ? options.priority : 0,
     featureCallback: featureCallback,
