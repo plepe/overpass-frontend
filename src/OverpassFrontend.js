@@ -82,11 +82,9 @@ OverpassFrontend.prototype.get = function (ids, options, featureCallback, finalC
     finalCallback: finalCallback
   })
 
-  if (request.options.sort) {
-    var callbacks = new SortedCallbacks(request.options, request.featureCallback, request.finalCallback)
-    request.featureCallback = callbacks.next.bind(callbacks)
-    request.finalCallback = callbacks.final.bind(callbacks)
-  }
+  var callbacks = new SortedCallbacks(request.options, request.featureCallback, request.finalCallback)
+  request.featureCallback = callbacks.next.bind(callbacks)
+  request.finalCallback = callbacks.final.bind(callbacks)
 
   this.overpassRequests.push(request)
 
@@ -114,7 +112,6 @@ OverpassFrontend.prototype._overpassProcess = function () {
     BBoxTodo: {},
     todoRequests: {}
   }
-  var todoCallbacks = []
   var query = ''
   var request
 
@@ -160,7 +157,7 @@ OverpassFrontend.prototype._overpassProcess = function () {
         // for bbox option, if object is (partly) loaded, but outside call
         // featureCallback with 'false'
         if (request.options.bbox && ob.bounds && !request.options.bbox.intersects(ob.bounds)) {
-          todoCallbacks.push([ request.featureCallback, false, i ])
+          request.featureCallback(null, false, i)
           request.ids[i] = null
           continue
         }
@@ -171,13 +168,9 @@ OverpassFrontend.prototype._overpassProcess = function () {
         }
 
         // if sort is set in options maybe defer calling featureCallback
-        if ((!('sort' in request.options) ||
-           (request.options.sort && allFoundUntilNow)) && ready) {
-          todoCallbacks.push([ request.featureCallback, ob, i ])
-          request.ids[i] = null
-        }
-
         if (ready) {
+          request.featureCallback(null, ob, i)
+          request.ids[i] = null
           continue
         }
       }
@@ -226,7 +219,7 @@ OverpassFrontend.prototype._overpassProcess = function () {
     }
 
     if (allFoundUntilNow) {
-      todoCallbacks.push([ request.finalCallback, null, null ])
+      request.finalCallback(null)
       this.overpassRequests[j] = null
     }
 
@@ -256,8 +249,6 @@ OverpassFrontend.prototype._overpassProcess = function () {
       query += '.r out ' + outOptions + ';\n'
     }
   }
-
-  callCallbacks(todoCallbacks)
 
   removeNullEntries(this.overpassRequests)
 
