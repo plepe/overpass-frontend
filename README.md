@@ -45,6 +45,7 @@ Options:
 | ------- | ------ | ------------
 | priority | number | Priority for loading these objects. The lower the sooner they will be requested. Default: 0
 | sort | string | Call the featureCallback in some particular order. See below for possible sort orders. `null` (default): no particular order.
+| sortDir | "asc" or "desc" | Sort direction. Default: "asc"
 | bbox    | L.latLngBounds | Only include objects which intersect the given bbox. The featureCallback will be called anyway, but boolean false will be passed.
 | properties | bit array | Which properties of the features should be downloaded: OVERPASS_ID_ONLY, OVERPASS_BBOX, OVERPASS_TAGS, OVERPASS_GEOM, OVERPASS_META. Combine by binary OR: ``OVERPASS_ID | OVERPASS_BBOX``. Default: ``OVERPASS_BBOX | OVERPASS_TAGS | OVERPASS_MEMBERS``
 

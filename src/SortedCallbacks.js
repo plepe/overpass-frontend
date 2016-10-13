@@ -11,6 +11,9 @@ function SortedCallbacks (options, featureCallback, finalCallback) {
   if (!('sort' in this.options) || this.options.sort === false) {
     this.options.sort = null
   }
+  if (!('sortDir' in this.options)) {
+    this.options.sortDir = 'asc'
+  }
   if (this.options.sort === true) {
     this.options.sort = 'index'
   }
@@ -24,7 +27,7 @@ SortedCallbacks.prototype.next = function (err, feature, index) {
   }
 
   if ((this.options.sort === null) ||
-      (this.options.sort === 'index' && index === this.lastIndex + 1)) {
+      (this.options.sort === 'index' && this.options.sortDir === 'asc' && index === this.lastIndex + 1)) {
     async.setImmediate(function () {
       this.featureCallback(this.list[index].err, this.list[index].feature, index)
     }.bind(this))
@@ -44,6 +47,10 @@ SortedCallbacks.prototype.final = function (err) {
     }
 
     this.list = weightSort(this.list)
+  }
+
+  if (this.options.sortDir === 'desc') {
+    this.list.reverse()
   }
 
   async.setImmediate(function () {
