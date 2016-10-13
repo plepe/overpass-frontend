@@ -444,6 +444,38 @@ describe('Overpass get', function() {
         }
       )
     })
+
+    it('should return a list of way features, ordered by BBoxDiagonalLength', function(done) {
+      var found = []
+      var expected = [ 'w243704615', 'w125586430', 'w313063294', 'w172236247' ]
+
+      overpassFrontend.BBoxQuery(
+        'way[building];',
+        {
+          minlon: 16.3375,
+          minlat: 48.1995,
+          maxlon: 16.3385,
+          maxlat: 48.2005
+        },
+        {
+          properties: OverpassFrontend.ID_ONLY,
+          sort: 'BBoxDiagonalLength'
+        },
+        function(err, result, index) {
+          found.push(result.id)
+
+          if (expected.indexOf(result.id) === -1)
+            assert(false, 'Object ' + result.id + ' should not be found!')
+        },
+        function(err) {
+          if (found.length != expected.length)
+            assert(false, 'Wrong count of objects found!')
+
+          done()
+        }
+      )
+    })
+
   })
   describe('removeFromCache()', function() {
     // TODO: Missing!
