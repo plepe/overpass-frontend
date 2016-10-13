@@ -133,7 +133,7 @@ describe('Overpass get', function() {
         {
           sort: 'BBoxDiagonalLength',
           sortDir: 'asc',
-          properties: OverpassFrontend.BBOX
+          properties: OverpassFrontend.ID_ONLY
         },
         function(err, result, index) {
           if (err) {
