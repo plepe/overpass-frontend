@@ -8,8 +8,11 @@ function SortedCallbacks (options, featureCallback, finalCallback) {
   this.finalCallback = finalCallback
   this.options = options
 
-  if (!('sort' in this.options)) {
-    this.options.sort = false
+  if (!('sort' in this.options) || this.options.sort === false) {
+    this.options.sort = null
+  }
+  if (this.options.sort === true) {
+    this.options.sort = 'index'
   }
 }
 
@@ -20,8 +23,8 @@ SortedCallbacks.prototype.next = function (err, feature, index) {
     index: index
   }
 
-  if ((this.options.sort === false) ||
-      ((this.options.sort === true) && (index === this.lastIndex + 1))) {
+  if ((this.options.sort === null) ||
+      (this.options.sort === 'index' && index === this.lastIndex + 1)) {
     async.setImmediate(function () {
       this.featureCallback(this.list[index].err, this.list[index].feature, index)
     }.bind(this))
