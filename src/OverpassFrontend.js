@@ -1,6 +1,5 @@
 if (typeof require !== 'undefined') {
   var weightSort = require('weight-sort')
-  var async = require('async')
   var BoundingBox = require('boundingbox')
   var Quadtree = require('quadtree-lookup')
   var turf = {
@@ -347,8 +346,7 @@ OverpassFrontend.prototype._handleGetResult = function (context, err, results) {
  * @param {L.latLngBounds} bounds - A Leaflet Bounds object, e.g. from map.getBounds()
  * @param {object} options
  * @param {number} [options.priority=0] - Priority for loading these objects. The lower the sooner they will be requested.
- * @param {boolean} [options.orderApproxRouteLength=false] - Order objects by approximate route length (calculated from the bounding box diagonal)
- * @param {boolean} [options.sort=false] - When set to true, the function featureCallback will be called in some particular order (e.g. from orderApproxRouteLength).
+ * @param {boolean} [options.sort=false] - When set to true, the function featureCallback will be called in some particular order
  * @param {function} featureCallback Will be called for each object in the order of the IDs in parameter 'ids'. Will be passed: 1. err (if an error occured, otherwise null), 2. the object or null.
  * @param {function} finalCallback Will be called after the last feature. Will be passed: 1. err (if an error occured, otherwise null).
  */
@@ -375,16 +373,13 @@ OverpassFrontend.prototype.BBoxQuery = function (query, bounds, options, feature
     finalCallback: finalCallback
   })
 
-  if (request.options.sort) {
-    var callbacks = new SortedCallbacks(request.options, request.featureCallback, request.finalCallback)
-    request.featureCallback = callbacks.next.bind(callbacks)
-    request.finalCallback = callbacks.final.bind(callbacks)
-  }
+  var callbacks = new SortedCallbacks(request.options, request.featureCallback, request.finalCallback)
+  request.featureCallback = callbacks.next.bind(callbacks)
+  request.finalCallback = callbacks.final.bind(callbacks)
 
   if (request.query in this.overpassBBoxQueryElements) {
     // if we already have cached objects, check if we have immediate results
     var quadtreeBounds = toQuadtreeLookupBox(request.bounds)
-    var todoCallbacks = []
     var done = false
 
     var items = this.overpassBBoxQueryElements[request.query].queryRange(quadtreeBounds)
@@ -397,9 +392,7 @@ OverpassFrontend.prototype.BBoxQuery = function (query, bounds, options, feature
       if ((request.options.properties & ob.properties) === request.options.properties) {
         request.doneFeatures[id] = ob
 
-        if (!options.orderApproxRouteLength) {
-          todoCallbacks.push([ request.featureCallback, ob, null ])
-        }
+        request.featureCallback(null, ob)
       }
     }
 
@@ -411,14 +404,11 @@ OverpassFrontend.prototype.BBoxQuery = function (query, bounds, options, feature
     }
 
     if (remainingBounds === undefined) {
-      todoCallbacks.push([ request.finalCallback, null, null ])
+      request.finalCallback(null)
       done = true
     } else {
       request.remainingBounds = new BoundingBox(remainingBounds)
     }
-
-    callCallbacks(todoCallbacks)
-    todoCallbacks = []
 
     if (done) {
       return request
@@ -528,24 +518,10 @@ OverpassFrontend.prototype._handleBBoxQueryResult = function (context, err, resu
     this.overpassBBoxQueryElements[request.query].insert(toQuadtreeLookupBox(obBBox), id)
   }
 
-  if (request.options.orderApproxRouteLength) {
-    for (id in this.doneFeatures) {
-      todo[id] = {
-        bounds: this.doneFeatures[id].bounds,
-        approxRouteLength: this.doneFeatures[id].bounds.diagonalLength()
-      }
-    }
-
-    todo = weightSort(todo, 'approxRouteLength')
-  }
-
-  var todoCallbacks = []
   for (var k in todo) {
-    todoCallbacks.push([ request.featureCallback, this.overpassElements[k], null ])
+    request.featureCallback(null, this.overpassElements[k])
   }
-  todoCallbacks.push([ request.finalCallback, null, null ])
-
-  callCallbacks(todoCallbacks)
+  request.finalCallback(null)
 
   this.overpassRequests[this.overpassRequests.indexOf(request)] = null
   this.overpassRequestActive = false
@@ -659,16 +635,6 @@ function toQuadtreeLookupBox (boundingbox) {
     new Quadtree.Point(boundingbox.bounds.minlat, boundingbox.bounds.minlon),
     new Quadtree.Point(boundingbox.bounds.maxlat, boundingbox.bounds.maxlon)
   )
-}
-
-function callCallbacks (todoCallbacks) {
-  async.setImmediate(function () {
-    for (var i = 0; i < todoCallbacks.length; i++) {
-      var c = todoCallbacks[i]
-
-      c[0](null, c[1], c[2])
-    }
-  })
 }
 
 if (typeof module !== 'undefined' && module.exports) {

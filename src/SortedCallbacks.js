@@ -20,6 +20,10 @@ function SortedCallbacks (options, featureCallback, finalCallback) {
 }
 
 SortedCallbacks.prototype.next = function (err, feature, index) {
+  if (typeof index === 'undefined') {
+    index = this.list.length
+  }
+
   this.list[index] = {
     err: err,
     feature: feature,
