@@ -60,7 +60,11 @@ function httpLoad (url, getParam, postParam, callback) {
   }
 
   req.open(reqType, url, true)
-  req.send(postData)
+  try {
+    req.send(postData)
+  } catch (err) {
+    callback(err, null)
+  }
 }
 
 module.exports = httpLoad

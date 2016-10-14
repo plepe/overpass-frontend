@@ -970,7 +970,24 @@ describe('Overpass objects structure', function() {
       )
     })
 
-
+    it('http error', function (done) {
+      var of = new OverpassFrontend('foo://bar')
+      of.get(['r910885'],
+        {
+          properties: OverpassFrontend.ID_ONLY
+        },
+        function(err, result, index) {
+          assert(false, 'feature_callback should not be called')
+        },
+        function(err) {
+          if(err === null) {
+            done('Query wrong, should not be successful')
+          } else {
+            done()
+          }
+        }
+      )
+    })
   })
 
   describe('OverpassFrontend, misc functions', function() {
