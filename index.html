@@ -5,15 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="node_modules/leaflet/dist/leaflet.css" />
     <script src="node_modules/leaflet/dist/leaflet.js"></script>
-    <script src="src/Overpass.js"></script>
-    <script src="src/http_load.js"></script>
-    <script src="src/weight_sort.js"></script>
-    <script src="node_modules/async/dist/async.min.js"></script>
+    <script src="dist/overpass-frontend.js"></script>
     <script>
 window.onload = function() {
-  var overpass = new Overpass('https://www.overpass-api.de/api/interpreter');
-  console.log(Overpass.TAGS)
-  overpass.get(['r910885'], { properties: Overpass.ID_ONLY | Overpass.BBOX | Overpass.TAGS },
+  var overpass = new OverpassFrontend('//www.overpass-api.de/api/interpreter');
+  overpass.get(['r910885'], { properties: OverpassFrontend.ID_ONLY | OverpassFrontend.BBOX | OverpassFrontend.TAGS },
     function(err, result, index) {
       console.log(err, result);
     },
