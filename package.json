@@ -27,9 +27,9 @@
   },
   "scripts": {
     "test": "mocha --bail",
-    "build": "browserify src/OverpassFrontend.js -o dist/overpass-frontend.js",
+    "build": "browserify index.js -o dist/overpass-frontend.js",
     "prepublish": "npm run build && npm run lint",
-    "lint": "eslint src/*.js"
+    "lint": "eslint src/*.js index.js"
   },
   "repository": {
     "type": "git",
