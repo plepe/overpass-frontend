@@ -14,7 +14,7 @@ Parameters:
 
 | Name    | Type   | Description
 | ------- | ------ | ---------------------
-| url     | string | The URL of the API, e.g. 'https://overpass-api.de/api/'
+| url     | string | The URL of the API, e.g. 'https://overpass-api.de/api/'. If you omit the protocol, it will use the protocol which is in use for the current page (or https: on nodejs): '//overpass-api.de/api/'.
 | options | object | various options, see below
 
 Options:

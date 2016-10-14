@@ -1,3 +1,5 @@
+/* global location:false */
+
 if (typeof XMLHttpRequest === 'undefined') {
   var XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest
 }
@@ -43,6 +45,14 @@ function httpLoad (url, getParam, postParam, callback) {
   if (postParam) {
     reqType = 'POST'
     postData = postParam
+  }
+
+  if (url.substr(0, 2) === '//') {
+    if (typeof location === 'undefined') {
+      url = 'https:' + url
+    } else {
+      url = location.protocol + url
+    }
   }
 
   req.open(reqType, url, true)
