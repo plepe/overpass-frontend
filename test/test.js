@@ -924,6 +924,53 @@ describe('Overpass objects structure', function() {
         }
       )
     })
+
+    it('Server not available - get request', function (done) {
+      var of = new OverpassFrontend('http://domaindoesnotexist.foo')
+      of.get([ 'r910885' ],
+        {
+          properties: OverpassFrontend.ID_ONLY
+        },
+        function(err, result, index) {
+          assert(false, 'feature_callback should not be called')
+        },
+        function(err) {
+          if(err === null) {
+            done('Query wrong, should not be successful')
+          } else {
+            done()
+          }
+        }
+      )
+    })
+
+    it('Server not available - BBoxQuery request', function (done) {
+      var of = new OverpassFrontend('invalid')
+      of.BBoxQuery(
+        'node[amenity=bench];',
+        {
+          minlon: 16.3384616,
+          minlat: 48.1990347,
+          maxlon: 16.3386118,
+          maxlat: 48.1991437
+        },
+        {
+          properties: OverpassFrontend.ID_ONLY
+        },
+        function(err, result, index) {
+          assert(false, 'feature_callback should not be called')
+        },
+        function(err) {
+          if(err === null) {
+            done('Query wrong, should not be successful')
+          } else {
+            done()
+          }
+        }
+      )
+    })
+
+
   })
 
   describe('OverpassFrontend, misc functions', function() {

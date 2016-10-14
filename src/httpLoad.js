@@ -24,17 +24,21 @@ function httpLoad (url, getParam, postParam, callback) {
         try {
           err = JSON.parse(req.responseText)
         } catch (err) {
-          var lines = req.responseText.split(/\n/)
-          var e = ''
+          if (req.responseText.search('OSM3S Response') !== -1) {
+            var lines = req.responseText.split(/\n/)
+            var e = ''
 
-          for (var i = 0; i < lines.length; i++) {
-            var m
-            if ((m = lines[i].match(/<p><strong style="color:#FF0000">Error<\/strong>: (.*)<\/p>/))) {
-              e += m[1] + '\n'
+            for (var i = 0; i < lines.length; i++) {
+              var m
+              if ((m = lines[i].match(/<p><strong style="color:#FF0000">Error<\/strong>: (.*)<\/p>/))) {
+                e += m[1] + '\n'
+              }
             }
-          }
 
-          callback(e, null)
+            callback(e, null)
+          } else {
+            callback(req.responseText, null)
+          }
         }
       }
     }
