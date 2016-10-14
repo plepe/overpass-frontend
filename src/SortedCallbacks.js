@@ -1,6 +1,6 @@
 var async = require('async')
 var weightSort = require('weight-sort')
-var OverpassFrontend = require('./OverpassFrontend')
+var OverpassFrontend = require('./defines')
 
 function SortedCallbacks (options, featureCallback, finalCallback) {
   this.list = []
@@ -20,7 +20,7 @@ function SortedCallbacks (options, featureCallback, finalCallback) {
   }
 
   if (this.options.sort === 'BBoxDiagonalLength') {
-    this.options.properties |= 8 // OverpassFrontend.BBOX
+    this.options.properties |= OverpassFrontend.BBOX
   }
 }
 

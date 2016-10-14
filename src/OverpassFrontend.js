@@ -16,6 +16,7 @@ if (typeof require !== 'undefined') {
   var OverpassWay = require('./OverpassWay')
   var OverpassRelation = require('./OverpassRelation')
   var OverpassRequest = require('./OverpassRequest')
+  var defines = require('./defines')
 }
 
 function OverpassFrontend (url, options) {
@@ -40,16 +41,9 @@ function OverpassFrontend (url, options) {
   this.overpassBBoxQueryRequested = {}
 }
 
-// Defines
-OverpassFrontend.ID_ONLY = 0
-OverpassFrontend.TAGS = 1
-OverpassFrontend.META = 2
-OverpassFrontend.MEMBERS = 4
-OverpassFrontend.BBOX = 8
-OverpassFrontend.GEOM = 16
-OverpassFrontend.CENTER = 32
-OverpassFrontend.ALL = 63
-OverpassFrontend.DEFAULT = 13
+for (var k in defines) {
+  OverpassFrontend[k] = defines[k]
+}
 
 OverpassFrontend.prototype.get = function (ids, options, featureCallback, finalCallback) {
   if (typeof ids === 'string') {

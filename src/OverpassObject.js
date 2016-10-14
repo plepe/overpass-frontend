@@ -1,5 +1,5 @@
 var BoundingBox = require('boundingbox')
-var OverpassFrontend = require('./OverpassFrontend')
+var OverpassFrontend = require('./defines')
 
 function OverpassObject () {
   this.data = {}
