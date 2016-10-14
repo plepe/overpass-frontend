@@ -1,4 +1,4 @@
-if (typeof require !== 'undefined') {
+if (typeof XMLHttpRequest === 'undefined') {
   var XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest
 }
 
@@ -49,6 +49,4 @@ function httpLoad (url, getParam, postParam, callback) {
   req.send(postData)
 }
 
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = httpLoad
-}
+module.exports = httpLoad

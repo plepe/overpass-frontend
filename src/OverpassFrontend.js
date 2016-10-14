@@ -1,23 +1,21 @@
-if (typeof require !== 'undefined') {
-  var weightSort = require('weight-sort')
-  var BoundingBox = require('boundingbox')
-  var Quadtree = require('quadtree-lookup')
-  var turf = {
-    difference: require('turf-difference'),
-    union: require('turf-union')
-  }
-
-  var httpLoad = require('./httpLoad')
-  var removeNullEntries = require('./removeNullEntries')
-  var SortedCallbacks = require('./SortedCallbacks')
-
-  var OverpassObject = require('./OverpassObject')
-  var OverpassNode = require('./OverpassNode')
-  var OverpassWay = require('./OverpassWay')
-  var OverpassRelation = require('./OverpassRelation')
-  var OverpassRequest = require('./OverpassRequest')
-  var defines = require('./defines')
+var weightSort = require('weight-sort')
+var BoundingBox = require('boundingbox')
+var Quadtree = require('quadtree-lookup')
+var turf = {
+  difference: require('turf-difference'),
+  union: require('turf-union')
 }
+
+var httpLoad = require('./httpLoad')
+var removeNullEntries = require('./removeNullEntries')
+var SortedCallbacks = require('./SortedCallbacks')
+
+var OverpassObject = require('./OverpassObject')
+var OverpassNode = require('./OverpassNode')
+var OverpassWay = require('./OverpassWay')
+var OverpassRelation = require('./OverpassRelation')
+var OverpassRequest = require('./OverpassRequest')
+var defines = require('./defines')
 
 function OverpassFrontend (url, options) {
   this.url = url
@@ -626,9 +624,4 @@ function toQuadtreeLookupBox (boundingbox) {
   )
 }
 
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = OverpassFrontend
-}
-if (typeof window !== 'undefined') {
-  window.OverpassFrontend = OverpassFrontend
-}
+module.exports = OverpassFrontend
