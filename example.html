@@ -1,7 +1,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>OverpassFrontend example</title>
+  <title>OverpassFrontendFrontend example</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="node_modules/leaflet/dist/leaflet.css" />
   <style>
@@ -19,6 +19,7 @@
   <script type='text/javascript'>
 var map
 var overpass
+var request
 var current_objects = {}
 
 function check_update_map () {
@@ -36,12 +37,14 @@ function check_update_map () {
 
   // Abort current requests (in case they are long-lasting - we don't need them
   // anyway). Data which is being submitted will still be loaded to the cache.
-  overpass.abort_all_requests()
+  if (request) {
+    request.abort()
+  }
 
   // Query all trees in the current view
-  overpass.bbox_query('node[natural=tree];', bounds,
+  overpass.BBoxQuery('node[natural=tree];', bounds,
     {
-      properties: Overpass.ALL
+      properties: OverpassFrontend.ALL
     },
     function (err, ob) {
       if (!ob.feature) {
@@ -66,7 +69,7 @@ function check_update_map () {
 
 window.onload = function() {
   map = L.map('map').setView([51.505, -0.09], 18)
-  overpass = new Overpass('http://www.overpass-api.de/api/interpreter')
+  overpass = new OverpassFrontend('//www.overpass-api.de/api/interpreter')
 
   var osm_mapnik = L.tileLayer('//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     {
