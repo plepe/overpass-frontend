@@ -44,9 +44,19 @@ Options:
 | Option  | Type   | Description
 | ------- | ------ | ------------
 | priority | number | Priority for loading these objects. The lower the sooner they will be requested. Default: 0
-| callOrdered | boolean | When set to true, the function featureCallback will be called in the order of the array ids. Default: false.
+| sort | string | Call the featureCallback in some particular order. See below for possible sort orders. `null` (default): no particular order.
+| sortDir | "asc" or "desc" | Sort direction. Default: "asc"
 | bbox    | L.latLngBounds | Only include objects which intersect the given bbox. The featureCallback will be called anyway, but boolean false will be passed.
 | properties | bit array | Which properties of the features should be downloaded: OVERPASS_ID_ONLY, OVERPASS_BBOX, OVERPASS_TAGS, OVERPASS_GEOM, OVERPASS_META. Combine by binary OR: ``OVERPASS_ID | OVERPASS_BBOX``. Default: ``OVERPASS_BBOX | OVERPASS_TAGS | OVERPASS_MEMBERS``
+
+Available sort orders:
+
+If no sort order (resp. `null`) is specified, the featureCallback can be called as soon as the object is loaded (e.g. immediately, if it is already loaded).
+
+| Sort Type | Description  |
+| --------- | ------------ |
+| index     | Features should be returned in the order of the 'ids' array. |
+| BBoxDiagonalLength | Order by the length of the diagonal of the bounding box. |
 
 Returns an OverpassRequest object.
 
@@ -68,7 +78,7 @@ Options:
 | Option  | Type   | Description
 | ------- | ------ | ------------
 | priority | number | Priority for loading these objects. The lower the sooner they will be requested. Default: 0
-| callOrdered | boolean | When set to true, the function featureCallback will be called in some particular order (e.g. from orderApproxRouteLength).
+| sort | boolean | When set to true, the function featureCallback will be called in some particular order (e.g. from orderApproxRouteLength).
 | properties | bit array | Which properties of the features should be downloaded: OVERPASS_ID_ONLY, OVERPASS_BBOX, OVERPASS_TAGS, OVERPASS_GEOM, OVERPASS_META. Combine by binary OR: ``OVERPASS_ID | OVERPASS_BBOX``. Default: ``OVERPASS_BBOX | OVERPASS_TAGS | OVERPASS_MEMBERS``
 | orderApproxRouteLength | boolean | Order objects by approximate route length (calculated from the diagonal of the bounding box)
 
