@@ -19,9 +19,13 @@ OverpassRelation.prototype.updateData = function (data, request) {
       (request.options.properties & OverpassFrontend.GEOM) &&
       data.members) {
     this.geometry = []
+    this.members = []
 
     for (var i = 0; i < data.members.length; i++) {
       var member = data.members[i]
+
+      this.members.push(data.members[i])
+      this.members[i].id = data.members[i].type.substr(0, 1) + data.members[i].ref
 
       switch (member.type) {
         case 'node':
