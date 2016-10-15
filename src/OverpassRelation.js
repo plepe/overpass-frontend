@@ -16,6 +16,18 @@ OverpassRelation.prototype.updateData = function (data, request) {
   this.constructor.super_.prototype.updateData.call(this, data, request)
 
   if ((request.options.properties & OverpassFrontend.MEMBERS) &&
+      data.members) {
+    this.members = []
+
+    for (var i = 0; i < data.members.length; i++) {
+      var member = data.members[i]
+
+      this.members.push(data.members[i])
+      this.members[i].id = data.members[i].type.substr(0, 1) + data.members[i].ref
+    }
+  }
+
+  if ((request.options.properties & OverpassFrontend.MEMBERS) &&
       (request.options.properties & OverpassFrontend.GEOM) &&
       data.members) {
     this.geometry = []
