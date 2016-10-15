@@ -21,6 +21,18 @@ OverpassWay.prototype.updateData = function (data, request) {
   }
 
   this.constructor.super_.prototype.updateData.call(this, data, request)
+
+  if (typeof this.data.nodes !== 'undefined') {
+    this.members = []
+
+    for (var i = 0; i < this.data.nodes.length; i++) {
+      this.members.push({
+        id: 'n' + this.data.nodes[i],
+        ref: this.data.nodes[i],
+        type: 'node'
+      })
+    }
+  }
 }
 
 OverpassWay.prototype.member_ids = function () {
