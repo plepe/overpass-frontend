@@ -191,6 +191,7 @@ OverpassFrontend.prototype._overpassProcess = function () {
 
         context.todo[ids[i]] = true
         context.BBoxTodo[ids[i]] = true
+        request.bboxSeenSeparator = false
       } else {
         context.todo[ids[i]] = true
       }
@@ -233,7 +234,6 @@ OverpassFrontend.prototype._overpassProcess = function () {
       if (BBoxQuery) {
         query += '(node.n; - node.n' + BBoxQuery + '->.n);\nout ids bb qt;\n'
       }
-      query += '.n out ' + outOptions + ';\n'
     }
 
     if (wayQuery !== '') {
@@ -241,7 +241,6 @@ OverpassFrontend.prototype._overpassProcess = function () {
       if (BBoxQuery) {
         query += '(way.w; - way.w' + BBoxQuery + '->.w);\nout ids bb qt;\n'
       }
-      query += '.w out ' + outOptions + ';\n'
     }
 
     if (relationQuery !== '') {
@@ -249,6 +248,19 @@ OverpassFrontend.prototype._overpassProcess = function () {
       if (BBoxQuery) {
         query += '(relation.r; - relation.r' + BBoxQuery + '->.r);\nout ids bb qt;\n'
       }
+    }
+
+    if (BBoxQuery) {
+      // additional separator to separate objects outside bbox from inside bbox
+      query += 'out count;\n'
+    }
+    if (nodeQuery !== '') {
+      query += '.n out ' + outOptions + ';\n'
+    }
+    if (wayQuery !== '') {
+      query += '.w out ' + outOptions + ';\n'
+    }
+    if (relationQuery !== '') {
       query += '.r out ' + outOptions + ';\n'
     }
   }
@@ -301,7 +313,11 @@ OverpassFrontend.prototype._handleGetResult = function (context, err, results) {
 
     if ('count' in el) {
       // separator found
-      request = context.requests.shift()
+      if (request.options.bbox) {
+        request.bboxSeenSeparator = true
+      } else {
+        request = context.requests.shift()
+      }
       continue
     } else {
       id = el.type.substr(0, 1) + el.id
@@ -309,9 +325,7 @@ OverpassFrontend.prototype._handleGetResult = function (context, err, results) {
 
     // bounding box only result -> save to overpassElements with bounds only
     if (request.options.bbox) {
-      var elBBox = new BoundingBox(el)
-
-      if (!request.options.bbox.intersects(elBBox)) {
+      if (!request.bboxSeenSeparator) {
         var BBoxRequest = {
           options: {
             properties: OverpassFrontend.BBOX
