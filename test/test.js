@@ -525,6 +525,11 @@ describe('Overpass query by id with bbox option', function() {
             maxlat: 48.1991437
           }
 
+    // make sure, that elements are not loaded
+    query.forEach(function (item) {
+      overpassFrontend.removeFromCache(item)
+    })
+
     overpassFrontend.get(query.concat([]), { properties: OverpassFrontend.ALL, bbox: bbox },
         function(err, result, index) {
           if (result === false && index_outside_bbox.indexOf(index) == -1)
@@ -562,6 +567,20 @@ describe('Overpass query by id with bbox option', function() {
           done()
         }
     )
+  })
+
+  it('Check data of outside objects', function(done) {
+    var query = [ 'n2832485845', 'n3037882439' ]
+
+    overpassFrontend.get(query.concat([]), { properties: OverpassFrontend.ID_ONLY },
+        function(err, result, index) {
+          assert.equal(OverpassFrontend.BBOX, result.properties, 'Element ' + result.id + ' which was loaded outside bbox, should only have BBOX data')
+        },
+        function(err) {
+          done()
+        }
+    )
+
   })
 })
 
