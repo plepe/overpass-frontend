@@ -104,10 +104,11 @@ OverpassFrontend.prototype._overpassProcess = function () {
   var context = {
     todo: {},
     BBoxTodo: {},
-    todoRequests: {}
+    requests: []
   }
   var query = ''
   var request
+  var currentRequest
 
   if (this.overpassRequests[0].type === 'BBoxQuery') {
     request = this.overpassRequests.splice(0, 1)
@@ -189,11 +190,19 @@ OverpassFrontend.prototype._overpassProcess = function () {
         }
 
         context.todo[ids[i]] = true
-        context.todoRequests[ids[i]] = request
         context.BBoxTodo[ids[i]] = true
       } else {
         context.todo[ids[i]] = true
-        context.todoRequests[ids[i]] = request
+      }
+
+      if (currentRequest !== request) {
+        if (currentRequest) {
+          // add separator to distinguish requests
+          query += 'out count;\n'
+        }
+
+        currentRequest = request
+        context.requests.push(request)
       }
 
       switch (ids[i].substr(0, 1)) {
@@ -262,12 +271,14 @@ OverpassFrontend.prototype._overpassProcess = function () {
 OverpassFrontend.prototype._handleGetResult = function (context, err, results) {
   var el
   var id
+  var request
+  var i
 
   if (err) {
     var done = []
 
-    for (var k in context.todoRequests) {
-      var request = context.todoRequests[k]
+    for (i = 0; i < context.requests.length; i++) {
+      request = context.requests[i]
 
       if (done.indexOf(request) === -1) {
         // call finalCallback for the request
@@ -283,10 +294,18 @@ OverpassFrontend.prototype._handleGetResult = function (context, err, results) {
     return
   }
 
-  for (var i = 0; i < results.elements.length; i++) {
+  request = context.requests.shift()
+
+  for (i = 0; i < results.elements.length; i++) {
     el = results.elements[i]
-    id = el.type.substr(0, 1) + el.id
-    request = context.todoRequests[id]
+
+    if ('count' in el) {
+      // separator found
+      request = context.requests.shift()
+      continue
+    } else {
+      id = el.type.substr(0, 1) + el.id
+    }
 
     // bounding box only result -> save to overpassElements with bounds only
     if (request.options.bbox) {
