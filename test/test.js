@@ -2,6 +2,7 @@ var fs = require('fs')
 var conf = JSON.parse(fs.readFileSync('test/conf.json', 'utf8'));
 
 var assert = require('assert')
+var async = require('async')
 
 var OverpassFrontend = require('../src/OverpassFrontend')
 var BoundingBox = require('boundingbox')
@@ -35,6 +36,36 @@ describe('Overpass get', function() {
         function(err) {
           done(err);
         })
+    })
+
+    it('should handle several simultaneous requests', function(done) {
+      async.parallel([
+        function(callback) {
+          overpassFrontend.get('r910886', { properties: OverpassFrontend.ALL },
+            function(err, result, index) {
+              assert.equal(null, err, err)
+              assert.equal('r910886', result.id, 'Wrong object ' + result.id + '?')
+            },
+            function(err) {
+              callback()
+            }
+          )
+        },
+        function(callback) {
+          overpassFrontend.get('n79721398', { properties: OverpassFrontend.ALL },
+            function(err, result, index) {
+              assert.equal(null, err, err)
+              assert.equal('n79721398', result.id, 'Wrong object ' + result.id + '?')
+            },
+            function(err) {
+              callback();
+            }
+          )
+        }],
+        function() {
+          done()
+        }
+      )
     })
 
     it('option "sort": should return ordered by id (even when cached)', function(done) {
