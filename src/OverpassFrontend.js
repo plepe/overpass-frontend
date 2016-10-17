@@ -1,3 +1,4 @@
+var async = require('async')
 var weightSort = require('weight-sort')
 var BoundingBox = require('boundingbox')
 var Quadtree = require('quadtree-lookup')
@@ -79,7 +80,9 @@ OverpassFrontend.prototype.get = function (ids, options, featureCallback, finalC
 
   this.overpassRequests.push(request)
 
-  this._overpassProcess()
+  async.setImmediate(function () {
+    this._overpassProcess()
+  }.bind(this))
 
   return request
 }
@@ -328,7 +331,9 @@ OverpassFrontend.prototype._handleGetResult = function (context, err, results) {
 
   this.overpassRequestActive = false
 
-  this._overpassProcess()
+  async.setImmediate(function () {
+    this._overpassProcess()
+  }.bind(this))
 }
 
 /**
@@ -417,7 +422,9 @@ OverpassFrontend.prototype.BBoxQuery = function (query, bounds, options, feature
 
   this.overpassRequests.push(request)
 
-  this._overpassProcess()
+  async.setImmediate(function () {
+    this._overpassProcess()
+  }.bind(this))
 
   return request
 }
@@ -513,7 +520,9 @@ OverpassFrontend.prototype._handleBBoxQueryResult = function (context, err, resu
   this.overpassRequests[this.overpassRequests.indexOf(request)] = null
   this.overpassRequestActive = false
 
-  this._overpassProcess()
+  async.setImmediate(function () {
+    this._overpassProcess()
+  }.bind(this))
 }
 
 OverpassFrontend.prototype.abortRequest = function (request) {
