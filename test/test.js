@@ -312,8 +312,7 @@ describe('Overpass get', function() {
             assert(false, 'Object ' + result.id + ' should not be found!')
         },
         function(err) {
-          if(found.length != expected.length)
-            assert(false, 'Wrong count of objects found!')
+          assert.equal(expected.length, found.length, 'Wrong count of objects found!')
 
           done()
         }
@@ -342,8 +341,7 @@ describe('Overpass get', function() {
             assert(false, 'Object ' + result.id + ' should not be found!')
         },
         function(err) {
-          if(found.length != expected.length)
-            assert(false, 'Wrong count of objects found!')
+          assert.equal(expected.length, found.length, 'Wrong count of objects found!')
 
           done()
         }
@@ -374,8 +372,7 @@ describe('Overpass get', function() {
             assert(false, 'Object ' + result.id + ' should not be found!')
         },
         function(err) {
-          if(found.length != expected.length)
-            assert(false, 'Wrong count of objects found!')
+          assert.equal(expected.length, found.length, 'Wrong count of objects found!')
 
           done()
         }
@@ -404,8 +401,7 @@ describe('Overpass get', function() {
             assert(false, 'Object ' + result.id + ' should not be found!')
         },
         function(err) {
-          if(found.length != expected.length)
-            assert(false, 'Wrong count of objects found!')
+          assert.equal(expected.length, found.length, 'Wrong count of objects found!')
 
           done()
         }
