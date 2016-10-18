@@ -101,7 +101,7 @@ OverpassObject.prototype.GeoJSONProperties = function () {
   return ret
 }
 
-OverpassObject.prototype.isVisible = function (bbox) {
+OverpassObject.prototype.intersects = function (bbox) {
   if (!this.bounds) {
     return null
   }
