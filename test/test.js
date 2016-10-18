@@ -680,7 +680,7 @@ describe('Overpass objects structure', function() {
     it('method intersects()', function (done) {
       overpassFrontend.get('n3037893169', { properties: OverpassFrontend.BBOX },
         function (err, result, index) {
-          assert.equal(1, result.intersects(new BoundingBox({
+          assert.equal(2, result.intersects(new BoundingBox({
               minlat: 48.198,
               maxlat: 48.199,
               minlon: 16.338,
