@@ -99,7 +99,10 @@ Abort all currently running requests. For each request the final callback will b
 Passed to the featureCallback function.
 
 ## OverpassObject.intersects(bbox)
-Returns true, if the bounding box of the object intersects `bbox`, otherwise false.
+Returns:
+* 2: if `bbox` intersects the object
+* 1: `bbox` might intersect the object, e.g. when only the bounding box of the object is known.
+* 0: `bbox` does not intersect the object (or the bounding box, it the exact geometry is not known)
 
 ## OverpassObject.leafletFeature(options)
 Returns a feature for adding to a Leaflet based map. As options all Path resp. Marker options are available, additionally:

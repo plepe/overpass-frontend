@@ -680,14 +680,14 @@ describe('Overpass objects structure', function() {
     it('method intersects()', function (done) {
       overpassFrontend.get('n3037893169', { properties: OverpassFrontend.BBOX },
         function (err, result, index) {
-          assert.equal(true, result.intersects(new BoundingBox({
+          assert.equal(1, result.intersects(new BoundingBox({
               minlat: 48.198,
               maxlat: 48.199,
               minlon: 16.338,
               maxlon: 16.339
             }
           )))
-          assert.equal(false, result.intersects(new BoundingBox({
+          assert.equal(0, result.intersects(new BoundingBox({
               minlat: 48.197,
               maxlat: 48.198,
               minlon: 16.338,
@@ -723,14 +723,14 @@ describe('Overpass objects structure', function() {
     it('method intersects()', function (done) {
       overpassFrontend.get('w299709373', { properties: OverpassFrontend.BBOX },
         function (err, result, index) {
-          assert.equal(true, result.intersects(new BoundingBox({
+          assert.equal(1, result.intersects(new BoundingBox({
               minlat: 48.198,
               maxlat: 48.199,
               minlon: 16.338,
               maxlon: 16.339
             }
           )))
-          assert.equal(false, result.intersects(new BoundingBox({
+          assert.equal(0, result.intersects(new BoundingBox({
               minlat: 48.197,
               maxlat: 48.198,
               minlon: 16.338,
@@ -766,14 +766,14 @@ describe('Overpass objects structure', function() {
     it('method intersects()', function (done) {
       overpassFrontend.get('r1980077', { properties: OverpassFrontend.BBOX },
         function (err, result, index) {
-          assert.equal(true, result.intersects(new BoundingBox({
+          assert.equal(1, result.intersects(new BoundingBox({
               minlat: 48.198,
               maxlat: 48.199,
               minlon: 16.338,
               maxlon: 16.339
             }
           )))
-          assert.equal(false, result.intersects(new BoundingBox({
+          assert.equal(0, result.intersects(new BoundingBox({
               minlat: 48.197,
               maxlat: 48.198,
               minlon: 16.338,
@@ -804,14 +804,14 @@ describe('Overpass objects structure', function() {
     it('method intersects()', function (done) {
       overpassFrontend.get('r20313', { properties: OverpassFrontend.BBOX },
         function (err, result, index) {
-          assert.equal(null, result.intersects(new BoundingBox({
+          assert.equal(1, result.intersects(new BoundingBox({
               minlat: 48.198,
               maxlat: 48.199,
               minlon: 16.338,
               maxlon: 16.339
             }
           )))
-          assert.equal(null, result.intersects(new BoundingBox({
+          assert.equal(1, result.intersects(new BoundingBox({
               minlat: 48.197,
               maxlat: 48.198,
               minlon: 16.338,
