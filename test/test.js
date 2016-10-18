@@ -321,7 +321,7 @@ describe('Overpass get', function() {
 
     it('should return a list of node features (2nd try, partly cached)', function(done) {
       var found = []
-      var expected = [ 'n3037893162', 'n3037893163', 'n3037893164', 'n3037893159', 'n3037893160' ]
+      var expected = [ 'n3037893162', 'n3037893163', 'n3037893164' ]
 
       overpassFrontend.BBoxQuery(
         'node[amenity=bench];',
@@ -381,7 +381,7 @@ describe('Overpass get', function() {
 
     it('should return a list of way features (2nd try, partly cached)', function(done) {
       var found = []
-      var expected = [ 'w299709373', 'w299709375' ]
+      var expected = [ 'w299709373' ]
 
       overpassFrontend.BBoxQuery(
         'way[highway=footway];',
