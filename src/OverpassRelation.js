@@ -2,6 +2,7 @@
 
 var util = require('util')
 var OverpassObject = require('./OverpassObject')
+var OverpassFrontend = require('./defines')
 
 util.inherits(OverpassRelation, OverpassObject)
 function OverpassRelation () {
@@ -10,6 +11,30 @@ function OverpassRelation () {
 
 OverpassRelation.prototype.updateData = function (data, request) {
   this.constructor.super_.prototype.updateData.call(this, data, request)
+
+  if ((request.options.properties & OverpassFrontend.MEMBERS) &&
+      (request.options.properties & OverpassFrontend.GEOM) &&
+      data.members) {
+    this.geometry = []
+
+    for (var i = 0; i < data.members.length; i++) {
+      var member = data.members[i]
+
+      switch (member.type) {
+        case 'node':
+          this.geometry.push({
+            lat: member.lat,
+            lon: member.lon
+          })
+          break
+        case 'way':
+          this.geometry.push(member.geometry)
+          break
+        case 'relation':
+          break
+      }
+    }
+  }
 }
 
 OverpassRelation.prototype.member_ids = function () {
@@ -77,6 +102,37 @@ OverpassRelation.prototype.leafletFeature = function (options) {
   }
 
   return L.featureGroup(features)
+}
+
+OverpassRelation.prototype.GeoJSON = function () {
+  var geometries = []
+  for (var i = 0; i < this.geometry.length; i++) {
+    var geometry = this.geometry[i]
+
+    if ('length' in geometry) {
+      geometries.push({
+        type: 'LineString',
+        coordinates: geometry.map(function (item) {
+          return [ item.lon, item.lat ]
+        })
+      })
+    } else {
+      geometries.push({
+        type: 'Point',
+        coordinates: [ geometry.lon, geometry.lat ]
+      })
+    }
+  }
+
+  return {
+    type: 'Feature',
+    id: this.type + '/' + this.osm_id,
+    geometry: {
+      type: 'GeometryCollection',
+      geometries: geometries
+    },
+    properties: this.GeoJSONProperties()
+  }
 }
 
 module.exports = OverpassRelation
