@@ -287,6 +287,80 @@ describe('Overpass get', function() {
         function(err) {
         })
     })
+
+    it('relation', function(done) {
+      overpassFrontend.get('r3854502', { properties: OverpassFrontend.ALL },
+        function(err, result, index) {
+	  var geojson = result.GeoJSON();
+
+          assert.deepEqual({
+	    "type": "Feature",
+	    "id": "relation/3854502",
+	    "geometry": {
+              "type": "GeometryCollection",
+              "geometries": [
+                {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3401188,
+                      48.1943668
+                    ],
+                    [
+                      16.3409734,
+                      48.1946786
+                    ]
+                  ]
+                },
+                {
+                  "type": "Point",
+                  "coordinates": [
+                    16.3401188,
+                    48.1943668
+                  ]
+                },
+                {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3398155,
+                      48.1944888
+                    ],
+                    [
+                      16.3399651,
+                      48.1944683
+                    ],
+                    [
+                      16.3400559,
+                      48.1944373
+                    ],
+                    [
+                      16.3401188,
+                      48.1943668
+                    ]
+                  ]
+                }
+              ]
+	    },
+	    "properties": {
+	      "@changeset": 32165173,
+	      "@id": "relation/3854502",
+	      "@timestamp": "2015-06-23T16:09:42Z",
+	      "@uid": 161619,
+	      "@user": "FvGordon",
+	      "@version": 2,
+	      "note": "applies only to cyclists against oneway",
+	      "restriction:bicycle": "no_right_turn",
+	      "type": "restriction"
+	    }
+	  },
+          geojson);
+
+          done();
+        },
+        function(err) {
+        })
+    })
   })
 
   describe('bbox query', function() {
