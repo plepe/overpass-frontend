@@ -3,6 +3,9 @@
 var util = require('util')
 var OverpassObject = require('./OverpassObject')
 var OverpassFrontend = require('./defines')
+var turf = {
+  bboxClip: require('turf-bbox-clip')
+}
 
 util.inherits(OverpassRelation, OverpassObject)
 function OverpassRelation () {
@@ -133,6 +136,47 @@ OverpassRelation.prototype.GeoJSON = function () {
     },
     properties: this.GeoJSONProperties()
   }
+}
+
+OverpassRelation.prototype.intersects = function (bbox) {
+  var i
+
+  if (this.geometry) {
+    var geojson = this.GeoJSON()
+
+    for (i = 0; i < geojson.geometry.geometries.length; i++) {
+      var g = {
+        type: 'Feature',
+        geometry: geojson.geometry.geometries[i]
+      }
+
+      var intersects = turf.bboxClip(g, [ bbox.bounds.minlon, bbox.bounds.minlat, bbox.bounds.maxlon, bbox.bounds.maxlat ])
+
+      if (g.geometry.type === 'Point') {
+        if (intersects) {
+          return 2
+        }
+      }
+      if (g.geometry.type === 'LineString') {
+        if (intersects.geometry.coordinates.length) {
+          return 2
+        }
+      }
+    }
+
+    // if there's a relation member (where Overpass does not return the
+    // geometry) we can't know if the geometry intersects -> return 1
+    for (i = 0; i < this.data.members.length; i++) {
+      if (this.data.members[i].type === 'relation') {
+        return 1
+      }
+    }
+
+    // if there's no relation member we can be sure there's no intersection
+    return 0
+  }
+
+  return this.constructor.super_.prototype.intersects.call(this, bbox)
 }
 
 module.exports = OverpassRelation
