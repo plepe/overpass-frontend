@@ -13,7 +13,8 @@
     "weight-sort": "*",
     "quadtree-lookup": "https://github.com/petrbrzek/quadtree-lookup",
     "turf-difference": "*",
-    "turf-union": "*"
+    "turf-union": "*",
+    "turf-bbox-clip": "https://github.com/Turfjs/turf-bbox-clip"
   },
   "devDependencies": {
     "browserify": "*",

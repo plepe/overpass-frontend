@@ -2,6 +2,9 @@
 
 var util = require('util')
 var OverpassObject = require('./OverpassObject')
+var turf = {
+  bboxClip: require('turf-bbox-clip')
+}
 
 util.inherits(OverpassWay, OverpassObject)
 function OverpassWay () {
@@ -67,6 +70,16 @@ OverpassWay.prototype.leafletFeature = function (options) {
   }
 
   return L.polyline(this.geometry, options)
+}
+
+OverpassWay.prototype.intersects = function (bbox) {
+  if (this.geometry) {
+    var intersects = turf.bboxClip(this.GeoJSON(), [ bbox.bounds.minlon, bbox.bounds.minlat, bbox.bounds.maxlon, bbox.bounds.maxlat ])
+
+    return intersects.geometry.coordinates.length ? 2 : 0
+  }
+
+  return this.constructor.super_.prototype.intersects.call(this, bbox)
 }
 
 module.exports = OverpassWay

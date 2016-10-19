@@ -101,12 +101,12 @@ OverpassObject.prototype.GeoJSONProperties = function () {
   return ret
 }
 
-OverpassObject.prototype.isVisible = function (bbox) {
+OverpassObject.prototype.intersects = function (bbox) {
   if (!this.bounds) {
-    return null
+    return 1
   }
 
-  return bbox.intersects(this.bounds)
+  return bbox.intersects(this.bounds) ? 1 : 0
 }
 
 OverpassObject.prototype.leafletFeature = function (options) {
