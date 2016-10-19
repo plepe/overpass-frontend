@@ -47,4 +47,12 @@ OverpassNode.prototype.leafletFeature = function (options) {
   }
 }
 
+OverpassNode.prototype.intersects = function (bbox) {
+  if (!this.bounds) {
+    return 1
+  }
+
+  return bbox.intersects(this.bounds) ? 2 : 0
+}
+
 module.exports = OverpassNode

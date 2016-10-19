@@ -151,7 +151,7 @@ OverpassFrontend.prototype._overpassProcess = function () {
 
         // for bbox option, if object is (partly) loaded, but outside call
         // featureCallback with 'false'
-        if (request.options.bbox && ob.bounds && !request.options.bbox.intersects(ob.bounds)) {
+        if (request.options.bbox && !ob.intersects(request.options.bbox)) {
           request.featureCallback(null, false, i)
           request.ids[i] = null
           continue
@@ -184,7 +184,7 @@ OverpassFrontend.prototype._overpassProcess = function () {
         // check if we already know the bbox of the element; if yes, don't try
         // to load object if it does not intersect bounds
         if (ids[i] in this.overpassElements && (this.overpassElements[ids[i]].properties & OverpassFrontend.BBOX)) {
-          if (!request.options.bbox.intersects(this.overpassElements[ids[i]].bounds)) {
+          if (!this.overpassElements[ids[i]].intersects(request.options.bbox)) {
             continue
           }
         }

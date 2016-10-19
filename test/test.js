@@ -318,6 +318,80 @@ describe('Overpass get', function() {
         function(err) {
         })
     })
+
+    it('relation', function(done) {
+      overpassFrontend.get('r3854502', { properties: OverpassFrontend.ALL },
+        function(err, result, index) {
+	  var geojson = result.GeoJSON();
+
+          assert.deepEqual({
+	    "type": "Feature",
+	    "id": "relation/3854502",
+	    "geometry": {
+              "type": "GeometryCollection",
+              "geometries": [
+                {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3401188,
+                      48.1943668
+                    ],
+                    [
+                      16.3409734,
+                      48.1946786
+                    ]
+                  ]
+                },
+                {
+                  "type": "Point",
+                  "coordinates": [
+                    16.3401188,
+                    48.1943668
+                  ]
+                },
+                {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3398155,
+                      48.1944888
+                    ],
+                    [
+                      16.3399651,
+                      48.1944683
+                    ],
+                    [
+                      16.3400559,
+                      48.1944373
+                    ],
+                    [
+                      16.3401188,
+                      48.1943668
+                    ]
+                  ]
+                }
+              ]
+	    },
+	    "properties": {
+	      "@changeset": 32165173,
+	      "@id": "relation/3854502",
+	      "@timestamp": "2015-06-23T16:09:42Z",
+	      "@uid": 161619,
+	      "@user": "FvGordon",
+	      "@version": 2,
+	      "note": "applies only to cyclists against oneway",
+	      "restriction:bicycle": "no_right_turn",
+	      "type": "restriction"
+	    }
+	  },
+          geojson);
+
+          done();
+        },
+        function(err) {
+        })
+    })
   })
 
   describe('bbox query', function() {
@@ -343,8 +417,7 @@ describe('Overpass get', function() {
             assert(false, 'Object ' + result.id + ' should not be found!')
         },
         function(err) {
-          if(found.length != expected.length)
-            assert(false, 'Wrong count of objects found!')
+          assert.equal(expected.length, found.length, 'Wrong count of objects found!')
 
           done()
         }
@@ -353,7 +426,7 @@ describe('Overpass get', function() {
 
     it('should return a list of node features (2nd try, partly cached)', function(done) {
       var found = []
-      var expected = [ 'n3037893162', 'n3037893163', 'n3037893164', 'n3037893159', 'n3037893160' ]
+      var expected = [ 'n3037893162', 'n3037893163', 'n3037893164' ]
 
       overpassFrontend.BBoxQuery(
         'node[amenity=bench];',
@@ -373,8 +446,7 @@ describe('Overpass get', function() {
             assert(false, 'Object ' + result.id + ' should not be found!')
         },
         function(err) {
-          if(found.length != expected.length)
-            assert(false, 'Wrong count of objects found!')
+          assert.equal(expected.length, found.length, 'Wrong count of objects found!')
 
           done()
         }
@@ -405,8 +477,7 @@ describe('Overpass get', function() {
             assert(false, 'Object ' + result.id + ' should not be found!')
         },
         function(err) {
-          if(found.length != expected.length)
-            assert(false, 'Wrong count of objects found!')
+          assert.equal(expected.length, found.length, 'Wrong count of objects found!')
 
           done()
         }
@@ -415,7 +486,7 @@ describe('Overpass get', function() {
 
     it('should return a list of way features (2nd try, partly cached)', function(done) {
       var found = []
-      var expected = [ 'w299709373', 'w299709375' ]
+      var expected = [ 'w299709373' ]
 
       overpassFrontend.BBoxQuery(
         'way[highway=footway];',
@@ -435,8 +506,7 @@ describe('Overpass get', function() {
             assert(false, 'Object ' + result.id + ' should not be found!')
         },
         function(err) {
-          if(found.length != expected.length)
-            assert(false, 'Wrong count of objects found!')
+          assert.equal(expected.length, found.length, 'Wrong count of objects found!')
 
           done()
         }
@@ -731,17 +801,17 @@ describe('Overpass objects structure', function() {
       )
     })
 
-    it('method isVisible()', function (done) {
+    it('method intersects()', function (done) {
       overpassFrontend.get('n3037893169', { properties: OverpassFrontend.BBOX },
         function (err, result, index) {
-          assert.equal(true, result.isVisible(new BoundingBox({
+          assert.equal(2, result.intersects(new BoundingBox({
               minlat: 48.198,
               maxlat: 48.199,
               minlon: 16.338,
               maxlon: 16.339
             }
           )))
-          assert.equal(false, result.isVisible(new BoundingBox({
+          assert.equal(0, result.intersects(new BoundingBox({
               minlat: 48.197,
               maxlat: 48.198,
               minlon: 16.338,
@@ -774,17 +844,17 @@ describe('Overpass objects structure', function() {
       )
     })
 
-    it('method isVisible()', function (done) {
+    it('method intersects()', function (done) {
       overpassFrontend.get('w299709373', { properties: OverpassFrontend.BBOX },
         function (err, result, index) {
-          assert.equal(true, result.isVisible(new BoundingBox({
+          assert.equal(1, result.intersects(new BoundingBox({
               minlat: 48.198,
               maxlat: 48.199,
               minlon: 16.338,
               maxlon: 16.339
             }
           )))
-          assert.equal(false, result.isVisible(new BoundingBox({
+          assert.equal(0, result.intersects(new BoundingBox({
               minlat: 48.197,
               maxlat: 48.198,
               minlon: 16.338,
@@ -817,17 +887,41 @@ describe('Overpass objects structure', function() {
       )
     })
 
-    it('method isVisible()', function (done) {
+    it('method intersects() - BBox only', function (done) {
       overpassFrontend.get('r1980077', { properties: OverpassFrontend.BBOX },
         function (err, result, index) {
-          assert.equal(true, result.isVisible(new BoundingBox({
+          assert.equal(1, result.intersects(new BoundingBox({
               minlat: 48.198,
               maxlat: 48.199,
               minlon: 16.338,
               maxlon: 16.339
             }
           )))
-          assert.equal(false, result.isVisible(new BoundingBox({
+          assert.equal(0, result.intersects(new BoundingBox({
+              minlat: 48.197,
+              maxlat: 48.198,
+              minlon: 16.338,
+              maxlon: 16.339
+            }
+          )))
+        },
+        function (err) {
+          done()
+        }
+      )
+    })
+
+    it('method intersects() - full geometry', function (done) {
+      overpassFrontend.get('r1980077', { properties: OverpassFrontend.ALL },
+        function (err, result, index) {
+          assert.equal(2, result.intersects(new BoundingBox({
+              minlat: 48.198,
+              maxlat: 48.199,
+              minlon: 16.338,
+              maxlon: 16.339
+            }
+          )))
+          assert.equal(0, result.intersects(new BoundingBox({
               minlat: 48.197,
               maxlat: 48.198,
               minlon: 16.338,
@@ -855,17 +949,17 @@ describe('Overpass objects structure', function() {
       )
     })
 
-    it('method isVisible()', function (done) {
+    it('method intersects()', function (done) {
       overpassFrontend.get('r20313', { properties: OverpassFrontend.BBOX },
         function (err, result, index) {
-          assert.equal(null, result.isVisible(new BoundingBox({
+          assert.equal(1, result.intersects(new BoundingBox({
               minlat: 48.198,
               maxlat: 48.199,
               minlon: 16.338,
               maxlon: 16.339
             }
           )))
-          assert.equal(null, result.isVisible(new BoundingBox({
+          assert.equal(1, result.intersects(new BoundingBox({
               minlat: 48.197,
               maxlat: 48.198,
               minlon: 16.338,
