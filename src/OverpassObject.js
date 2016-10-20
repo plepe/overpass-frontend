@@ -1,5 +1,9 @@
 var BoundingBox = require('boundingbox')
 var OverpassFrontend = require('./defines')
+var turf = {
+  difference: require('turf-difference'),
+  intersect: require('turf-intersect')
+}
 
 function OverpassObject () {
   this.data = {}
@@ -37,6 +41,16 @@ OverpassObject.prototype.updateData = function (data, request) {
     }
   } else {
     this.properties = this.properties | request.options.properties
+  }
+
+  // result of a request with bbox limitation, where the object was outside
+  if (request.bboxNoMatch && this.bounds) {
+    // this.boundsPossibleMatch: record unsucessful bbox requests for an object
+    if (typeof this.boundsPossibleMatch === 'undefined') {
+      this.boundsPossibleMatch = this.bounds.toGeoJSON()
+    }
+
+    this.boundsPossibleMatch = turf.difference(this.boundsPossibleMatch, request.options.bbox.toGeoJSON())
   }
 
   if (request.options.properties & OverpassFrontend.TAGS) {
@@ -103,6 +117,17 @@ OverpassObject.prototype.GeoJSONProperties = function () {
 
 OverpassObject.prototype.intersects = function (bbox) {
   if (!this.bounds) {
+    return 0
+  }
+
+  if (this.boundsPossibleMatch) {
+    var remaining = turf.intersect(bbox.toGeoJSON(), this.boundsPossibleMatch)
+
+    if (!remaining || remaining.geometry.type !== 'Polygon') {
+      // geometry.type != Polygon: bbox matches border of this.boundsPossibleMatch
+      return 0
+    }
+
     return 1
   }
 

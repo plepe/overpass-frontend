@@ -586,8 +586,8 @@ describe('Overpass get', function() {
 describe('Overpass query by id with bbox option', function() {
   it('First call', function(done) {
     var query = [ 'w299709373', 'w299709375', 'w4583442', 'w299704585', 'n2832485845', 'n3037893162', 'r20313', 'r3636229', 'r3311614' ]
-    var expected = [ 'w299709373', 'w299709375', 'n3037893162', 'r3636229', 'r20313' ]
-    var index_outside_bbox = [ 2, 3, 4, 5, 8 ]
+    var expected = [ 'w299709373', 'n3037893162' ]
+    var index_outside_bbox = [ 1, 2, 3, 4, 5, 6, 7, 8 ]
     var bbox = {
             minlon: 16.3384616,
             minlat: 48.1990347,
@@ -617,7 +617,7 @@ describe('Overpass query by id with bbox option', function() {
   it('Second call', function(done) {
     var query = [ 'w299709373', 'w299709375', 'w4583442', 'w299704585', 'n2832485845', 'n3037882439', 'n3037893162' ]
     var expected = [ 'w299709375', 'w299704585' ]
-    var index_outside_bbox = [ 0, 2, 4, 5, 6 ]
+    var index_outside_bbox = [ 0, 1, 2, 4, 5, 6 ]
     var bbox = {
             minlat: 48.1996955,
             minlon: 16.3381572,
@@ -644,7 +644,7 @@ describe('Overpass query by id with bbox option', function() {
 
     overpassFrontend.get(query.concat([]), { properties: OverpassFrontend.ID_ONLY },
         function(err, result, index) {
-          assert.equal(OverpassFrontend.BBOX, result.properties, 'Element ' + result.id + ' which was loaded outside bbox, should only have BBOX data')
+          assert.equal(OverpassFrontend.BBOX | OverpassFrontend.CENTER, result.properties, 'Element ' + result.id + ' which was loaded outside bbox, should only have BBOX data')
         },
         function(err) {
           done()
