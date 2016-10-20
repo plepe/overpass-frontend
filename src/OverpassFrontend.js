@@ -328,8 +328,10 @@ OverpassFrontend.prototype._handleGetResult = function (context, err, results) {
       if (!request.bboxSeenSeparator) {
         var BBoxRequest = {
           options: {
-            properties: OverpassFrontend.BBOX
-          }
+            properties: OverpassFrontend.BBOX,
+            bbox: request.options.bbox
+          },
+          bboxNoMatch: true
         }
 
         this.createOrUpdateOSMObject(el, BBoxRequest)
