@@ -53,6 +53,11 @@ OverpassObject.prototype.updateData = function (data, request) {
     this.boundsPossibleMatch = turf.difference(this.boundsPossibleMatch, request.options.bbox.toGeoJSON())
   }
 
+  // geometry is known -> no need for this.boundsPossibleMatch
+  if (this.geometry) {
+    delete this.boundsPossibleMatch
+  }
+
   if (request.options.properties & OverpassFrontend.TAGS) {
     if (typeof data.tags === 'undefined') {
       this.tags = {}
