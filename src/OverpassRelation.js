@@ -13,8 +13,6 @@ function OverpassRelation () {
 }
 
 OverpassRelation.prototype.updateData = function (data, request) {
-  this.constructor.super_.prototype.updateData.call(this, data, request)
-
   if ((request.options.properties & OverpassFrontend.MEMBERS) &&
       (request.options.properties & OverpassFrontend.GEOM) &&
       data.members) {
@@ -42,6 +40,8 @@ OverpassRelation.prototype.updateData = function (data, request) {
       }
     }
   }
+
+  this.constructor.super_.prototype.updateData.call(this, data, request)
 }
 
 OverpassRelation.prototype.member_ids = function () {

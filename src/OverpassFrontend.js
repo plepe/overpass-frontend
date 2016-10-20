@@ -1,3 +1,4 @@
+var async = require('async')
 var weightSort = require('weight-sort')
 var BoundingBox = require('boundingbox')
 var Quadtree = require('quadtree-lookup')
@@ -79,7 +80,9 @@ OverpassFrontend.prototype.get = function (ids, options, featureCallback, finalC
 
   this.overpassRequests.push(request)
 
-  this._overpassProcess()
+  async.setImmediate(function () {
+    this._overpassProcess()
+  }.bind(this))
 
   return request
 }
@@ -101,10 +104,11 @@ OverpassFrontend.prototype._overpassProcess = function () {
   var context = {
     todo: {},
     BBoxTodo: {},
-    todoRequests: {}
+    requests: []
   }
   var query = ''
   var request
+  var currentRequest
 
   if (this.overpassRequests[0].type === 'BBoxQuery') {
     request = this.overpassRequests.splice(0, 1)
@@ -186,11 +190,20 @@ OverpassFrontend.prototype._overpassProcess = function () {
         }
 
         context.todo[ids[i]] = true
-        context.todoRequests[ids[i]] = request
         context.BBoxTodo[ids[i]] = true
+        request.bboxSeenSeparator = false
       } else {
         context.todo[ids[i]] = true
-        context.todoRequests[ids[i]] = request
+      }
+
+      if (currentRequest !== request) {
+        if (currentRequest) {
+          // add separator to distinguish requests
+          query += 'out count;\n'
+        }
+
+        currentRequest = request
+        context.requests.push(request)
       }
 
       switch (ids[i].substr(0, 1)) {
@@ -221,7 +234,6 @@ OverpassFrontend.prototype._overpassProcess = function () {
       if (BBoxQuery) {
         query += '(node.n; - node.n' + BBoxQuery + '->.n);\nout ids bb qt;\n'
       }
-      query += '.n out ' + outOptions + ';\n'
     }
 
     if (wayQuery !== '') {
@@ -229,7 +241,6 @@ OverpassFrontend.prototype._overpassProcess = function () {
       if (BBoxQuery) {
         query += '(way.w; - way.w' + BBoxQuery + '->.w);\nout ids bb qt;\n'
       }
-      query += '.w out ' + outOptions + ';\n'
     }
 
     if (relationQuery !== '') {
@@ -237,6 +248,19 @@ OverpassFrontend.prototype._overpassProcess = function () {
       if (BBoxQuery) {
         query += '(relation.r; - relation.r' + BBoxQuery + '->.r);\nout ids bb qt;\n'
       }
+    }
+
+    if (BBoxQuery) {
+      // additional separator to separate objects outside bbox from inside bbox
+      query += 'out count;\n'
+    }
+    if (nodeQuery !== '') {
+      query += '.n out ' + outOptions + ';\n'
+    }
+    if (wayQuery !== '') {
+      query += '.w out ' + outOptions + ';\n'
+    }
+    if (relationQuery !== '') {
       query += '.r out ' + outOptions + ';\n'
     }
   }
@@ -259,12 +283,14 @@ OverpassFrontend.prototype._overpassProcess = function () {
 OverpassFrontend.prototype._handleGetResult = function (context, err, results) {
   var el
   var id
+  var request
+  var i
 
   if (err) {
     var done = []
 
-    for (var k in context.todoRequests) {
-      var request = context.todoRequests[k]
+    for (i = 0; i < context.requests.length; i++) {
+      request = context.requests[i]
 
       if (done.indexOf(request) === -1) {
         // call finalCallback for the request
@@ -280,20 +306,32 @@ OverpassFrontend.prototype._handleGetResult = function (context, err, results) {
     return
   }
 
-  for (var i = 0; i < results.elements.length; i++) {
+  request = context.requests.shift()
+
+  for (i = 0; i < results.elements.length; i++) {
     el = results.elements[i]
-    id = el.type.substr(0, 1) + el.id
-    request = context.todoRequests[id]
+
+    if ('count' in el) {
+      // separator found
+      if (request.options.bbox) {
+        request.bboxSeenSeparator = true
+      } else {
+        request = context.requests.shift()
+      }
+      continue
+    } else {
+      id = el.type.substr(0, 1) + el.id
+    }
 
     // bounding box only result -> save to overpassElements with bounds only
     if (request.options.bbox) {
-      var elBBox = new BoundingBox(el)
-
-      if (!request.options.bbox.intersects(elBBox)) {
+      if (!request.bboxSeenSeparator) {
         var BBoxRequest = {
           options: {
-            properties: OverpassFrontend.BBOX
-          }
+            properties: OverpassFrontend.BBOX,
+            bbox: request.options.bbox
+          },
+          bboxNoMatch: true
         }
 
         this.createOrUpdateOSMObject(el, BBoxRequest)
@@ -328,7 +366,9 @@ OverpassFrontend.prototype._handleGetResult = function (context, err, results) {
 
   this.overpassRequestActive = false
 
-  this._overpassProcess()
+  async.setImmediate(function () {
+    this._overpassProcess()
+  }.bind(this))
 }
 
 /**
@@ -417,7 +457,9 @@ OverpassFrontend.prototype.BBoxQuery = function (query, bounds, options, feature
 
   this.overpassRequests.push(request)
 
-  this._overpassProcess()
+  async.setImmediate(function () {
+    this._overpassProcess()
+  }.bind(this))
 
   return request
 }
@@ -513,7 +555,9 @@ OverpassFrontend.prototype._handleBBoxQueryResult = function (context, err, resu
   this.overpassRequests[this.overpassRequests.indexOf(request)] = null
   this.overpassRequestActive = false
 
-  this._overpassProcess()
+  async.setImmediate(function () {
+    this._overpassProcess()
+  }.bind(this))
 }
 
 OverpassFrontend.prototype.abortRequest = function (request) {
