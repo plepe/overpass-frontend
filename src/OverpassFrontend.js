@@ -149,6 +149,13 @@ OverpassFrontend.prototype._overpassProcess = function () {
         var ob = this.overpassElements[ids[i]]
         var ready = true
 
+        // Feature does not exists!
+        if (ob === null) {
+          request.featureCallback(null, null, i)
+          request.ids[i] = null
+          continue
+        }
+
         // for bbox option, if object is (partly) loaded, but outside call
         // featureCallback with 'false'
         if (request.options.bbox && !ob.intersects(request.options.bbox)) {
