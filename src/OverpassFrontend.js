@@ -363,11 +363,7 @@ OverpassFrontend.prototype._handleGetResult = function (context, err, results) {
 
   for (id in context.todo) {
     if (!(id in this.overpassElements)) {
-      if (id in context.BBoxTodo) {
-        this.overpassElements[id] = false
-      } else {
-        this.overpassElements[id] = null
-      }
+      this.overpassElements[id] = null
     }
   }
 
