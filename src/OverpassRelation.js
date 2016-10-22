@@ -16,8 +16,6 @@ OverpassRelation.prototype.updateData = function (data, request) {
   var i
   var member
 
-  this.constructor.super_.prototype.updateData.call(this, data, request)
-
   if ((request.options.properties & OverpassFrontend.MEMBERS) &&
       data.members) {
     this.members = []
@@ -53,6 +51,8 @@ OverpassRelation.prototype.updateData = function (data, request) {
       }
     }
   }
+
+  this.constructor.super_.prototype.updateData.call(this, data, request)
 }
 
 OverpassRelation.prototype.member_ids = function () {
