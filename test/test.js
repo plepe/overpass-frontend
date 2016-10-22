@@ -794,6 +794,48 @@ describe('Overpass objects structure', function() {
       )
     })
 
+    it('Overpass.MEMBERS', function(done) {
+      overpassFrontend.removeFromCache('w358545531')
+      overpassFrontend.get('w358545531', { properties: OverpassFrontend.MEMBERS },
+        function(err, result, index) {
+          assert.deepEqual(result.nodes,
+            [ 252548492, 252548493, 3636794383, 3037366507, 1750886218 ],
+            'List of node-IDs wrong!')
+          assert.deepEqual(result.members, [
+              {
+                "id": "n252548492",
+                "ref": 252548492,
+                "type": "node"
+              },
+              {
+                "id": "n252548493",
+                "ref": 252548493,
+                "type": "node"
+              },
+              {
+                "id": "n3636794383",
+                "ref": 3636794383,
+                "type": "node"
+              },
+              {
+                "id": "n3037366507",
+                "ref": 3037366507,
+                "type": "node"
+              },
+              {
+                "id": "n1750886218",
+                "ref": 1750886218,
+                "type": "node"
+              }
+            ]
+          )
+        },
+        function(err) {
+          done()
+        }
+      )
+    })
+
     it('method intersects()', function (done) {
       overpassFrontend.get('w299709373', { properties: OverpassFrontend.BBOX },
         function (err, result, index) {
@@ -830,6 +872,38 @@ describe('Overpass objects structure', function() {
 	    "minlat": 48.1982148,
 	    "minlon": 16.3380726
           }, result.bounds.bounds)
+        },
+        function(err) {
+          done()
+        }
+      )
+    })
+
+    it('Overpass.MEMBERS', function(done) {
+      overpassFrontend.removeFromCache('r1980077')
+      overpassFrontend.get('r1980077', { properties: OverpassFrontend.MEMBERS },
+        function(err, result, index) {
+          assert.deepEqual(result.members, [
+	      {
+		"type": "node",
+		"ref": 378462,
+		"role": "via",
+		"id": "n378462"
+	      },
+	      {
+		"type": "way",
+		"ref": 4583442,
+		"role": "to",
+		"id": "w4583442"
+	      },
+	      {
+		"type": "way",
+		"ref": 272672836,
+		"role": "from",
+		"id": "w272672836"
+	      }
+	    ]
+          )
         },
         function(err) {
           done()
