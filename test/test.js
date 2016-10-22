@@ -69,7 +69,8 @@ describe('Overpass get', function() {
     })
 
     it('option "sort": should return ordered by id (even when cached)', function(done) {
-      var items = [ 'r910885', 'n3037893169', 'r910885', 'w146678749' ]
+      var items = [ 'r910885', 'n3037893169', 'r910885', 'w146678749', 'w12345' ]
+      var expected = [ 'r910885', 'n3037893169', 'r910885', 'w146678749', null ]
       var lastIndex = null
 
       overpassFrontend.get(
@@ -83,13 +84,17 @@ describe('Overpass get', function() {
             assert(false, 'Error: ' + err)
           }
 
-          var p = items.indexOf(result.id)
-          if (p === -1) {
-            assert(false, 'Object ' + result.id + ' should not be found')
-          }
+          if (result === null) {
+            assert.equal(result, expected[index], 'Index ' + index + ' should be null!')
+          } else {
+            var p = expected.indexOf(result.id)
+            if (p === -1) {
+              assert(false, 'Object ' + result.id + ' should not be found')
+            }
 
-          if (items[index] !== result.id) {
-            assert(false, 'Object ' + result.id + ': wrong index ' + index + '!')
+            if (expected[index] !== result.id) {
+              assert(false, 'Object ' + result.id + ': wrong index ' + index + '!')
+            }
           }
 
           if (lastIndex === null) {
@@ -104,15 +109,15 @@ describe('Overpass get', function() {
           lastIndex = index
         },
         function(err) {
-          assert.equal(items.length, lastIndex + 1, 'Should return ' + items.length + ' elements')
+          assert.equal(expected.length, lastIndex + 1, 'Should return ' + expected.length + ' elements')
 
           done(err)
         })
     })
 
     it('option "sort": should return ordered by id (sortDir: "desc")', function(done) {
-      var items = [ 'r910885', 'n3037893169', 'r910885', 'w146678749' ]
-      var expected = [ 'w146678749', 'r910885', 'n3037893169', 'r910885' ]
+      var items = [ 'r910885', 'n3037893169', 'r910885', 'w146678749', 'w12345' ]
+      var expected = [ null, 'w146678749', 'r910885', 'n3037893169', 'r910885' ]
       var lastIndex = null
 
       overpassFrontend.get(
@@ -127,13 +132,17 @@ describe('Overpass get', function() {
             assert(false, 'Error: ' + err)
           }
 
-          var p = expected.indexOf(result.id)
-          if (p === -1) {
-            assert(false, 'Object ' + result.id + ' should not be found')
-          }
+          if (result === null) {
+            assert.equal(result, expected[index], 'Index ' + index + ' should be null!')
+          } else {
+            var p = expected.indexOf(result.id)
+            if (p === -1) {
+              assert(false, 'Object ' + result.id + ' should not be found')
+            }
 
-          if (expected[index] !== result.id) {
-            assert(false, 'Object ' + result.id + ': wrong index ' + index + '!')
+            if (expected[index] !== result.id) {
+              assert(false, 'Object ' + result.id + ': wrong index ' + index + '!')
+            }
           }
 
           if (lastIndex === null) {
@@ -155,8 +164,8 @@ describe('Overpass get', function() {
     })
 
     it('option "sort"="BBoxDiagonalLength"', function(done) {
-      var items = [ 'w125586435', 'w299696929', 'w174711686', 'w247954720' ]
-      var expected = [ 'w247954720', 'w174711686', 'w125586435', 'w299696929' ]
+      var items = [ 'w125586435', 'w299696929', 'w174711686', 'w247954720', 'w12345' ]
+      var expected = [ null, 'w247954720', 'w174711686', 'w125586435', 'w299696929' ]
       var lastIndex = null
 
       overpassFrontend.get(
@@ -171,13 +180,17 @@ describe('Overpass get', function() {
             assert(false, 'Error: ' + err)
           }
 
-          var p = expected.indexOf(result.id)
-          if (p === -1) {
-            assert(false, 'Object ' + result.id + ' should not be found')
-          }
+          if (result === null) {
+            assert.equal(result, expected[index], 'Index ' + index + ' should be null!')
+          } else {
+            var p = expected.indexOf(result.id)
+            if (p === -1) {
+              assert(false, 'Object ' + result.id + ' should not be found')
+            }
 
-          if (expected[index] !== result.id) {
-            assert(false, 'Object ' + result.id + ': wrong index ' + index + '!')
+            if (expected[index] !== result.id) {
+              assert(false, 'Object ' + result.id + ': wrong index ' + index + '!')
+            }
           }
 
           if (lastIndex === null) {
@@ -585,9 +598,10 @@ describe('Overpass get', function() {
 
 describe('Overpass query by id with bbox option', function() {
   it('First call', function(done) {
-    var query = [ 'w299709373', 'w299709375', 'w4583442', 'w299704585', 'n2832485845', 'n3037893162', 'r20313', 'r3636229', 'r3311614' ]
+    var query = [ 'w299709373', 'w299709375', 'w4583442', 'w299704585', 'n2832485845', 'n3037893162', 'r20313', 'r3636229', 'r3311614', 'w12345' ]
     var expected = [ 'w299709373', 'n3037893162' ]
     var index_outside_bbox = [ 1, 2, 3, 4, 5, 6, 7, 8 ]
+    var index_non_existant = [ 9 ]
     var bbox = {
             minlon: 16.3384616,
             minlat: 48.1990347,
@@ -605,8 +619,13 @@ describe('Overpass query by id with bbox option', function() {
           if (result === false && index_outside_bbox.indexOf(index) == -1)
               assert(false, 'Index ' + index + ' should return a valid result (' + query[index] + ')')
 
-          if(result !== false && expected.indexOf(result.id) == -1)
+          if (result === null && index_non_existant.indexOf(index) === -1) {
+            assert(false, 'Index ' + index + ' should not return a non-existant object (' + query[index] + ')')
+          }
+
+          if (result !== false && result !== null && expected.indexOf(result.id) == -1) {
             assert(false, 'Returning object ' + result.id + ' which should not be returned')
+          }
         },
         function(err) {
           done()
@@ -615,9 +634,10 @@ describe('Overpass query by id with bbox option', function() {
   })
 
   it('Second call', function(done) {
-    var query = [ 'w299709373', 'w299709375', 'w4583442', 'w299704585', 'n2832485845', 'n3037882439', 'n3037893162' ]
+    var query = [ 'w299709373', 'w299709375', 'w4583442', 'w299704585', 'n2832485845', 'n3037882439', 'n3037893162', 'w12345' ]
     var expected = [ 'w299709375', 'w299704585' ]
     var index_outside_bbox = [ 0, 1, 2, 4, 5, 6 ]
+    var index_non_existant = [ 7 ]
     var bbox = {
             minlat: 48.1996955,
             minlon: 16.3381572,
@@ -630,8 +650,13 @@ describe('Overpass query by id with bbox option', function() {
           if (result === false && index_outside_bbox.indexOf(index) == -1)
               assert(false, 'Index ' + index + ' should return a valid result (' + query[index] + ')')
 
-          if(result !== false && expected.indexOf(result.id) == -1)
+          if (result === null && index_non_existant.indexOf(index) === -1) {
+            assert(false, 'Index ' + index + ' should not return a non-existant object (' + query[index] + ')')
+          }
+
+          if (result !== false && result !== null && expected.indexOf(result.id) == -1) {
             assert(false, 'Returning object ' + result.id + ' which should not be returned')
+          }
         },
         function(err) {
           done()
