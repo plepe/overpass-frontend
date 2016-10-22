@@ -12,58 +12,65 @@ var overpassFrontend = new OverpassFrontend(conf.url)
 describe('Overpass get', function() {
   describe('single id', function() {
     it('should return an existing relation', function(done) {
-      overpassFrontend.get('r910885', { properties: OverpassFrontend.ALL },
+      overpassFrontend.get('r910885',
+        {
+          properties: OverpassFrontend.ALL
+        },
         function(err, result, index) {
-          if(err)
-            done(err)
-
-          if(result.id == 'r910885')
-            done()
-          else
-            done('wrong object?')
+          assert.equal(err, null, 'Error should be null')
+          assert.equal(result.id, 'r910885', 'Wrong object returned: ' + result.id)
         },
         function(err) {
+          done(err)
         })
     })
 
     it('should return null for a missing object', function(done) {
-      overpassFrontend.get('r32', { properties: OverpassFrontend.ALL },
+      overpassFrontend.get('r32',
+        {
+          properties: OverpassFrontend.ALL
+        },
         function(err, result, index) {
-          if(result !== null) {
-            done('r32 should not exist!')
-          }
+          assert.equal(err, null, 'Error should be null')
+          assert.equal(result, null, 'r32 should not exist!')
         },
         function(err) {
-          done(err);
+          done(err)
         })
     })
 
     it('should handle several simultaneous requests', function(done) {
       async.parallel([
         function(callback) {
-          overpassFrontend.get('r910886', { properties: OverpassFrontend.ALL },
+          overpassFrontend.get('r910886',
+            {
+              properties: OverpassFrontend.ALL
+            },
             function(err, result, index) {
-              assert.equal(null, err, err)
+              assert.equal(err, null, 'Error should be null')
               assert.equal('r910886', result.id, 'Wrong object ' + result.id + '?')
             },
             function(err) {
-              callback()
+              callback(err)
             }
           )
         },
         function(callback) {
-          overpassFrontend.get('n79721398', { properties: OverpassFrontend.ALL },
+          overpassFrontend.get('n79721398',
+            {
+              properties: OverpassFrontend.ALL
+            },
             function(err, result, index) {
-              assert.equal(null, err, err)
-              assert.equal('n79721398', result.id, 'Wrong object ' + result.id + '?')
+              assert.equal(err, null, 'Error should be null')
+              assert.equal(result.id, 'n79721398', 'Wrong object ' + result.id + '?')
             },
             function(err) {
-              callback();
+              callback(err)
             }
           )
         }],
-        function() {
-          done()
+        function(err) {
+          done(err)
         }
       )
     })
@@ -80,31 +87,20 @@ describe('Overpass get', function() {
           properties: OverpassFrontend.ID_ONLY
         },
         function(err, result, index) {
-          if (err) {
-            assert(false, 'Error: ' + err)
-          }
+          assert.equal(err, null, 'Error should be null')
 
           if (result === null) {
             assert.equal(result, expected[index], 'Index ' + index + ' should be null!')
           } else {
             var p = expected.indexOf(result.id)
-            if (p === -1) {
-              assert(false, 'Object ' + result.id + ' should not be found')
-            }
-
-            if (expected[index] !== result.id) {
-              assert(false, 'Object ' + result.id + ': wrong index ' + index + '!')
-            }
+            assert.notEqual(p, -1, 'Object ' + result.id + ' should not be found')
+            assert.equal(result.id, expected[index], 'Object ' + result.id + ': wrong index ' + index + '!')
           }
 
           if (lastIndex === null) {
-            if (index !== 0) {
-              assert(false, 'Object ' + result.id + ' (Index ' + index + '): should not be first element')
-            }
+            assert.equal(index, 0, 'Object ' + (result ? result.id : 'null') + ' (Index ' + index + '): should not be first element')
           } else {
-            if (index !== lastIndex + 1) {
-              assert(false, 'Object ' + result.id + ' (Index ' + index + '): should not come after ' + lastIndex)
-            }
+            assert.equal(index, lastIndex + 1, 'Object ' + (result ? result.id : 'null') + ' (Index ' + index + '): should not come after ' + lastIndex)
           }
           lastIndex = index
         },
@@ -128,31 +124,20 @@ describe('Overpass get', function() {
           properties: OverpassFrontend.ID_ONLY
         },
         function(err, result, index) {
-          if (err) {
-            assert(false, 'Error: ' + err)
-          }
+          assert.equal(err, null, 'Error should be null')
 
           if (result === null) {
             assert.equal(result, expected[index], 'Index ' + index + ' should be null!')
           } else {
             var p = expected.indexOf(result.id)
-            if (p === -1) {
-              assert(false, 'Object ' + result.id + ' should not be found')
-            }
-
-            if (expected[index] !== result.id) {
-              assert(false, 'Object ' + result.id + ': wrong index ' + index + '!')
-            }
+            assert.notEqual(p, -1, 'Object ' + result.id + ' should not be found')
+            assert.equal(result.id, expected[index], 'Object ' + result.id + ': wrong index ' + index + '!')
           }
 
           if (lastIndex === null) {
-            if (index !== 0) {
-              assert(false, 'Object ' + result.id + ' (Index ' + index + '): should not be first element')
-            }
+            assert.equal(index, 0, 'Object ' + (result ? result.id : 'null') + ' (Index ' + index + '): should not be first element')
           } else {
-            if (index !== lastIndex + 1) {
-              assert(false, 'Object ' + result.id + ' (Index ' + index + '): should not come after ' + lastIndex)
-            }
+            assert.equal(index, lastIndex + 1, 'Object ' + (result ? result.id : 'null') + ' (Index ' + index + '): should not come after ' + lastIndex)
           }
           lastIndex = index
         },
@@ -176,31 +161,20 @@ describe('Overpass get', function() {
           properties: OverpassFrontend.ID_ONLY
         },
         function(err, result, index) {
-          if (err) {
-            assert(false, 'Error: ' + err)
-          }
+          assert.equal(err, null, 'Error should be null')
 
           if (result === null) {
             assert.equal(result, expected[index], 'Index ' + index + ' should be null!')
           } else {
             var p = expected.indexOf(result.id)
-            if (p === -1) {
-              assert(false, 'Object ' + result.id + ' should not be found')
-            }
-
-            if (expected[index] !== result.id) {
-              assert(false, 'Object ' + result.id + ': wrong index ' + index + '!')
-            }
+            assert.notEqual(p, -1, 'Object ' + result.id + ' should not be found')
+            assert.equal(result.id, expected[index], 'Object ' + result.id + ': wrong index ' + index + '!')
           }
 
           if (lastIndex === null) {
-            if (index !== 0) {
-              assert(false, 'Object ' + result.id + ' (Index ' + index + '): should not be first element')
-            }
+            assert.equal(index, 0, 'Object ' + (result ? result.id : 'null') + ' (Index ' + index + '): should not be first element')
           } else {
-            if (index !== lastIndex + 1) {
-              assert(false, 'Object ' + result.id + ' (Index ' + index + '): should not come after ' + lastIndex)
-            }
+            assert.equal(index, lastIndex + 1, 'Object ' + (result ? result.id : 'null') + ' (Index ' + index + '): should not come after ' + lastIndex)
           }
           lastIndex = index
         },
@@ -224,27 +198,20 @@ describe('Overpass get', function() {
           properties: OverpassFrontend.BBOX
         },
         function(err, result, index) {
-          if (err) {
-            assert(false, 'Error: ' + err)
-          }
+          assert.equal(err, null, 'Error should be null')
 
-          var p = expected.indexOf(result.id)
-          if (p === -1) {
-            assert(false, 'Object ' + result.id + ' should not be found')
-          }
-
-          if (expected[index] !== result.id) {
-            assert(false, 'Object ' + result.id + ': wrong index ' + index + '!')
+          if (result === null) {
+            assert.equal(result, expected[index], 'Index ' + index + ' should be null!')
+          } else {
+            var p = expected.indexOf(result.id)
+            assert.notEqual(p, -1, 'Object ' + result.id + ' should not be found')
+            assert.equal(result.id, expected[index], 'Object ' + result.id + ': wrong index ' + index + '!')
           }
 
           if (lastIndex === null) {
-            if (index !== 0) {
-              assert(false, 'Object ' + result.id + ' (Index ' + index + '): should not be first element')
-            }
+            assert.equal(index, 0, 'Object ' + (result ? result.id : 'null') + ' (Index ' + index + '): should not be first element')
           } else {
-            if (index !== lastIndex + 1) {
-              assert(false, 'Object ' + result.id + ' (Index ' + index + '): should not come after ' + lastIndex)
-            }
+            assert.equal(index, lastIndex + 1, 'Object ' + (result ? result.id : 'null') + ' (Index ' + index + '): should not come after ' + lastIndex)
           }
           lastIndex = index
         },
