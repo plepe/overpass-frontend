@@ -836,6 +836,41 @@ describe('Overpass objects structure', function() {
       )
     })
 
+    it('Overpass.GEOM', function(done) {
+      overpassFrontend.removeFromCache('w358545531')
+      overpassFrontend.get('w358545531', { properties: OverpassFrontend.GEOM },
+        function(err, result, index) {
+          assert.deepEqual(result.geometry, 
+	    [
+	      {
+		"lat": 48.1984776,
+		"lon": 16.3387818
+	      },
+	      {
+		"lat": 48.1986881,
+		"lon": 16.3387314
+	      },
+	      {
+		"lat": 48.1991344,
+		"lon": 16.33858
+	      },
+	      {
+		"lat": 48.1995912,
+		"lon": 16.3383945
+	      },
+	      {
+		"lat": 48.1996981,
+		"lon": 16.3383497
+	      }
+	    ]
+	  )
+        },
+        function(err) {
+          done()
+        }
+      )
+    })
+
     it('method intersects()', function (done) {
       overpassFrontend.get('w299709373', { properties: OverpassFrontend.BBOX },
         function (err, result, index) {
@@ -911,7 +946,71 @@ describe('Overpass objects structure', function() {
       )
     })
 
+    it('Overpass.GEOM', function(done) {
+      overpassFrontend.removeFromCache('r1980077')
+      overpassFrontend.get('r1980077', { properties: OverpassFrontend.GEOM | OverpassFrontend.MEMBERS },
+        function(err, result, index) {
+          assert.deepEqual(result.geometry, 
+	    [
+	      {
+		"lat": 48.1982148,
+		"lon": 16.3382648
+	      },
+	      [
+		{
+		  "lat": 48.1983967,
+		  "lon": 16.3390104
+		},
+		{
+		  "lat": 48.1983357,
+		  "lon": 16.3387535
+		},
+		{
+		  "lat": 48.1983024,
+		  "lon": 16.3386136
+		},
+		{
+		  "lat": 48.1982664,
+		  "lon": 16.3384619
+		},
+		{
+		  "lat": 48.198255,
+		  "lon": 16.3384203
+		},
+		{
+		  "lat": 48.1982449,
+		  "lon": 16.3383811
+		},
+		{
+		  "lat": 48.1982148,
+		  "lon": 16.3382648
+		}
+	      ],
+	      [
+		{
+		  "lat": 48.1987724,
+		  "lon": 16.3380726
+		},
+		{
+		  "lat": 48.1983261,
+		  "lon": 16.3382355
+		},
+		{
+		  "lat": 48.1982148,
+		  "lon": 16.3382648
+		}
+	      ]
+	    ]
+	  )
+        },
+        function(err) {
+          done()
+        }
+      )
+    })
+
     it('method intersects() - BBox only', function (done) {
+      overpassFrontend.removeFromCache('r1980077')
       overpassFrontend.get('r1980077', { properties: OverpassFrontend.BBOX },
         function (err, result, index) {
           assert.equal(1, result.intersects(new BoundingBox({
