@@ -318,7 +318,7 @@ OverpassFrontend.prototype._handleGetResult = function (context, err, results) {
 
     if ('count' in el) {
       // separator found
-      if (request.options.bbox) {
+      if (request.options.bbox && !request.bboxSeenSeparator) {
         request.bboxSeenSeparator = true
       } else {
         request = context.requests.shift()
