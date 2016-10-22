@@ -103,7 +103,6 @@ OverpassFrontend.prototype._overpassProcess = function () {
   var effort = 0
   var context = {
     todo: {},
-    BBoxTodo: {},
     requests: []
   }
   var query = ''
@@ -197,7 +196,6 @@ OverpassFrontend.prototype._overpassProcess = function () {
         }
 
         context.todo[ids[i]] = true
-        context.BBoxTodo[ids[i]] = true
         request.bboxSeenSeparator = false
       } else {
         context.todo[ids[i]] = true
