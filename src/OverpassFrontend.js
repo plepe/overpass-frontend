@@ -255,7 +255,7 @@ OverpassFrontend.prototype._overpassProcess = function () {
       }
     }
 
-    if (BBoxQuery) {
+    if (BBoxQuery && (nodeQuery !== '' || wayQuery !== '' || relationQuery !== '')) {
       // additional separator to separate objects outside bbox from inside bbox
       query += 'out count;\n'
     }
