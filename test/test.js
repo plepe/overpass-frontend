@@ -648,9 +648,11 @@ describe('Overpass query by id with bbox option', function() {
     it('should handle several simultaneous requests', function(done) {
       var items1 = [ 'n3037893167', 'n3037893166' ]
       var items2 = [ 'n3037893165' ]
+      var items3 = [ 'n1853730723' ]
 
       overpassFrontend.removeFromCache(items1)
       overpassFrontend.removeFromCache(items2)
+      overpassFrontend.removeFromCache(items3)
 
       async.parallel([
         function(callback) {
@@ -701,13 +703,125 @@ describe('Overpass query by id with bbox option', function() {
             }
           )
         },
-],
+        function(callback) {
+          var done = []
+
+          overpassFrontend.get(items3,
+            {
+              properties: OverpassFrontend.ALL,
+              bbox: {
+                minlon: 16.3375,
+                minlat: 48.1985,
+                maxlon: 16.3385,
+                maxlat: 48.2005
+              }
+            },
+            function(err, result, index) {
+              assert.equal(null, err, err)
+              assert.notEqual(items3.indexOf(result.id), -1, 'Item should not be returned by 3rd request: ' + result.id)
+              done.push(result.id)
+            },
+            function(err) {
+              assert.equal(done.length, items3.length, '3nd request should return ' + items3.length + ' items')
+              callback(err)
+            }
+          )
+        }],
         function(err) {
           done(err)
         }
       )
     })
 
+    it('should handle several simultaneous requests with too much effort', function(done) {
+      var items1 = [ 'n3037893167', 'n3037893166' ]
+      var items2 = [ 'n3037893165' ]
+      var items3 = [ 'n1853730723' ]
+
+      overpassFrontend.removeFromCache(items1)
+      overpassFrontend.removeFromCache(items2)
+      overpassFrontend.removeFromCache(items3)
+      overpassFrontend.options.effortPerRequest = 2
+
+      async.parallel([
+        function(callback) {
+          var done = []
+
+          overpassFrontend.get(items1,
+            {
+              properties: OverpassFrontend.ALL,
+              bbox: {
+                minlon: 16.3375,
+                minlat: 48.1985,
+                maxlon: 16.3385,
+                maxlat: 48.2005
+              }
+            },
+            function(err, result, index) {
+              assert.equal(null, err, err)
+              assert.notEqual(items1.indexOf(result.id), -1, 'Item should not be returned by 1st request: ' + result.id)
+              done.push(result.id)
+            },
+            function(err) {
+              assert.equal(done.length, items1.length, '2nd request should return ' + items1.length + ' items')
+              callback(err)
+            }
+          )
+        },
+        function(callback) {
+          var done = []
+
+          overpassFrontend.get(items2,
+            {
+              properties: OverpassFrontend.ALL,
+              bbox: {
+                minlon: 16.3375,
+                minlat: 48.1985,
+                maxlon: 16.3385,
+                maxlat: 48.2005
+              }
+            },
+            function(err, result, index) {
+              assert.equal(null, err, err)
+              assert.notEqual(items2.indexOf(result.id), -1, 'Item should not be returned by 2nd request: ' + result.id)
+              done.push(result.id)
+            },
+            function(err) {
+              assert.equal(done.length, items2.length, '2nd request should return ' + items2.length + ' items')
+              callback(err)
+            }
+          )
+        },
+        function(callback) {
+          var done = []
+
+          overpassFrontend.get(items3,
+            {
+              properties: OverpassFrontend.ALL,
+              bbox: {
+                minlon: 16.3375,
+                minlat: 48.1985,
+                maxlon: 16.3385,
+                maxlat: 48.2005
+              }
+            },
+            function(err, result, index) {
+              assert.equal(null, err, err)
+              assert.notEqual(items3.indexOf(result.id), -1, 'Item should not be returned by 3rd request: ' + result.id)
+              done.push(result.id)
+            },
+            function(err) {
+              assert.equal(done.length, items3.length, '3nd request should return ' + items3.length + ' items')
+              callback(err)
+            }
+          )
+        }],
+        function(err) {
+          overpassFrontend.options.effortPerRequest = 1000
+          done(err)
+        }
+      )
+    })
 })
 
 describe('Overpass objects structure', function() {
