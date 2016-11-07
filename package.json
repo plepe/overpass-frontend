@@ -9,7 +9,7 @@
   "dependencies": {
     "async": "*",
     "xmlhttprequest": "*",
-    "boundingbox": "*",
+    "boundingbox": "^0.1.0",
     "weight-sort": "*",
     "quadtree-lookup": "https://github.com/petrbrzek/quadtree-lookup",
     "turf-difference": "*",
@@ -22,7 +22,7 @@
     "escape-html": "*",
     "eslint": "^3.6.1",
     "eslint-config-standard": "^6.2.0",
-    "eslint-plugin-promise": "^2.0.1",
+    "eslint-plugin-promise": "^3.3.0",
     "eslint-plugin-standard": "^2.0.1",
     "leaflet": "^0.7.0",
     "mocha": "*"

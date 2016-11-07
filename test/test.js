@@ -892,7 +892,7 @@ describe('Overpass objects structure', function() {
 	    "maxlon": 16.3384675,
 	    "minlat": 48.1984802,
 	    "minlon": 16.3384675
-          }, result.bounds.bounds)
+          }, result.bounds)
 	  // TODO: knowledge of internal structure of BoundingBox necessary?
         },
         function(err) {
@@ -954,7 +954,7 @@ describe('Overpass objects structure', function() {
 	    "maxlon": 16.3384675,
 	    "minlat": 48.1984802,
 	    "minlon": 16.3384675
-          }, result.bounds.bounds)
+          }, result.bounds)
 	  // TODO: knowledge of internal structure of BoundingBox necessary?
           assert.deepEqual({
 	    "lat": 48.1984802,
@@ -1006,7 +1006,7 @@ describe('Overpass objects structure', function() {
 	    "maxlon": 16.3386136,
 	    "minlat": 48.1983024,
 	    "minlon": 16.3380308
-          }, result.bounds.bounds)
+          }, result.bounds)
         },
         function(err) {
           done()
@@ -1126,7 +1126,7 @@ describe('Overpass objects structure', function() {
 	    "maxlon": 16.3390104,
 	    "minlat": 48.1982148,
 	    "minlon": 16.3380726
-          }, result.bounds.bounds)
+          }, result.bounds)
         },
         function(err) {
           done()

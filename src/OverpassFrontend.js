@@ -664,8 +664,8 @@ function overpassOutOptions (options) {
 
 function toQuadtreeLookupBox (boundingbox) {
   return new Quadtree.Box(
-    new Quadtree.Point(boundingbox.bounds.minlat, boundingbox.bounds.minlon),
-    new Quadtree.Point(boundingbox.bounds.maxlat, boundingbox.bounds.maxlon)
+    new Quadtree.Point(boundingbox.minlat, boundingbox.minlon),
+    new Quadtree.Point(boundingbox.maxlat, boundingbox.maxlon)
   )
 }
 

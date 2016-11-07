@@ -165,7 +165,7 @@ OverpassRelation.prototype.intersects = function (bbox) {
         geometry: geojson.geometry.geometries[i]
       }
 
-      var intersects = turf.bboxClip(g, [ bbox.bounds.minlon, bbox.bounds.minlat, bbox.bounds.maxlon, bbox.bounds.maxlat ])
+      var intersects = turf.bboxClip(g, [ bbox.minlon, bbox.minlat, bbox.maxlon, bbox.maxlat ])
 
       if (g.geometry.type === 'Point') {
         if (intersects) {
