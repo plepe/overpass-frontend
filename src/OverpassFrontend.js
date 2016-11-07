@@ -129,10 +129,7 @@ OverpassFrontend.prototype._overpassProcess = function () {
     var BBoxQuery = ''
 
     if (request.options.bbox) {
-      BBoxQuery = request.options.bbox.toBBoxString()
-      BBoxQuery = BBoxQuery.split(/,/)
-      BBoxQuery = '(' + BBoxQuery[1] + ',' + BBoxQuery[0] + ',' +
-                    BBoxQuery[3] + ',' + BBoxQuery[2] + ')'
+      BBoxQuery = '(' + request.options.bbox.toLatLonString() + ')'
     }
 
     if (!ids) {
@@ -466,10 +463,7 @@ OverpassFrontend.prototype.BBoxQuery = function (query, bounds, options, feature
 }
 
 OverpassFrontend.prototype._processBBoxQuery = function (request) {
-  var BBoxString = request.remainingBounds.toBBoxString()
-  BBoxString = BBoxString.split(/,/)
-  BBoxString = BBoxString[1] + ',' + BBoxString[0] + ',' +
-                BBoxString[3] + ',' + BBoxString[2]
+  var BBoxString = request.remainingBounds.toLatLonString()
 
   var queryOptions = '[bbox:' + BBoxString + ']'
 
