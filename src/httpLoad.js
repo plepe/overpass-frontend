@@ -35,6 +35,11 @@ function httpLoad (url, getParam, postParam, callback) {
               }
             }
 
+            // Could not parse error message - create alternative
+            if (e === '') {
+              e = 'Got error ' + req.status
+            }
+
             callback(e, null)
           } else {
             callback(req.responseText, null)
