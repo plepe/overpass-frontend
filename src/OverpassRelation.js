@@ -156,6 +156,12 @@ OverpassRelation.prototype.GeoJSON = function () {
 OverpassRelation.prototype.intersects = function (bbox) {
   var i
 
+  if (this.bounds) {
+    if (!bbox.intersects(this.bounds)) {
+      return 0
+    }
+  }
+
   if (this.geometry) {
     var geojson = this.GeoJSON()
 

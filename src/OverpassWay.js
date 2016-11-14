@@ -85,6 +85,12 @@ OverpassWay.prototype.leafletFeature = function (options) {
 }
 
 OverpassWay.prototype.intersects = function (bbox) {
+  if (this.bounds) {
+    if (!bbox.intersects(this.bounds)) {
+      return 0
+    }
+  }
+
   if (this.geometry) {
     var intersects = turf.bboxClip(this.GeoJSON(), [ bbox.minlon, bbox.minlat, bbox.maxlon, bbox.maxlat ])
 

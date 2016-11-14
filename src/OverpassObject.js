@@ -125,6 +125,10 @@ OverpassObject.prototype.intersects = function (bbox) {
     return 0
   }
 
+  if (!bbox.intersects(this.bounds)) {
+    return 0
+  }
+
   if (this.boundsPossibleMatch) {
     var remaining = turf.intersect(bbox.toGeoJSON(), this.boundsPossibleMatch)
 
@@ -136,7 +140,7 @@ OverpassObject.prototype.intersects = function (bbox) {
     return 1
   }
 
-  return bbox.intersects(this.bounds) ? 1 : 0
+  return 1
 }
 
 OverpassObject.prototype.leafletFeature = function (options) {
