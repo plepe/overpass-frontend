@@ -110,8 +110,8 @@ OverpassFrontend.prototype._overpassProcess = function () {
   var currentRequest
 
   if (this.overpassRequests[0].type === 'BBoxQuery') {
-    request = this.overpassRequests.splice(0, 1)
-    return this._processBBoxQuery(request[0])
+    request = this.overpassRequests[0]
+    return this._processBBoxQuery(request)
   }
 
   for (var j = 0; j < this.overpassRequests.length; j++) {
@@ -389,6 +389,10 @@ OverpassFrontend.prototype.BBoxQuery = function (query, bounds, options, feature
   }
   options.properties |= OverpassFrontend.BBOX
 
+  if (typeof options.split === 'undefined') {
+    options.split = 0
+  }
+
   var request = new OverpassRequest(this, {
     type: 'BBoxQuery',
     query: query,
@@ -534,7 +538,8 @@ OverpassFrontend.prototype._handleBBoxQueryResult = function (context, err, resu
     var obBBox = new BoundingBox(el)
     var approxRouteLength = obBBox.diagonalLength(obBBox)
 
-    this.createOrUpdateOSMObject(el, request)
+    var ob = this.createOrUpdateOSMObject(el, request)
+    request.doneFeatures[id] = ob
 
     todo[id] = {
       bounds: obBBox,
@@ -547,9 +552,13 @@ OverpassFrontend.prototype._handleBBoxQueryResult = function (context, err, resu
   for (var k in todo) {
     request.featureCallback(null, this.overpassElements[k])
   }
-  request.finalCallback(null)
 
-  this.overpassRequests[this.overpassRequests.indexOf(request)] = null
+  if ((request.options.split === 0) ||
+      (request.options.split > results.elements.length)) {
+    request.finalCallback(null)
+
+    this.overpassRequests[this.overpassRequests.indexOf(request)] = null
+  }
   this.overpassRequestActive = false
 
   async.setImmediate(function () {
@@ -613,6 +622,7 @@ OverpassFrontend.prototype.createOrUpdateOSMObject = function (el, request) {
   ob.updateData(el, request)
 
   this.overpassElements[id] = ob
+  return ob
 }
 
 OverpassFrontend.prototype.regexpEscape = function (str) {
@@ -634,6 +644,10 @@ OverpassFrontend.prototype.regexpEscape = function (str) {
 
 function overpassOutOptions (options) {
   var outOptions = ''
+
+  if ('split' in options && options.split > 0) {
+    outOptions += options.split + ' '
+  }
 
   if (options.properties & OverpassFrontend.META) {
     outOptions += 'meta '
