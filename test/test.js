@@ -595,6 +595,71 @@ describe('Overpass get', function() {
       )
     })
 
+    it('should handle simultaneous requests gracefully (overlapping area; partyly known; requests splitted)', function(done) {
+      var found1 = []
+      var found2 = []
+      var expected1 = [ 'n1853730762', 'n1853730763', 'n1853730777', 'n1853730779', 'n1853730785', 'n1853730792', 'n1853730797', 'n1853730821', 'n1853730767', 'n1853730778', 'n1853730787', 'n1853730801', 'n1853730774', 'n1853730788', 'n1853730816', 'n1853730828', 'n1853730831', 'n1853730842', 'n1853730843' ]
+      var expected2 = [ 'n1853730762', 'n1853730763', 'n1853730777', 'n1853730779', 'n1853730785', 'n1853730792', 'n1853730797', 'n1853730821', 'n1853730767', 'n1853730778', 'n1853730787', 'n1853730801', 'n1853730774', 'n1853730788', 'n1853730816', 'n1853730828', 'n1853730831', 'n1853730842', 'n1853730843', 'n1853730825' ]
+
+      async.parallel([
+        function (callback) {
+          overpassFrontend.BBoxQuery(
+            'node[natural=tree];',
+            {
+              minlon: 16.3380,
+              minlat: 48.1990,
+              maxlon: 16.3387,
+              maxlat: 48.1993
+            },
+            {
+              properties: OverpassFrontend.ID_ONLY,
+              split: 3
+            },
+            function(err, result, index) {
+              console.log('got1', result.id)
+              found1.push(result.id)
+
+              if(expected1.indexOf(result.id) == -1)
+                assert(false, '(1) Object ' + result.id + ' should not be found!')
+            },
+            function(err) {
+              assert.deepEqual(expected1.sort(), found1.sort(), '(1) Wrong count of objects found!')
+
+              callback()
+            }
+          )
+        },
+        function (callback) {
+          overpassFrontend.BBoxQuery(
+            'node[natural=tree];',
+            {
+              minlon: 16.3377,
+              minlat: 48.1990,
+              maxlon: 16.3387,
+              maxlat: 48.1993
+            },
+            {
+              properties: OverpassFrontend.ID_ONLY,
+              split: 3
+            },
+            function(err, result, index) {
+              console.log('got2', result.id)
+              found2.push(result.id)
+
+              if(expected2.indexOf(result.id) == -1)
+                assert(false, '(2) Object ' + result.id + ' should not be found!')
+            },
+            function(err) {
+              assert.deepEqual(expected2.sort(), found2.sort(), '(2) Wrong count of objects found!')
+
+              callback()
+            }
+          )
+        }
+      ], function () {
+        done()
+      })
+    })
   })
   describe('removeFromCache()', function() {
     // TODO: Missing!

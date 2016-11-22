@@ -108,13 +108,24 @@ OverpassFrontend.prototype._overpassProcess = function () {
   var query = ''
   var request
   var currentRequest
+  var j
+
+  for (j = 0; j < this.overpassRequests.length; j++) {
+    request = this.overpassRequests[j]
+
+    if (request.type === 'BBoxQuery') {
+      // e.g. call featureCallback for elements which were received in the
+      // meantime
+      this._preprocessBBoxQuery(request)
+    }
+  }
 
   if (this.overpassRequests[0].type === 'BBoxQuery') {
     request = this.overpassRequests[0]
     return this._processBBoxQuery(request)
   }
 
-  for (var j = 0; j < this.overpassRequests.length; j++) {
+  for (j = 0; j < this.overpassRequests.length; j++) {
     request = this.overpassRequests[j]
 
     if (request.type !== 'get') {
@@ -414,23 +425,7 @@ OverpassFrontend.prototype.BBoxQuery = function (query, bounds, options, feature
   request.finalCallback = callbacks.final.bind(callbacks)
 
   if (request.query in this.overpassBBoxQueryElements) {
-    // if we already have cached objects, check if we have immediate results
-    var quadtreeBounds = toQuadtreeLookupBox(request.bounds)
-    var done = false
-
-    var items = this.overpassBBoxQueryElements[request.query].queryRange(quadtreeBounds)
-    // TODO: do something with 'items'
-
-    for (var i = 0; i < items.length; i++) {
-      var id = items[i].value
-      var ob = this.overpassElements[id]
-
-      if ((request.options.properties & ob.properties) === request.options.properties) {
-        request.doneFeatures[id] = ob
-
-        request.featureCallback(null, ob)
-      }
-    }
+    this._preprocessBBoxQuery(request)
 
     // check if we need to call Overpass API (whole area known?)
     var remainingBounds = request.bounds
@@ -439,6 +434,7 @@ OverpassFrontend.prototype.BBoxQuery = function (query, bounds, options, feature
       remainingBounds = turf.difference(toRequest, this.overpassBBoxQueryRequested[request.query])
     }
 
+    var done = false
     if (remainingBounds === undefined) {
       request.finalCallback(null)
       done = true
@@ -470,7 +466,50 @@ OverpassFrontend.prototype.BBoxQuery = function (query, bounds, options, feature
   return request
 }
 
+OverpassFrontend.prototype._preprocessBBoxQuery = function (request) {
+  // if we already have cached objects, check if we have immediate results
+  var quadtreeBounds = toQuadtreeLookupBox(request.bounds)
+
+  var items = this.overpassBBoxQueryElements[request.query].queryRange(quadtreeBounds)
+  // TODO: do something with 'items'
+
+  for (var i = 0; i < items.length; i++) {
+    var id = items[i].value
+    var ob = this.overpassElements[id]
+
+    if (id in request.doneFeatures) {
+      continue
+    }
+
+    if ((request.options.properties & ob.properties) === request.options.properties) {
+      request.doneFeatures[id] = ob
+
+      request.featureCallback(null, ob)
+    }
+  }
+}
+
 OverpassFrontend.prototype._processBBoxQuery = function (request) {
+  // check if we need to call Overpass API (whole area known?)
+  var remainingBounds = request.bounds
+  if (this.overpassBBoxQueryRequested[request.query] !== null) {
+    var toRequest = request.bounds.toGeoJSON()
+    remainingBounds = turf.difference(toRequest, this.overpassBBoxQueryRequested[request.query])
+
+    if (remainingBounds === undefined) {
+      request.finalCallback(null)
+      this.overpassRequests[this.overpassRequests.indexOf(request)] = null
+
+      this.overpassRequestActive = false
+
+      async.setImmediate(function () {
+        this._overpassProcess()
+      }.bind(this))
+
+      return
+    }
+  }
+
   // var BBoxString = request.remainingBounds.toLatLonString()
   // TODO: turf union/difference is broken - use full bounds instead
   var BBoxString = request.bounds.toLatLonString()
@@ -528,13 +567,6 @@ OverpassFrontend.prototype._handleBBoxQueryResult = function (context, err, resu
     return
   }
 
-  var toRequest = request.remainingBounds.toGeoJSON()
-  if (this.overpassBBoxQueryRequested[request.query] === null) {
-    this.overpassBBoxQueryRequested[request.query] = toRequest
-  } else {
-    this.overpassBBoxQueryRequested[request.query] = turf.union(toRequest, this.overpassBBoxQueryRequested[request.query])
-  }
-
   for (var i = 0; i < results.elements.length; i++) {
     var el = results.elements[i]
     var id = el.type.substr(0, 1) + el.id
@@ -559,6 +591,13 @@ OverpassFrontend.prototype._handleBBoxQueryResult = function (context, err, resu
 
   if ((request.options.split === 0) ||
       (request.options.split > results.elements.length)) {
+    var toRequest = request.remainingBounds.toGeoJSON()
+    if (this.overpassBBoxQueryRequested[request.query] === null) {
+      this.overpassBBoxQueryRequested[request.query] = toRequest
+    } else {
+      this.overpassBBoxQueryRequested[request.query] = turf.union(toRequest, this.overpassBBoxQueryRequested[request.query])
+    }
+
     request.finalCallback(null)
 
     this.overpassRequests[this.overpassRequests.indexOf(request)] = null
