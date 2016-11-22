@@ -38,6 +38,7 @@ function OverpassFrontend (url, options) {
   this.overpassRequestActive = false
   this.overpassBBoxQueryElements = {}
   this.overpassBBoxQueryRequested = {}
+  this.overpassBBoxQueryLastUpdated = {}
 }
 
 for (var k in defines) {
@@ -417,7 +418,8 @@ OverpassFrontend.prototype.BBoxQuery = function (query, bounds, options, feature
     priority: 'priority' in options ? options.priority : 0,
     doneFeatures: {},
     featureCallback: featureCallback,
-    finalCallback: finalCallback
+    finalCallback: finalCallback,
+    lastChecked: 0
   })
 
   var callbacks = new SortedCallbacks(request.options, request.featureCallback, request.finalCallback)
@@ -455,6 +457,7 @@ OverpassFrontend.prototype.BBoxQuery = function (query, bounds, options, feature
     )
 
     this.overpassBBoxQueryRequested[request.query] = null
+    this.overpassBBoxQueryLastUpdated[request.query] = 0
   }
 
   this.overpassRequests.push(request)
@@ -467,6 +470,11 @@ OverpassFrontend.prototype.BBoxQuery = function (query, bounds, options, feature
 }
 
 OverpassFrontend.prototype._preprocessBBoxQuery = function (request) {
+  if (request.lastChecked > this.overpassBBoxQueryLastUpdated[request.query]) {
+    return
+  }
+  request.lastChecked = new Date().getTime()
+
   // if we already have cached objects, check if we have immediate results
   var quadtreeBounds = toQuadtreeLookupBox(request.bounds)
 
@@ -589,6 +597,8 @@ OverpassFrontend.prototype._handleBBoxQueryResult = function (context, err, resu
     request.featureCallback(null, this.overpassElements[k])
   }
 
+  this.overpassBBoxQueryLastUpdated[request.query] = new Date().getTime()
+
   if ((request.options.split === 0) ||
       (request.options.split > results.elements.length)) {
     var toRequest = request.remainingBounds.toGeoJSON()
@@ -612,6 +622,7 @@ OverpassFrontend.prototype._handleBBoxQueryResult = function (context, err, resu
 OverpassFrontend.prototype.clearBBoxQuery = function (query) {
   delete this.overpassBBoxQueryElements[query]
   delete this.overpassBBoxQueryRequested[query]
+  delete this.overpassBBoxQueryLastUpdated[query]
 }
 
 OverpassFrontend.prototype.abortRequest = function (request) {
