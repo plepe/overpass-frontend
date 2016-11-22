@@ -406,7 +406,7 @@ describe('Overpass get', function() {
 
     it('should return a list of node features (2nd try, partly cached)', function(done) {
       var found = []
-      var expected = [ 'n3037893162', 'n3037893163', 'n3037893164' ]
+      var expected = [ 'n3037893162', 'n3037893163', 'n3037893164', 'n3037893159', 'n3037893160' ]
 
       overpassFrontend.BBoxQuery(
         'node[amenity=bench];',
@@ -450,11 +450,14 @@ describe('Overpass get', function() {
           properties: OverpassFrontend.ID_ONLY
         },
         function(err, result, index) {
-          found.push(result.id)
-
           if(expected.indexOf(result.id) === -1 &&
-             might.indexOf(result.id) !== -1)
+             might.indexOf(result.id) === -1) {
             assert(false, 'Object ' + result.id + ' should not be found!')
+          }
+
+          if (expected.indexOf(result.id) !== -1) {
+            found.push(result.id)
+          }
         },
         function(err) {
           assert.equal(expected.length, found.length, 'Wrong count of objects found!')
@@ -467,6 +470,7 @@ describe('Overpass get', function() {
     it('should return a list of way features (2nd try, partly cached)', function(done) {
       var found = []
       var expected = [ 'w299709373' ]
+      var might = [ 'w299709375' ] // correct, if only bbox check is used
 
       overpassFrontend.BBoxQuery(
         'way[highway=footway];',
@@ -480,10 +484,14 @@ describe('Overpass get', function() {
           properties: OverpassFrontend.ID_ONLY
         },
         function(err, result, index) {
-          found.push(result.id)
-
-          if(expected.indexOf(result.id) == -1)
+          if(expected.indexOf(result.id) === -1 &&
+             might.indexOf(result.id) === -1) {
             assert(false, 'Object ' + result.id + ' should not be found!')
+          }
+
+          if (expected.indexOf(result.id) !== -1) {
+            found.push(result.id)
+          }
         },
         function(err) {
           assert.equal(expected.length, found.length, 'Wrong count of objects found!')
