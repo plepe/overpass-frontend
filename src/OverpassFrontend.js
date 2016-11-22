@@ -568,6 +568,7 @@ OverpassFrontend.prototype._handleBBoxQueryResult = function (context, err, resu
 
 OverpassFrontend.prototype.clearBBoxQuery = function (query) {
   delete this.overpassBBoxQueryElements[query]
+  delete this.overpassBBoxQueryRequested[query]
 }
 
 OverpassFrontend.prototype.abortRequest = function (request) {
