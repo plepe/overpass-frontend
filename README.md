@@ -84,6 +84,9 @@ Options:
 
 Returns an OverpassRequest object.
 
+## OverpassFrontend.clearBBoxQuery(query)
+Clears cached information about the given BBoxQuery. It won't remove the elements from cache though.
+
 ## OverpassFrontend.regexpEscape(str)
 Escape a string for usage in a regular expression to the Overpass API.
 

@@ -1547,6 +1547,7 @@ describe('Overpass objects structure', function() {
     })
 
     it('abort() should abort a "BBoxQuery" request', function (done) {
+      overpassFrontend.clearBBoxQuery('node[natural=tree];')
       var req = overpassFrontend.BBoxQuery(
         'node[natural=tree];',
         {
@@ -1571,6 +1572,7 @@ describe('Overpass objects structure', function() {
     })
 
     it('abort() should abort a "BBoxQuery" request', function (done) {
+      overpassFrontend.clearBBoxQuery('node[natural=tree];')
       var req = overpassFrontend.BBoxQuery(
         'node[natural=tree];',
         {

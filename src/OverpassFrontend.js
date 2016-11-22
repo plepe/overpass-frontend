@@ -557,6 +557,10 @@ OverpassFrontend.prototype._handleBBoxQueryResult = function (context, err, resu
   }.bind(this))
 }
 
+OverpassFrontend.prototype.clearBBoxQuery = function (query) {
+  delete this.overpassBBoxQueryElements[query]
+}
+
 OverpassFrontend.prototype.abortRequest = function (request) {
   var p = this.overpassRequests.indexOf(request)
 
