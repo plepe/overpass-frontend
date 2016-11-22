@@ -463,7 +463,9 @@ OverpassFrontend.prototype.BBoxQuery = function (query, bounds, options, feature
 }
 
 OverpassFrontend.prototype._processBBoxQuery = function (request) {
-  var BBoxString = request.remainingBounds.toLatLonString()
+  // var BBoxString = request.remainingBounds.toLatLonString()
+  // TODO: turf union/difference is broken - use full bounds instead
+  var BBoxString = request.bounds.toLatLonString()
 
   var queryOptions = '[bbox:' + BBoxString + ']'
 
