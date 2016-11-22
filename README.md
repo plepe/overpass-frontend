@@ -81,6 +81,7 @@ Options:
 | sort | boolean | When set to true, the function featureCallback will be called in some particular order (e.g. from orderApproxRouteLength).
 | properties | bit array | Which properties of the features should be downloaded: OVERPASS_ID_ONLY, OVERPASS_BBOX, OVERPASS_TAGS, OVERPASS_GEOM, OVERPASS_META. Combine by binary OR: ``OVERPASS_ID | OVERPASS_BBOX``. Default: ``OVERPASS_BBOX | OVERPASS_TAGS | OVERPASS_MEMBERS``
 | orderApproxRouteLength | boolean | Order objects by approximate route length (calculated from the diagonal of the bounding box)
+| split | integer | If more than 'split' elements would be returned, split into several smaller requests, with 'split' elements each. Default: 0 (do not split)
 
 Returns an OverpassRequest object.
 

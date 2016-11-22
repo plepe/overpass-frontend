@@ -565,6 +565,36 @@ describe('Overpass get', function() {
       )
     })
 
+    it('should return a list of node features (request splitted)', function(done) {
+      var found = []
+      var expected = [ 'n1853730762', 'n1853730763', 'n1853730777', 'n1853730779', 'n1853730785', 'n1853730792', 'n1853730797', 'n1853730821' ]
+
+      overpassFrontend.BBoxQuery(
+        'node[natural=tree];',
+        {
+          minlon: 16.3384,
+          minlat: 48.1990,
+          maxlon: 16.3387,
+          maxlat: 48.1993
+        },
+        {
+          properties: OverpassFrontend.ID_ONLY,
+          split: 3
+        },
+        function(err, result, index) {
+          found.push(result.id)
+
+          if(expected.indexOf(result.id) == -1)
+            assert(false, 'Object ' + result.id + ' should not be found!')
+        },
+        function(err) {
+          assert.deepEqual(expected.sort(), found.sort(), 'Wrong count of objects found!')
+
+          done()
+        }
+      )
+    })
+
   })
   describe('removeFromCache()', function() {
     // TODO: Missing!
