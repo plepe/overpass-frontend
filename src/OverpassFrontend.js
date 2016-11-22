@@ -110,8 +110,8 @@ OverpassFrontend.prototype._overpassProcess = function () {
   var currentRequest
 
   if (this.overpassRequests[0].type === 'BBoxQuery') {
-    request = this.overpassRequests.splice(0, 1)
-    return this._processBBoxQuery(request[0])
+    request = this.overpassRequests[0]
+    return this._processBBoxQuery(request)
   }
 
   for (var j = 0; j < this.overpassRequests.length; j++) {
