@@ -269,6 +269,10 @@ OverpassFrontend.prototype._overpassProcess = function () {
 
   if (query === '') {
     this.overpassRequestActive = false
+    async.setImmediate(function () {
+      this._overpassProcess()
+    }.bind(this))
+
     return
   }
 
