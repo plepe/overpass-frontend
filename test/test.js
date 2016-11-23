@@ -1691,4 +1691,9 @@ describe('Overpass objects structure', function() {
       req.abort()
     })
   })
+
+  describe('request list should be empty', function () {
+    console.log(overpassFrontend.overpassRequests)
+    return true
+  })
 })
