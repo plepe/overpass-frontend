@@ -7,6 +7,12 @@ function OverpassRequest (overpass, data) {
 }
 
 OverpassRequest.prototype.abort = function () {
+  if (this.aborted) {
+    console.log('already aborted', this)
+    return
+  }
+
+  this.aborted = true
   return this.overpass.abortRequest(this)
 }
 

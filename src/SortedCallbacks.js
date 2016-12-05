@@ -46,6 +46,10 @@ SortedCallbacks.prototype.next = function (err, feature, index) {
 }
 
 SortedCallbacks.prototype.final = function (err) {
+  if (this.done) {
+    console.log('SortedCallbacks done!', this)
+  }
+  this.done = true
   if (this.options.sort === 'BBoxDiagonalLength') {
     for (var i = 0; i < this.list.length; i++) {
       var feature = this.list[i].feature
@@ -64,6 +68,9 @@ SortedCallbacks.prototype.final = function (err) {
 
   async.setImmediate(function () {
     for (var i = this.lastIndex + 1; i < this.list.length; i++) {
+      if (!this.list[i])  {
+      console.log('not list', i, this)
+    }
       this.featureCallback(this.list[i].err, this.list[i].feature, i)
     }
 
