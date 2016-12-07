@@ -426,7 +426,7 @@ describe('Overpass get', function() {
             assert(false, 'Object ' + result.id + ' should not be found!')
         },
         function(err) {
-          assert.equal(expected.length, found.length, 'Wrong count of objects found!')
+          assert.deepEqual(expected.sort(), found.sort(), 'Wrong count of objects found!')
 
           done()
         }
