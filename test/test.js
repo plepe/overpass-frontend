@@ -7,7 +7,7 @@ var async = require('async')
 var OverpassFrontend = require('../src/OverpassFrontend')
 var BoundingBox = require('boundingbox')
 var overpassFrontend = new OverpassFrontend(conf.url)
-
+var removeNullEntries = require('../src/removeNullEntries')
 
 describe('Overpass get', function() {
   describe('single id', function() {
@@ -1689,6 +1689,13 @@ describe('Overpass objects structure', function() {
       )
 
       req.abort()
+    })
+
+    it('request list should be empty', function () {
+      removeNullEntries(overpassFrontend.overpassRequests)
+
+      assert.deepEqual(overpassFrontend.overpassRequests, [], 'request list should be empty')
+      return true
     })
   })
 })
