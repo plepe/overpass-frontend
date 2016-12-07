@@ -565,9 +565,10 @@ OverpassFrontend.prototype._handleBBoxQueryResult = function (context, err, resu
   var request = context.request
   var todo = {}
 
-  if (err) {
+  if (err && err !== 'abort') {
     // call finalCallback for the request
     request.finalCallback(err)
+
     // remove current request
     this.overpassRequests[this.overpassRequests.indexOf(request)] = null
     this.overpassRequestActive = false
@@ -593,8 +594,10 @@ OverpassFrontend.prototype._handleBBoxQueryResult = function (context, err, resu
     this.overpassBBoxQueryElements[request.query].insert(toQuadtreeLookupBox(obBBox), id)
   }
 
-  for (var k in todo) {
-    request.featureCallback(null, this.overpassElements[k])
+  if (!request.aborted) {
+    for (var k in todo) {
+      request.featureCallback(null, this.overpassElements[k])
+    }
   }
 
   this.overpassBBoxQueryLastUpdated[request.query] = new Date().getTime()
@@ -608,7 +611,9 @@ OverpassFrontend.prototype._handleBBoxQueryResult = function (context, err, resu
       this.overpassBBoxQueryRequested[request.query] = turf.union(toRequest, this.overpassBBoxQueryRequested[request.query])
     }
 
-    request.finalCallback(null)
+    if (!this.aborted) {
+      request.finalCallback(null)
+    }
 
     this.overpassRequests[this.overpassRequests.indexOf(request)] = null
   }
@@ -632,6 +637,7 @@ OverpassFrontend.prototype.abortRequest = function (request) {
     return
   }
 
+  request.aborted = true
   request.finalCallback('abort')
   this.overpassRequests[p] = null
 }
