@@ -64,7 +64,10 @@ SortedCallbacks.prototype.final = function (err) {
 
   async.setImmediate(function () {
     for (var i = this.lastIndex + 1; i < this.list.length; i++) {
-      this.featureCallback(this.list[i].err, this.list[i].feature, i)
+      // if a request got aborted, the entry in list is missing
+      if (this.list[i]) {
+        this.featureCallback(this.list[i].err, this.list[i].feature, i)
+      }
     }
 
     this.finalCallback(err)
