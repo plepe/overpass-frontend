@@ -65,6 +65,8 @@ OverpassFrontend.prototype.get = function (ids, options, featureCallback, finalC
   if (options.bbox) {
     options.bbox = new BoundingBox(options.bbox)
   }
+  // option 'split' not available for get requests -> use effort instead
+  delete options.split
 
   var request = new OverpassRequest(this, {
     type: 'get',
