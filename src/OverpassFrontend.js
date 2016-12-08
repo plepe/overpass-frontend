@@ -39,6 +39,7 @@ function OverpassFrontend (url, options) {
   this.overpassBBoxQueryElements = {}
   this.overpassBBoxQueryRequested = {}
   this.overpassBBoxQueryLastUpdated = {}
+  this.errorCount = 0
 }
 
 for (var k in defines) {
@@ -309,21 +310,31 @@ OverpassFrontend.prototype._handleGetResult = function (context, err, results) {
   if (err) {
     var done = []
 
-    for (i = 0; i < context.requests.length; i++) {
-      request = context.requests[i]
+    this.errorCount++
+    this.overpassRequestActive = false
 
-      if (done.indexOf(request) === -1) {
-        // call finalCallback for the request
-        request.finalCallback(err)
-        // remove current request
-        this.overpassRequests[this.overpassRequests.indexOf(request)] = null
-        // we already handled this request
-        done.push(request)
+    if (this.errorCount <= 3) {
+      // retry
+      this._overpassProcess()
+    } else {
+      // abort
+      for (i = 0; i < context.requests.length; i++) {
+        request = context.requests[i]
+
+        if (done.indexOf(request) === -1) {
+          // call finalCallback for the request
+          request.finalCallback(err)
+          // remove current request
+          this.overpassRequests[this.overpassRequests.indexOf(request)] = null
+          // we already handled this request
+          done.push(request)
+        }
       }
     }
 
-    this.overpassRequestActive = false
     return
+  } else {
+    this.errorCount = 0
   }
 
   request = context.requests.shift()
@@ -568,14 +579,24 @@ OverpassFrontend.prototype._handleBBoxQueryResult = function (context, err, resu
   var todo = {}
 
   if (err) {
-    // call finalCallback for the request
-    request.finalCallback(err)
-
-    // remove current request
-    this.overpassRequests[this.overpassRequests.indexOf(request)] = null
+    this.errorCount++
     this.overpassRequestActive = false
 
+    if (this.errorCount <= 3) {
+      // retry
+      this._overpassProcess()
+    } else {
+      // abort
+      // call finalCallback for the request
+      request.finalCallback(err)
+
+      // remove current request
+      this.overpassRequests[this.overpassRequests.indexOf(request)] = null
+    }
+
     return
+  } else {
+    this.errorCount = 0
   }
 
   for (var i = 0; i < results.elements.length; i++) {
