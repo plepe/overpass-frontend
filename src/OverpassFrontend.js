@@ -567,7 +567,7 @@ OverpassFrontend.prototype._handleBBoxQueryResult = function (context, err, resu
   var request = context.request
   var todo = {}
 
-  if (err && err !== 'abort') {
+  if (err) {
     // call finalCallback for the request
     request.finalCallback(err)
 
