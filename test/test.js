@@ -39,6 +39,22 @@ describe('Overpass get', function() {
         })
     })
 
+    it('should return null for illegal objects', function(done) {
+      var tests = [ 'o32', 'na', 'r1234a' ]
+
+      overpassFrontend.get(tests,
+        {
+          properties: OverpassFrontend.ALL
+        },
+        function(err, result, index) {
+          assert.equal(err, null, 'Error should be null')
+          assert.equal(result, null, tests[index] + ' should not exist!')
+        },
+        function(err) {
+          done(err)
+        })
+    })
+
     it('should handle several simultaneous requests', function(done) {
       async.parallel([
         function(callback) {
@@ -1484,29 +1500,6 @@ describe('Overpass objects structure', function() {
             "line 4: parse error: Unexpected end of input.\n" +
             "line 4: parse error: Unexpected end of input.\n" +
             "line 4: parse error: Unexpected end of input.\n\n")
-            done()
-
-          else
-            done('Wrong error message: ' + err)
-        }
-      )
-    })
-
-    it('Illegal ID', function (done) {
-      overpassFrontend.get([ 'na' ],
-        {
-          properties: OverpassFrontend.ID_ONLY
-        },
-        function(err, result, index) {
-          assert(false, 'Query wrong, feature_callback should not be called')
-        },
-        function(err) {
-          if(err === null)
-            done('Query wrong, should not be successful')
-
-          else if(err == "line 2: parse error: Unknown query clause\n" +
-            "line 2: parse error: ')' expected - 'a' found.\n" +
-            "line 2: parse error: An empty query is not allowed\n\n")
             done()
 
           else

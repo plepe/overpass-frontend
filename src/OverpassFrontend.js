@@ -186,6 +186,13 @@ OverpassFrontend.prototype._overpassProcess = function () {
           request.ids[i] = null
           continue
         }
+      } else {
+        // Illegal ID
+        if (ids[i] !== null && !ids[i].match(/^[nwr][0-9]+$/)) {
+          request.featureCallback(null, null, i)
+          request.ids[i] = null
+          continue
+        }
       }
 
       allFoundUntilNow = false

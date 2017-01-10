@@ -34,7 +34,7 @@ Parameters:
 
 | Name    | Type   | Description
 | ------- | ------ | -------------
-| ids     | string, string[] | One or more IDs, e.g. [ 'n123', 'w2345', 'n123' ]
+| ids     | string, string[] | One or more IDs, e.g. [ 'n123', 'w2345', 'n123' ]. Illegal IDs will not produce an error but generate a 'null' object.
 | options | object | Various options, see below
 | featureCallback | function | Will be called for each object in the order of the IDs in parameter 'ids'. Will be passed: 1. err (if an error occured, otherwise null), 2. the object or null, 3. the index in the array ids.
 | finalCallback | function | Will be called after the last feature. Will be passed: 1. err (if an error occured, otherwise null).
