@@ -634,14 +634,14 @@ OverpassFrontend.prototype._handleBBoxQueryResult = function (context, err, resu
 
   if ((request.options.split === 0) ||
       (request.options.split > results.elements.length)) {
-    var toRequest = request.remainingBounds.toGeoJSON()
-    if (this.overpassBBoxQueryRequested[request.query] === null) {
-      this.overpassBBoxQueryRequested[request.query] = toRequest
-    } else {
-      this.overpassBBoxQueryRequested[request.query] = turf.union(toRequest, this.overpassBBoxQueryRequested[request.query])
-    }
-
     if (!this.aborted) {
+      var toRequest = request.remainingBounds.toGeoJSON()
+      if (this.overpassBBoxQueryRequested[request.query] === null) {
+        this.overpassBBoxQueryRequested[request.query] = toRequest
+      } else {
+        this.overpassBBoxQueryRequested[request.query] = turf.union(toRequest, this.overpassBBoxQueryRequested[request.query])
+      }
+
       request.finalCallback(null)
     }
 
