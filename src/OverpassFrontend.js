@@ -3,8 +3,8 @@ var weightSort = require('weight-sort')
 var BoundingBox = require('boundingbox')
 var Quadtree = require('quadtree-lookup')
 var turf = {
-  difference: require('turf-difference'),
-  union: require('turf-union')
+  difference: require('@turf/difference'),
+  union: require('@turf/union')
 }
 
 var httpLoad = require('./httpLoad')

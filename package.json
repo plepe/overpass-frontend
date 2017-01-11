@@ -12,9 +12,9 @@
     "boundingbox": "^0.1.0",
     "weight-sort": "*",
     "quadtree-lookup": "https://github.com/petrbrzek/quadtree-lookup",
-    "turf-difference": "*",
-    "turf-intersect": "*",
-    "turf-union": "*",
+    "@turf/difference": "*",
+    "@turf/intersect": "*",
+    "@turf/union": "*",
     "turf-bbox-clip": "https://github.com/Turfjs/turf-bbox-clip"
   },
   "devDependencies": {
