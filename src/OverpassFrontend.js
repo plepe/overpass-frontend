@@ -349,7 +349,7 @@ OverpassFrontend.prototype._handleGetResult = function (context, err, results) {
   for (i = 0; i < results.elements.length; i++) {
     el = results.elements[i]
 
-    if ('count' in el) {
+    if ('count' in el || ('type' in el && el.type === 'count')) {
       // separator found
       if (request.options.bbox && !request.bboxSeenSeparator) {
         request.bboxSeenSeparator = true
