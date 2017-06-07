@@ -29,7 +29,7 @@ function check_update_map () {
   for (var k in current_objects) {
     var ob = current_objects[k]
 
-    if (!ob.isVisible(bounds)) {
+    if (!ob.intersects(bounds)) {
       map.removeLayer(ob.feature)
       delete(current_objects[k])
     }
