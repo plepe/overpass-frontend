@@ -509,6 +509,11 @@ OverpassFrontend.prototype._preprocessBBoxQuery = function (request) {
       continue
     }
 
+    // also check the object directly if it intersects the bbox - if possible
+    if (!ob.intersects(request.bounds)) {
+      continue
+    }
+
     if ((request.options.properties & ob.properties) === request.options.properties) {
       request.doneFeatures[id] = ob
 
