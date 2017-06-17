@@ -7,15 +7,16 @@
     "test": "test"
   },
   "dependencies": {
-    "async": "*",
-    "xmlhttprequest": "*",
-    "boundingbox": "^0.1.0",
-    "weight-sort": "*",
-    "quadtree-lookup": "https://github.com/petrbrzek/quadtree-lookup",
     "@turf/difference": "*",
     "@turf/intersect": "*",
     "@turf/union": "*",
-    "turf-bbox-clip": "https://github.com/Turfjs/turf-bbox-clip"
+    "async": "*",
+    "boundingbox": "^0.1.0",
+    "osmtogeojson": "^3.0.0-beta.2",
+    "quadtree-lookup": "https://github.com/petrbrzek/quadtree-lookup",
+    "turf-bbox-clip": "https://github.com/Turfjs/turf-bbox-clip",
+    "weight-sort": "*",
+    "xmlhttprequest": "*"
   },
   "devDependencies": {
     "browserify": "*",
@@ -25,11 +26,13 @@
     "eslint-plugin-promise": "^3.3.0",
     "eslint-plugin-standard": "^2.0.1",
     "leaflet": "^0.7.0",
-    "mocha": "*"
+    "mocha": "*",
+    "watchify": "^3.9.0"
   },
   "scripts": {
     "test": "mocha --bail",
     "build": "browserify index.js -o dist/overpass-frontend.js",
+    "watch": "watchify --debug index.js -o dist/overpass-frontend.js -v",
     "prepublish": "npm run build && npm run lint",
     "lint": "eslint src/*.js index.js"
   },
