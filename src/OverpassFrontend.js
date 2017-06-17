@@ -530,7 +530,9 @@ OverpassFrontend.prototype._processBBoxQuery = function (request) {
     remainingBounds = turf.difference(toRequest, this.overpassBBoxQueryRequested[request.query])
 
     if (remainingBounds === undefined) {
-      request.finalCallback(null)
+      if (!request.aborted) {
+        request.finalCallback(null)
+      }
       this.overpassRequests[this.overpassRequests.indexOf(request)] = null
 
       this.overpassRequestActive = false
@@ -600,7 +602,9 @@ OverpassFrontend.prototype._handleBBoxQueryResult = function (context, err, resu
     } else {
       // abort
       // call finalCallback for the request
-      request.finalCallback(err)
+      if (!request.aborted) {
+        request.finalCallback(err)
+      }
 
       // remove current request
       this.overpassRequests[this.overpassRequests.indexOf(request)] = null
@@ -639,7 +643,7 @@ OverpassFrontend.prototype._handleBBoxQueryResult = function (context, err, resu
 
   if ((request.options.split === 0) ||
       (request.options.split > results.elements.length)) {
-    if (!this.aborted) {
+    if (!request.aborted) {
       var toRequest = request.remainingBounds.toGeoJSON()
       if (this.overpassBBoxQueryRequested[request.query] === null) {
         this.overpassBBoxQueryRequested[request.query] = toRequest
