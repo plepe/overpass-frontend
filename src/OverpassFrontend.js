@@ -314,6 +314,10 @@ OverpassFrontend.prototype._handleGetResult = function (context, err, results) {
   var request
   var i
 
+  if (!err && results.remark) {
+    err = results.remark
+  }
+
   if (err) {
     var done = []
 
@@ -591,6 +595,10 @@ OverpassFrontend.prototype._processBBoxQuery = function (request) {
 OverpassFrontend.prototype._handleBBoxQueryResult = function (context, err, results) {
   var request = context.request
   var todo = {}
+
+  if (!err && results.remark) {
+    err = results.remark
+  }
 
   if (err) {
     this.errorCount++
