@@ -5,9 +5,19 @@ var assert = require('assert')
 var async = require('async')
 
 var OverpassFrontend = require('../src/OverpassFrontend')
+var Filter = require('../src/Filter')
 var BoundingBox = require('boundingbox')
 var overpassFrontend = new OverpassFrontend(conf.url)
 var removeNullEntries = require('../src/removeNullEntries')
+
+describe('Filter', function () {
+  describe ('input exploded', function () {
+    it ('[amenity]', function () {
+      var f = new Filter([ { op: 'has_key', key: 'amenity' } ])
+      assert.equal(f.toString(), '["amenity"]')
+    })
+  })
+})
 
 describe('Overpass get', function() {
   describe('single id', function() {
