@@ -577,10 +577,10 @@ OverpassFrontend.prototype._processBBoxQuery = function (request) {
 
   if (countRemoveDoneFeatures) {
     query += '(' + queryRemoveDoneFeatures + ')->.done;\n'
-    query += '(.result; - .done);\n'
+    query += '(.result; - .done)->.result;\n'
   }
 
-  query += 'out ' + overpassOutOptions(request.options) + ';'
+  query += '.result out ' + overpassOutOptions(request.options) + ';'
 
   setTimeout(function () {
     httpLoad(
