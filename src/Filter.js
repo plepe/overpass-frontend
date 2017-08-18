@@ -27,7 +27,7 @@ function Filter (def) {
 }
 
 Filter.prototype.match = function (ob) {
-  return !!this.def.filter(test.bind(this, ob)).length
+  return this.def.filter(test.bind(this, ob)).length === this.def.length
 }
 
 Filter.prototype.toString = function () {

@@ -21,6 +21,11 @@ describe('Filter', function () {
       var f = new Filter([ { op: '=', key: 'amenity', value: 'restaurant' } ])
       assert.equal(f.toString(), '["amenity"="restaurant"]')
     })
+
+    it ('[amenity=restaurant][shop]', function () {
+      var f = new Filter([ { op: '=', key: 'amenity', value: 'restaurant' }, { op: 'has_key', key: 'shop' } ])
+      assert.equal(f.toString(), '["amenity"="restaurant"]["shop"]')
+    })
   })
 
   describe ('match', function () {
@@ -44,6 +49,19 @@ describe('Filter', function () {
       assert.equal(r, false, 'Object should not match')
       var r = f.match({ tags: { shop: 'supermarket' } })
       assert.equal(r, false, 'Object should not match')
+    })
+
+    it ('[amenity=restaurant][shop]', function () {
+      var f = new Filter([ { op: '=', key: 'amenity', value: 'restaurant' }, { op: 'has_key', key: 'shop' } ])
+
+      var r = f.match({ tags: { amenity: 'restaurant' } })
+      assert.equal(r, false, 'Object should not match')
+      var r = f.match({ tags: { amenity: 'cafe' } })
+      assert.equal(r, false, 'Object should not match')
+      var r = f.match({ tags: { shop: 'supermarket' } })
+      assert.equal(r, false, 'Object should not match')
+      var r = f.match({ tags: { amenity: 'restaurant', shop: 'supermarket' } })
+      assert.equal(r, true, 'Object should match')
     })
   })
 })
@@ -1132,6 +1150,58 @@ describe('Overpass BBoxQuery', function() {
       {
       },
       function (err, result) {
+        found.push(result.id)
+
+        if (expected.indexOf(result.id) === -1) {
+          error += 'Unexpected result ' + result.id + '\n'
+        }
+      },
+      function (err) {
+        console.log(found)
+        if (err) {
+          return done(err)
+        }
+
+        if (error) {
+          return done(error)
+        }
+
+        if (found.length !== expected.length) {
+          return done('Wrong count of objects returned:\n' +
+               'Expected: ' + expected.join(', ') + '\n' +
+               'Found: ' + found.join(', '))
+        }
+
+        done()
+      }
+    )
+  })
+
+  it('Simple queries - all restaurants with additional filter (has cuisine tag)', function (done) {
+    overpassFrontend.clearBBoxQuery("(node[amenity=restaurant];way[amenity=restaurant];relation[amenity=restaurant];)")
+
+    var expected = [ 'n441576820', 'n442066582', 'n442972880', 'n1467109667', 'n355123976', 'n1955278832', 'n441576823', 'n2083468740', 'n2099023017', 'w369989037', 'w370577069' ]
+    var found = []
+    var error = ''
+
+    overpassFrontend.BBoxQuery(
+      "(node[amenity=restaurant];way[amenity=restaurant];relation[amenity=restaurant];)",
+      {
+	"maxlat": 48.200,
+	"maxlon": 16.345,
+	"minlat": 48.195,
+	"minlon": 16.335
+      },
+      {
+        'filter': [
+          {
+            'key': 'cuisine',
+            'op': 'has_key'
+          }
+        ]
+      },
+      function (err, result) {
+        console.log(result.tags)
         found.push(result.id)
 
         if (expected.indexOf(result.id) === -1) {
