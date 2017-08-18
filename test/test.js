@@ -1114,7 +1114,6 @@ describe('Overpass BBoxQuery', function() {
         }
       },
       function (err) {
-        console.log(found)
         if (err) {
           return done(err)
         }
@@ -1157,7 +1156,6 @@ describe('Overpass BBoxQuery', function() {
         }
       },
       function (err) {
-        console.log(found)
         if (err) {
           return done(err)
         }
@@ -1201,7 +1199,6 @@ describe('Overpass BBoxQuery', function() {
         ]
       },
       function (err, result) {
-        console.log(result.tags)
         found.push(result.id)
 
         if (expected.indexOf(result.id) === -1) {
@@ -1209,7 +1206,6 @@ describe('Overpass BBoxQuery', function() {
         }
       },
       function (err) {
-        console.log(found)
         if (err) {
           return done(err)
         }
