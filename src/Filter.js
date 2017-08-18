@@ -3,8 +3,11 @@ function qlesc (str) {
 }
 
 function compile (part) {
-  if (part.op === 'has_key') {
-    return '[' + qlesc(part.key) + ']'
+  switch (part.op) {
+    case 'has_key':
+      return '[' + qlesc(part.key) + ']'
+    case '=':
+      return '[' + qlesc(part.key) + '=' + qlesc(part.value) + ']'
   }
 }
 
@@ -12,6 +15,8 @@ function test (ob, part) {
   switch (part.op) {
     case 'has_key':
       return ob.tags && (part.key in ob.tags)
+    case '=':
+      return ob.tags && (part.key in ob.tags) && (ob.tags[part.key] === part.value)
     default:
       return false
   }

@@ -8,6 +8,11 @@ describe('Filter', function () {
       var f = new Filter([ { op: 'has_key', key: 'amenity' } ])
       assert.equal(f.toString(), '["amenity"]')
     })
+
+    it ('[amenity=restaurant]', function () {
+      var f = new Filter([ { op: '=', key: 'amenity', value: 'restaurant' } ])
+      assert.equal(f.toString(), '["amenity"="restaurant"]')
+    })
   })
 
   describe ('match', function () {
@@ -18,6 +23,17 @@ describe('Filter', function () {
       assert.equal(r, true, 'Object should match')
       var r = f.match({ tags: { amenity: 'cafe' } })
       assert.equal(r, true, 'Object should match')
+      var r = f.match({ tags: { shop: 'supermarket' } })
+      assert.equal(r, false, 'Object should not match')
+    })
+
+    it ('[amenity=restaurant]', function () {
+      var f = new Filter([ { op: '=', key: 'amenity', value: 'restaurant' } ])
+
+      var r = f.match({ tags: { amenity: 'restaurant' } })
+      assert.equal(r, true, 'Object should match')
+      var r = f.match({ tags: { amenity: 'cafe' } })
+      assert.equal(r, false, 'Object should not match')
       var r = f.match({ tags: { shop: 'supermarket' } })
       assert.equal(r, false, 'Object should not match')
     })
