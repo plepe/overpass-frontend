@@ -943,6 +943,93 @@ describe('Overpass query by id with bbox option', function() {
     })
 })
 
+describe('Overpass BBoxQuery', function() {
+  it('Simple queries - all nodes', function (done) {
+    var expected = [ 'n3037893169', 'n3037431649' ]
+    var found = []
+    var error = ''
+
+    overpassFrontend.BBoxQuery(
+      "node",
+      {
+	"maxlat": 48.19852,
+	"maxlon": 16.33853,
+	"minlat": 48.19848,
+	"minlon": 16.33846
+      },
+      {
+      },
+      function (err, result) {
+        found.push(result.id)
+
+        if (expected.indexOf(result.id) === -1) {
+          error += 'Unexpected result ' + result.id + '\n'
+        }
+      },
+      function (err) {
+        if (err) {
+          return done(err)
+        }
+
+        if (error) {
+          return done(error)
+        }
+
+        if (found.length !== expected.length) {
+          return done('Wrong count of objects returned:\n' +
+               'Expected: ' + expected.join(', ') + '\n' +
+               'Found: ' + found.join(', '))
+        }
+
+        done()
+      }
+    )
+  })
+
+  it('Simple queries - all restaurants', function (done) {
+    var expected = [ 'n441576820', 'n442066582', 'n442972880', 'n1467109667', 'n355123976', 'n1955278832', 'n441576823', 'n2083468740', 'n2099023017', 'w369989037', 'w370577069' ]
+    var found = []
+    var error = ''
+
+    overpassFrontend.BBoxQuery(
+      "(node[amenity=restaurant];way[amenity=restaurant];relation[amenity=restaurant];)",
+      {
+	"maxlat": 48.200,
+	"maxlon": 16.345,
+	"minlat": 48.195,
+	"minlon": 16.335
+      },
+      {
+      },
+      function (err, result) {
+        found.push(result.id)
+
+        if (expected.indexOf(result.id) === -1) {
+          error += 'Unexpected result ' + result.id + '\n'
+        }
+      },
+      function (err) {
+        console.log(found)
+        if (err) {
+          return done(err)
+        }
+
+        if (error) {
+          return done(error)
+        }
+
+        if (found.length !== expected.length) {
+          return done('Wrong count of objects returned:\n' +
+               'Expected: ' + expected.join(', ') + '\n' +
+               'Found: ' + found.join(', '))
+        }
+
+        done()
+      }
+    )
+  })
+})
+
 describe('Overpass objects structure', function() {
   describe('Node', function() {
     it('Overpass.ID_ONLY', function(done) {
