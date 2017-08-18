@@ -1178,7 +1178,55 @@ describe('Overpass BBoxQuery', function() {
   it('Simple queries - all restaurants with additional filter (has cuisine tag)', function (done) {
     overpassFrontend.clearBBoxQuery("(node[amenity=restaurant];way[amenity=restaurant];relation[amenity=restaurant];)")
 
-    var expected = [ 'n441576820', 'n442066582', 'n442972880', 'n1467109667', 'n355123976', 'n1955278832', 'n441576823', 'n2083468740', 'n2099023017', 'w369989037', 'w370577069' ]
+    var expected = [ 'n441576820', 'n442066582', 'n355123976', 'n1955278832', 'n2083468740', 'n2099023017' ]
+    var found = []
+    var error = ''
+
+    overpassFrontend.BBoxQuery(
+      "(node[amenity=restaurant];way[amenity=restaurant];relation[amenity=restaurant];)",
+      {
+	"maxlat": 48.200,
+	"maxlon": 16.345,
+	"minlat": 48.195,
+	"minlon": 16.335
+      },
+      {
+        'filter': [
+          {
+            'key': 'cuisine',
+            'op': 'has_key'
+          }
+        ]
+      },
+      function (err, result) {
+        found.push(result.id)
+
+        if (expected.indexOf(result.id) === -1) {
+          error += 'Unexpected result ' + result.id + '\n'
+        }
+      },
+      function (err) {
+        if (err) {
+          return done(err)
+        }
+
+        if (error) {
+          return done(error)
+        }
+
+        if (found.length !== expected.length) {
+          return done('Wrong count of objects returned:\n' +
+               'Expected: ' + expected.join(', ') + '\n' +
+               'Found: ' + found.join(', '))
+        }
+
+        done()
+      }
+    )
+  })
+
+  it('Simple queries - all restaurants with additional filter (has cuisine tag) (cached)', function (done) {
+    var expected = [ 'n441576820', 'n442066582', 'n355123976', 'n1955278832', 'n2083468740', 'n2099023017' ]
     var found = []
     var error = ''
 

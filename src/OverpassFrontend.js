@@ -16,6 +16,7 @@ var OverpassNode = require('./OverpassNode')
 var OverpassWay = require('./OverpassWay')
 var OverpassRelation = require('./OverpassRelation')
 var OverpassRequest = require('./OverpassRequest')
+var Filter = require('./Filter')
 var defines = require('./defines')
 
 function OverpassFrontend (url, options) {
@@ -433,6 +434,10 @@ OverpassFrontend.prototype.BBoxQuery = function (query, bounds, options, feature
     options.split = 0
   }
 
+  if ((typeof options.filter !== 'undefined') && !(options.filter instanceof Filter)) {
+    options.filter = new Filter(options.filter)
+  }
+
   var request = new OverpassRequest(this, {
     type: 'BBoxQuery',
     query: query,
@@ -518,6 +523,10 @@ OverpassFrontend.prototype._preprocessBBoxQuery = function (request) {
       continue
     }
 
+    if (request.options.filter && !request.options.filter.match(ob)) {
+      continue
+    }
+
     if ((request.options.properties & ob.properties) === request.options.properties) {
       request.doneFeatures[id] = ob
 
@@ -560,6 +569,12 @@ OverpassFrontend.prototype._processBBoxQuery = function (request) {
   }
 
   var query = '[out:json]' + queryOptions + ';\n(' + request.query + ')->.result;\n'
+
+  if (request.options.filter) {
+    query += '(node.result' + request.options.filter.toString() + ';' +
+             'way.result' + request.options.filter.toString() + ';' +
+             'relation.result' + request.options.filter.toString() + ')->.result;\n'
+  }
 
   var queryRemoveDoneFeatures = ''
   var countRemoveDoneFeatures = 0
