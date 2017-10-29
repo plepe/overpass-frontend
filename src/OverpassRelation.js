@@ -1,6 +1,7 @@
 /* global L:false */
 
 var util = require('util')
+var osmtogeojson = require('osmtogeojson')
 var OverpassObject = require('./OverpassObject')
 var OverpassFrontend = require('./defines')
 var turf = {
@@ -14,42 +15,23 @@ function OverpassRelation () {
 
 OverpassRelation.prototype.updateData = function (data, request) {
   var i
-  var member
 
   if ((request.options.properties & OverpassFrontend.MEMBERS) &&
       data.members) {
     this.members = []
 
     for (i = 0; i < data.members.length; i++) {
-      member = data.members[i]
+      var member = data.members[i]
 
-      this.members.push(data.members[i])
-      this.members[i].id = data.members[i].type.substr(0, 1) + data.members[i].ref
+      this.members.push(member)
+      this.members[i].id = member.type.substr(0, 1) + member.ref
     }
   }
 
   if ((request.options.properties & OverpassFrontend.MEMBERS) &&
       (request.options.properties & OverpassFrontend.GEOM) &&
       data.members) {
-    this.geometry = []
-
-    for (i = 0; i < data.members.length; i++) {
-      member = data.members[i]
-
-      switch (member.type) {
-        case 'node':
-          this.geometry.push({
-            lat: member.lat,
-            lon: member.lon
-          })
-          break
-        case 'way':
-          this.geometry.push(member.geometry)
-          break
-        case 'relation':
-          break
-      }
-    }
+    this.geometry = osmtogeojson({ elements: [ data ] })
   }
 
   this.constructor.super_.prototype.updateData.call(this, data, request)
@@ -79,78 +61,52 @@ OverpassRelation.prototype.leafletFeature = function (options) {
     return null
   }
 
-  var features = []
+  var feature = L.geoJSON(this.geometry, {
+    pointToLayer: function (options, geoJsonPoint, member) {
+      switch (options.nodeFeature) {
+        case 'Marker':
+          feature = L.marker(member, options)
+          break
+        case 'Circle':
+          feature = L.circle(member, options.radius, options)
+          break
+        case 'CircleMarker':
+        default:
+          feature = L.circleMarker(member, options)
+      }
 
-  for (var i = 0; i < this.data.members.length; i++) {
-    var member = this.data.members[i]
-    var feature
+      return feature
+    }.bind(this, options)
+  })
 
-    switch (member.type) {
-      case 'node':
-        switch (options.nodeFeature) {
-          case 'Marker':
-            feature = L.marker(member, options)
-            break
-          case 'Circle':
-            feature = L.circle(member, options.radius, options)
-            break
-          case 'CircleMarker':
-          default:
-            feature = L.circleMarker(member, options)
-        }
+  feature.setStyle(options)
 
-        features.push(feature)
-        break
-
-      case 'way':
-        if (member.geometry[member.geometry.length - 1].lat === member.geometry[0].lat &&
-           member.geometry[member.geometry.length - 1].lon === member.geometry[0].lon) {
-          feature = L.polygon(member.geometry, options)
-        } else {
-          feature = L.polyline(member.geometry, options)
-        }
-
-        features.push(feature)
-        break
-
-      case 'relation':
-      default:
-        break
-    }
-  }
-
-  return L.featureGroup(features)
+  return feature
 }
 
 OverpassRelation.prototype.GeoJSON = function () {
-  var geometries = []
-  for (var i = 0; i < this.geometry.length; i++) {
-    var geometry = this.geometry[i]
+  var ret = {
+    type: 'Feature',
+    id: this.type + '/' + this.osm_id,
+    properties: this.GeoJSONProperties()
+  }
 
-    if ('length' in geometry) {
-      geometries.push({
-        type: 'LineString',
-        coordinates: geometry.map(function (item) {
-          return [ item.lon, item.lat ]
-        })
-      })
+  if (this.geometry && this.geometry.features && this.geometry.features.length) {
+    if (this.geometry.features.length === 1) {
+      ret.geometry = this.geometry.features[0].geometry
     } else {
-      geometries.push({
-        type: 'Point',
-        coordinates: [ geometry.lon, geometry.lat ]
+      ret.geometry = {
+        type: 'GeometryCollection',
+        geometries: []
+      }
+
+      this.geometry.features.forEach(function (x) {
+        ret.geometry.geometries.push(x.geometry)
       })
     }
   }
 
-  return {
-    type: 'Feature',
-    id: this.type + '/' + this.osm_id,
-    geometry: {
-      type: 'GeometryCollection',
-      geometries: geometries
-    },
-    properties: this.GeoJSONProperties()
-  }
+  return ret
 }
 
 OverpassRelation.prototype.intersects = function (bbox) {
@@ -163,13 +119,8 @@ OverpassRelation.prototype.intersects = function (bbox) {
   }
 
   if (this.geometry) {
-    var geojson = this.GeoJSON()
-
-    for (i = 0; i < geojson.geometry.geometries.length; i++) {
-      var g = {
-        type: 'Feature',
-        geometry: geojson.geometry.geometries[i]
-      }
+    for (i = 0; i < this.geometry.features.length; i++) {
+      var g = this.geometry.features[i]
 
       var intersects = turf.bboxClip(g, [ bbox.minlon, bbox.minlat, bbox.maxlon, bbox.maxlat ])
 

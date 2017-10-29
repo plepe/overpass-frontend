@@ -340,13 +340,6 @@ describe('Overpass get', function() {
                   ]
                 },
                 {
-                  "type": "Point",
-                  "coordinates": [
-                    16.3401188,
-                    48.1943668
-                  ]
-                },
-                {
                   "type": "LineString",
                   "coordinates": [
                     [
@@ -365,6 +358,13 @@ describe('Overpass get', function() {
                       16.3401188,
                       48.1943668
                     ]
+                  ]
+                },
+                {
+                  "type": "Point",
+                  "coordinates": [
+                    16.3401188,
+                    48.1943668
                   ]
                 }
               ]
@@ -1377,57 +1377,90 @@ describe('Overpass objects structure', function() {
       overpassFrontend.get('r1980077', { properties: OverpassFrontend.GEOM | OverpassFrontend.MEMBERS },
         function(err, result, index) {
           assert.deepEqual(result.geometry, 
-	    [
-	      {
-		"lat": 48.1982148,
-		"lon": 16.3382648
-	      },
-	      [
-		{
-		  "lat": 48.1983967,
-		  "lon": 16.3390104
-		},
-		{
-		  "lat": 48.1983357,
-		  "lon": 16.3387535
-		},
-		{
-		  "lat": 48.1983024,
-		  "lon": 16.3386136
-		},
-		{
-		  "lat": 48.1982664,
-		  "lon": 16.3384619
-		},
-		{
-		  "lat": 48.198255,
-		  "lon": 16.3384203
-		},
-		{
-		  "lat": 48.1982449,
-		  "lon": 16.3383811
-		},
-		{
-		  "lat": 48.1982148,
-		  "lon": 16.3382648
-		}
-	      ],
-	      [
-		{
-		  "lat": 48.1987724,
-		  "lon": 16.3380726
-		},
-		{
-		  "lat": 48.1983261,
-		  "lon": 16.3382355
-		},
-		{
-		  "lat": 48.1982148,
-		  "lon": 16.3382648
-		}
-	      ]
-	    ]
-	  )
+            {
+              "type": "FeatureCollection",
+              "features": [
+                {
+                  "type": "Feature",
+                  "id": "way/4583442",
+                  "properties": {
+                    "id": "way/4583442"
+                  },
+                  "geometry": {
+                    "type": "LineString",
+                    "coordinates": [
+                      [
+                        16.3390104,
+                        48.1983967
+                      ],
+                      [
+                        16.3387535,
+                        48.1983357
+                      ],
+                      [
+                        16.3386136,
+                        48.1983024
+                      ],
+                      [
+                        16.3384619,
+                        48.1982664
+                      ],
+                      [
+                        16.3384203,
+                        48.198255
+                      ],
+                      [
+                        16.3383811,
+                        48.1982449
+                      ],
+                      [
+                        16.3382648,
+                        48.1982148
+                      ]
+                    ]
+                  }
+                },
+                {
+                  "type": "Feature",
+                  "id": "way/272672836",
+                  "properties": {
+                    "id": "way/272672836"
+                  },
+                  "geometry": {
+                    "type": "LineString",
+                    "coordinates": [
+                      [
+                        16.3380726,
+                        48.1987724
+                      ],
+                      [
+                        16.3382355,
+                        48.1983261
+                      ],
+                      [
+                        16.3382648,
+                        48.1982148
+                      ]
+                    ]
+                  }
+                },
+                {
+                  "type": "Feature",
+                  "id": "node/378462",
+                  "properties": {
+                    "id": "node/378462"
+                  },
+                  "geometry": {
+                    "type": "Point",
+                    "coordinates": [
+                      16.3382648,
+                      48.1982148
+                    ]
+                  }
+                }
+              ]
+            }
+          )
         },
         function(err) {
           done()
