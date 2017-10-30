@@ -129,7 +129,7 @@ OverpassRelation.prototype.intersects = function (bbox) {
           return 2
         }
       }
-      if (g.geometry.type === 'LineString') {
+      if (g.geometry.type === 'LineString' || g.geometry.type === 'Polygon') {
         if (intersects.geometry.coordinates.length) {
           return 2
         }
