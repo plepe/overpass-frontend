@@ -134,7 +134,7 @@ OverpassRelation.prototype.intersects = function (bbox) {
           return 2
         }
       }
-      if (g.geometry.type === 'MultiPolygon') {
+      if (g.geometry.type === 'MultiPolygon' || g.geometry.type === 'MultiLineString') {
         for (var j = 0; j < intersects.geometry.coordinates.length; j++) {
           if (intersects.geometry.coordinates[j].length) {
             return 2
