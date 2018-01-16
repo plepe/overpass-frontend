@@ -457,6 +457,12 @@ OverpassFrontend.prototype.BBoxQuery = function (query, bounds, options, feature
     if (typeof options.memberSplit === 'undefined') {
       request.options.memberSplit = 0
     }
+
+    if (typeof options.memberProperties === 'undefined') {
+      options.memberProperties = OverpassFrontend.DEFAULT
+    }
+    options.memberProperties |= OverpassFrontend.BBOX
+    request.options.memberProperties = options.memberProperties
   }
 
   var callbacks = new SortedCallbacks(request.options, request.featureCallback, request.finalCallback)

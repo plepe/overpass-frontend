@@ -1504,6 +1504,73 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
       }
     )
   })
+
+  it('Simple queries - routes with members - default properties', function (done) {
+    overpassFrontend.clearBBoxQuery("relation[type=route][route=tram]")
+    overpassFrontend.removeFromCache('r910885')
+    overpassFrontend.removeFromCache('n2293993991')
+    overpassFrontend.removeFromCache('w220270696')
+    var expected = [ 'r910885', 'r910886', 'r1306732', 'r1306733' ]
+    var expectedMembers = [ 'n2293993991', 'n2293993859', 'n2293993867' , 'n2293993929', 'w122580925', 'w220270706', 'w220270708', 'w220270709', 'w220270714', 'w232881263', 'w232881441', 'w261111319', 'w220270696', 'w220270713', 'w383292582' ]
+    var found = []
+    var foundMembers = []
+    var error = ''
+
+    overpassFrontend.BBoxQuery(
+      "relation[type=route][route=tram]",
+      {
+	"maxlat": 48.19953,
+	"maxlon": 16.33506,
+	"minlat": 48.19800,
+	"minlon": 16.32581,
+      },
+      {
+        "members": true,
+        "memberCallback": function (err, result) {
+          foundMembers.push(result.id)
+
+          if (expectedMembers.indexOf(result.id) === -1) {
+            error += 'Unexpected member result ' + result.id + '\n'
+          }
+
+          assert.equal(OverpassFrontend.DEFAULT, result.properties&OverpassFrontend.DEFAULT)
+        }
+      },
+      function (err, result) {
+        found.push(result.id)
+
+        if (expected.indexOf(result.id) === -1) {
+          error += 'Unexpected result ' + result.id + '\n'
+        }
+
+        assert.equal(OverpassFrontend.DEFAULT, result.properties&OverpassFrontend.DEFAULT)
+      },
+      function (err) {
+        if (err) {
+          return done(err)
+        }
+
+        if (error) {
+          return done(error)
+        }
+
+        if (found.length !== expected.length) {
+          return done('Wrong count of objects returned:\n' +
+               'Expected: ' + expected.join(', ') + '\n' +
+               'Found: ' + found.join(', '))
+        }
+
+        if (foundMembers.length !== expectedMembers.length) {
+          return done('Wrong count of member objects returned:\n' +
+               'Expected: ' + expectedMembers.join(', ') + '\n' +
+               'Found: ' + foundMembers.join(', '))
+        }
+
+        done()
+      }
+    )
+  })
+
 })
 
 describe('Overpass objects structure', function() {
