@@ -37,8 +37,11 @@ function OverpassFrontend (url, options) {
   this.overpassRequests = []
   this.overpassRequestActive = false
   this.overpassBBoxQueryElements = {}
+  this.overpassBBoxQueryElementMembers = {}
   this.overpassBBoxQueryRequested = {}
+  this.overpassBBoxQueryRequestedMembers = {}
   this.overpassBBoxQueryLastUpdated = {}
+  this.overpassBBoxQueryLastUpdatedMembers = {}
   this.errorCount = 0
 }
 
@@ -446,14 +449,23 @@ OverpassFrontend.prototype.BBoxQuery = function (query, bounds, options, feature
     lastChecked: 0
   })
 
+  if (request.options.members) {
+    request.remainingMemberBounds = bounds
+    request.doneMemberFeatures = {}
+    request.memberCallback = request.options.memberCallback || function () {}
+
+    if (typeof options.memberSplit === 'undefined') {
+      request.options.memberSplit = 0
+    }
+  }
+
   var callbacks = new SortedCallbacks(request.options, request.featureCallback, request.finalCallback)
   request.featureCallback = callbacks.next.bind(callbacks)
   request.finalCallback = callbacks.final.bind(callbacks)
   request.callCount = 0
+  var done = true
 
   if (request.query in this.overpassBBoxQueryElements) {
-    this._preprocessBBoxQuery(request)
-
     // check if we need to call Overpass API (whole area known?)
     var remainingBounds = request.bounds
     if (this.overpassBBoxQueryRequested[request.query] !== null) {
@@ -461,16 +473,9 @@ OverpassFrontend.prototype.BBoxQuery = function (query, bounds, options, feature
       remainingBounds = turf.difference(toRequest, this.overpassBBoxQueryRequested[request.query])
     }
 
-    var done = false
-    if (remainingBounds === undefined) {
-      request.finalCallback(null)
-      done = true
-    } else {
+    if (remainingBounds !== undefined) {
       request.remainingBounds = new BoundingBox(remainingBounds)
-    }
-
-    if (done) {
-      return request
+      done = false
     }
   } else {
     // otherwise initialize cache
@@ -483,6 +488,42 @@ OverpassFrontend.prototype.BBoxQuery = function (query, bounds, options, feature
 
     this.overpassBBoxQueryRequested[request.query] = null
     this.overpassBBoxQueryLastUpdated[request.query] = 0
+    done = false
+  }
+
+  if (request.options.members) {
+    if (request.query in this.overpassBBoxQueryElementMembers) {
+      // check if we need to call Overpass API (whole area known?)
+      remainingBounds = request.bounds
+      if (this.overpassBBoxQueryRequestedMembers[request.query] !== null) {
+        toRequest = request.bounds.toGeoJSON()
+        remainingBounds = turf.difference(toRequest, this.overpassBBoxQueryRequestedMembers[request.query])
+      }
+
+      if (remainingBounds !== undefined) {
+        request.remainingMemberBounds = new BoundingBox(remainingBounds)
+        done = false
+      }
+    } else {
+      // otherwise initialize cache
+      this.overpassBBoxQueryElementMembers[request.query] = new Quadtree.Quadtree(
+        new Quadtree.Box(
+          new Quadtree.Point(-90, -180),
+          new Quadtree.Point(90, 180)
+        )
+      )
+
+      this.overpassBBoxQueryRequestedMembers[request.query] = null
+      this.overpassBBoxQueryLastUpdatedMembers[request.query] = 0
+      done = false
+    }
+  }
+
+  this._preprocessBBoxQuery(request)
+
+  if (done) {
+    request.finalCallback(null)
+    return request
   }
 
   this.overpassRequests.push(request)
@@ -525,6 +566,30 @@ OverpassFrontend.prototype._preprocessBBoxQuery = function (request) {
       request.featureCallback(null, ob)
     }
   }
+
+  if (request.options.members) {
+    items = this.overpassBBoxQueryElementMembers[request.query].queryRange(quadtreeBounds)
+
+    for (i = 0; i < items.length; i++) {
+      id = items[i].value
+      ob = this.overpassElements[id]
+
+      if (id in request.doneMemberFeatures) {
+        continue
+      }
+
+      // also check the object directly if it intersects the bbox - if possible
+      if (!ob.intersects(request.bounds)) {
+        continue
+      }
+
+      if ((request.options.memberProperties & ob.properties) === request.options.memberProperties) {
+        request.doneMemberFeatures[id] = ob
+
+        request.memberCallback(null, ob)
+      }
+    }
+  }
 }
 
 OverpassFrontend.prototype._processBBoxQuery = function (request) {
@@ -536,7 +601,29 @@ OverpassFrontend.prototype._processBBoxQuery = function (request) {
     var toRequest = request.bounds.toGeoJSON()
     remainingBounds = turf.difference(toRequest, this.overpassBBoxQueryRequested[request.query])
 
-    if (remainingBounds === undefined) {
+    if (remainingBounds === undefined && !request.options.members) {
+      if (!request.aborted) {
+        request.finalCallback(null)
+      }
+      this.overpassRequests[this.overpassRequests.indexOf(request)] = null
+
+      this.overpassRequestActive = false
+
+      async.setImmediate(function () {
+        this._overpassProcess()
+      }.bind(this))
+
+      return
+    }
+
+    var done = remainingBounds === undefined
+  }
+
+  if (request.options.members && this.overpassBBoxQueryRequestedMembers[request.query] !== null) {
+    toRequest = request.bounds.toGeoJSON()
+    remainingBounds = turf.difference(toRequest, this.overpassBBoxQueryRequestedMembers[request.query])
+
+    if (remainingBounds === undefined && done) {
       if (!request.aborted) {
         request.finalCallback(null)
       }
@@ -585,6 +672,43 @@ OverpassFrontend.prototype._processBBoxQuery = function (request) {
 
   query += 'out ' + overpassOutOptions(request.options) + ';'
 
+  if (request.options.members) {
+    query += '\nout count;\n'
+    query += '(\n' +
+             '  node(r.result)(' + BBoxString + ');\n' +
+             '  way(r.result)(' + BBoxString + ');\n' +
+             '  relation(r.result)(' + BBoxString + ');\n' +
+             ')->.resultMembers;\n'
+
+    var queryRemoveDoneMemberFeatures = ''
+    var countRemoveDoneMemberFeatures = 0
+
+    for (id in request.doneMemberFeatures) {
+      ob = request.doneMemberFeatures[id]
+
+      if (countRemoveDoneMemberFeatures % 1000 === 999) {
+        query += '(' + queryRemoveDoneMemberFeatures + ')->.done;\n'
+        queryRemoveDoneMemberFeatures = '.done;'
+      }
+
+      queryRemoveDoneMemberFeatures += ob.type + '(' + ob.osm_id + ');'
+      countRemoveDoneMemberFeatures++
+    }
+
+    if (countRemoveDoneMemberFeatures) {
+      query += '(' + queryRemoveDoneMemberFeatures + ')->.doneMembers;\n'
+      query += '(.resultMembers; - .doneMembers);\n'
+    } else {
+      query += '(.resultMembers);\n'
+    }
+
+    var membersOptions = {
+      split: request.options.memberSplit,
+      properties: request.options.memberProperties
+    }
+    query += 'out ' + overpassOutOptions(membersOptions) + ';'
+  }
+
   setTimeout(function () {
     httpLoad(
       this.url,
@@ -598,6 +722,10 @@ OverpassFrontend.prototype._processBBoxQuery = function (request) {
 OverpassFrontend.prototype._handleBBoxQueryResult = function (context, err, results) {
   var request = context.request
   var todo = {}
+  var todoMembers = {}
+  var seenSeparator = false
+  var count = 0
+  var countMembers = 0
 
   if (!err && results.remark) {
     err = results.remark
@@ -628,32 +756,67 @@ OverpassFrontend.prototype._handleBBoxQueryResult = function (context, err, resu
 
   for (var i = 0; i < results.elements.length; i++) {
     var el = results.elements[i]
+    if ('count' in el || ('type' in el && el.type === 'count')) {
+      seenSeparator = true
+      continue
+    }
+
     var id = el.type.substr(0, 1) + el.id
 
     var obBBox = new BoundingBox(el)
     var approxRouteLength = obBBox.diagonalLength(obBBox)
 
-    var ob = this.createOrUpdateOSMObject(el, request)
-    request.doneFeatures[id] = ob
-
-    todo[id] = {
-      bounds: obBBox,
-      approxRouteLength: approxRouteLength
+    var r = request
+    if (seenSeparator) {
+      r = {
+        options: {
+          properties: request.options.memberProperties,
+          bbox: request.options.bbox
+        }
+      }
     }
+    var ob = this.createOrUpdateOSMObject(el, r)
 
-    this.overpassBBoxQueryElements[request.query].insert(toQuadtreeLookupBox(obBBox), id)
+    if (!seenSeparator) {
+      count++
+      request.doneFeatures[id] = ob
+
+      todo[id] = {
+        bounds: obBBox,
+        approxRouteLength: approxRouteLength
+      }
+
+      this.overpassBBoxQueryElements[request.query].insert(toQuadtreeLookupBox(obBBox), id)
+    } else {
+      countMembers++
+      request.doneMemberFeatures[id] = ob
+
+      todoMembers[id] = {
+        bounds: obBBox,
+        approxRouteLength: approxRouteLength
+      }
+
+      this.overpassBBoxQueryElementMembers[request.query].insert(toQuadtreeLookupBox(obBBox), id)
+    }
   }
 
   if (!request.aborted) {
     for (var k in todo) {
       request.featureCallback(null, this.overpassElements[k])
     }
+
+    for (k in todoMembers) {
+      request.memberCallback(null, this.overpassElements[k])
+    }
   }
 
   this.overpassBBoxQueryLastUpdated[request.query] = new Date().getTime()
+  this.overpassBBoxQueryLastUpdatedMembers[request.query] = new Date().getTime()
+
+  var done = true
 
   if ((request.options.split === 0) ||
-      (request.options.split > results.elements.length)) {
+      (request.options.split > count)) {
     if (!request.aborted) {
       var toRequest = request.remainingBounds.toGeoJSON()
       if (this.overpassBBoxQueryRequested[request.query] === null) {
@@ -661,12 +824,32 @@ OverpassFrontend.prototype._handleBBoxQueryResult = function (context, err, resu
       } else {
         this.overpassBBoxQueryRequested[request.query] = turf.union(toRequest, this.overpassBBoxQueryRequested[request.query])
       }
-
-      request.finalCallback(null)
     }
+  } else {
+    done = false
+  }
 
+  if (request.options.members) {
+    if ((request.options.memberSplit === 0) ||
+        (request.options.memberSplit > countMembers)) {
+      if (!request.aborted) {
+        toRequest = request.remainingMemberBounds.toGeoJSON()
+        if (this.overpassBBoxQueryRequestedMembers[request.query] === null) {
+          this.overpassBBoxQueryRequestedMembers[request.query] = toRequest
+        } else {
+          this.overpassBBoxQueryRequestedMembers[request.query] = turf.union(toRequest, this.overpassBBoxQueryRequestedMembers[request.query])
+        }
+      }
+    } else {
+      done = false
+    }
+  }
+
+  if (done) {
+    request.finalCallback(null)
     this.overpassRequests[this.overpassRequests.indexOf(request)] = null
   }
+
   this.overpassRequestActive = false
 
   async.setImmediate(function () {
@@ -676,8 +859,11 @@ OverpassFrontend.prototype._handleBBoxQueryResult = function (context, err, resu
 
 OverpassFrontend.prototype.clearBBoxQuery = function (query) {
   delete this.overpassBBoxQueryElements[query]
+  delete this.overpassBBoxQueryElementMembers[query]
   delete this.overpassBBoxQueryRequested[query]
+  delete this.overpassBBoxQueryRequestedMembers[query]
   delete this.overpassBBoxQueryLastUpdated[query]
+  delete this.overpassBBoxQueryLastUpdatedMembers[query]
 }
 
 OverpassFrontend.prototype.abortRequest = function (request) {
