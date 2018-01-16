@@ -277,6 +277,7 @@ class OverpassFrontend {
 
   clearBBoxQuery (query) {
     delete this.cacheBBoxQueries[query]
+    delete this.cacheBBoxQueries[query + '|members']
   }
 
   _abortRequest (request) {
