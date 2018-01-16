@@ -449,6 +449,7 @@ OverpassFrontend.prototype.BBoxQuery = function (query, bounds, options, feature
   var callbacks = new SortedCallbacks(request.options, request.featureCallback, request.finalCallback)
   request.featureCallback = callbacks.next.bind(callbacks)
   request.finalCallback = callbacks.final.bind(callbacks)
+  request.callCount = 0
 
   if (request.query in this.overpassBBoxQueryElements) {
     this._preprocessBBoxQuery(request)
@@ -527,6 +528,8 @@ OverpassFrontend.prototype._preprocessBBoxQuery = function (request) {
 }
 
 OverpassFrontend.prototype._processBBoxQuery = function (request) {
+  request.callCount++
+
   // check if we need to call Overpass API (whole area known?)
   var remainingBounds = request.bounds
   if (this.overpassBBoxQueryRequested[request.query] !== null) {

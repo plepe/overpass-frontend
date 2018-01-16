@@ -454,7 +454,7 @@ describe('Overpass get', function() {
       var expected = [ 'w299709373' ]
       var might = [ 'w299709375' ] // correct, if only bbox check is used
 
-      overpassFrontend.BBoxQuery(
+      var request = overpassFrontend.BBoxQuery(
         'way[highway=footway];',
         {
           minlon: 16.3384616,
@@ -476,6 +476,7 @@ describe('Overpass get', function() {
           }
         },
         function(err) {
+          assert.equal(1, request.callCount, 'Server should be called once')
           assert.equal(expected.length, found.length, 'Wrong count of objects found!')
 
           done()
@@ -488,7 +489,7 @@ describe('Overpass get', function() {
       var expected = [ 'w299709373' ]
       var might = [ 'w299709375' ] // correct, if only bbox check is used
 
-      overpassFrontend.BBoxQuery(
+      var request = overpassFrontend.BBoxQuery(
         'way[highway=footway];',
         {
           minlon: 16.3382616,
@@ -510,6 +511,7 @@ describe('Overpass get', function() {
           }
         },
         function(err) {
+          assert.equal(1, request.callCount, 'Server should be called once')
           assert.equal(expected.length, found.length, 'Wrong count of objects found!')
 
           done()
@@ -522,7 +524,7 @@ describe('Overpass get', function() {
       var expected = [ 'w299709373' ]
       var might = [ 'w299709375' ] // correct, if only bbox check is used
 
-      overpassFrontend.BBoxQuery(
+      var request = overpassFrontend.BBoxQuery(
         'way[highway=footway];',
         {
           minlon: 16.3384616,
@@ -542,6 +544,7 @@ describe('Overpass get', function() {
             assert(false, 'Object ' + result.id + ' should not be found!')
         },
         function(err) {
+          assert.equal(0, request.callCount, 'Server should be not be called (fully cached)')
           if(expectedFound.length != expected.length)
             assert(false, 'Wrong count of objects found!')
 
