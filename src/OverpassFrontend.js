@@ -561,7 +561,7 @@ OverpassFrontend.prototype._processBBoxQuery = function (request) {
     request: request
   }
 
-  var query = request.compileQuery()
+  var { query } = request.compileQuery()
 
   setTimeout(function () {
     httpLoad(
