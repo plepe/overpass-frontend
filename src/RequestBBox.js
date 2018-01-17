@@ -1,13 +1,76 @@
 const Request = require('./Request')
 const overpassOutOptions = require('./overpassOutOptions')
+const defines = require('./defines')
 const turf = require('./turf')
 const toQuadtreeLookupBox = require('./toQuadtreeLookupBox')
+const BoundingBox = require('boundingbox')
+const SortedCallbacks = require('./SortedCallbacks')
+const Quadtree = require('quadtree-lookup')
 
 class RequestBBox extends Request {
   constructor (overpass, data) {
     super(overpass, data)
     this.type = 'BBoxQuery'
+
+    if (typeof this.options.properties === 'undefined') {
+      this.options.properties = defines.DEFAULT
+    }
+    this.options.properties |= defines.BBOX
+
+    if (typeof this.options.split === 'undefined') {
+      this.options.split = 0
+    }
+
+    // make sure the request ends with ';'
+    if (!this.query.match(/;\s*$/)) {
+      this.query += ';'
+    }
+
+    var callbacks = new SortedCallbacks(this.options, this.featureCallback, this.finalCallback)
+    this.featureCallback = callbacks.next.bind(callbacks)
+    this.finalCallback = callbacks.final.bind(callbacks)
+
+    this.callCount = 0
     this.loadFinish = false
+    this.lastChecked = 0
+
+    this.init()
+  }
+
+  init () {
+    if (this.query in this.overpass.overpassBBoxQueryElements) {
+      this.overpass._preprocessBBoxQuery(this)
+
+      // check if we need to call Overpass API (whole area known?)
+      var remainingBounds = this.bounds
+      if (this.overpass.overpassBBoxQueryRequested[this.query] !== null) {
+        var toRequest = this.bounds.toGeoJSON()
+        remainingBounds = turf.difference(toRequest, this.overpass.overpassBBoxQueryRequested[this.query])
+      }
+
+      var done = false
+      if (remainingBounds === undefined) {
+        this.finalCallback(null)
+        done = true
+      } else {
+        this.remainingBounds = new BoundingBox(remainingBounds)
+      }
+
+      if (done) {
+        return
+      }
+    } else {
+      // otherwise initialize cache
+      this.overpass.overpassBBoxQueryElements[this.query] = new Quadtree.Quadtree(
+        new Quadtree.Box(
+          new Quadtree.Point(-90, -180),
+          new Quadtree.Point(90, 180)
+        )
+      )
+
+      this.overpass.overpassBBoxQueryRequested[this.query] = null
+      this.overpass.overpassBBoxQueryLastUpdated[this.query] = 0
+    }
   }
 
   compileQuery () {
