@@ -351,7 +351,7 @@ OverpassFrontend.prototype._handleGetResult = function (context, err, results) {
   for (i = 0; i < results.elements.length; i++) {
     el = results.elements[i]
 
-    if ('count' in el || ('type' in el && el.type === 'count')) {
+    if (isSeparator(el)) {
       // separator found
       if (request.options.bbox && !request.bboxSeenSeparator) {
         request.bboxSeenSeparator = true
@@ -710,6 +710,10 @@ function toQuadtreeLookupBox (boundingbox) {
     new Quadtree.Point(boundingbox.minlat, boundingbox.minlon),
     new Quadtree.Point(boundingbox.maxlat, boundingbox.maxlon)
   )
+}
+
+function isSeparator (el) {
+  return ('count' in el || ('type' in el && el.type === 'count'))
 }
 
 module.exports = OverpassFrontend
