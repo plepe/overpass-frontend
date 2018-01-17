@@ -21,7 +21,7 @@ OverpassNode.prototype.GeoJSON = function () {
   }
 }
 
-OverpassNode.prototype.updateData = function (data, request) {
+OverpassNode.prototype.updateData = function (data, options) {
   if (data.lat) {
     this.geometry = {
       lat: data.lat,
@@ -32,7 +32,7 @@ OverpassNode.prototype.updateData = function (data, request) {
     this.center = this.bounds.getCenter()
   }
 
-  this.constructor.super_.prototype.updateData.call(this, data, request)
+  this.constructor.super_.prototype.updateData.call(this, data, options)
 }
 
 OverpassNode.prototype.leafletFeature = function (options) {

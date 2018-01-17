@@ -14,7 +14,7 @@ OverpassObject.prototype.member_ids = function () {
   return []
 }
 
-OverpassObject.prototype.updateData = function (data, request) {
+OverpassObject.prototype.updateData = function (data, options) {
   if (typeof this.id === 'undefined') {
     this.id = data.type.substr(0, 1) + data.id
     this.type = data.type
@@ -34,24 +34,24 @@ OverpassObject.prototype.updateData = function (data, request) {
     this.center = this.bounds.getCenter()
   }
 
-  if (request.options.bbox) {
-    if (!this.bounds || request.options.bbox.intersects(this.bounds)) {
-      this.properties = this.properties | request.options.properties
+  if (options.bbox) {
+    if (!this.bounds || options.bbox.intersects(this.bounds)) {
+      this.properties = this.properties | options.properties
     } else {
       this.properties = this.properties | OverpassFrontend.BBOX | OverpassFrontend.CENTER
     }
   } else {
-    this.properties = this.properties | request.options.properties
+    this.properties = this.properties | options.properties
   }
 
   // result of a request with bbox limitation, where the object was outside
-  if (request.bboxNoMatch && this.bounds) {
+  if (options.bboxNoMatch && this.bounds) {
     // this.boundsPossibleMatch: record unsucessful bbox requests for an object
     if (typeof this.boundsPossibleMatch === 'undefined') {
       this.boundsPossibleMatch = this.bounds.toGeoJSON()
     }
 
-    this.boundsPossibleMatch = turf.difference(this.boundsPossibleMatch, request.options.bbox.toGeoJSON())
+    this.boundsPossibleMatch = turf.difference(this.boundsPossibleMatch, options.bbox.toGeoJSON())
   }
 
   // geometry is known -> no need for this.boundsPossibleMatch
@@ -59,7 +59,7 @@ OverpassObject.prototype.updateData = function (data, request) {
     delete this.boundsPossibleMatch
   }
 
-  if (request.options.properties & OverpassFrontend.TAGS) {
+  if (options.properties & OverpassFrontend.TAGS) {
     if (typeof data.tags === 'undefined') {
       this.tags = {}
     } else {

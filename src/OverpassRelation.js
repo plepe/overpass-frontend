@@ -13,10 +13,10 @@ function OverpassRelation () {
   OverpassObject.call(this)
 }
 
-OverpassRelation.prototype.updateData = function (data, request) {
+OverpassRelation.prototype.updateData = function (data, options) {
   var i
 
-  if ((request.options.properties & OverpassFrontend.MEMBERS) &&
+  if ((options.properties & OverpassFrontend.MEMBERS) &&
       data.members) {
     this.members = []
 
@@ -28,13 +28,13 @@ OverpassRelation.prototype.updateData = function (data, request) {
     }
   }
 
-  if ((request.options.properties & OverpassFrontend.MEMBERS) &&
-      (request.options.properties & OverpassFrontend.GEOM) &&
+  if ((options.properties & OverpassFrontend.MEMBERS) &&
+      (options.properties & OverpassFrontend.GEOM) &&
       data.members) {
     this.geometry = osmtogeojson({ elements: [ data ] })
   }
 
-  this.constructor.super_.prototype.updateData.call(this, data, request)
+  this.constructor.super_.prototype.updateData.call(this, data, options)
 }
 
 OverpassRelation.prototype.member_ids = function () {
