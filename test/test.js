@@ -1708,7 +1708,7 @@ describe('Overpass objects structure', function() {
   })
 
   describe('Request', function() {
-    it('get() should return Request object', function (done) {
+    it('get() should return RequestGet object', function (done) {
       var req = overpassFrontend.get([ 'n3037893169' ],
         {
           properties: OverpassFrontend.ID_ONLY
@@ -1720,7 +1720,7 @@ describe('Overpass objects structure', function() {
         }
       )
 
-      assert.equal('Request', req.constructor.name)
+      assert.equal('RequestGet', req.constructor.name)
     })
 
     it('abort() should abort a "get" request', function (done) {
