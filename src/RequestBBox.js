@@ -50,8 +50,8 @@ class RequestBBox extends Request {
     }
   }
 
-  receiveObject (ob, compiledQuery, partIndex) {
-    compiledQuery.parts[partIndex].count++
+  receiveObject (ob, subRequest, partIndex) {
+    subRequest.parts[partIndex].count++
     this.doneFeatures[ob.id] = ob
     this.overpass.overpassBBoxQueryElements[this.query].insert(toQuadtreeLookupBox(ob.bounds), ob.id)
 
