@@ -536,11 +536,21 @@ OverpassFrontend.prototype._processBBoxQuery = function (request) {
     request.finish()
   }
 
-  var context = {
-    request: request
-  }
+  var context = [ request.compileQuery() ]
 
-  var { query } = request.compileQuery()
+  this._sendBBoxQueryRequests(context)
+}
+
+OverpassFrontend.prototype._sendBBoxQueryRequests = function (context) {
+  var query = ''
+
+  for (var i = 0; i < context.length; i++) {
+    if (i !== 0) {
+      query += '\nout count;\n'
+    }
+
+    query += context[i].query
+  }
 
   setTimeout(function () {
     httpLoad(
@@ -553,7 +563,6 @@ OverpassFrontend.prototype._processBBoxQuery = function (request) {
 }
 
 OverpassFrontend.prototype._handleBBoxQueryResult = function (context, err, results) {
-  var request = context.request
   var todo = {}
 
   if (!err && results.remark) {
@@ -570,7 +579,9 @@ OverpassFrontend.prototype._handleBBoxQueryResult = function (context, err, resu
     } else {
       // abort
       // call finalCallback for the request
-      request.finish(err)
+      context.forEach(function (compiledQuery) {
+        compiledQuery.request.finish(err)
+      })
     }
 
     return
@@ -578,15 +589,34 @@ OverpassFrontend.prototype._handleBBoxQueryResult = function (context, err, resu
     this.errorCount = 0
   }
 
+  var contextIndex = 0
+  var partIndex = request
+  var request = context[0].request
+  var part = context[0].parts[0]
+
   for (var i = 0; i < results.elements.length; i++) {
     var el = results.elements[i]
+
+    if (isSeparator(el)) {
+      partIndex++
+
+      if (partIndex >= context[contextIndex].part.length) {
+        contextIndex++
+        partIndex = 0
+        request = context[contextIndex].request
+        part = context[contextIndex].part[0]
+      } else {
+        partIndex++
+        part = context[contextIndex].part[partIndex]
+      }
+    }
 
     var ob = this.createOrUpdateOSMObject(el, request)
 
     request.doneFeatures[ob.id] = ob
 
     todo[ob.id] = {
-      bounds: ob.bounds
+      bounds: ob.bounds,
     }
 
     this.overpassBBoxQueryElements[request.query].insert(toQuadtreeLookupBox(ob.bounds), ob.id)

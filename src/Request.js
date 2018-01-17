@@ -5,6 +5,7 @@
  * @property {object[]} parts An entry for each part (separated by the 'out count' separator)
  * @property {int} parts[].properties The properties which each returned map feature has set (TAGS, BBOX, ...)
  * @property {int} effort Supposed "effort" of this query
+ * @property {Request} request The request this compiled query belongs to
  */
 class Request {
   constructor (overpass, data) {
