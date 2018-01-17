@@ -28,6 +28,7 @@ OverpassObject.prototype.updateData = function (data, request) {
   if (data.bounds) {
     this.bounds = new BoundingBox(data.bounds)
     this.center = this.bounds.getCenter()
+    this.diagonalLength = this.bounds.diagonalLength()
   } else if (data.center) {
     this.bounds = new BoundingBox(data.center)
     this.center = this.bounds.getCenter()
