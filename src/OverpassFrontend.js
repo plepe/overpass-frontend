@@ -528,6 +528,7 @@ OverpassFrontend.prototype._processBBoxQuery = function (request) {
 
   if (request.isDone()) {
     request.finish()
+    return this._next()
   }
 
   var subRequests = [ request.compileQuery() ]
@@ -655,6 +656,9 @@ OverpassFrontend.prototype.abortRequest = function (request) {
 
 OverpassFrontend.prototype._finishRequest = function (request) {
   this.overpassRequests[this.overpassRequests.indexOf(request)] = null
+}
+
+OverpassFrontend.prototype._next = function () {
   this.overpassRequestActive = false
 
   async.setImmediate(function () {
