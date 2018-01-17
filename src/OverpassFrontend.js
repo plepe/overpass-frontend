@@ -2,10 +2,7 @@ var async = require('async')
 var weightSort = require('weight-sort')
 var BoundingBox = require('boundingbox')
 var Quadtree = require('quadtree-lookup')
-var turf = {
-  difference: require('@turf/difference'),
-  union: require('@turf/union')
-}
+const turf = require('./turf')
 
 var httpLoad = require('./httpLoad')
 var removeNullEntries = require('./removeNullEntries')
