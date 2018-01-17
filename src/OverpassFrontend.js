@@ -575,20 +575,16 @@ OverpassFrontend.prototype._handleBBoxQueryResult = function (context, err, resu
 
   for (var i = 0; i < results.elements.length; i++) {
     var el = results.elements[i]
-    var id = el.type.substr(0, 1) + el.id
-
-    var obBBox = new BoundingBox(el)
-    var approxRouteLength = obBBox.diagonalLength(obBBox)
 
     var ob = this.createOrUpdateOSMObject(el, request)
-    request.doneFeatures[id] = ob
 
-    todo[id] = {
-      bounds: obBBox,
-      approxRouteLength: approxRouteLength
+    request.doneFeatures[ob.id] = ob
+
+    todo[ob.id] = {
+      bounds: ob.bounds
     }
 
-    this.overpassBBoxQueryElements[request.query].insert(toQuadtreeLookupBox(obBBox), id)
+    this.overpassBBoxQueryElements[request.query].insert(toQuadtreeLookupBox(ob.bounds), ob.id)
   }
 
   if (!request.aborted) {
