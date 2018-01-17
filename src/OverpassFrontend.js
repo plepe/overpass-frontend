@@ -588,7 +588,7 @@ OverpassFrontend.prototype._handleBBoxQueryResult = function (context, err, resu
   }
 
   var contextIndex = 0
-  var partIndex = request
+  var partIndex = 0
   var request = context[0].request
   var part = context[0].parts[0]
 
