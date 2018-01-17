@@ -36,7 +36,9 @@ class RequestBBox extends Request {
 
     query += 'out ' + overpassOutOptions(this.options) + ';'
 
-    return query
+    return {
+      query
+    }
   }
 }
 
