@@ -535,20 +535,20 @@ OverpassFrontend.prototype._processBBoxQuery = function (request) {
     request.finish()
   }
 
-  var context = [ request.compileQuery() ]
+  var subRequests = [ request.compileQuery() ]
 
-  this._sendBBoxQueryRequests(context)
+  this._sendBBoxQueryRequests(subRequests)
 }
 
-OverpassFrontend.prototype._sendBBoxQueryRequests = function (context) {
+OverpassFrontend.prototype._sendBBoxQueryRequests = function (subRequests) {
   var query = ''
 
-  for (var i = 0; i < context.length; i++) {
+  for (var i = 0; i < subRequests.length; i++) {
     if (i !== 0) {
       query += '\nout count;\n'
     }
 
-    query += context[i].query
+    query += subRequests[i].query
   }
 
   setTimeout(function () {
@@ -556,12 +556,12 @@ OverpassFrontend.prototype._sendBBoxQueryRequests = function (context) {
       this.url,
       null,
       query,
-      this._handleBBoxQueryResult.bind(this, context)
+      this._handleBBoxQueryResult.bind(this, subRequests)
     )
   }.bind(this), this.options.timeGap)
 }
 
-OverpassFrontend.prototype._handleBBoxQueryResult = function (context, err, results) {
+OverpassFrontend.prototype._handleBBoxQueryResult = function (subRequests, err, results) {
   if (!err && results.remark) {
     err = results.remark
   }
@@ -576,8 +576,8 @@ OverpassFrontend.prototype._handleBBoxQueryResult = function (context, err, resu
     } else {
       // abort
       // call finalCallback for the request
-      context.forEach(function (compiledQuery) {
-        compiledQuery.request.finish(err)
+      subRequests.forEach(function (subRequest) {
+        subRequest.request.finish(err)
       })
     }
 
@@ -586,10 +586,11 @@ OverpassFrontend.prototype._handleBBoxQueryResult = function (context, err, resu
     this.errorCount = 0
   }
 
-  var contextIndex = 0
+  var subRequestsIndex = 0
   var partIndex = 0
-  var request = context[0].request
-  var part = context[0].parts[0]
+  var subRequest = subRequests[0]
+  var request = subRequest.request
+  var part = subRequest.parts[0]
 
   for (var i = 0; i < results.elements.length; i++) {
     var el = results.elements[i]
@@ -597,20 +598,22 @@ OverpassFrontend.prototype._handleBBoxQueryResult = function (context, err, resu
     if (isSeparator(el)) {
       partIndex++
 
-      if (partIndex >= context[contextIndex].part.length) {
-        contextIndex++
+      if (partIndex >= subRequests[subRequestsIndex].part.length) {
+        subRequestsIndex++
         partIndex = 0
-        request = context[contextIndex].request
-        part = context[contextIndex].part[0]
+        subRequest = subRequests[subRequestsIndex]
+        request = subRequest.request
+        part = subRequest.part[0]
       } else {
-        partIndex++
-        part = context[contextIndex].part[partIndex]
+        part = subRequest.part[partIndex]
       }
+
+      continue
     }
 
     var ob = this.createOrUpdateOSMObject(el, part)
 
-    request.receiveObject(ob, context[contextIndex], partIndex)
+    request.receiveObject(ob, subRequests[subRequestsIndex], partIndex)
   }
 
   this.overpassBBoxQueryLastUpdated[request.query] = new Date().getTime()

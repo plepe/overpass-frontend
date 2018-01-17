@@ -1,6 +1,6 @@
 /**
  * A compiled query
- * @typedef {Object} CompiledQuery
+ * @typedef {Object} SubRequest
  * @property {string} query The compiled code
  * @property {object[]} parts An entry for each part (separated by the 'out count' separator)
  * @property {int} parts[].properties The properties which each returned map feature has set (TAGS, BBOX, ...)
@@ -18,7 +18,7 @@ class Request {
 
   /**
    * compile the query
-   * @return {CompiledQuery} the compiled query
+   * @return {SubRequest} the compiled query
    */
   compileQuery () {
   }
