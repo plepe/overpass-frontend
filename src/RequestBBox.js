@@ -1,6 +1,7 @@
 const Request = require('./Request')
 const overpassOutOptions = require('./overpassOutOptions')
 const turf = require('./turf')
+const toQuadtreeLookupBox = require('./toQuadtreeLookupBox')
 
 class RequestBBox extends Request {
   constructor (overpass, data) {
@@ -42,9 +43,20 @@ class RequestBBox extends Request {
       request: this,
       parts: [
         {
-          properties: this.options.properties
+          properties: this.options.properties,
+          count: 0
         }
       ]
+    }
+  }
+
+  receiveObject (ob, compiledQuery, partIndex) {
+    compiledQuery.parts[partIndex].count++
+    this.doneFeatures[ob.id] = ob
+    this.overpass.overpassBBoxQueryElements[this.query].insert(toQuadtreeLookupBox(ob.bounds), ob.id)
+
+    if (!this.aborted) {
+      this.featureCallback(null, ob)
     }
   }
 
