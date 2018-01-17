@@ -531,7 +531,7 @@ OverpassFrontend.prototype._preprocessBBoxQuery = function (request) {
 OverpassFrontend.prototype._processBBoxQuery = function (request) {
   request.callCount++
 
-  if (request.isDone()) {
+  if (!request.needLoad()) {
     request.finish()
     return this._next()
   }
@@ -600,6 +600,8 @@ OverpassFrontend.prototype._handleBBoxQueryResult = function (subRequests, err, 
       partIndex++
 
       if (partIndex >= subRequests[subRequestsIndex].part.length) {
+        request.finishSubRequest(subRequest)
+
         subRequestsIndex++
         partIndex = 0
         subRequest = subRequests[subRequestsIndex]
@@ -617,28 +619,9 @@ OverpassFrontend.prototype._handleBBoxQueryResult = function (subRequests, err, 
     request.receiveObject(ob, subRequests[subRequestsIndex], partIndex)
   }
 
-  this.overpassBBoxQueryLastUpdated[request.query] = new Date().getTime()
+  request.finishSubRequest(subRequest)
 
-  if ((request.options.split === 0) ||
-      (request.options.split > results.elements.length)) {
-    if (!request.aborted) {
-      var toRequest = request.remainingBounds.toGeoJSON()
-      if (this.overpassBBoxQueryRequested[request.query] === null) {
-        this.overpassBBoxQueryRequested[request.query] = toRequest
-      } else {
-        this.overpassBBoxQueryRequested[request.query] = turf.union(toRequest, this.overpassBBoxQueryRequested[request.query])
-      }
-
-      request.finalCallback(null)
-    }
-
-    this.overpassRequests[this.overpassRequests.indexOf(request)] = null
-  }
-  this.overpassRequestActive = false
-
-  async.setImmediate(function () {
-    this._overpassProcess()
-  }.bind(this))
+  this._next()
 }
 
 OverpassFrontend.prototype.clearBBoxQuery = function (query) {

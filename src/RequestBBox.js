@@ -7,6 +7,7 @@ class RequestBBox extends Request {
   constructor (overpass, data) {
     super(overpass, data)
     this.type = 'BBoxQuery'
+    this.loadFinish = false
   }
 
   compileQuery () {
@@ -60,17 +61,41 @@ class RequestBBox extends Request {
     }
   }
 
-  isDone () {
+  finishSubRequest (subRequest) {
+    this.overpass.overpassBBoxQueryLastUpdated[this.query] = new Date().getTime()
+
+    if ((this.options.split === 0) ||
+        (this.options.split > subRequest.parts[0].count)) {
+      this.loadFinish = true
+
+      if (!this.aborted) {
+        var toRequest = this.remainingBounds.toGeoJSON()
+        if (this.overpass.overpassBBoxQueryRequested[this.query] === null) {
+          this.overpass.overpassBBoxQueryRequested[this.query] = toRequest
+        } else {
+          this.overpass.overpassBBoxQueryRequested[this.query] = turf.union(toRequest, this.overpass.overpassBBoxQueryRequested[this.query])
+        }
+      }
+
+      this.finish()
+    }
+  }
+
+  needLoad () {
+    if (this.loadFinish) {
+      return false
+    }
+
     // check if we need to call Overpass API (whole area known?)
     var remainingBounds = this.bounds
     if (this.overpass.overpassBBoxQueryRequested[this.query] !== null) {
       var toRequest = this.bounds.toGeoJSON()
       remainingBounds = turf.difference(toRequest, this.overpass.overpassBBoxQueryRequested[this.query])
 
-      return remainingBounds === undefined
+      return remainingBounds !== undefined
     }
 
-    return false
+    return true
   }
 }
 
