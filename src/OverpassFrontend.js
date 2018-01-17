@@ -14,7 +14,6 @@ var RequestGet = require('./RequestGet')
 var RequestBBox = require('./RequestBBox')
 var defines = require('./defines')
 const overpassOutOptions = require('./overpassOutOptions')
-const toQuadtreeLookupBox = require('./toQuadtreeLookupBox')
 
 function OverpassFrontend (url, options) {
   this.url = url
@@ -117,7 +116,7 @@ OverpassFrontend.prototype._overpassProcess = function () {
     if (request.type === 'BBoxQuery') {
       // e.g. call featureCallback for elements which were received in the
       // meantime
-      this._preprocessBBoxQuery(request)
+      request.preprocess()
     }
   }
 
@@ -431,39 +430,6 @@ OverpassFrontend.prototype.BBoxQuery = function (query, bounds, options, feature
   this._next()
 
   return request
-}
-
-OverpassFrontend.prototype._preprocessBBoxQuery = function (request) {
-  if (request.lastChecked > this.overpassBBoxQueryLastUpdated[request.query]) {
-    return
-  }
-  request.lastChecked = new Date().getTime()
-
-  // if we already have cached objects, check if we have immediate results
-  var quadtreeBounds = toQuadtreeLookupBox(request.bounds)
-
-  var items = this.overpassBBoxQueryElements[request.query].queryRange(quadtreeBounds)
-  // TODO: do something with 'items'
-
-  for (var i = 0; i < items.length; i++) {
-    var id = items[i].value
-    var ob = this.overpassElements[id]
-
-    if (id in request.doneFeatures) {
-      continue
-    }
-
-    // also check the object directly if it intersects the bbox - if possible
-    if (!ob.intersects(request.bounds)) {
-      continue
-    }
-
-    if ((request.options.properties & ob.properties) === request.options.properties) {
-      request.doneFeatures[id] = ob
-
-      request.featureCallback(null, ob)
-    }
-  }
 }
 
 OverpassFrontend.prototype._processBBoxQuery = function (request) {

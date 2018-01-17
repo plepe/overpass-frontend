@@ -39,7 +39,7 @@ class RequestBBox extends Request {
 
   init () {
     if (this.query in this.overpass.overpassBBoxQueryElements) {
-      this.overpass._preprocessBBoxQuery(this)
+      this.preprocess()
 
       // check if we need to call Overpass API (whole area known?)
       var remainingBounds = this.bounds
@@ -70,6 +70,39 @@ class RequestBBox extends Request {
 
       this.overpass.overpassBBoxQueryRequested[this.query] = null
       this.overpass.overpassBBoxQueryLastUpdated[this.query] = 0
+    }
+  }
+
+  preprocess () {
+    if (this.lastChecked > this.overpass.overpassBBoxQueryLastUpdated[this.query]) {
+      return
+    }
+    this.lastChecked = new Date().getTime()
+
+    // if we already have cached objects, check if we have immediate results
+    var quadtreeBounds = toQuadtreeLookupBox(this.bounds)
+
+    var items = this.overpass.overpassBBoxQueryElements[this.query].queryRange(quadtreeBounds)
+    // TODO: do something with 'items'
+
+    for (var i = 0; i < items.length; i++) {
+      var id = items[i].value
+      var ob = this.overpass.overpassElements[id]
+
+      if (id in this.doneFeatures) {
+        continue
+      }
+
+      // also check the object directly if it intersects the bbox - if possible
+      if (!ob.intersects(this.bounds)) {
+        continue
+      }
+
+      if ((this.options.properties & ob.properties) === this.options.properties) {
+        this.doneFeatures[id] = ob
+
+        this.featureCallback(null, ob)
+      }
     }
   }
 
