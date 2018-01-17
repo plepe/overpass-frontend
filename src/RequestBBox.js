@@ -1,5 +1,6 @@
 const Request = require('./Request')
 const overpassOutOptions = require('./overpassOutOptions')
+const turf = require('./turf')
 
 class RequestBBox extends Request {
   constructor (overpass, data) {
@@ -37,8 +38,26 @@ class RequestBBox extends Request {
     query += 'out ' + overpassOutOptions(this.options) + ';'
 
     return {
-      query
+      query,
+      parts: [
+        {
+          properties: this.options.properties
+        }
+      ]
     }
+  }
+
+  isDone () {
+    // check if we need to call Overpass API (whole area known?)
+    var remainingBounds = this.bounds
+    if (this.overpass.overpassBBoxQueryRequested[this.query] !== null) {
+      var toRequest = this.bounds.toGeoJSON()
+      remainingBounds = turf.difference(toRequest, this.overpass.overpassBBoxQueryRequested[this.query])
+
+      return remainingBounds === undefined
+    }
+
+    return false
   }
 }
 

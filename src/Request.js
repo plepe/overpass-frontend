@@ -25,6 +25,14 @@ class Request {
   abort () {
     return this.overpass.abortRequest(this)
   }
+
+  finish (err) {
+    if (!this.aborted) {
+      this.finalCallback(err)
+    }
+
+    this.overpass._finishRequest(this)
+  }
 }
 
 module.exports = Request
