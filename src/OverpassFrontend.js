@@ -18,6 +18,7 @@ var OverpassRelation = require('./OverpassRelation')
 var RequestGet = require('./RequestGet')
 var RequestBBox = require('./RequestBBox')
 var defines = require('./defines')
+const overpassOutOptions = require('./overpassOutOptions')
 
 function OverpassFrontend (url, options) {
   this.url = url
@@ -755,40 +756,6 @@ OverpassFrontend.prototype.regexpEscape = function (str) {
        .replace('*', '\\*')
        .replace('^', '\\^')
        .replace('$', '\\$')
-}
-
-function overpassOutOptions (options) {
-  var outOptions = ''
-
-  if ('split' in options && options.split > 0) {
-    outOptions += options.split + ' '
-  }
-
-  if (options.properties & OverpassFrontend.META) {
-    outOptions += 'meta '
-  } else if (options.properties & OverpassFrontend.TAGS) {
-    if (options.properties & OverpassFrontend.MEMBERS) {
-      outOptions += 'body '
-    } else {
-      outOptions += 'tags '
-    }
-  } else if (options.properties & OverpassFrontend.MEMBERS) {
-    outOptions += 'skel '
-  } else {
-    outOptions += 'ids '
-  }
-
-  if (options.properties & OverpassFrontend.GEOM) {
-    outOptions += 'geom '
-  } else if (options.properties & OverpassFrontend.BBOX) {
-    outOptions += 'bb '
-  } else if (options.properties & OverpassFrontend.CENTER) {
-    outOptions += 'center '
-  }
-
-  outOptions += 'qt'
-
-  return outOptions
 }
 
 function toQuadtreeLookupBox (boundingbox) {
