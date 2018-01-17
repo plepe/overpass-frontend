@@ -16,6 +16,7 @@ var RequestGet = require('./RequestGet')
 var RequestBBox = require('./RequestBBox')
 var defines = require('./defines')
 const overpassOutOptions = require('./overpassOutOptions')
+const toQuadtreeLookupBox = require('./toQuadtreeLookupBox')
 
 function OverpassFrontend (url, options) {
   this.url = url
@@ -731,13 +732,6 @@ OverpassFrontend.prototype.regexpEscape = function (str) {
        .replace('*', '\\*')
        .replace('^', '\\^')
        .replace('$', '\\$')
-}
-
-function toQuadtreeLookupBox (boundingbox) {
-  return new Quadtree.Box(
-    new Quadtree.Point(boundingbox.minlat, boundingbox.minlon),
-    new Quadtree.Point(boundingbox.maxlat, boundingbox.maxlon)
-  )
 }
 
 function isSeparator (el) {
