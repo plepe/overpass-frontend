@@ -39,6 +39,7 @@ class RequestBBox extends Request {
 
     return {
       query,
+      request: this,
       parts: [
         {
           properties: this.options.properties
