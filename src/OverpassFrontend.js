@@ -527,26 +527,8 @@ OverpassFrontend.prototype._preprocessBBoxQuery = function (request) {
 OverpassFrontend.prototype._processBBoxQuery = function (request) {
   request.callCount++
 
-  // check if we need to call Overpass API (whole area known?)
-  var remainingBounds = request.bounds
-  if (this.overpassBBoxQueryRequested[request.query] !== null) {
-    var toRequest = request.bounds.toGeoJSON()
-    remainingBounds = turf.difference(toRequest, this.overpassBBoxQueryRequested[request.query])
-
-    if (remainingBounds === undefined) {
-      if (!request.aborted) {
-        request.finalCallback(null)
-      }
-      this.overpassRequests[this.overpassRequests.indexOf(request)] = null
-
-      this.overpassRequestActive = false
-
-      async.setImmediate(function () {
-        this._overpassProcess()
-      }.bind(this))
-
-      return
-    }
+  if (request.isDone()) {
+    request.finish()
   }
 
   var context = {
@@ -583,12 +565,7 @@ OverpassFrontend.prototype._handleBBoxQueryResult = function (context, err, resu
     } else {
       // abort
       // call finalCallback for the request
-      if (!request.aborted) {
-        request.finalCallback(err)
-      }
-
-      // remove current request
-      this.overpassRequests[this.overpassRequests.indexOf(request)] = null
+      request.finish(err)
     }
 
     return
@@ -660,6 +637,15 @@ OverpassFrontend.prototype.abortRequest = function (request) {
   request.aborted = true
   request.finalCallback('abort')
   this.overpassRequests[p] = null
+}
+
+OverpassFrontend.prototype._finishRequest = function (request) {
+  this.overpassRequests[this.overpassRequests.indexOf(request)] = null
+  this.overpassRequestActive = false
+
+  async.setImmediate(function () {
+    this._overpassProcess()
+  }.bind(this))
 }
 
 OverpassFrontend.prototype.abortAllRequests = function () {
