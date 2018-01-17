@@ -1,8 +1,6 @@
 var async = require('async')
 var weightSort = require('weight-sort')
 var BoundingBox = require('boundingbox')
-var Quadtree = require('quadtree-lookup')
-const turf = require('./turf')
 
 var httpLoad = require('./httpLoad')
 var removeNullEntries = require('./removeNullEntries')
@@ -418,74 +416,19 @@ OverpassFrontend.prototype._handleGetResult = function (context, err, results) {
 OverpassFrontend.prototype.BBoxQuery = function (query, bounds, options, featureCallback, finalCallback) {
   bounds = new BoundingBox(bounds)
 
-  if (options === null) {
-    options = {}
-  }
-  if (typeof options.properties === 'undefined') {
-    options.properties = OverpassFrontend.DEFAULT
-  }
-  options.properties |= OverpassFrontend.BBOX
-
-  if (typeof options.split === 'undefined') {
-    options.split = 0
-  }
-
   var request = new RequestBBox(this, {
     query: query,
     bounds: bounds,
     remainingBounds: bounds,
     options: options,
-    priority: 'priority' in options ? options.priority : 0,
     doneFeatures: {},
     featureCallback: featureCallback,
-    finalCallback: finalCallback,
-    lastChecked: 0
+    finalCallback: finalCallback
   })
-
-  var callbacks = new SortedCallbacks(request.options, request.featureCallback, request.finalCallback)
-  request.featureCallback = callbacks.next.bind(callbacks)
-  request.finalCallback = callbacks.final.bind(callbacks)
-  request.callCount = 0
-
-  if (request.query in this.overpassBBoxQueryElements) {
-    this._preprocessBBoxQuery(request)
-
-    // check if we need to call Overpass API (whole area known?)
-    var remainingBounds = request.bounds
-    if (this.overpassBBoxQueryRequested[request.query] !== null) {
-      var toRequest = request.bounds.toGeoJSON()
-      remainingBounds = turf.difference(toRequest, this.overpassBBoxQueryRequested[request.query])
-    }
-
-    var done = false
-    if (remainingBounds === undefined) {
-      request.finalCallback(null)
-      done = true
-    } else {
-      request.remainingBounds = new BoundingBox(remainingBounds)
-    }
-
-    if (done) {
-      return request
-    }
-  } else {
-    // otherwise initialize cache
-    this.overpassBBoxQueryElements[request.query] = new Quadtree.Quadtree(
-      new Quadtree.Box(
-        new Quadtree.Point(-90, -180),
-        new Quadtree.Point(90, 180)
-      )
-    )
-
-    this.overpassBBoxQueryRequested[request.query] = null
-    this.overpassBBoxQueryLastUpdated[request.query] = 0
-  }
 
   this.overpassRequests.push(request)
 
-  async.setImmediate(function () {
-    this._overpassProcess()
-  }.bind(this))
+  this._next()
 
   return request
 }

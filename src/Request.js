@@ -14,6 +14,8 @@ class Request {
     for (var k in data) {
       this[k] = data[k]
     }
+
+    this.priority = 'priority' in this.options ? this.options.priority : 0
   }
 
   /**
