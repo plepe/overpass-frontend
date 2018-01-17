@@ -15,7 +15,7 @@ var OverpassObject = require('./OverpassObject')
 var OverpassNode = require('./OverpassNode')
 var OverpassWay = require('./OverpassWay')
 var OverpassRelation = require('./OverpassRelation')
-var OverpassRequest = require('./OverpassRequest')
+var Request = require('./Request')
 var defines = require('./defines')
 
 function OverpassFrontend (url, options) {
@@ -69,7 +69,7 @@ OverpassFrontend.prototype.get = function (ids, options, featureCallback, finalC
   // option 'split' not available for get requests -> use effort instead
   delete options.split
 
-  var request = new OverpassRequest(this, {
+  var request = new Request(this, {
     type: 'get',
     ids: ids.concat([]),
     options: options,
@@ -433,7 +433,7 @@ OverpassFrontend.prototype.BBoxQuery = function (query, bounds, options, feature
     options.split = 0
   }
 
-  var request = new OverpassRequest(this, {
+  var request = new Request(this, {
     type: 'BBoxQuery',
     query: query,
     bounds: bounds,
