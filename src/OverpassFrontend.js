@@ -562,8 +562,6 @@ OverpassFrontend.prototype._sendBBoxQueryRequests = function (context) {
 }
 
 OverpassFrontend.prototype._handleBBoxQueryResult = function (context, err, results) {
-  var todo = {}
-
   if (!err && results.remark) {
     err = results.remark
   }
@@ -612,19 +610,7 @@ OverpassFrontend.prototype._handleBBoxQueryResult = function (context, err, resu
 
     var ob = this.createOrUpdateOSMObject(el, part)
 
-    request.doneFeatures[ob.id] = ob
-
-    todo[ob.id] = {
-      bounds: ob.bounds
-    }
-
-    this.overpassBBoxQueryElements[request.query].insert(toQuadtreeLookupBox(ob.bounds), ob.id)
-  }
-
-  if (!request.aborted) {
-    for (var k in todo) {
-      request.featureCallback(null, this.overpassElements[k])
-    }
+    request.receiveObject(ob, context[contextIndex], partIndex)
   }
 
   this.overpassBBoxQueryLastUpdated[request.query] = new Date().getTime()
