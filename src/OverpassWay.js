@@ -11,7 +11,7 @@ function OverpassWay () {
   OverpassObject.call(this)
 }
 
-OverpassWay.prototype.updateData = function (data, request) {
+OverpassWay.prototype.updateData = function (data, options) {
   if (data.nodes) {
     this.nodes = data.nodes
   }
@@ -20,7 +20,7 @@ OverpassWay.prototype.updateData = function (data, request) {
     this.geometry = data.geometry
   }
 
-  this.constructor.super_.prototype.updateData.call(this, data, request)
+  this.constructor.super_.prototype.updateData.call(this, data, options)
 
   if (typeof this.data.nodes !== 'undefined') {
     this.members = []

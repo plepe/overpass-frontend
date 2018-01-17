@@ -366,21 +366,19 @@ OverpassFrontend.prototype._handleGetResult = function (context, err, results) {
     // bounding box only result -> save to overpassElements with bounds only
     if (request.options.bbox) {
       if (!request.bboxSeenSeparator) {
-        var BBoxRequest = {
-          options: {
-            properties: OverpassFrontend.BBOX,
-            bbox: request.options.bbox
-          },
+        var options = {
+          properties: OverpassFrontend.BBOX,
+          bbox: request.options.bbox,
           bboxNoMatch: true
         }
 
-        this.createOrUpdateOSMObject(el, BBoxRequest)
+        this.createOrUpdateOSMObject(el, options)
 
         continue
       }
     }
 
-    this.createOrUpdateOSMObject(el, request)
+    this.createOrUpdateOSMObject(el, request.options)
 
     var members = this.overpassElements[id].member_ids()
     if (members) {
@@ -611,12 +609,12 @@ OverpassFrontend.prototype._handleBBoxQueryResult = function (context, err, resu
       }
     }
 
-    var ob = this.createOrUpdateOSMObject(el, request)
+    var ob = this.createOrUpdateOSMObject(el, part)
 
     request.doneFeatures[ob.id] = ob
 
     todo[ob.id] = {
-      bounds: ob.bounds,
+      bounds: ob.bounds
     }
 
     this.overpassBBoxQueryElements[request.query].insert(toQuadtreeLookupBox(ob.bounds), ob.id)
@@ -701,7 +699,7 @@ OverpassFrontend.prototype.removeFromCache = function (ids) {
   }
 }
 
-OverpassFrontend.prototype.createOrUpdateOSMObject = function (el, request) {
+OverpassFrontend.prototype.createOrUpdateOSMObject = function (el, options) {
   var id = el.type.substr(0, 1) + el.id
   var ob = null
 
@@ -717,7 +715,7 @@ OverpassFrontend.prototype.createOrUpdateOSMObject = function (el, request) {
     ob = new OverpassObject(id)
   }
 
-  ob.updateData(el, request)
+  ob.updateData(el, options)
 
   this.overpassElements[id] = ob
   return ob
