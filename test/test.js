@@ -12,6 +12,8 @@ var removeNullEntries = require('../src/removeNullEntries')
 describe('Overpass get', function() {
   describe('single id', function() {
     it('should return an existing relation', function(done) {
+      var finalCalled = 0
+
       overpassFrontend.get('r910885',
         {
           properties: OverpassFrontend.ALL
@@ -21,11 +23,14 @@ describe('Overpass get', function() {
           assert.equal(result.id, 'r910885', 'Wrong object returned: ' + result.id)
         },
         function(err) {
+          assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
           done(err)
         })
     })
 
     it('should return null for a missing object', function(done) {
+      var finalCalled = 0
+
       overpassFrontend.get('r32',
         {
           properties: OverpassFrontend.ALL
@@ -35,11 +40,13 @@ describe('Overpass get', function() {
           assert.equal(result, null, 'r32 should not exist!')
         },
         function(err) {
+          assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
           done(err)
         })
     })
 
     it('should return null for illegal objects', function(done) {
+      var finalCalled = 0
       var tests = [ 'o32', 'na', 'r1234a' ]
 
       overpassFrontend.get(tests,
@@ -51,6 +58,7 @@ describe('Overpass get', function() {
           assert.equal(result, null, tests[index] + ' should not exist!')
         },
         function(err) {
+          assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
           done(err)
         })
     })
@@ -58,6 +66,7 @@ describe('Overpass get', function() {
     it('should handle several simultaneous requests', function(done) {
       async.parallel([
         function(callback) {
+          var finalCalled = 0
           overpassFrontend.get('r910886',
             {
               properties: OverpassFrontend.ALL
@@ -67,11 +76,13 @@ describe('Overpass get', function() {
               assert.equal('r910886', result.id, 'Wrong object ' + result.id + '?')
             },
             function(err) {
+              assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
               callback(err)
             }
           )
         },
         function(callback) {
+          var finalCalled = 0
           overpassFrontend.get('n79721398',
             {
               properties: OverpassFrontend.ALL
@@ -81,6 +92,7 @@ describe('Overpass get', function() {
               assert.equal(result.id, 'n79721398', 'Wrong object ' + result.id + '?')
             },
             function(err) {
+              assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
               callback(err)
             }
           )
@@ -92,6 +104,7 @@ describe('Overpass get', function() {
     })
 
     it('option "sort": should return ordered by id (even when cached)', function(done) {
+      var finalCalled = 0
       var items = [ 'r910885', 'n3037893169', 'r910885', 'w146678749', 'w12345' ]
       var expected = [ 'r910885', 'n3037893169', 'r910885', 'w146678749', null ]
       var lastIndex = null
@@ -121,6 +134,7 @@ describe('Overpass get', function() {
           lastIndex = index
         },
         function(err) {
+          assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
           assert.equal(expected.length, lastIndex + 1, 'Should return ' + expected.length + ' elements')
 
           done(err)
@@ -128,6 +142,7 @@ describe('Overpass get', function() {
     })
 
     it('option "sort": should return ordered by id (sortDir: "desc")', function(done) {
+      var finalCalled = 0
       var items = [ 'r910885', 'n3037893169', 'r910885', 'w146678749', 'w12345' ]
       var expected = [ null, 'w146678749', 'r910885', 'n3037893169', 'r910885' ]
       var lastIndex = null
@@ -158,6 +173,7 @@ describe('Overpass get', function() {
           lastIndex = index
         },
         function(err) {
+          assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
           assert.equal(expected.length, lastIndex + 1, 'Should return ' + expected.length + ' elements')
 
           done(err)
@@ -165,6 +181,7 @@ describe('Overpass get', function() {
     })
 
     it('option "sort"="BBoxDiagonalLength"', function(done) {
+      var finalCalled = 0
       var items = [ 'w125586435', 'w299696929', 'w174711686', 'w247954720', 'w12345' ]
       var expected = [ null, 'w247954720', 'w174711686', 'w125586435', 'w299696929' ]
       var lastIndex = null
@@ -195,6 +212,7 @@ describe('Overpass get', function() {
           lastIndex = index
         },
         function(err) {
+          assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
           assert.equal(expected.length, lastIndex + 1, 'Should return ' + expected.length + ' elements')
 
           done(err)
@@ -202,6 +220,7 @@ describe('Overpass get', function() {
     })
 
     it('option "sort"="BBoxDiagonalLength", sortDir "desc"', function(done) {
+      var finalCalled = 0
       var items = [ 'w125586435', 'w299696929', 'w174711686', 'w247954720' ]
       var expected = [ 'w299696929', 'w125586435', 'w174711686', 'w247954720' ]
       var lastIndex = null
@@ -232,6 +251,7 @@ describe('Overpass get', function() {
           lastIndex = index
         },
         function(err) {
+          assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
           assert.equal(expected.length, lastIndex + 1, 'Should return ' + expected.length + ' elements')
 
           done(err)
@@ -241,6 +261,7 @@ describe('Overpass get', function() {
 
   describe('GeoJSON', function() {
     it('node', function(done) {
+      var finalCalled = 0
       overpassFrontend.get('n3037893169', { properties: OverpassFrontend.ALL },
         function(err, result, index) {
 	  var geojson = result.GeoJSON();
@@ -271,10 +292,12 @@ describe('Overpass get', function() {
           done();
         },
         function(err) {
+          assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
         })
     })
 
     it('way', function(done) {
+      var finalCalled = 0
       overpassFrontend.get('w146678749', { properties: OverpassFrontend.ALL },
         function(err, result, index) {
 	  var geojson = result.GeoJSON();
@@ -312,10 +335,12 @@ describe('Overpass get', function() {
           done();
         },
         function(err) {
+          assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
         })
     })
 
     it('relation', function(done) {
+      var finalCalled = 0
       overpassFrontend.get('r3854502', { properties: OverpassFrontend.ALL },
         function(err, result, index) {
 	  var geojson = result.GeoJSON();
@@ -386,12 +411,14 @@ describe('Overpass get', function() {
           done();
         },
         function(err) {
+          assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
         })
     })
   })
 
   describe('bbox query', function() {
     it('should return a list of node features', function(done) {
+      var finalCalled = 0
       var found = []
       var expected = [ 'n3037893162', 'n3037893163', 'n3037893164' ]
 
@@ -413,6 +440,7 @@ describe('Overpass get', function() {
             assert(false, 'Object ' + result.id + ' should not be found!')
         },
         function(err) {
+          assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
           assert.equal(expected.length, found.length, 'Wrong count of objects found!')
 
           done()
@@ -421,6 +449,7 @@ describe('Overpass get', function() {
     })
 
     it('should return a list of node features (2nd try, partly cached)', function(done) {
+      var finalCalled = 0
       var found = []
       var expected = [ 'n3037893162', 'n3037893163', 'n3037893164', 'n3037893159', 'n3037893160' ]
 
@@ -442,6 +471,7 @@ describe('Overpass get', function() {
             assert(false, 'Object ' + result.id + ' should not be found!')
         },
         function(err) {
+          assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
           assert.deepEqual(expected.sort(), found.sort(), 'Wrong count of objects found!')
 
           done()
@@ -450,6 +480,7 @@ describe('Overpass get', function() {
     })
 
     it('should return a list of way features', function(done) {
+      var finalCalled = 0
       var found = []
       var expected = [ 'w299709373' ]
       var might = [ 'w299709375' ] // correct, if only bbox check is used
@@ -476,6 +507,7 @@ describe('Overpass get', function() {
           }
         },
         function(err) {
+          assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
           assert.equal(1, request.callCount, 'Server should be called once')
           assert.equal(expected.length, found.length, 'Wrong count of objects found!')
 
@@ -485,6 +517,7 @@ describe('Overpass get', function() {
     })
 
     it('should return a list of way features (2nd try, partly cached)', function(done) {
+      var finalCalled = 0
       var found = []
       var expected = [ 'w299709373' ]
       var might = [ 'w299709375' ] // correct, if only bbox check is used
@@ -511,6 +544,7 @@ describe('Overpass get', function() {
           }
         },
         function(err) {
+          assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
           assert.equal(1, request.callCount, 'Server should be called once')
           assert.equal(expected.length, found.length, 'Wrong count of objects found!')
 
@@ -520,6 +554,7 @@ describe('Overpass get', function() {
     })
 
     it('should return a list of way features (3rd try, fully cached)', function(done) {
+      var finalCalled = 0
       var expectedFound = []
       var expected = [ 'w299709373' ]
       var might = [ 'w299709375' ] // correct, if only bbox check is used
@@ -544,6 +579,7 @@ describe('Overpass get', function() {
             assert(false, 'Object ' + result.id + ' should not be found!')
         },
         function(err) {
+          assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
           assert.equal(0, request.callCount, 'Server should be not be called (fully cached)')
           if(expectedFound.length != expected.length)
             assert(false, 'Wrong count of objects found!')
@@ -554,6 +590,7 @@ describe('Overpass get', function() {
     })
 
     it('should return a list of way features, ordered by BBoxDiagonalLength', function(done) {
+      var finalCalled = 0
       var found = []
       var expected = [ 'w243704615', 'w125586430', 'w313063294', 'w172236247' ]
 
@@ -576,6 +613,7 @@ describe('Overpass get', function() {
             assert(false, 'Object ' + result.id + ' should not be found!')
         },
         function(err) {
+          assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
           if (found.length != expected.length)
             assert(false, 'Wrong count of objects found!')
 
@@ -585,6 +623,7 @@ describe('Overpass get', function() {
     })
 
     it('should return a list of node features (request splitted)', function(done) {
+      var finalCalled = 0
       var found = []
       var expected = [ 'n1853730762', 'n1853730763', 'n1853730777', 'n1853730779', 'n1853730785', 'n1853730792', 'n1853730797', 'n1853730821' ]
       var expectedSubRequestCount = 3
@@ -609,6 +648,7 @@ describe('Overpass get', function() {
             assert(false, 'Object ' + result.id + ' should not be found!')
         },
         function(err) {
+          assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
           assert.deepEqual(expected.sort(), found.sort(), 'Wrong count of objects found!')
           assert.equal(expectedSubRequestCount, foundSubRequestCount, 'Wrong count of subrequests')
 
@@ -631,6 +671,7 @@ describe('Overpass get', function() {
 
       async.parallel([
         function (callback) {
+          var finalCalled = 0
           overpassFrontend.BBoxQuery(
             'node[natural=tree];',
             {
@@ -644,13 +685,13 @@ describe('Overpass get', function() {
               split: 3
             },
             function(err, result, index) {
-              console.log('got1', result.id)
               found1.push(result.id)
 
               if(expected1.indexOf(result.id) == -1)
                 assert(false, '(1) Object ' + result.id + ' should not be found!')
             },
             function(err) {
+              assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
               assert.deepEqual(expected1.sort(), found1.sort(), '(1) Wrong count of objects found!')
 
               callback()
@@ -658,6 +699,7 @@ describe('Overpass get', function() {
           )
         },
         function (callback) {
+          var finalCalled = 0
           overpassFrontend.BBoxQuery(
             'node[natural=tree];',
             {
@@ -671,13 +713,13 @@ describe('Overpass get', function() {
               split: 3
             },
             function(err, result, index) {
-              console.log('got2', result.id)
               found2.push(result.id)
 
               if(expected2.indexOf(result.id) == -1)
                 assert(false, '(2) Object ' + result.id + ' should not be found!')
             },
             function(err) {
+              assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
               assert.deepEqual(expected2.sort(), found2.sort(), '(2) Wrong count of objects found!')
 
               callback()
@@ -696,6 +738,7 @@ describe('Overpass get', function() {
 
 describe('Overpass query by id with bbox option', function() {
   it('First call', function(done) {
+    var finalCalled = 0
     var query = [ 'w299709373', 'w299709375', 'w4583442', 'w299704585', 'n2832485845', 'n3037893162', 'r20313', 'r3636229', 'r3311614', 'w12345' ]
     var expected = [ 'w299709373', 'n3037893162' ]
     var index_outside_bbox = [ 1, 2, 3, 4, 5, 6, 7, 8 ]
@@ -726,12 +769,14 @@ describe('Overpass query by id with bbox option', function() {
           }
         },
         function(err) {
+          assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
           done()
         }
     )
   })
 
   it('Second call', function(done) {
+    var finalCalled = 0
     var query = [ 'w299709373', 'w299709375', 'w4583442', 'w299704585', 'n2832485845', 'n3037882439', 'n3037893162', 'w12345' ]
     var expected = [ 'w299709375', 'w299704585' ]
     var index_outside_bbox = [ 0, 1, 2, 4, 5, 6 ]
@@ -757,12 +802,14 @@ describe('Overpass query by id with bbox option', function() {
           }
         },
         function(err) {
+          assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
           done()
         }
     )
   })
 
   it('Check data of outside objects', function(done) {
+    var finalCalled = 0
     var query = [ 'n2832485845', 'n3037882439' ]
 
     overpassFrontend.get(query.concat([]), { properties: OverpassFrontend.ID_ONLY },
@@ -770,6 +817,7 @@ describe('Overpass query by id with bbox option', function() {
           assert.equal(OverpassFrontend.BBOX | OverpassFrontend.CENTER, result.properties, 'Element ' + result.id + ' which was loaded outside bbox, should only have BBOX data')
         },
         function(err) {
+          assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
           done()
         }
     )
@@ -788,6 +836,7 @@ describe('Overpass query by id with bbox option', function() {
       async.parallel([
         function(callback) {
           var done = []
+          var finalCalled = 0
 
           overpassFrontend.get(items1,
             {
@@ -805,6 +854,7 @@ describe('Overpass query by id with bbox option', function() {
               done.push(result.id)
             },
             function(err) {
+              assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
               assert.equal(done.length, items1.length, '2nd request should return ' + items1.length + ' items')
               callback(err)
             }
@@ -812,6 +862,7 @@ describe('Overpass query by id with bbox option', function() {
         },
         function(callback) {
           var done = []
+          var finalCalled = 0
 
           overpassFrontend.get(items2,
             {
@@ -829,6 +880,7 @@ describe('Overpass query by id with bbox option', function() {
               done.push(result.id)
             },
             function(err) {
+              assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
               assert.equal(done.length, items2.length, '2nd request should return ' + items2.length + ' items')
               callback(err)
             }
@@ -836,6 +888,7 @@ describe('Overpass query by id with bbox option', function() {
         },
         function(callback) {
           var done = []
+          var finalCalled = 0
 
           overpassFrontend.get(items3,
             {
@@ -853,6 +906,7 @@ describe('Overpass query by id with bbox option', function() {
               done.push(result.id)
             },
             function(err) {
+              assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
               assert.equal(done.length, items3.length, '3nd request should return ' + items3.length + ' items')
               callback(err)
             }
@@ -877,6 +931,7 @@ describe('Overpass query by id with bbox option', function() {
       async.parallel([
         function(callback) {
           var done = []
+          var finalCalled = 0
 
           overpassFrontend.get(items1,
             {
@@ -894,6 +949,7 @@ describe('Overpass query by id with bbox option', function() {
               done.push(result.id)
             },
             function(err) {
+              assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
               assert.equal(done.length, items1.length, '2nd request should return ' + items1.length + ' items')
               callback(err)
             }
@@ -901,6 +957,7 @@ describe('Overpass query by id with bbox option', function() {
         },
         function(callback) {
           var done = []
+          var finalCalled = 0
 
           overpassFrontend.get(items2,
             {
@@ -918,6 +975,7 @@ describe('Overpass query by id with bbox option', function() {
               done.push(result.id)
             },
             function(err) {
+              assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
               assert.equal(done.length, items2.length, '2nd request should return ' + items2.length + ' items')
               callback(err)
             }
@@ -925,6 +983,7 @@ describe('Overpass query by id with bbox option', function() {
         },
         function(callback) {
           var done = []
+          var finalCalled = 0
 
           overpassFrontend.get(items3,
             {
@@ -942,6 +1001,7 @@ describe('Overpass query by id with bbox option', function() {
               done.push(result.id)
             },
             function(err) {
+              assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
               assert.equal(done.length, items3.length, '3nd request should return ' + items3.length + ' items')
               callback(err)
             }
@@ -957,6 +1017,7 @@ describe('Overpass query by id with bbox option', function() {
 
 describe('Overpass BBoxQuery', function() {
   it('Simple queries - all nodes', function (done) {
+    var finalCalled = 0
     var expected = [ 'n3037893169', 'n3037431649' ]
     var found = []
     var error = ''
@@ -979,6 +1040,7 @@ describe('Overpass BBoxQuery', function() {
         }
       },
       function (err) {
+        assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
         if (err) {
           return done(err)
         }
@@ -999,6 +1061,7 @@ describe('Overpass BBoxQuery', function() {
   })
 
   it('Simple queries - all restaurants', function (done) {
+    var finalCalled = 0
     var expected = [ 'n441576820', 'n442066582', 'n442972880', 'n1467109667', 'n355123976', 'n1955278832', 'n441576823', 'n2083468740', 'n2099023017', 'w369989037', 'w370577069' ]
     var found = []
     var error = ''
@@ -1021,6 +1084,7 @@ describe('Overpass BBoxQuery', function() {
         }
       },
       function (err) {
+        assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
         console.log(found)
         if (err) {
           return done(err)
@@ -1610,6 +1674,7 @@ describe('Overpass objects structure', function() {
 
   describe('Error handling', function() {
     it('Illegal BBoxQuery', function (done) {
+      var finalCalled = 0
       overpassFrontend.BBoxQuery(
         'node[amenity=bench',
         {
@@ -1641,6 +1706,7 @@ describe('Overpass objects structure', function() {
     })
 
     it('Server not available - get request', function (done) {
+      var finalCalled = 0
       var of = new OverpassFrontend('http://domaindoesnotexist.foo')
       of.get([ 'r910885' ],
         {
@@ -1660,6 +1726,7 @@ describe('Overpass objects structure', function() {
     })
 
     it('Server not available - BBoxQuery request', function (done) {
+      var finalCalled = 0
       var of = new OverpassFrontend('invalid')
       of.BBoxQuery(
         'node[amenity=bench];',
@@ -1686,6 +1753,7 @@ describe('Overpass objects structure', function() {
     })
 
     it('http error', function (done) {
+      var finalCalled = 0
       var of = new OverpassFrontend('foo://bar')
       of.get(['r910885'],
         {
@@ -1707,6 +1775,7 @@ describe('Overpass objects structure', function() {
 
   describe('OverpassFrontend, misc functions', function() {
     it('regexpEscape()', function() {
+      var finalCalled = 0
       var input = 'bank+atm'
       var expected = 'bank\\+atm'
 
@@ -1718,6 +1787,7 @@ describe('Overpass objects structure', function() {
 
   describe('Request', function() {
     it('get() should return RequestGet object', function (done) {
+      var finalCalled = 0
       var req = overpassFrontend.get([ 'n3037893169' ],
         {
           properties: OverpassFrontend.ID_ONLY
@@ -1733,6 +1803,7 @@ describe('Overpass objects structure', function() {
     })
 
     it('abort() should abort a "get" request', function (done) {
+      var finalCalled = 0
       var req = overpassFrontend.get([ 'n3037893161' ],
         {
           properties: OverpassFrontend.ID_ONLY
@@ -1750,6 +1821,7 @@ describe('Overpass objects structure', function() {
     })
 
     it('abort() should abort a "get" request (even when object has already been loaded)', function (done) {
+      var finalCalled = 0
       var req = overpassFrontend.get([ 'n3037893169' ],
         {
           properties: OverpassFrontend.ID_ONLY
@@ -1767,6 +1839,7 @@ describe('Overpass objects structure', function() {
     })
 
     it('abort() should abort a "BBoxQuery" request', function (done) {
+      var finalCalled = 0
       overpassFrontend.clearBBoxQuery('node[natural=tree];')
       var req = overpassFrontend.BBoxQuery(
         'node[natural=tree];',
@@ -1792,6 +1865,7 @@ describe('Overpass objects structure', function() {
     })
 
     it('abort() should abort a "BBoxQuery" request', function (done) {
+      var finalCalled = 0
       overpassFrontend.clearBBoxQuery('node[natural=tree];')
       var req = overpassFrontend.BBoxQuery(
         'node[natural=tree];',
@@ -1817,6 +1891,7 @@ describe('Overpass objects structure', function() {
     })
 
     it('request list should be empty', function () {
+      var finalCalled = 0
       removeNullEntries(overpassFrontend.overpassRequests)
 
       assert.deepEqual(overpassFrontend.overpassRequests, [], 'request list should be empty')
