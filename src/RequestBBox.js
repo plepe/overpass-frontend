@@ -125,13 +125,16 @@ class RequestBBox extends Request {
    * compile the query
    * @return {SubRequest} - the compiled query
    */
-  compileQuery () {
-    // var BBoxString = this.remainingBounds.toLatLonString()
-    // TODO: turf union/difference is broken - use full bounds instead
-    var BBoxString = this.bounds.toLatLonString()
-    var queryOptions = '[bbox:' + BBoxString + ']'
+  compileQuery (context) {
+    this.callCount++
+    // if the context already has a bbox and it differs from this, we can't add
+    // ours
+    if (context.bbox && context.bbox.toLatLonString() !== this.bounds.toLatLonString()) {
+      return false
+    }
+    context.bbox = this.bounds
 
-    var query = '[out:json]' + queryOptions + ';\n(' + this.query + ')->.result;\n'
+    var query = '(' + this.query + ')->.result;\n'
 
     var queryRemoveDoneFeatures = ''
     var countRemoveDoneFeatures = 0
