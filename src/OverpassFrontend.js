@@ -138,12 +138,12 @@ OverpassFrontend.prototype._overpassProcess = function () {
       this.url,
       null,
       '[out:json];\n' + context.query,
-      this._handleGetResult.bind(this, context)
+      this._handleResult.bind(this, context)
     )
   }.bind(this), this.options.timeGap)
 }
 
-OverpassFrontend.prototype._handleGetResult = function (context, err, results) {
+OverpassFrontend.prototype._handleResult = function (context, err, results) {
   if (!err && results.remark) {
     err = results.remark
   }
@@ -265,86 +265,29 @@ OverpassFrontend.prototype._processBBoxQuery = function (request) {
 }
 
 OverpassFrontend.prototype._sendBBoxQueryRequests = function (subRequests) {
-  var query = ''
+  var context = {
+    todo: {},
+    subRequests: subRequests,
+    query: '',
+    maxEffort: this.options.effortPerRequest
+  }
 
   for (var i = 0; i < subRequests.length; i++) {
     if (i !== 0) {
-      query += '\nout count;\n'
+      context.query += '\nout count;\n'
     }
 
-    query += subRequests[i].query
+    context.query += subRequests[i].query
   }
 
   setTimeout(function () {
     httpLoad(
       this.url,
       null,
-      query,
-      this._handleBBoxQueryResult.bind(this, subRequests)
+      context.query,
+      this._handleResult.bind(this, context)
     )
   }.bind(this), this.options.timeGap)
-}
-
-OverpassFrontend.prototype._handleBBoxQueryResult = function (subRequests, err, results) {
-  if (!err && results.remark) {
-    err = results.remark
-  }
-
-  if (err) {
-    this.errorCount++
-    this.overpassRequestActive = false
-
-    if (this.errorCount <= 3) {
-      // retry
-      this._overpassProcess()
-    } else {
-      // abort
-      // call finalCallback for the request
-      subRequests.forEach(function (subRequest) {
-        subRequest.request.finish(err)
-      })
-    }
-
-    return
-  } else {
-    this.errorCount = 0
-  }
-
-  var subRequestsIndex = 0
-  var partIndex = 0
-  var subRequest = subRequests[0]
-  var request = subRequest.request
-  var part = subRequest.parts[0]
-
-  for (var i = 0; i < results.elements.length; i++) {
-    var el = results.elements[i]
-
-    if (isSeparator(el)) {
-      partIndex++
-
-      if (partIndex >= subRequests[subRequestsIndex].part.length) {
-        request.finishSubRequest(subRequest)
-
-        subRequestsIndex++
-        partIndex = 0
-        subRequest = subRequests[subRequestsIndex]
-        request = subRequest.request
-        part = subRequest.part[0]
-      } else {
-        part = subRequest.part[partIndex]
-      }
-
-      continue
-    }
-
-    var ob = this.createOrUpdateOSMObject(el, part)
-
-    request.receiveObject(ob, subRequests[subRequestsIndex], partIndex)
-  }
-
-  request.finishSubRequest(subRequest)
-
-  this._next()
 }
 
 OverpassFrontend.prototype.clearBBoxQuery = function (query) {
