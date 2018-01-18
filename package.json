@@ -12,6 +12,7 @@
     "@turf/union": "*",
     "async": "*",
     "boundingbox": "^0.1.0",
+    "event-emitter": "^0.3.5",
     "osmtogeojson": "^3.0.0-beta.2",
     "quadtree-lookup": "https://github.com/petrbrzek/quadtree-lookup",
     "turf-bbox-clip": "https://github.com/Turfjs/turf-bbox-clip",

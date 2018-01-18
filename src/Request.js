@@ -27,11 +27,9 @@ class Request {
   }
 
   /**
-   * compile the query
-   * @return {SubRequest} - the compiled query
+   * Request got aborted
+   * @event Request#abort
    */
-  compileQuery () {
-  }
 
   /**
    * abort this request
@@ -44,6 +42,12 @@ class Request {
   }
 
   /**
+   * Request is finished
+   * @event Request#finish
+   * @param {Error|null} - null if no error occured
+   */
+
+  /**
    * request is finished
    * @param {Error|null} err - null if no error occured
    */
@@ -53,7 +57,46 @@ class Request {
     }
 
     this.overpass._finishRequest(this)
+    this.emit('finish', err)
+  }
+
+  /**
+   * SubRequest got compiled
+   * @event Request#subrequest-compiile
+   * @param {SubRequest} subRequest - the sub request
+   */
+
+  /**
+   * compile the query
+   * @return {SubRequest} - the compiled query
+   */
+  compileQuery () {
+  }
+
+  /**
+   * receive an object from OverpassFronted -> enter to cache, return to caller
+   * @param {OverpassObject} ob - Object which has been received
+   * @param {SubRequest} subRequest - sub request which is being handled right now
+   * @param {int} partIndex - Which part of the subRequest is being received
+   */
+  receiveObject (ob, subRequest, partIndex) {
+  }
+
+  /**
+   * SubRequest got finished
+   * @event Request#subrequest-finished
+   * @param {SubRequest} subRequest - the sub request
+   */
+
+  /**
+   * the current subrequest is finished -> update caches, check whether request is finished
+   * @param {SubRequest} subRequest - the current sub request
+   */
+  finishSubRequest (subRequest) {
+    this.emit('subrequest-finish', subRequest)
   }
 }
+
+ee(Request.prototype)
 
 module.exports = Request
