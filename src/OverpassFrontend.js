@@ -254,11 +254,6 @@ OverpassFrontend.prototype.BBoxQuery = function (query, bounds, options, feature
 OverpassFrontend.prototype._processBBoxQuery = function (request) {
   request.callCount++
 
-  if (!request.needLoad()) {
-    request.finish()
-    return this._next()
-  }
-
   var subRequests = [ request.compileQuery() ]
 
   this._sendBBoxQueryRequests(subRequests)

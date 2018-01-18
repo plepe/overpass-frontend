@@ -77,6 +77,10 @@ class RequestBBox extends Request {
    */
   preprocess () {
     if (this.lastChecked > this.overpass.overpassBBoxQueryLastUpdated[this.query]) {
+      if (!this.needLoad()) {
+        this.finish()
+      }
+
       return
     }
     this.lastChecked = new Date().getTime()
@@ -105,6 +109,10 @@ class RequestBBox extends Request {
 
         this.featureCallback(null, ob)
       }
+    }
+
+    if (!this.needLoad()) {
+      this.finish()
     }
   }
 
