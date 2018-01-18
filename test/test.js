@@ -769,7 +769,7 @@ describe('Overpass query by id with bbox option', function() {
 
     it('should handle several simultaneous requests', function(done) {
       var items1 = [ 'n3037893167', 'n3037893166' ]
-      var items2 = [ 'n3037893165' ]
+      var items2 = [ 'n3037893165', 'n3037893166' ]
       var items3 = [ 'n1853730723' ]
 
       overpassFrontend.removeFromCache(items1)
@@ -796,7 +796,7 @@ describe('Overpass query by id with bbox option', function() {
               done.push(result.id)
             },
             function(err) {
-              assert.equal(done.length, items1.length, '2nd request should return ' + items1.length + ' items')
+              assert.equal(done.length, items1.length, '1st request should return ' + items1.length + ' items')
               callback(err)
             }
           )
@@ -844,7 +844,7 @@ describe('Overpass query by id with bbox option', function() {
               done.push(result.id)
             },
             function(err) {
-              assert.equal(done.length, items3.length, '3nd request should return ' + items3.length + ' items')
+              assert.equal(done.length, items3.length, '3rd request should return ' + items3.length + ' items')
               callback(err)
             }
           )
