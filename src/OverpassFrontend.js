@@ -12,7 +12,6 @@ var OverpassRelation = require('./OverpassRelation')
 var RequestGet = require('./RequestGet')
 var RequestBBox = require('./RequestBBox')
 var defines = require('./defines')
-const overpassOutOptions = require('./overpassOutOptions')
 
 function OverpassFrontend (url, options) {
   this.url = url
@@ -78,14 +77,7 @@ OverpassFrontend.prototype._overpassProcess = function () {
   }
 
   this.overpassRequestActive = true
-  var effort = 0
-  var context = {
-    todo: {},
-    requests: []
-  }
-  var query = ''
   var request
-  var currentRequest
   var j
 
   for (j = 0; j < this.overpassRequests.length; j++) {
@@ -103,6 +95,13 @@ OverpassFrontend.prototype._overpassProcess = function () {
     return this._processBBoxQuery(request)
   }
 
+  var context = {
+    todo: {},
+    subRequests: [],
+    query: '',
+    maxEffort: this.options.effortPerRequest
+  }
+
   for (j = 0; j < this.overpassRequests.length; j++) {
     request = this.overpassRequests[j]
 
@@ -110,191 +109,46 @@ OverpassFrontend.prototype._overpassProcess = function () {
       continue
     }
 
-    var ids = request.ids
-    var allFoundUntilNow = true
-    var nodeQuery = ''
-    var wayQuery = ''
-    var relationQuery = ''
-    var BBoxQuery = ''
+    request.preprocess()
 
-    if (request.options.bbox) {
-      BBoxQuery = '(' + request.options.bbox.toLatLonString() + ')'
-    }
+    var subRequest = request.compileQuery(context)
 
-    if (!ids) {
-      ids = []
-    }
+    if (subRequest) {
+      context.subRequests.push(subRequest)
 
-    for (var i = 0; i < ids.length; i++) {
-      if (ids[i] === null) {
-        continue
+      if (context.query !== '') {
+        context.query += '\nout count;\n'
       }
 
-      if (ids[i] in this.overpassElements) {
-        var ob = this.overpassElements[ids[i]]
-        var ready = true
-
-        // Feature does not exists!
-        if (ob === null) {
-          request.featureCallback(null, null, i)
-          request.ids[i] = null
-          continue
-        }
-
-        // for bbox option, if object is (partly) loaded, but outside call
-        // featureCallback with 'false'
-        if (request.options.bbox && !ob.intersects(request.options.bbox)) {
-          request.featureCallback(null, false, i)
-          request.ids[i] = null
-          continue
-        }
-
-        // not fully loaded
-        if ((ob !== false && ob !== null) && (request.options.properties & ob.properties) !== request.options.properties) {
-          ready = false
-        }
-
-        // if sort is set in options maybe defer calling featureCallback
-        if (ready) {
-          request.featureCallback(null, ob, i)
-          request.ids[i] = null
-          continue
-        }
-      } else {
-        // Illegal ID
-        if (ids[i] !== null && !ids[i].match(/^[nwr][0-9]+$/)) {
-          request.featureCallback(null, null, i)
-          request.ids[i] = null
-          continue
-        }
-      }
-
-      allFoundUntilNow = false
-      if (ids[i] in context.todo) {
-        continue
-      }
-
-      // too much data - delay for next iteration
-      if (effort >= this.options.effortPerRequest) {
-        continue
-      }
-
-      if (request.options.bbox) {
-        // check if we already know the bbox of the element; if yes, don't try
-        // to load object if it does not intersect bounds
-        if (ids[i] in this.overpassElements && (this.overpassElements[ids[i]].properties & OverpassFrontend.BBOX)) {
-          if (!this.overpassElements[ids[i]].intersects(request.options.bbox)) {
-            continue
-          }
-        }
-
-        context.todo[ids[i]] = true
-        request.bboxSeenSeparator = false
-      } else {
-        context.todo[ids[i]] = true
-      }
-
-      if (currentRequest !== request) {
-        if (currentRequest) {
-          // add separator to distinguish requests
-          query += 'out count;\n'
-        }
-
-        currentRequest = request
-        context.requests.push(request)
-      }
-
-      switch (ids[i].substr(0, 1)) {
-        case 'n':
-          nodeQuery += 'node(' + ids[i].substr(1) + ');\n'
-          effort += this.options.effortNode
-          break
-        case 'w':
-          wayQuery += 'way(' + ids[i].substr(1) + ');\n'
-          effort += this.options.effortWay
-          break
-        case 'r':
-          relationQuery += 'relation(' + ids[i].substr(1) + ');\n'
-          effort += this.options.effortRelation
-          break
-      }
+      context.maxEffort -= subRequest.effort
+      context.query += subRequest.query
     }
 
-    if (allFoundUntilNow) {
-      request.finalCallback(null)
-      this.overpassRequests[j] = null
-    }
-
-    var outOptions = overpassOutOptions(request.options)
-
-    if (nodeQuery !== '') {
-      query += '((' + nodeQuery + ');)->.n;\n'
-      if (BBoxQuery) {
-        query += '(node.n; - node.n' + BBoxQuery + '->.n);\nout ids bb qt;\n'
-      }
-    }
-
-    if (wayQuery !== '') {
-      query += '((' + wayQuery + ');)->.w;\n'
-      if (BBoxQuery) {
-        query += '(way.w; - way.w' + BBoxQuery + '->.w);\nout ids bb qt;\n'
-      }
-    }
-
-    if (relationQuery !== '') {
-      query += '((' + relationQuery + ');)->.r;\n'
-      if (BBoxQuery) {
-        query += '(relation.r; - relation.r' + BBoxQuery + '->.r);\nout ids bb qt;\n'
-      }
-    }
-
-    if (BBoxQuery && (nodeQuery !== '' || wayQuery !== '' || relationQuery !== '')) {
-      // additional separator to separate objects outside bbox from inside bbox
-      query += 'out count;\n'
-    }
-    if (nodeQuery !== '') {
-      query += '.n out ' + outOptions + ';\n'
-    }
-    if (wayQuery !== '') {
-      query += '.w out ' + outOptions + ';\n'
-    }
-    if (relationQuery !== '') {
-      query += '.r out ' + outOptions + ';\n'
+    if (context.maxEffort < 0) {
+      break
     }
   }
 
-  if (query === '') {
-    this.overpassRequestActive = false
-    async.setImmediate(function () {
-      this._overpassProcess()
-    }.bind(this))
-
-    return
+  if (context.query === '') {
+    return this._next()
   }
 
   setTimeout(function () {
     httpLoad(
       this.url,
       null,
-      '[out:json];\n' + query,
+      '[out:json];\n' + context.query,
       this._handleGetResult.bind(this, context)
     )
   }.bind(this), this.options.timeGap)
 }
 
 OverpassFrontend.prototype._handleGetResult = function (context, err, results) {
-  var el
-  var id
-  var request
-  var i
-
   if (!err && results.remark) {
     err = results.remark
   }
 
   if (err) {
-    var done = []
-
     this.errorCount++
     this.overpassRequestActive = false
 
@@ -303,18 +157,10 @@ OverpassFrontend.prototype._handleGetResult = function (context, err, results) {
       this._overpassProcess()
     } else {
       // abort
-      for (i = 0; i < context.requests.length; i++) {
-        request = context.requests[i]
-
-        if (done.indexOf(request) === -1) {
-          // call finalCallback for the request
-          request.finalCallback(err)
-          // remove current request
-          this.overpassRequests[this.overpassRequests.indexOf(request)] = null
-          // we already handled this request
-          done.push(request)
-        }
-      }
+      // call finalCallback for the request
+      context.subRequests.forEach(function (subRequest) {
+        subRequest.request.finish(err)
+      })
     }
 
     return
@@ -322,63 +168,58 @@ OverpassFrontend.prototype._handleGetResult = function (context, err, results) {
     this.errorCount = 0
   }
 
-  request = context.requests.shift()
+  var subRequestsIndex = 0
+  var partIndex = 0
+  var subRequest = context.subRequests[0]
+  var request = subRequest.request
+  var part = subRequest.parts[0]
 
-  for (i = 0; i < results.elements.length; i++) {
-    el = results.elements[i]
+  for (var i = 0; i < results.elements.length; i++) {
+    var el = results.elements[i]
 
     if (isSeparator(el)) {
-      // separator found
-      if (request.options.bbox && !request.bboxSeenSeparator) {
-        request.bboxSeenSeparator = true
+      partIndex++
+
+      if (partIndex >= subRequest.parts.length) {
+        request.finishSubRequest(subRequest)
+
+        subRequestsIndex++
+        partIndex = 0
+        subRequest = context.subRequests[subRequestsIndex]
+        request = subRequest.request
+        part = subRequest.parts[0]
       } else {
-        request = context.requests.shift()
+        part = subRequest.parts[partIndex]
       }
+
       continue
-    } else {
-      id = el.type.substr(0, 1) + el.id
     }
 
-    // bounding box only result -> save to overpassElements with bounds only
-    if (request.options.bbox) {
-      if (!request.bboxSeenSeparator) {
-        var options = {
-          properties: OverpassFrontend.BBOX,
-          bbox: request.options.bbox,
-          bboxNoMatch: true
-        }
+    var ob = this.createOrUpdateOSMObject(el, part)
 
-        this.createOrUpdateOSMObject(el, options)
-
-        continue
-      }
-    }
-
-    this.createOrUpdateOSMObject(el, request.options)
-
-    var members = this.overpassElements[id].member_ids()
+    var members = this.overpassElements[ob.id].member_ids()
     if (members) {
       for (var j = 0; j < members.length; j++) {
         if (!(members[j] in this.overpassElements_member_of)) {
-          this.overpassElements_member_of[members[j]] = [ this.overpassElements[id] ]
+          this.overpassElements_member_of[members[j]] = [ this.overpassElements[ob.id] ]
         } else {
-          this.overpassElements_member_of[members[j]].push(this.overpassElements[id])
+          this.overpassElements_member_of[members[j]].push(this.overpassElements[ob.id])
         }
       }
     }
+
+    request.receiveObject(ob, subRequest, partIndex)
   }
 
-  for (id in context.todo) {
+  for (var id in context.todo) {
     if (!(id in this.overpassElements)) {
       this.overpassElements[id] = null
     }
   }
 
-  this.overpassRequestActive = false
+  request.finishSubRequest(subRequest)
 
-  async.setImmediate(function () {
-    this._overpassProcess()
-  }.bind(this))
+  this._next()
 }
 
 /**
