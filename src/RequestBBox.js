@@ -7,7 +7,15 @@ const BoundingBox = require('boundingbox')
 const SortedCallbacks = require('./SortedCallbacks')
 const Quadtree = require('quadtree-lookup')
 
+/**
+ * A BBox request
+ * @extends Request
+ */
 class RequestBBox extends Request {
+  /**
+   * @param {OverpassFrontend} overpass
+   * @param {data} data
+   */
   constructor (overpass, data) {
     super(overpass, data)
     this.type = 'BBoxQuery'
@@ -29,10 +37,6 @@ class RequestBBox extends Request {
     this.loadFinish = false
     this.lastChecked = 0
 
-    this.init()
-  }
-
-  init () {
     if (this.query in this.overpass.overpassBBoxQueryElements) {
       this.preprocess()
 
@@ -68,6 +72,9 @@ class RequestBBox extends Request {
     }
   }
 
+  /**
+   * check if there are any map features which can be returned right now
+   */
   preprocess () {
     if (this.lastChecked > this.overpass.overpassBBoxQueryLastUpdated[this.query]) {
       return
@@ -101,6 +108,10 @@ class RequestBBox extends Request {
     }
   }
 
+  /**
+   * compile the query
+   * @return {SubRequest} - the compiled query
+   */
   compileQuery () {
     // var BBoxString = this.remainingBounds.toLatLonString()
     // TODO: turf union/difference is broken - use full bounds instead
@@ -142,6 +153,12 @@ class RequestBBox extends Request {
     }
   }
 
+  /**
+   * receive an object from OverpassFronted -> enter to cache, return to caller
+   * @param {OverpassObject} ob - Object which has been received
+   * @param {SubRequest} subRequest - sub request which is being handled right now
+   * @param {int} partIndex - Which part of the subRequest is being received
+   */
   receiveObject (ob, subRequest, partIndex) {
     subRequest.parts[partIndex].count++
     this.doneFeatures[ob.id] = ob
@@ -152,6 +169,10 @@ class RequestBBox extends Request {
     }
   }
 
+  /**
+   * the current subrequest is finished -> update caches, check whether request is finished
+   * @param {SubRequest} subRequest - the current sub request
+   */
   finishSubRequest (subRequest) {
     this.overpass.overpassBBoxQueryLastUpdated[this.query] = new Date().getTime()
 
@@ -172,6 +193,10 @@ class RequestBBox extends Request {
     }
   }
 
+  /**
+   * check if we need to call Overpass API. Maybe whole area is cached anyway?
+   * @return {boolean} - true, if we need to call Overpass API
+   */
   needLoad () {
     if (this.loadFinish) {
       return false
