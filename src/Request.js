@@ -26,7 +26,9 @@ class Request {
   }
 
   abort () {
-    return this.overpass.abortRequest(this)
+    this.aborted = true
+    this.finalCallback('abort')
+    this.overpass._abortRequest(this)
   }
 
   finish (err) {
