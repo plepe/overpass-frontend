@@ -534,15 +534,13 @@ OverpassFrontend.prototype.clearBBoxQuery = function (query) {
   delete this.overpassBBoxQueryLastUpdated[query]
 }
 
-OverpassFrontend.prototype.abortRequest = function (request) {
+OverpassFrontend.prototype._abortRequest = function (request) {
   var p = this.overpassRequests.indexOf(request)
 
   if (p === -1) {
     return
   }
 
-  request.aborted = true
-  request.finalCallback('abort')
   this.overpassRequests[p] = null
 }
 
