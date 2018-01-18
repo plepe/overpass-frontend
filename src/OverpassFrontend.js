@@ -4,7 +4,6 @@ var BoundingBox = require('boundingbox')
 
 var httpLoad = require('./httpLoad')
 var removeNullEntries = require('./removeNullEntries')
-var SortedCallbacks = require('./SortedCallbacks')
 
 var OverpassObject = require('./OverpassObject')
 var OverpassNode = require('./OverpassNode')
@@ -43,46 +42,25 @@ for (var k in defines) {
   OverpassFrontend[k] = defines[k]
 }
 
+/**
+ * @param {string|string[]} ids - Id or array of Ids of OSM map features
+ * @param {object} options
+ * @param {number} [options.priority=0] - Priority for loading these objects. The lower the sooner they will be requested.
+ * @param {boolean} [options.sort=false] - When set to true, the function featureCallback will be called in some particular order
+ * @param {function} featureCallback Will be called for each object in the order of the IDs in parameter 'ids'. Will be passed: 1. err (if an error occured, otherwise null), 2. the object or null.
+ * @param {function} finalCallback Will be called after the last feature. Will be passed: 1. err (if an error occured, otherwise null).
+ */
 OverpassFrontend.prototype.get = function (ids, options, featureCallback, finalCallback) {
-  if (typeof ids === 'string') {
-    ids = [ ids ]
-  }
-  if (options === null) {
-    options = {}
-  }
-  if (typeof options.properties === 'undefined') {
-    options.properties = OverpassFrontend.DEFAULT
-  }
-
-  for (var i = 0; i < ids.length; i++) {
-    if (ids[i] in this.overpassElements && this.overpassElements[ids[i]] === false) {
-      delete this.overpassElements[ids[i]]
-    }
-  }
-
-  if (options.bbox) {
-    options.bbox = new BoundingBox(options.bbox)
-  }
-  // option 'split' not available for get requests -> use effort instead
-  delete options.split
-
   var request = new RequestGet(this, {
-    ids: ids.concat([]),
+    ids: ids,
     options: options,
-    priority: 'priority' in options ? options.priority : 0,
     featureCallback: featureCallback,
     finalCallback: finalCallback
   })
 
-  var callbacks = new SortedCallbacks(request.options, request.featureCallback, request.finalCallback)
-  request.featureCallback = callbacks.next.bind(callbacks)
-  request.finalCallback = callbacks.final.bind(callbacks)
-
   this.overpassRequests.push(request)
 
-  async.setImmediate(function () {
-    this._overpassProcess()
-  }.bind(this))
+  this._next()
 
   return request
 }
