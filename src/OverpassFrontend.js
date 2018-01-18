@@ -65,30 +65,32 @@ OverpassFrontend.prototype.get = function (ids, options, featureCallback, finalC
 }
 
 OverpassFrontend.prototype._overpassProcess = function () {
+  // currently active - we'll come back later :-)
   if (this.overpassRequestActive) {
     return
   }
 
+  // preprocess all requests
+  // e.g. call featureCallback for elements which were received in the
+  // meantime
+  this.overpassRequests.forEach(request => {
+    if (request) {
+      request.preprocess()
+    }
+  })
   this.overpassRequests = removeNullEntries(this.overpassRequests)
-  this.overpassRequests = weightSort(this.overpassRequests, 'priority')
 
+  // nothing todo ...
   if (!this.overpassRequests.length) {
     return
   }
 
+  // now order all requests by priority
+  this.overpassRequests = weightSort(this.overpassRequests, 'priority')
+
   this.overpassRequestActive = true
   var request
   var j
-
-  for (j = 0; j < this.overpassRequests.length; j++) {
-    request = this.overpassRequests[j]
-
-    if (request.type === 'BBoxQuery') {
-      // e.g. call featureCallback for elements which were received in the
-      // meantime
-      request.preprocess()
-    }
-  }
 
   if (this.overpassRequests[0].type === 'BBoxQuery') {
     request = this.overpassRequests[0]
@@ -108,8 +110,6 @@ OverpassFrontend.prototype._overpassProcess = function () {
     if (request.type !== 'get') {
       continue
     }
-
-    request.preprocess()
 
     var subRequest = request.compileQuery(context)
 
