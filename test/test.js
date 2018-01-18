@@ -587,8 +587,10 @@ describe('Overpass get', function() {
     it('should return a list of node features (request splitted)', function(done) {
       var found = []
       var expected = [ 'n1853730762', 'n1853730763', 'n1853730777', 'n1853730779', 'n1853730785', 'n1853730792', 'n1853730797', 'n1853730821' ]
+      var expectedSubRequestCount = 3
+      var foundSubRequestCount = 0
 
-      overpassFrontend.BBoxQuery(
+      var req = overpassFrontend.BBoxQuery(
         'node[natural=tree];',
         {
           minlon: 16.3384,
@@ -608,10 +610,17 @@ describe('Overpass get', function() {
         },
         function(err) {
           assert.deepEqual(expected.sort(), found.sort(), 'Wrong count of objects found!')
+          assert.equal(expectedSubRequestCount, foundSubRequestCount, 'Wrong count of subrequests')
 
           done()
         }
       )
+
+      req.on('subrequest-finish', function (subRequest) {
+        // console.log(subRequest.query)
+        // console.log('-> got ' + subRequest.parts[0].count + ' results')
+        foundSubRequestCount++
+      })
     })
 
     it('should handle simultaneous requests gracefully (overlapping area; partyly known; requests splitted)', function(done) {

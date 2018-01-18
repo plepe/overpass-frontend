@@ -146,7 +146,7 @@ class RequestBBox extends Request {
 
     query += 'out ' + overpassOutOptions(this.options) + ';'
 
-    return {
+    var subRequest = {
       query,
       request: this,
       parts: [
@@ -156,6 +156,8 @@ class RequestBBox extends Request {
         }
       ]
     }
+    this.emit('subrequest-compile', subRequest)
+    return subRequest
   }
 
   /**
@@ -179,6 +181,8 @@ class RequestBBox extends Request {
    * @param {SubRequest} subRequest - the current sub request
    */
   finishSubRequest (subRequest) {
+    super.finishSubRequest(subRequest)
+
     this.overpass.overpassBBoxQueryLastUpdated[this.query] = new Date().getTime()
 
     if ((this.options.split === 0) ||
