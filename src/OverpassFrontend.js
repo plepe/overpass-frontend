@@ -92,12 +92,8 @@ OverpassFrontend.prototype._overpassProcess = function () {
   var request
   var j
 
-  if (this.overpassRequests[0].type === 'BBoxQuery') {
-    request = this.overpassRequests[0]
-    return this._processBBoxQuery(request)
-  }
-
   var context = {
+    bbox: null,
     todo: {},
     subRequests: [],
     query: '',
@@ -106,10 +102,6 @@ OverpassFrontend.prototype._overpassProcess = function () {
 
   for (j = 0; j < this.overpassRequests.length; j++) {
     request = this.overpassRequests[j]
-
-    if (request.type !== 'get') {
-      continue
-    }
 
     var subRequest = request.compileQuery(context)
 
@@ -133,11 +125,18 @@ OverpassFrontend.prototype._overpassProcess = function () {
     return this._next()
   }
 
+  var query = '[out:json]'
+  if (context.bbox) {
+    query += '[bbox:' + context.bbox.toLatLonString() + ']'
+  }
+
+  query += ';\n' + context.query
+
   setTimeout(function () {
     httpLoad(
       this.url,
       null,
-      '[out:json];\n' + context.query,
+      query,
       this._handleResult.bind(this, context)
     )
   }.bind(this), this.options.timeGap)
@@ -249,40 +248,6 @@ OverpassFrontend.prototype.BBoxQuery = function (query, bounds, options, feature
   this._next()
 
   return request
-}
-
-OverpassFrontend.prototype._processBBoxQuery = function (request) {
-  request.callCount++
-
-  var subRequests = [ request.compileQuery() ]
-
-  this._sendBBoxQueryRequests(subRequests)
-}
-
-OverpassFrontend.prototype._sendBBoxQueryRequests = function (subRequests) {
-  var context = {
-    todo: {},
-    subRequests: subRequests,
-    query: '',
-    maxEffort: this.options.effortPerRequest
-  }
-
-  for (var i = 0; i < subRequests.length; i++) {
-    if (i !== 0) {
-      context.query += '\nout count;\n'
-    }
-
-    context.query += subRequests[i].query
-  }
-
-  setTimeout(function () {
-    httpLoad(
-      this.url,
-      null,
-      context.query,
-      this._handleResult.bind(this, context)
-    )
-  }.bind(this), this.options.timeGap)
 }
 
 OverpassFrontend.prototype.clearBBoxQuery = function (query) {
