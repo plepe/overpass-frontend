@@ -1159,7 +1159,7 @@ describe('Overpass objects structure', function() {
       overpassFrontend.removeFromCache('n3037893169')
       overpassFrontend.get('n3037893169', { properties: OverpassFrontend.MEMBERS },
         function(err, result, index) {
-          assert.deepEqual([], result.member_ids())
+          assert.deepEqual([], result.memberIds())
         },
         function(err) {
           done()
@@ -1231,7 +1231,7 @@ describe('Overpass objects structure', function() {
 	    "user": "Kevin Kofler",
 	    "version": 1
           }, result.meta)
-          assert.deepEqual([], result.member_ids())
+          assert.deepEqual([], result.memberIds())
           assert.deepEqual({
 	    "maxlat": 48.1984802,
 	    "maxlon": 16.3384675,
