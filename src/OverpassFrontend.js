@@ -203,7 +203,7 @@ class OverpassFrontend {
 
       var ob = this.createOrUpdateOSMObject(el, part)
 
-      var members = this.overpassElements[ob.id].member_ids()
+      var members = this.overpassElements[ob.id].memberIds()
       if (members) {
         for (var j = 0; j < members.length; j++) {
           if (!(members[j] in this.overpassElements_member_of)) {

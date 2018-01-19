@@ -30,23 +30,28 @@ class OverpassWay extends OverpassObject {
     }
   }
 
-  member_ids () {
-    if (this._member_ids) {
-      return this._member_ids
+  memberIds () {
+    if (this._memberIds) {
+      return this._memberIds
     }
 
     if (!this.nodes) {
       return null
     }
 
-    this._member_ids = []
+    this._memberIds = []
     for (var i = 0; i < this.nodes.length; i++) {
       var member = this.nodes[i]
 
-      this._member_ids.push('n' + member)
+      this._memberIds.push('n' + member)
     }
 
-    return this._member_ids
+    return this._memberIds
+  }
+
+  member_ids () { // eslint-disable-line
+    console.log('called deprecated OverpassWay.member_ids() function - replace by memberIds()')
+    return this.memberIds()
   }
 
   GeoJSON () {

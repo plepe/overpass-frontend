@@ -32,23 +32,28 @@ class OverpassRelation extends OverpassObject {
     super.updateData(data, options)
   }
 
-  member_ids () {
-    if (this._member_ids) {
-      return this._member_ids
+  memberIds () {
+    if (this._memberIds) {
+      return this._memberIds
     }
 
     if (typeof this.data.members === 'undefined') {
       return null
     }
 
-    this._member_ids = []
+    this._memberIds = []
     for (var i = 0; i < this.data.members.length; i++) {
       var member = this.data.members[i]
 
-      this._member_ids.push(member.type.substr(0, 1) + member.ref)
+      this._memberIds.push(member.type.substr(0, 1) + member.ref)
     }
 
-    return this._member_ids
+    return this._memberIds
+  }
+
+  member_ids () { // eslint-disable-line
+    console.log('called deprecated OverpassRelation.member_ids() function - replace by memberIds()')
+    return this.memberIds()
   }
 
   leafletFeature (options) {

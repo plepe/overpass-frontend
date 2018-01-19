@@ -11,8 +11,13 @@ class OverpassObject {
     this.properties = 0
   }
 
-  member_ids () {
+  memberIds () {
     return []
+  }
+
+  member_ids () { // eslint-disable-line
+    console.log('called deprecated OverpassObject.member_ids() function - replace by memberIds()')
+    return this.memberIds()
   }
 
   updateData (data, options) {
