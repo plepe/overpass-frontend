@@ -13,6 +13,9 @@ var RequestGet = require('./RequestGet')
 var RequestBBox = require('./RequestBBox')
 var defines = require('./defines')
 
+/**
+ * @class OverpassFrontend
+ */
 function OverpassFrontend (url, options) {
   this.url = url
   this.options = {
@@ -63,6 +66,16 @@ OverpassFrontend.prototype.get = function (ids, options, featureCallback, finalC
 
   return request
 }
+
+/**
+ * Current request context
+ * @typedef {Object} OverpassFrontend#Context
+ * @property {string} query - The compiled code of all sub requests
+ * @property {Request#SubRequest[]} subRequests - List of all subRequests in the context
+ * @property {BoundingBox} bbox - when there are any BBox requests, add this global bbox
+ * @property {int} maxEffort - how many queries can we still add to this context
+ * @property {object} todo - list of items which should be loaded via get requests to avoid duplicates
+ */
 
 OverpassFrontend.prototype._overpassProcess = function () {
   // currently active - we'll come back later :-)

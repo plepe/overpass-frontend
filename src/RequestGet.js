@@ -1,6 +1,5 @@
 const Request = require('./Request')
 const defines = require('./defines')
-const SortedCallbacks = require('./SortedCallbacks')
 const BoundingBox = require('boundingbox')
 const overpassOutOptions = require('./overpassOutOptions')
 
@@ -23,9 +22,6 @@ class RequestGet extends Request {
       this.ids = this.ids.concat()
     }
 
-    if (this.options === null) {
-      this.options = {}
-    }
     if (typeof this.options.properties === 'undefined') {
       this.options.properties = defines.DEFAULT
     }
@@ -41,10 +37,6 @@ class RequestGet extends Request {
     }
     // option 'split' not available for get requests -> use effort instead
     delete this.options.split
-
-    var callbacks = new SortedCallbacks(this.options, this.featureCallback, this.finalCallback)
-    this.featureCallback = callbacks.next.bind(callbacks)
-    this.finalCallback = callbacks.final.bind(callbacks)
 
     this.done = {}
   }
@@ -111,10 +103,12 @@ class RequestGet extends Request {
 
   /**
    * compile the query
-   * @param {object} context - current request context
-   * @return {SubRequest} - the compiled query
+   * @param {OverpassFrontend#Context} context - Current context
+   * @return {Request#SubRequest} - the compiled query
    */
   compileQuery (context) {
+    super.compileQuery(context)
+
     var query = ''
     var nodeQuery = ''
     var wayQuery = ''
@@ -232,7 +226,7 @@ class RequestGet extends Request {
   /**
    * receive an object from OverpassFronted -> enter to cache, return to caller
    * @param {OverpassObject} ob - Object which has been received
-   * @param {SubRequest} subRequest - sub request which is being handled right now
+   * @param {Request#SubRequest} subRequest - sub request which is being handled right now
    * @param {int} partIndex - Which part of the subRequest is being received
    */
   receiveObject (ob, subRequest, partIndex) {
@@ -274,9 +268,6 @@ class RequestGet extends Request {
     this.preprocess()
 
     return this.allFound
-//      request.finalCallback(null)
-//      this.overpassRequests[j] = null
-//    }
   }
 }
 
