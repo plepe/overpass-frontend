@@ -1706,6 +1706,7 @@ describe('Overpass objects structure', function() {
     })
 
     it('Server not available - get request', function (done) {
+      this.timeout(5000)
       var finalCalled = 0
       var of = new OverpassFrontend('http://domaindoesnotexist.foo')
       of.get([ 'r910885' ],
