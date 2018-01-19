@@ -4,7 +4,6 @@ const defines = require('./defines')
 const turf = require('./turf')
 const toQuadtreeLookupBox = require('./toQuadtreeLookupBox')
 const BoundingBox = require('boundingbox')
-const SortedCallbacks = require('./SortedCallbacks')
 const Quadtree = require('quadtree-lookup')
 
 /**
@@ -34,11 +33,6 @@ class RequestBBox extends Request {
       this.query += ';'
     }
 
-    var callbacks = new SortedCallbacks(this.options, this.featureCallback, this.finalCallback)
-    this.featureCallback = callbacks.next.bind(callbacks)
-    this.finalCallback = callbacks.final.bind(callbacks)
-
-    this.callCount = 0
     this.loadFinish = false
     this.lastChecked = 0
 
@@ -123,10 +117,12 @@ class RequestBBox extends Request {
 
   /**
    * compile the query
-   * @return {SubRequest} - the compiled query
+   * @param {OverpassFrontend#Context} context - Current context
+   * @return {Request#SubRequest|false} - the compiled query or false if the bbox does not match
    */
   compileQuery (context) {
-    this.callCount++
+    super.compileQuery(context)
+
     // if the context already has a bbox and it differs from this, we can't add
     // ours
     if (context.bbox && context.bbox.toLatLonString() !== this.bounds.toLatLonString()) {
@@ -174,7 +170,7 @@ class RequestBBox extends Request {
   /**
    * receive an object from OverpassFronted -> enter to cache, return to caller
    * @param {OverpassObject} ob - Object which has been received
-   * @param {SubRequest} subRequest - sub request which is being handled right now
+   * @param {Request#SubRequest} subRequest - sub request which is being handled right now
    * @param {int} partIndex - Which part of the subRequest is being received
    */
   receiveObject (ob, subRequest, partIndex) {
@@ -189,7 +185,7 @@ class RequestBBox extends Request {
 
   /**
    * the current subrequest is finished -> update caches, check whether request is finished
-   * @param {SubRequest} subRequest - the current sub request
+   * @param {Request#SubRequest} subRequest - the current sub request
    */
   finishSubRequest (subRequest) {
     super.finishSubRequest(subRequest)
