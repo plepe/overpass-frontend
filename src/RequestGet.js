@@ -233,7 +233,7 @@ class RequestGet extends Request {
     var p
     var indexes = []
 
-    subRequest.parts[partIndex].count++
+    super.receiveObject(ob, subRequest, partIndex)
 
     while ((p = this.ids.indexOf(ob.id)) !== -1) {
       this.ids[p] = null

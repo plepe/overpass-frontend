@@ -179,7 +179,8 @@ class RequestBBox extends Request {
    * @param {int} partIndex - Which part of the subRequest is being received
    */
   receiveObject (ob, subRequest, partIndex) {
-    subRequest.parts[partIndex].count++
+    super.receiveObject(ob, subRequest, partIndex)
+
     this.doneFeatures[ob.id] = ob
     this.cache.elements.insert(toQuadtreeLookupBox(ob.bounds), ob.id)
 
