@@ -95,10 +95,6 @@ class RequestGet extends Request {
 
       this.allFound = false
     }
-
-    if (this.allFound) {
-      this.finish()
-    }
   }
 
   /**
@@ -240,17 +236,13 @@ class RequestGet extends Request {
     indexes.forEach(p => fun(null, ob, p))
   }
 
-  finishSubRequest (subRequest) {
-    super.finishSubRequest(subRequest)
-
-    if (!this.needLoad()) {
-      this.finish()
-    }
-  }
-
   needLoad () {
     this.preprocess()
 
+    return this.allFound
+  }
+
+  mayFinish () {
     return this.allFound
   }
 }
