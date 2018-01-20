@@ -37,22 +37,8 @@ class RequestBBox extends Request {
       this.preprocess()
 
       // check if we need to call Overpass API (whole area known?)
-      var remainingBounds = this.bounds
-      if (this.overpass.cacheBBoxQueries[this.query].requested !== null) {
-        var toRequest = this.bounds.toGeoJSON()
-        remainingBounds = turf.difference(toRequest, this.overpass.cacheBBoxQueries[this.query].requested)
-      }
-
-      var done = false
-      if (remainingBounds === undefined) {
-        this.finalCallback(null)
-        done = true
-      } else {
-        this.remainingBounds = new BoundingBox(remainingBounds)
-      }
-
-      if (done) {
-        return
+      if (!this.needLoad()) {
+        return this.finalCallback(null)
       }
     } else {
       // otherwise initialize cache
@@ -228,7 +214,12 @@ class RequestBBox extends Request {
       var toRequest = this.bounds.toGeoJSON()
       remainingBounds = turf.difference(toRequest, this.cache.requested)
 
-      return remainingBounds !== undefined
+      if (remainingBounds === undefined) {
+        return false
+      } else {
+        this.remainingBounds = new BoundingBox(remainingBounds)
+        return true
+      }
     }
 
     return true
