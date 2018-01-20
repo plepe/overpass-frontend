@@ -1111,6 +1111,479 @@ describe('Overpass BBoxQuery', function() {
   })
 })
 
+describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
+  it('Simple queries - routes', function (done) {
+    var expected = [ 'r910885', 'r910886', 'r1306732', 'r1306733' ]
+    var expectedMembers = [ 'n2293993991', 'n2293993859', 'n2293993867' , 'n2293993929', 'w122580925', 'w220270706', 'w220270708', 'w220270709', 'w220270714', 'w232881263', 'w232881441', 'w261111319', 'w220270696', 'w220270713', 'w383292582' ]
+    var found = []
+    var foundMembers = []
+    var error = ''
+
+    overpassFrontend.BBoxQuery(
+      "relation[type=route][route=tram]",
+      {
+	"maxlat": 48.19953,
+	"maxlon": 16.33506,
+	"minlat": 48.19800,
+	"minlon": 16.32581,
+      },
+      {
+        "members": true,
+        "properties": OverpassFrontend.TAGS | OverpassFrontend.MEMBERS,
+        "memberProperties": OverpassFrontend.TAGS | OverpassFrontend.GEOM,
+        "memberCallback": function (err, result) {
+          foundMembers.push(result.id)
+
+          if (expectedMembers.indexOf(result.id) === -1) {
+            error += 'Unexpected member result ' + result.id + '\n'
+          }
+        }
+      },
+      function (err, result) {
+        found.push(result.id)
+
+        if (expected.indexOf(result.id) === -1) {
+          error += 'Unexpected result ' + result.id + '\n'
+        }
+      },
+      function (err) {
+        if (err) {
+          return done(err)
+        }
+
+        if (error) {
+          return done(error)
+        }
+
+        if (found.length !== expected.length) {
+          return done('Wrong count of objects returned:\n' +
+               'Expected: ' + expected.join(', ') + '\n' +
+               'Found: ' + found.join(', '))
+        }
+
+        if (foundMembers.length !== expectedMembers.length) {
+          return done('Wrong count of member objects returned:\n' +
+               'Expected: ' + expectedMembers.join(', ') + '\n' +
+               'Found: ' + foundMembers.join(', '))
+        }
+
+        done()
+      }
+    )
+  })
+
+  it('Simple queries - routes (fully cached)', function (done) {
+    var expected = [ 'r910885', 'r910886', 'r1306732', 'r1306733' ]
+    var expectedMembers = [ 'n2293993991', 'n2293993859', 'n2293993867' , 'n2293993929', 'w122580925', 'w220270706', 'w220270708', 'w220270709', 'w220270714', 'w232881263', 'w232881441', 'w261111319', 'w220270696', 'w220270713', 'w383292582' ]
+    var found = []
+    var foundMembers = []
+    var error = ''
+
+    overpassFrontend.BBoxQuery(
+      "relation[type=route][route=tram]",
+      {
+	"maxlat": 48.19953,
+	"maxlon": 16.33506,
+	"minlat": 48.19800,
+	"minlon": 16.32581,
+      },
+      {
+        "members": true,
+        "properties": OverpassFrontend.TAGS | OverpassFrontend.MEMBERS,
+        "memberProperties": OverpassFrontend.TAGS | OverpassFrontend.GEOM,
+        "memberCallback": function (err, result) {
+          foundMembers.push(result.id)
+
+          if (expectedMembers.indexOf(result.id) === -1) {
+            error += 'Unexpected member result ' + result.id + '\n'
+          }
+        }
+      },
+      function (err, result) {
+        found.push(result.id)
+
+        if (expected.indexOf(result.id) === -1) {
+          error += 'Unexpected result ' + result.id + '\n'
+        }
+      },
+      function (err) {
+        if (err) {
+          return done(err)
+        }
+
+        if (error) {
+          return done(error)
+        }
+
+        if (found.length !== expected.length) {
+          return done('Wrong count of objects returned:\n' +
+               'Expected: ' + expected.join(', ') + '\n' +
+               'Found: ' + found.join(', '))
+        }
+
+        if (foundMembers.length !== expectedMembers.length) {
+          return done('Wrong count of member objects returned:\n' +
+               'Expected: ' + expectedMembers.join(', ') + '\n' +
+               'Found: ' + foundMembers.join(', '))
+        }
+
+        done()
+      }
+    )
+  })
+
+  it('Simple queries - routes with different area', function (done) {
+    var expected = [ 'r910885', 'r910886', 'r1306732', 'r1306733' ]
+    var expectedMembers = [ 'w232881263', 'w232881441', 'w220270696', 'w220270713', 'w383292582', 'n2411909898', 'n2411911256' ]
+    var found = []
+    var foundMembers = []
+    var error = ''
+
+    overpassFrontend.BBoxQuery(
+      "relation[type=route][route=tram]",
+      {
+	"maxlat": 48.20400,
+	"maxlon": 16.33106,
+	"minlat": 48.19900,
+	"minlon": 16.32281,
+      },
+      {
+        "members": true,
+        "properties": OverpassFrontend.TAGS | OverpassFrontend.MEMBERS,
+        "memberProperties": OverpassFrontend.TAGS | OverpassFrontend.GEOM,
+        "memberCallback": function (err, result) {
+          foundMembers.push(result.id)
+
+          if (expectedMembers.indexOf(result.id) === -1) {
+            error += 'Unexpected member result ' + result.id + '\n'
+          }
+        }
+      },
+      function (err, result) {
+        found.push(result.id)
+
+        if (expected.indexOf(result.id) === -1) {
+          error += 'Unexpected result ' + result.id + '\n'
+        }
+      },
+      function (err) {
+        if (err) {
+          return done(err)
+        }
+
+        if (error) {
+          return done(error)
+        }
+
+        if (found.length !== expected.length) {
+          return done('Wrong count of objects returned:\n' +
+               'Expected: ' + expected.join(', ') + '\n' +
+               'Found: ' + found.join(', '))
+        }
+
+        if (foundMembers.length !== expectedMembers.length) {
+          return done('Wrong count of member objects returned:\n' +
+               'Expected: ' + expectedMembers.join(', ') + '\n' +
+               'Found: ' + foundMembers.join(', '))
+        }
+
+        done()
+      }
+    )
+  })
+
+  it('Simple queries - routes with split', function (done) {
+    overpassFrontend.clearBBoxQuery("relation[type=route][route=tram]")
+    var expected = [ 'r910885', 'r910886', 'r1306732', 'r1306733' ]
+    var expectedMembers = [ 'n2293993991', 'n2293993859', 'n2293993867' , 'n2293993929', 'w122580925', 'w220270706', 'w220270708', 'w220270709', 'w220270714', 'w232881263', 'w232881441', 'w261111319', 'w220270696', 'w220270713', 'w383292582' ]
+    var found = []
+    var foundMembers = []
+    var error = ''
+
+    overpassFrontend.BBoxQuery(
+      "relation[type=route][route=tram]",
+      {
+	"maxlat": 48.19953,
+	"maxlon": 16.33506,
+	"minlat": 48.19800,
+	"minlon": 16.32581,
+      },
+      {
+        "members": true,
+        "properties": OverpassFrontend.TAGS | OverpassFrontend.MEMBERS,
+        "memberProperties": OverpassFrontend.TAGS | OverpassFrontend.GEOM,
+        "split": 1,
+        "memberCallback": function (err, result) {
+          foundMembers.push(result.id)
+
+          if (expectedMembers.indexOf(result.id) === -1) {
+            error += 'Unexpected member result ' + result.id + '\n'
+          }
+        }
+      },
+      function (err, result) {
+        found.push(result.id)
+
+        if (expected.indexOf(result.id) === -1) {
+          error += 'Unexpected result ' + result.id + '\n'
+        }
+      },
+      function (err) {
+        if (err) {
+          return done(err)
+        }
+
+        if (error) {
+          return done(error)
+        }
+
+        if (found.length !== expected.length) {
+          return done('Wrong count of objects returned:\n' +
+               'Expected: ' + expected.join(', ') + '\n' +
+               'Found: ' + found.join(', '))
+        }
+
+        if (foundMembers.length !== expectedMembers.length) {
+          return done('Wrong count of member objects returned:\n' +
+               'Expected: ' + expectedMembers.join(', ') + '\n' +
+               'Found: ' + foundMembers.join(', '))
+        }
+
+        done()
+      }
+    )
+  })
+
+  it('Simple queries - routes with memberSplit', function (done) {
+    overpassFrontend.clearBBoxQuery("relation[type=route][route=tram]")
+    var expected = [ 'r910885', 'r910886', 'r1306732', 'r1306733' ]
+    var expectedMembers = [ 'n2293993991', 'n2293993859', 'n2293993867' , 'n2293993929', 'w122580925', 'w220270706', 'w220270708', 'w220270709', 'w220270714', 'w232881263', 'w232881441', 'w261111319', 'w220270696', 'w220270713', 'w383292582' ]
+    var found = []
+    var foundMembers = []
+    var error = ''
+
+    overpassFrontend.BBoxQuery(
+      "relation[type=route][route=tram]",
+      {
+	"maxlat": 48.19953,
+	"maxlon": 16.33506,
+	"minlat": 48.19800,
+	"minlon": 16.32581,
+      },
+      {
+        "members": true,
+        "properties": OverpassFrontend.TAGS | OverpassFrontend.MEMBERS,
+        "memberProperties": OverpassFrontend.TAGS | OverpassFrontend.GEOM,
+        "memberSplit": 5,
+        "memberCallback": function (err, result) {
+          foundMembers.push(result.id)
+
+          if (expectedMembers.indexOf(result.id) === -1) {
+            error += 'Unexpected member result ' + result.id + '\n'
+          }
+        }
+      },
+      function (err, result) {
+        found.push(result.id)
+
+        if (expected.indexOf(result.id) === -1) {
+          error += 'Unexpected result ' + result.id + '\n'
+        }
+      },
+      function (err) {
+        if (err) {
+          return done(err)
+        }
+
+        if (error) {
+          return done(error)
+        }
+
+        if (found.length !== expected.length) {
+          return done('Wrong count of objects returned:\n' +
+               'Expected: ' + expected.join(', ') + '\n' +
+               'Found: ' + found.join(', '))
+        }
+
+        if (foundMembers.length !== expectedMembers.length) {
+          return done('Wrong count of member objects returned:\n' +
+               'Expected: ' + expectedMembers.join(', ') + '\n' +
+               'Found: ' + foundMembers.join(', '))
+        }
+
+        done()
+      }
+    )
+  })
+
+  it('Simple queries - routes with split and memberSplit', function (done) {
+    overpassFrontend.clearBBoxQuery("relation[type=route][route=tram]")
+    var expected = [ 'r910885', 'r910886', 'r1306732', 'r1306733' ]
+    var expectedMembers = [ 'n2293993991', 'n2293993859', 'n2293993867' , 'n2293993929', 'w122580925', 'w220270706', 'w220270708', 'w220270709', 'w220270714', 'w232881263', 'w232881441', 'w261111319', 'w220270696', 'w220270713', 'w383292582' ]
+    var found = []
+    var foundMembers = []
+    var error = ''
+
+    overpassFrontend.BBoxQuery(
+      "relation[type=route][route=tram]",
+      {
+	"maxlat": 48.19953,
+	"maxlon": 16.33506,
+	"minlat": 48.19800,
+	"minlon": 16.32581,
+      },
+      {
+        "members": true,
+        "properties": OverpassFrontend.TAGS | OverpassFrontend.MEMBERS,
+        "memberProperties": OverpassFrontend.TAGS | OverpassFrontend.GEOM,
+        "split": 1,
+        "memberSplit": 5,
+        "memberCallback": function (err, result) {
+          foundMembers.push(result.id)
+
+          if (expectedMembers.indexOf(result.id) === -1) {
+            error += 'Unexpected member result ' + result.id + '\n'
+          }
+        }
+      },
+      function (err, result) {
+        found.push(result.id)
+
+        if (expected.indexOf(result.id) === -1) {
+          error += 'Unexpected result ' + result.id + '\n'
+        }
+      },
+      function (err) {
+        if (err) {
+          return done(err)
+        }
+
+        if (error) {
+          return done(error)
+        }
+
+        if (found.length !== expected.length) {
+          return done('Wrong count of objects returned:\n' +
+               'Expected: ' + expected.join(', ') + '\n' +
+               'Found: ' + found.join(', '))
+        }
+
+        if (foundMembers.length !== expectedMembers.length) {
+          return done('Wrong count of member objects returned:\n' +
+               'Expected: ' + expectedMembers.join(', ') + '\n' +
+               'Found: ' + foundMembers.join(', '))
+        }
+
+        done()
+      }
+    )
+  })
+
+  it('Simple queries - routes without members to fill cache', function (done) {
+    overpassFrontend.clearBBoxQuery("relation[type=route][route=tram]")
+    var expected = [ 'r910885', 'r910886', 'r1306732', 'r1306733' ]
+    var found = []
+    var error = ''
+
+    overpassFrontend.BBoxQuery(
+      "relation[type=route][route=tram]",
+      {
+	"maxlat": 48.19953,
+	"maxlon": 16.33506,
+	"minlat": 48.19800,
+	"minlon": 16.32581,
+      },
+      {
+        "properties": OverpassFrontend.TAGS | OverpassFrontend.MEMBERS
+      },
+      function (err, result) {
+        found.push(result.id)
+
+        if (expected.indexOf(result.id) === -1) {
+          error += 'Unexpected result ' + result.id + '\n'
+        }
+      },
+      function (err) {
+        if (err) {
+          return done(err)
+        }
+
+        if (error) {
+          return done(error)
+        }
+
+        if (found.length !== expected.length) {
+          return done('Wrong count of objects returned:\n' +
+               'Expected: ' + expected.join(', ') + '\n' +
+               'Found: ' + found.join(', '))
+        }
+
+        done()
+      }
+    )
+  })
+
+  it('Simple queries - routes with members after cache for parents full', function (done) {
+    var expected = [ 'r910885', 'r910886', 'r1306732', 'r1306733' ]
+    var expectedMembers = [ 'n2293993991', 'n2293993859', 'n2293993867' , 'n2293993929', 'w122580925', 'w220270706', 'w220270708', 'w220270709', 'w220270714', 'w232881263', 'w232881441', 'w261111319', 'w220270696', 'w220270713', 'w383292582' ]
+    var found = []
+    var foundMembers = []
+    var error = ''
+
+    overpassFrontend.BBoxQuery(
+      "relation[type=route][route=tram]",
+      {
+	"maxlat": 48.19953,
+	"maxlon": 16.33506,
+	"minlat": 48.19800,
+	"minlon": 16.32581,
+      },
+      {
+        "members": true,
+        "properties": OverpassFrontend.TAGS | OverpassFrontend.MEMBERS,
+        "memberProperties": OverpassFrontend.TAGS | OverpassFrontend.GEOM,
+        "memberCallback": function (err, result) {
+          foundMembers.push(result.id)
+
+          if (expectedMembers.indexOf(result.id) === -1) {
+            error += 'Unexpected member result ' + result.id + '\n'
+          }
+        }
+      },
+      function (err, result) {
+        found.push(result.id)
+
+        if (expected.indexOf(result.id) === -1) {
+          error += 'Unexpected result ' + result.id + '\n'
+        }
+      },
+      function (err) {
+        if (err) {
+          return done(err)
+        }
+
+        if (error) {
+          return done(error)
+        }
+
+        if (found.length !== expected.length) {
+          return done('Wrong count of objects returned:\n' +
+               'Expected: ' + expected.join(', ') + '\n' +
+               'Found: ' + found.join(', '))
+        }
+
+        if (foundMembers.length !== expectedMembers.length) {
+          return done('Wrong count of member objects returned:\n' +
+               'Expected: ' + expectedMembers.join(', ') + '\n' +
+               'Found: ' + foundMembers.join(', '))
+        }
+
+        done()
+      }
+    )
+  })
+})
+
 describe('Overpass objects structure', function() {
   describe('Node', function() {
     it('Overpass.ID_ONLY', function(done) {
