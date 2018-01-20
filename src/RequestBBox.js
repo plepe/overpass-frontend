@@ -160,7 +160,8 @@ class RequestBBox extends Request {
           properties: this.options.properties,
           count: 0
         }
-      ]
+      ],
+      effort: this.options.split ? this.options.split * 4 : 512 // TODO: configure bbox effort
     }
     this.emit('subrequest-compile', subRequest)
     return subRequest
