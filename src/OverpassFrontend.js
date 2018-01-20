@@ -27,14 +27,12 @@ class OverpassFrontend {
       this.options[k] = options[k]
     }
 
-    this.overpassElements = {}
-    this.overpassElements_member_of = {}
-    this.overpassTiles = {}
-    this.overpassRequests = []
-    this.overpassRequestActive = false
-    this.overpassBBoxQueryElements = {}
-    this.overpassBBoxQueryRequested = {}
-    this.overpassBBoxQueryLastUpdated = {}
+    this.cacheElements = {}
+    this.cacheElementsMemberOf = {}
+    this.cacheBBoxQueries = {}
+
+    this.requests = []
+    this.requestIsActive = false
     this.errorCount = 0
   }
 
@@ -54,7 +52,7 @@ class OverpassFrontend {
       finalCallback: finalCallback
     })
 
-    this.overpassRequests.push(request)
+    this.requests.push(request)
 
     this._next()
 
@@ -73,29 +71,29 @@ class OverpassFrontend {
 
   _overpassProcess () {
     // currently active - we'll come back later :-)
-    if (this.overpassRequestActive) {
+    if (this.requestIsActive) {
       return
     }
 
     // preprocess all requests
     // e.g. call featureCallback for elements which were received in the
     // meantime
-    this.overpassRequests.forEach(request => {
+    this.requests.forEach(request => {
       if (request) {
         request.preprocess()
       }
     })
-    this.overpassRequests = removeNullEntries(this.overpassRequests)
+    this.requests = removeNullEntries(this.requests)
 
     // nothing todo ...
-    if (!this.overpassRequests.length) {
+    if (!this.requests.length) {
       return
     }
 
     // now order all requests by priority
-    this.overpassRequests = weightSort(this.overpassRequests, 'priority')
+    this.requests = weightSort(this.requests, 'priority')
 
-    this.overpassRequestActive = true
+    this.requestIsActive = true
     var request
     var j
 
@@ -107,8 +105,8 @@ class OverpassFrontend {
       maxEffort: this.options.effortPerRequest
     }
 
-    for (j = 0; j < this.overpassRequests.length; j++) {
-      request = this.overpassRequests[j]
+    for (j = 0; j < this.requests.length; j++) {
+      request = this.requests[j]
 
       var subRequest = request.compileQuery(context)
 
@@ -156,7 +154,7 @@ class OverpassFrontend {
 
     if (err) {
       this.errorCount++
-      this.overpassRequestActive = false
+      this.requestIsActive = false
 
       if (this.errorCount <= 3) {
         // retry
@@ -203,13 +201,13 @@ class OverpassFrontend {
 
       var ob = this.createOrUpdateOSMObject(el, part)
 
-      var members = this.overpassElements[ob.id].memberIds()
+      var members = this.cacheElements[ob.id].memberIds()
       if (members) {
         for (var j = 0; j < members.length; j++) {
-          if (!(members[j] in this.overpassElements_member_of)) {
-            this.overpassElements_member_of[members[j]] = [ this.overpassElements[ob.id] ]
+          if (!(members[j] in this.cacheElementsMemberOf)) {
+            this.cacheElementsMemberOf[members[j]] = [ this.cacheElements[ob.id] ]
           } else {
-            this.overpassElements_member_of[members[j]].push(this.overpassElements[ob.id])
+            this.cacheElementsMemberOf[members[j]].push(this.cacheElements[ob.id])
           }
         }
       }
@@ -218,8 +216,8 @@ class OverpassFrontend {
     }
 
     for (var id in context.todo) {
-      if (!(id in this.overpassElements)) {
-        this.overpassElements[id] = null
+      if (!(id in this.cacheElements)) {
+        this.cacheElements[id] = null
       }
     }
 
@@ -250,7 +248,7 @@ class OverpassFrontend {
       finalCallback: finalCallback
     })
 
-    this.overpassRequests.push(request)
+    this.requests.push(request)
 
     this._next()
 
@@ -258,27 +256,25 @@ class OverpassFrontend {
   }
 
   clearBBoxQuery (query) {
-    delete this.overpassBBoxQueryElements[query]
-    delete this.overpassBBoxQueryRequested[query]
-    delete this.overpassBBoxQueryLastUpdated[query]
+    delete this.cacheBBoxQueries[query]
   }
 
   _abortRequest (request) {
-    var p = this.overpassRequests.indexOf(request)
+    var p = this.requests.indexOf(request)
 
     if (p === -1) {
       return
     }
 
-    this.overpassRequests[p] = null
+    this.requests[p] = null
   }
 
   _finishRequest (request) {
-    this.overpassRequests[this.overpassRequests.indexOf(request)] = null
+    this.requests[this.requests.indexOf(request)] = null
   }
 
   _next () {
-    this.overpassRequestActive = false
+    this.requestIsActive = false
 
     async.setImmediate(function () {
       this._overpassProcess()
@@ -286,15 +282,15 @@ class OverpassFrontend {
   }
 
   abortAllRequests () {
-    for (var j = 0; j < this.overpassRequests.length; j++) {
-      if (this.overpassRequests[j] === null) {
+    for (var j = 0; j < this.requests.length; j++) {
+      if (this.requests[j] === null) {
         continue
       }
 
-      this.overpassRequests[j].finalCallback('abort')
+      this.requests[j].finalCallback('abort')
     }
 
-    this.overpassRequests = []
+    this.requests = []
   }
 
   removeFromCache (ids) {
@@ -303,7 +299,7 @@ class OverpassFrontend {
     }
 
     for (var i = 0; i < ids.length; i++) {
-      delete this.overpassElements[ids[i]]
+      delete this.cacheElements[ids[i]]
     }
   }
 
@@ -311,8 +307,8 @@ class OverpassFrontend {
     var id = el.type.substr(0, 1) + el.id
     var ob = null
 
-    if (id in this.overpassElements) {
-      ob = this.overpassElements[id]
+    if (id in this.cacheElements) {
+      ob = this.cacheElements[id]
     } else if (el.type === 'relation') {
       ob = new OverpassRelation(id)
     } else if (el.type === 'way') {
@@ -325,7 +321,7 @@ class OverpassFrontend {
 
     ob.updateData(el, options)
 
-    this.overpassElements[id] = ob
+    this.cacheElements[id] = ob
     return ob
   }
 

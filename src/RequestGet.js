@@ -27,8 +27,8 @@ class RequestGet extends Request {
     }
 
     for (var i = 0; i < this.ids.length; i++) {
-      if (this.ids[i] in this.overpass.overpassElements && this.overpass.overpassElements[this.ids[i]] === false) {
-        delete this.overpass.overpassElements[this.ids[i]]
+      if (this.ids[i] in this.overpass.cacheElements && this.overpass.cacheElements[this.ids[i]] === false) {
+        delete this.overpass.cacheElements[this.ids[i]]
       }
     }
 
@@ -54,8 +54,8 @@ class RequestGet extends Request {
         continue
       }
 
-      if (id in this.overpass.overpassElements) {
-        var ob = this.overpass.overpassElements[id]
+      if (id in this.overpass.cacheElements) {
+        var ob = this.overpass.cacheElements[id]
         var ready = true
 
         // Feature does not exists!
@@ -140,8 +140,8 @@ class RequestGet extends Request {
       if (this.options.bbox) {
         // check if we already know the bbox of the element; if yes, don't try
         // to load object if it does not intersect bounds
-        if (id in this.overpass.overpassElements && (this.overpass.overpassElements[id].properties & defines.BBOX)) {
-          if (!this.overpass.overpassElements[id].intersects(this.options.bbox)) {
+        if (id in this.overpass.cacheElements && (this.overpass.cacheElements[id].properties & defines.BBOX)) {
+          if (!this.overpass.cacheElements[id].intersects(this.options.bbox)) {
             continue
           }
         }

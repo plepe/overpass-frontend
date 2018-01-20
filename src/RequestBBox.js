@@ -36,14 +36,16 @@ class RequestBBox extends Request {
     this.loadFinish = false
     this.lastChecked = 0
 
-    if (this.query in this.overpass.overpassBBoxQueryElements) {
+    if (this.query in this.overpass.cacheBBoxQueries) {
+      this.cache = this.overpass.cacheBBoxQueries[this.query]
+
       this.preprocess()
 
       // check if we need to call Overpass API (whole area known?)
       var remainingBounds = this.bounds
-      if (this.overpass.overpassBBoxQueryRequested[this.query] !== null) {
+      if (this.overpass.cacheBBoxQueries[this.query].requested !== null) {
         var toRequest = this.bounds.toGeoJSON()
-        remainingBounds = turf.difference(toRequest, this.overpass.overpassBBoxQueryRequested[this.query])
+        remainingBounds = turf.difference(toRequest, this.overpass.cacheBBoxQueries[this.query].requested)
       }
 
       var done = false
@@ -59,15 +61,17 @@ class RequestBBox extends Request {
       }
     } else {
       // otherwise initialize cache
-      this.overpass.overpassBBoxQueryElements[this.query] = new Quadtree.Quadtree(
+      this.overpass.cacheBBoxQueries[this.query] = {}
+      this.cache = this.overpass.cacheBBoxQueries[this.query]
+      this.cache.elements = new Quadtree.Quadtree(
         new Quadtree.Box(
           new Quadtree.Point(-90, -180),
           new Quadtree.Point(90, 180)
         )
       )
 
-      this.overpass.overpassBBoxQueryRequested[this.query] = null
-      this.overpass.overpassBBoxQueryLastUpdated[this.query] = 0
+      this.cache.requested = null
+      this.cache.timestamp = 0
     }
   }
 
@@ -75,7 +79,7 @@ class RequestBBox extends Request {
    * check if there are any map features which can be returned right now
    */
   preprocess () {
-    if (this.lastChecked > this.overpass.overpassBBoxQueryLastUpdated[this.query]) {
+    if (this.lastChecked > this.cache.timestamp) {
       if (!this.needLoad()) {
         this.finish()
       }
@@ -87,12 +91,12 @@ class RequestBBox extends Request {
     // if we already have cached objects, check if we have immediate results
     var quadtreeBounds = toQuadtreeLookupBox(this.bounds)
 
-    var items = this.overpass.overpassBBoxQueryElements[this.query].queryRange(quadtreeBounds)
+    var items = this.cache.elements.queryRange(quadtreeBounds)
     // TODO: do something with 'items'
 
     for (var i = 0; i < items.length; i++) {
       var id = items[i].value
-      var ob = this.overpass.overpassElements[id]
+      var ob = this.overpass.cacheElements[id]
 
       if (id in this.doneFeatures) {
         continue
@@ -176,7 +180,7 @@ class RequestBBox extends Request {
   receiveObject (ob, subRequest, partIndex) {
     subRequest.parts[partIndex].count++
     this.doneFeatures[ob.id] = ob
-    this.overpass.overpassBBoxQueryElements[this.query].insert(toQuadtreeLookupBox(ob.bounds), ob.id)
+    this.cache.elements.insert(toQuadtreeLookupBox(ob.bounds), ob.id)
 
     if (!this.aborted) {
       this.featureCallback(null, ob)
@@ -190,7 +194,7 @@ class RequestBBox extends Request {
   finishSubRequest (subRequest) {
     super.finishSubRequest(subRequest)
 
-    this.overpass.overpassBBoxQueryLastUpdated[this.query] = new Date().getTime()
+    this.cache.timestamp = new Date().getTime()
 
     if ((this.options.split === 0) ||
         (this.options.split > subRequest.parts[0].count)) {
@@ -198,10 +202,10 @@ class RequestBBox extends Request {
 
       if (!this.aborted) {
         var toRequest = this.remainingBounds.toGeoJSON()
-        if (this.overpass.overpassBBoxQueryRequested[this.query] === null) {
-          this.overpass.overpassBBoxQueryRequested[this.query] = toRequest
+        if (this.cache.requested === null) {
+          this.cache.requested = toRequest
         } else {
-          this.overpass.overpassBBoxQueryRequested[this.query] = turf.union(toRequest, this.overpass.overpassBBoxQueryRequested[this.query])
+          this.cache.requested = turf.union(toRequest, this.cache.requested)
         }
       }
 
@@ -220,9 +224,9 @@ class RequestBBox extends Request {
 
     // check if we need to call Overpass API (whole area known?)
     var remainingBounds = this.bounds
-    if (this.overpass.overpassBBoxQueryRequested[this.query] !== null) {
+    if (this.cache.requested !== null) {
       var toRequest = this.bounds.toGeoJSON()
-      remainingBounds = turf.difference(toRequest, this.overpass.overpassBBoxQueryRequested[this.query])
+      remainingBounds = turf.difference(toRequest, this.cache.requested)
 
       return remainingBounds !== undefined
     }
