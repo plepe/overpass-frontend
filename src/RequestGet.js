@@ -195,6 +195,7 @@ class RequestGet extends Request {
         properties: defines.BBOX,
         bbox: this.options.bbox,
         bboxNoMatch: true,
+        featureCallback: function () {},
         count: 0
       })
     }
@@ -210,6 +211,7 @@ class RequestGet extends Request {
 
     requestParts.push({
       properties: this.options.properties,
+      featureCallback: this.featureCallback,
       count: 0
     })
 
@@ -228,10 +230,12 @@ class RequestGet extends Request {
    * @param {OverpassObject} ob - Object which has been received
    * @param {Request#SubRequest} subRequest - sub request which is being handled right now
    * @param {int} partIndex - Which part of the subRequest is being received
+    var part = subRequest.parts[partIndex]
    */
   receiveObject (ob, subRequest, partIndex) {
     var p
     var indexes = []
+    var part = subRequest.parts[partIndex]
 
     super.receiveObject(ob, subRequest, partIndex)
 
@@ -244,16 +248,12 @@ class RequestGet extends Request {
       return
     }
 
-    if (partIndex !== subRequest.parts.length - 1) {
-      return
-    }
-
     if (this.options.bbox && !ob.intersects(this.options.bbox)) {
-      indexes.forEach(p => this.featureCallback(null, false, p))
+      indexes.forEach(p => part.featureCallback(null, false, p))
       return
     }
 
-    indexes.forEach(p => this.featureCallback(null, ob, p))
+    indexes.forEach(p => part.featureCallback(null, ob, p))
   }
 
   finishSubRequest (subRequest) {
