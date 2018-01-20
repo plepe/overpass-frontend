@@ -40,11 +40,6 @@ class RequestBBox extends Request {
       this.cache = this.overpass.cacheBBoxQueries[this.query]
 
       this.preprocess()
-
-      // check if we need to call Overpass API (whole area known?)
-      if (!this.needLoad()) {
-        return this.finalCallback(null)
-      }
     } else {
       // otherwise initialize cache
       this.overpass.cacheBBoxQueries[this.query] = {}
@@ -67,10 +62,8 @@ class RequestBBox extends Request {
   preprocess () {
     if (this.lastChecked > this.cache.timestamp) {
       if (!this.needLoad()) {
-        this.finish()
+        return
       }
-
-      return
     }
     this.lastChecked = new Date().getTime()
 
@@ -98,10 +91,6 @@ class RequestBBox extends Request {
 
         this.featureCallback(null, ob)
       }
-    }
-
-    if (!this.needLoad()) {
-      this.finish()
     }
   }
 
@@ -191,8 +180,6 @@ class RequestBBox extends Request {
           this.cache.requested = turf.union(toRequest, this.cache.requested)
         }
       }
-
-      this.finish()
     }
   }
 
@@ -220,6 +207,10 @@ class RequestBBox extends Request {
     }
 
     return true
+  }
+
+  mayFinish () {
+    return !this.needLoad()
   }
 }
 
