@@ -177,6 +177,9 @@ class OverpassFrontend {
     var subRequest = context.subRequests[0]
     var request = subRequest.request
     var part = subRequest.parts[0]
+    if (!('count' in part)) {
+      part.count = 0
+    }
 
     for (var i = 0; i < results.elements.length; i++) {
       var el = results.elements[i]
@@ -192,6 +195,9 @@ class OverpassFrontend {
           subRequest = context.subRequests[subRequestsIndex]
           request = subRequest.request
           part = subRequest.parts[0]
+          if (!('count' in part)) {
+            part.count = 0
+          }
         } else {
           part = subRequest.parts[partIndex]
         }
@@ -212,7 +218,13 @@ class OverpassFrontend {
         }
       }
 
-      request.receiveObject(ob, subRequest, partIndex)
+      part.count++
+      if (part.receiveObject) {
+        part.receiveObject(ob)
+      }
+      if (!request.aborted && part.featureCallback) {
+        part.featureCallback(err, ob)
+      }
     }
 
     for (var id in context.todo) {
