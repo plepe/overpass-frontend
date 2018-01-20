@@ -1893,9 +1893,9 @@ describe('Overpass objects structure', function() {
 
     it('request list should be empty', function () {
       var finalCalled = 0
-      removeNullEntries(overpassFrontend.overpassRequests)
+      removeNullEntries(overpassFrontend.requests)
 
-      assert.deepEqual(overpassFrontend.overpassRequests, [], 'request list should be empty')
+      assert.deepEqual(overpassFrontend.requests, [], 'request list should be empty')
       return true
     })
   })
