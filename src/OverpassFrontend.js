@@ -81,6 +81,10 @@ class OverpassFrontend {
     this.requests.forEach(request => {
       if (request) {
         request.preprocess()
+
+        if (request.mayFinish()) {
+          request.finish()
+        }
       }
     })
     this.requests = removeNullEntries(this.requests)
@@ -189,6 +193,10 @@ class OverpassFrontend {
 
         if (partIndex >= subRequest.parts.length) {
           request.finishSubRequest(subRequest)
+
+          if (request.mayFinish()) {
+            request.finish()
+          }
 
           subRequestsIndex++
           partIndex = 0
