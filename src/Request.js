@@ -93,6 +93,7 @@ class Request {
    * @param {int} partIndex - Which part of the subRequest is being received
    */
   receiveObject (ob, subRequest, partIndex) {
+    subRequest.parts[partIndex].count++
   }
 
   /**
