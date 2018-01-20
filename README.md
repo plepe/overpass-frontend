@@ -82,6 +82,10 @@ Options:
 | properties | bit array | Which properties of the features should be downloaded: OVERPASS_ID_ONLY, OVERPASS_BBOX, OVERPASS_TAGS, OVERPASS_GEOM, OVERPASS_META. Combine by binary OR: ``OVERPASS_ID | OVERPASS_BBOX``. Default: ``OVERPASS_BBOX | OVERPASS_TAGS | OVERPASS_MEMBERS``
 | orderApproxRouteLength | boolean | Order objects by approximate route length (calculated from the diagonal of the bounding box)
 | split | integer | If more than 'split' elements would be returned, split into several smaller requests, with 'split' elements each. Default: 0 (do not split)
+| members | boolean | Query relation members of. Default: false
+| memberCallback | function | For every member, call this callback function.
+| memberProperties | bit array | Which properties should be loaded for the members.
+| memberSplit | integer | If more than 'memberSplit' member elements would be returned, split into smaller requests (see 'split'). Default: 0 (do not split)
 
 Returns an OverpassRequest object.
 
