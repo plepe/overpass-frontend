@@ -144,8 +144,8 @@ class RequestBBox extends Request {
       parts: [
         {
           properties: this.options.properties,
-          featureCallback: this.featureCallback,
-          count: 0
+          receiveObject: this.receiveObject.bind(this),
+          featureCallback: this.featureCallback
         }
       ],
       effort: this.options.split ? this.options.split * 4 : 512 // TODO: configure bbox effort
@@ -160,17 +160,9 @@ class RequestBBox extends Request {
    * @param {Request#SubRequest} subRequest - sub request which is being handled right now
    * @param {int} partIndex - Which part of the subRequest is being received
    */
-  receiveObject (ob, subRequest, partIndex) {
-    var part = subRequest.parts[partIndex]
-
-    super.receiveObject(ob, subRequest, partIndex)
-
+  receiveObject (ob) {
     this.doneFeatures[ob.id] = ob
     this.cache.elements.insert(toQuadtreeLookupBox(ob.bounds), ob.id)
-
-    if (!this.aborted) {
-      part.featureCallback(null, ob)
-    }
   }
 
   /**
