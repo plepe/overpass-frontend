@@ -5,6 +5,7 @@ const turf = require('./turf')
 const toQuadtreeLookupBox = require('./toQuadtreeLookupBox')
 const BoundingBox = require('boundingbox')
 const Quadtree = require('quadtree-lookup')
+const RequestExtMembers = require('./RequestExtMembers')
 
 /**
  * A BBox request
@@ -30,6 +31,10 @@ class RequestBBox extends Request {
 
     this.loadFinish = false
     this.lastChecked = 0
+
+    if ('members' in this.options) {
+      RequestExtMembers(this)
+    }
 
     if (this.query in this.overpass.cacheBBoxQueries) {
       this.cache = this.overpass.cacheBBoxQueries[this.query]
