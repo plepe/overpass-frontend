@@ -98,6 +98,7 @@ class OverpassFrontend {
     this.requests = weightSort(this.requests, 'priority')
 
     this.requestIsActive = true
+    var currentRequests = []
     var request
     var j
 
@@ -112,18 +113,24 @@ class OverpassFrontend {
     for (j = 0; j < this.requests.length; j++) {
       request = this.requests[j]
 
+      if (request.willInclude(context)) {
+        currentRequests.push(request)
+      }
+    }
+
+    for (j = 0; j < currentRequests.length; j++) {
+      request = currentRequests[j]
+
       var subRequest = request.compileQuery(context)
 
-      if (subRequest) {
-        context.subRequests.push(subRequest)
+      context.subRequests.push(subRequest)
 
-        if (context.query !== '') {
-          context.query += '\nout count;\n'
-        }
-
-        context.maxEffort -= subRequest.effort
-        context.query += subRequest.query
+      if (context.query !== '') {
+        context.query += '\nout count;\n'
       }
+
+      context.maxEffort -= subRequest.effort
+      context.query += subRequest.query
 
       if (context.maxEffort < 0) {
         break

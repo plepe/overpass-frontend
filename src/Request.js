@@ -72,6 +72,15 @@ class Request {
   }
 
   /**
+   * shall this Request be included in the current call?
+   * @param {OverpassFrontend#Context} context - Current context
+   * @return {boolean} - yes|no
+   */
+  willInclude (context) {
+    return true
+  }
+
+  /**
    * SubRequest got compiled
    * @event Request#subrequest-compiile
    * @param {Request#SubRequest} subRequest - the sub request
