@@ -106,8 +106,7 @@ class OverpassFrontend {
       bbox: null,
       todo: {},
       subRequests: [],
-      query: '',
-      maxEffort: this.options.effortPerRequest
+      query: ''
     }
 
     for (j = 0; j < this.requests.length; j++) {
@@ -118,9 +117,11 @@ class OverpassFrontend {
       }
     }
 
+    var effortAvailable = this.options.effortPerRequest
+
     for (j = 0; j < currentRequests.length; j++) {
       request = currentRequests[j]
-
+      context.maxEffort = Math.ceil(effortAvailable / (currentRequests.length - j))
       var subRequest = request.compileQuery(context)
 
       context.subRequests.push(subRequest)
@@ -129,10 +130,10 @@ class OverpassFrontend {
         context.query += '\nout count;\n'
       }
 
-      context.maxEffort -= subRequest.effort
+      effortAvailable -= subRequest.effort
       context.query += subRequest.query
 
-      if (context.maxEffort < 0) {
+      if (effortAvailable <= 0) {
         break
       }
     }
