@@ -90,6 +90,20 @@ class RequestBBox extends Request {
   }
 
   /**
+   * shall this Request be included in the current call?
+   * @param {OverpassFrontend#Context} context - Current context
+   * @return {boolean} - yes|no
+   */
+  willInclude (context) {
+    if (context.bbox && context.bbox.toLatLonString() !== this.bounds.toLatLonString()) {
+      return false
+    }
+    context.bbox = this.bounds
+
+    return true
+  }
+
+  /**
    * compile the query
    * @param {OverpassFrontend#Context} context - Current context
    * @return {Request#SubRequest|false} - the compiled query or false if the bbox does not match
@@ -99,11 +113,6 @@ class RequestBBox extends Request {
 
     // if the context already has a bbox and it differs from this, we can't add
     // ours
-    if (context.bbox && context.bbox.toLatLonString() !== this.bounds.toLatLonString()) {
-      return false
-    }
-    context.bbox = this.bounds
-
     var query = '(' + this.query + ')->.result;\n'
 
     var queryRemoveDoneFeatures = ''
