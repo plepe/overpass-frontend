@@ -1,10 +1,12 @@
 var defines = require('./defines')
 
-function overpassOutOptions (options) {
+function overpassOutOptions (options, optionsOverride) {
   var outOptions = ''
 
   if ('split' in options && options.split > 0) {
     outOptions += options.split + ' '
+  } else if ('effortSplit' in options) {
+    outOptions += options.effortSplit + ' '
   }
 
   if (options.properties & defines.META) {

@@ -24,10 +24,6 @@ class RequestBBox extends Request {
     }
     this.options.properties |= defines.BBOX
 
-    if (typeof this.options.split === 'undefined') {
-      this.options.split = 0
-    }
-
     // make sure the request ends with ';'
     if (!this.query.match(/;\s*$/)) {
       this.query += ';'
@@ -139,6 +135,9 @@ class RequestBBox extends Request {
       query += '(.result; - .done;);\n'
     }
 
+    if (!('split' in this.options)) {
+      this.options.effortSplit = Math.ceil(context.maxEffort / 4)
+    }
     query += 'out ' + overpassOutOptions(this.options) + ';'
 
     var subRequest = {
@@ -151,7 +150,7 @@ class RequestBBox extends Request {
           featureCallback: this.featureCallback
         }
       ],
-      effort: this.options.split ? this.options.split * 4 : 512 // TODO: configure bbox effort
+      effort: this.options.split ? this.options.split * 4 : context.maxEffort // TODO: configure bbox effort
     }
     this.emit('subrequest-compile', subRequest)
     return subRequest
@@ -177,7 +176,7 @@ class RequestBBox extends Request {
 
     this.cache.timestamp = new Date().getTime()
 
-    if ((this.options.split === 0) ||
+    if (('effortSplit' in this.options && this.options.effortSplit > subRequest.parts[0].count) ||
         (this.options.split > subRequest.parts[0].count)) {
       this.loadFinish = true
 
