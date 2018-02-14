@@ -63,6 +63,7 @@ class OverpassFrontend {
    * Current request context
    * @typedef {Object} OverpassFrontend#Context
    * @property {string} query - The compiled code of all sub requests
+   * @property {Request[]} requests - List of all requests in the context
    * @property {Request#SubRequest[]} subRequests - List of all subRequests in the context
    * @property {BoundingBox} bbox - when there are any BBox requests, add this global bbox
    * @property {int} maxEffort - how many queries can we still add to this context
@@ -98,13 +99,13 @@ class OverpassFrontend {
     this.requests = weightSort(this.requests, 'priority')
 
     this.requestIsActive = true
-    var currentRequests = []
     var request
     var j
 
     var context = {
       bbox: null,
       todo: {},
+      requests: [],
       subRequests: [],
       query: ''
     }
@@ -113,15 +114,15 @@ class OverpassFrontend {
       request = this.requests[j]
 
       if (request.willInclude(context)) {
-        currentRequests.push(request)
+        context.requests.push(request)
       }
     }
 
     var effortAvailable = this.options.effortPerRequest
 
-    for (j = 0; j < currentRequests.length; j++) {
-      request = currentRequests[j]
-      context.maxEffort = Math.ceil(effortAvailable / (currentRequests.length - j))
+    for (j = 0; j < context.requests.length; j++) {
+      request = context.requests[j]
+      context.maxEffort = Math.ceil(effortAvailable / (context.requests.length - j))
       var subRequest = request.compileQuery(context)
 
       context.subRequests.push(subRequest)
