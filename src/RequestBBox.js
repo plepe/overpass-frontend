@@ -96,6 +96,13 @@ class RequestBBox extends Request {
     }
     context.bbox = this.bounds
 
+    for (let i in context.requests) {
+      let request = context.requests[i]
+      if (request instanceof RequestBBox && request.query === this.query) {
+        return false
+      }
+    }
+
     return true
   }
 
