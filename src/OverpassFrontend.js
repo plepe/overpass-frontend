@@ -335,7 +335,7 @@ class OverpassFrontend {
     var id = el.type.substr(0, 1) + el.id
     var ob = null
 
-    if (id in this.cacheElements) {
+    if (id in this.cacheElements && this.cacheElements[id]) {
       ob = this.cacheElements[id]
     } else if (el.type === 'relation') {
       ob = new OverpassRelation(id)
