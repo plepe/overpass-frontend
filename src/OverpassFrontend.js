@@ -107,13 +107,34 @@ class OverpassFrontend {
       todo: {},
       requests: [],
       subRequests: [],
-      query: ''
+      query: '',
+      minPriority: this.requests[0].priority,
+      minEffort: 0,
+      maxEffort: 0
     }
 
     for (j = 0; j < this.requests.length; j++) {
       request = this.requests[j]
 
+      if (request.priority > context.minPriority &&
+         (context.maxEffort === null || context.maxEffort > this.options.effortPerRequest)) {
+        break
+      }
+
       if (request.willInclude(context)) {
+        let { minEffort, maxEffort } = request.minMaxEffort()
+
+        if (context.minEffort > 0 && context.minEffort + minEffort > this.options.effortPerRequest) {
+          continue
+        }
+
+        context.minEffort += minEffort
+        if (maxEffort === null) {
+          context.maxEffort = null
+        } else if (context.maxEffort !== null) {
+          context.maxEffort += maxEffort
+        }
+
         context.requests.push(request)
       }
     }
@@ -122,7 +143,8 @@ class OverpassFrontend {
 
     for (j = 0; j < context.requests.length; j++) {
       request = context.requests[j]
-      context.maxEffort = Math.ceil(effortAvailable / (context.requests.length - j))
+      let remainingRequestsAtPriority = context.requests.slice(j).filter(r => r.priority === request.priority)
+      context.maxEffort = Math.ceil(effortAvailable / remainingRequestsAtPriority.length)
       var subRequest = request.compileQuery(context)
 
       context.subRequests.push(subRequest)

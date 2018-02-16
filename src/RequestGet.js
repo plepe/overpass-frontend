@@ -41,6 +41,35 @@ class RequestGet extends Request {
     this.done = {}
   }
 
+  _effortForId (id) {
+    if (!id) {
+      return null
+    }
+
+    var type = id.substr(0, 1)
+    switch (type) {
+      case 'n':
+        return this.overpass.options.effortNode
+      case 'w':
+        return this.overpass.options.effortWay
+      case 'r':
+        return this.overpass.options.effortRelation
+    }
+  }
+
+  /**
+   * how much effort can a call to this request use
+   * @return {Request#minMaxEffortResult} - minimum and maximum effort
+   */
+  minMaxEffort () {
+    var todo = this.ids.filter(x => x)
+
+    let minEffort = Math.min.apply(this, todo.map(id => this._effortForId(id)))
+    let maxEffort = todo.map(id => this._effortForId(id)).reduce((a, b) => a + b)
+
+    return { minEffort, maxEffort }
+  }
+
   /**
    * check if there are any map features which can be returned right now
    */
