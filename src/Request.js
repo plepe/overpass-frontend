@@ -81,6 +81,20 @@ class Request {
   }
 
   /**
+   * @typedef {Object} Request#minMaxEffortResult
+   * @property {number} Remaining minimal effort of this request
+   * @property {number|null} Remaining maximum effort (or null if unknown)
+   */
+
+  /**
+   * how much effort can a call to this request use
+   * @return {Request#minMaxEffortResult} - minimum and maximum effort
+   */
+  minMaxEffort () {
+    return { minEffort: 0, maxEffort: 0 }
+  }
+
+  /**
    * SubRequest got compiled
    * @event Request#subrequest-compiile
    * @param {Request#SubRequest} subRequest - the sub request

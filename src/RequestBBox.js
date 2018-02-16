@@ -23,6 +23,7 @@ class RequestBBox extends Request {
       this.options.properties = defines.DEFAULT
     }
     this.options.properties |= defines.BBOX
+    this.options.minEffort = this.options.minEffort || 256
 
     this.loadFinish = false
     this.lastChecked = 0
@@ -88,7 +89,7 @@ class RequestBBox extends Request {
   /**
    * shall this Request be included in the current call?
    * @param {OverpassFrontend#Context} context - Current context
-   * @return {boolean} - yes|no
+   * @return {boolean|int[]} - yes|no - or [ minEffort, maxEffort ]
    */
   willInclude (context) {
     if (context.bbox && context.bbox.toLatLonString() !== this.bounds.toLatLonString()) {
@@ -107,12 +108,22 @@ class RequestBBox extends Request {
   }
 
   /**
+   * how much effort can a call to this request use
+   * @return {Request#minMaxEffortResult} - minimum and maximum effort
+   */
+  minMaxEffort () {
+    return { minEffort: this.options.minEffort, maxEffort: null }
+  }
+
+  /**
    * compile the query
    * @param {OverpassFrontend#Context} context - Current context
    * @return {Request#SubRequest|false} - the compiled query or false if the bbox does not match
    */
   compileQuery (context) {
     super.compileQuery(context)
+
+    let effortAvailable = Math.max(context.maxEffort, this.options.minEffort)
 
     // if the context already has a bbox and it differs from this, we can't add
     // ours
@@ -138,7 +149,7 @@ class RequestBBox extends Request {
     }
 
     if (!('split' in this.options)) {
-      this.options.effortSplit = Math.ceil(context.maxEffort / 4)
+      this.options.effortSplit = Math.ceil(effortAvailable / 4)
     }
     query += 'out ' + overpassOutOptions(this.options) + ';'
 
@@ -152,7 +163,7 @@ class RequestBBox extends Request {
           featureCallback: this.featureCallback
         }
       ],
-      effort: this.options.split ? this.options.split * 4 : context.maxEffort // TODO: configure bbox effort
+      effort: this.options.split ? this.options.split * 4 : effortAvailable // TODO: configure bbox effort
     }
     this.emit('subrequest-compile', subRequest)
     return subRequest
