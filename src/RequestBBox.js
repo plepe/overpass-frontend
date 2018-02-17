@@ -97,6 +97,10 @@ class RequestBBox extends Request {
    * @return {boolean|int[]} - yes|no - or [ minEffort, maxEffort ]
    */
   willInclude (context) {
+    if (this.loadFinish) {
+      return false
+    }
+
     if (context.bbox && context.bbox.toLatLonString() !== this.bounds.toLatLonString()) {
       return false
     }
@@ -117,6 +121,10 @@ class RequestBBox extends Request {
    * @return {Request#minMaxEffortResult} - minimum and maximum effort
    */
   minMaxEffort () {
+    if (this.loadFinish) {
+      return { minEffort: 0, maxEffort: 0 }
+    }
+
     return { minEffort: this.options.minEffort, maxEffort: null }
   }
 
@@ -127,6 +135,15 @@ class RequestBBox extends Request {
    */
   compileQuery (context) {
     super.compileQuery(context)
+
+    if (this.loadFinish || (context.bbox && context.bbox.toLatLonString() !== this.bounds.toLatLonString())) {
+      return {
+        query: '',
+        request: this,
+        parts: [],
+        effort: 0
+      }
+    }
 
     let effortAvailable = Math.max(context.maxEffort, this.options.minEffort)
 
