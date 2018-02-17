@@ -1,34 +1,39 @@
+const defines = require('./defines')
 const overpassOutOptions = require('./overpassOutOptions')
 const Quadtree = require('quadtree-lookup')
 const toQuadtreeLookupBox = require('./toQuadtreeLookupBox')
 const turf = require('./turf')
 const BoundingBox = require('boundingbox')
+const each = require('lodash/forEach')
+const map = require('lodash/map')
+const keys = require('lodash/keys')
 
 function requestExtMembersInit () {
-  var cacheId = this.query + '|members'
-
-  if (cacheId in this.overpass.cacheBBoxQueries) {
-    this.cacheExtMembers = this.overpass.cacheBBoxQueries[cacheId]
-  } else {
-    // otherwise initialize cache
-    this.overpass.cacheBBoxQueries[cacheId] = {}
-    this.cacheExtMembers = this.overpass.cacheBBoxQueries[cacheId]
-    this.cacheExtMembers.elements = new Quadtree.Quadtree(
-      new Quadtree.Box(
-        new Quadtree.Point(-90, -180),
-        new Quadtree.Point(90, 180)
-      )
-    )
-
-    this.cacheExtMembers.requested = null
-    this.cacheExtMembers.timestamp = 0
-  }
+  this.options.properties |= defines.MEMBERS
 
   this.doneFeaturesExtMembers = {}
+  this.todoExtMembers = {}
 }
 
 function requestExtMembersPreprocess (fun) {
   fun.call(this)
+
+  this.todoExtMembers = {}
+  each(this.doneFeatures, ob => {
+    each(ob.members, member => {
+      if (!(member.id in this.doneFeaturesExtMembers)) {
+        this.todoExtMembers[member.id] = undefined
+      }
+    })
+  })
+
+  each(this.todoExtMembers, (value, id) => {
+    if (id in this.overpass.cacheElements) {
+    }
+  })
+
+  return
+
 
   var quadtreeBounds = toQuadtreeLookupBox(this.bounds)
 
@@ -59,9 +64,21 @@ function requestExtMembersPreprocess (fun) {
 function requestExtMembersCompileQuery (fun, context) {
   var subRequest = fun.call(this, context)
 
-  var BBoxString = this.bounds.toLatLonString()
+  if (keys(this.doneFeatures).length === 0) {
+    return subRequest
+  }
 
-  var query = '(\n' +
+  let query = '(\n'
+  map(this.doneFeatures, ob => {
+    if (ob.type === 'relation') {
+      return 'relation(' + ob.id + ');\n';
+    }
+    return ''
+  }).join('')
+  query += ')->.result;'
+
+  let BBoxString = this.bounds.toLatLonString()
+  query = '(\n' +
      '  node(r.result)(' + BBoxString + ');\n' +
      '  way(r.result)(' + BBoxString + ');\n' +
      '  relation(r.result)(' + BBoxString + ');\n' +
@@ -90,6 +107,7 @@ function requestExtMembersCompileQuery (fun, context) {
 
   var membersOptions = {
     split: this.options.memberSplit,
+    effortSplit: this.options.membersEffortSplit,
     properties: this.options.memberProperties,
     receiveObject: requestExtMembersReceive.bind(this),
     featureCallback: this.options.memberCallback,
@@ -100,23 +118,32 @@ function requestExtMembersCompileQuery (fun, context) {
 
   subRequest.query += '\nout count;\n' + query
   subRequest.parts.push(membersOptions)
+  this.subRequestIndexExtMembers = 
 
   return subRequest
 }
 
 function requestExtMembersReceive (ob) {
   this.doneFeaturesExtMembers[ob.id] = ob
-  this.cacheExtMembers.elements.insert(toQuadtreeLookupBox(ob.bounds), ob.id)
+}
+
+function requestExtMembersFinishSubRequest (subRequest) {
+  var result = fun.call(this)
+
+  if (('membersEffortSplit' in this.options && this.options.membersEffortSplit > subRequest.parts[].count) ||
+      (this.options.split > subRequest.parts[0].count)) {
+    this.loadFinish = true
+
 }
 
 function requestExtMembersNeedLoad (fun) {
   var result = fun.call(this)
+  return result
 
   if (result === true) {
     return true
   }
 
-  var remainingBounds = this.bounds
   if (this.cacheExtMembers.requested !== null) {
     var toRequest = this.bounds.toGeoJSON()
     remainingBounds = turf.difference(toRequest, this.cacheExtMembers.requested)
