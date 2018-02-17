@@ -3,6 +3,7 @@ const overpassOutOptions = require('./overpassOutOptions')
 const each = require('lodash/forEach')
 const map = require('lodash/map')
 const keys = require('lodash/keys')
+const BoundingBox = require('boundingbox')
 
 class RequestExtMembers {
   constructor (request) {
@@ -13,6 +14,10 @@ class RequestExtMembers {
     this.options.properties |= defines.MEMBERS
     this.options.memberProperties = this.options.memberProperties || defines.DEFAULT
     this.options.memberProperties |= defines.BBOX
+
+    if (this.options.memberBounds) {
+      this.bounds = new BoundingBox(this.options.memberBounds)
+    }
 
     this.master.compileQuery = this.compileQuery.bind(this, this.master.compileQuery)
     this.master.needLoad = this.needLoad.bind(this, this.master.needLoad)
@@ -53,7 +58,7 @@ class RequestExtMembers {
       if (id in this.overpass.cacheElements) {
         var ob = this.overpass.cacheElements[id]
 
-        if (!ob.intersects(this.master.bounds)) {
+        if (this.bounds && !ob.intersects(this.bounds)) {
           return
         }
 
@@ -85,11 +90,15 @@ class RequestExtMembers {
     query += ')->.result;'
     this.currentRelations = keys(this.relations)
 
-    let BBoxString = this.master.bounds.toLatLonString()
+    let BBoxString = ''
+    if (this.bounds) {
+      BBoxString = '(' + this.bounds.toLatLonString() + ')'
+    }
+
     query += '(\n' +
-       '  node(r.result)(' + BBoxString + ');\n' +
-       '  way(r.result)(' + BBoxString + ');\n' +
-       '  relation(r.result)(' + BBoxString + ');\n' +
+       '  node(r.result)' + BBoxString + ';\n' +
+       '  way(r.result)' + BBoxString + ';\n' +
+       '  relation(r.result)' + BBoxString + ';\n' +
        ')->.resultMembers;\n'
 
     var queryRemoveDoneFeatures = ''
