@@ -266,6 +266,10 @@ class OverpassFrontend {
       }
     }
 
+    if (!(subRequestsIndex === context.subRequests.length - 1 || partIndex === context.subRequests[subRequestsIndex].parts.length - 1)) {
+      console.log('too many parts!!!!')
+    }
+
     for (var id in context.todo) {
       if (!(id in this.cacheElements)) {
         this.cacheElements[id] = null
@@ -357,6 +361,10 @@ class OverpassFrontend {
   createOrUpdateOSMObject (el, options) {
     var id = el.type.substr(0, 1) + el.id
     var ob = null
+
+    if (id in this.cacheElements && !this.cacheElements[id]) {
+      console.log('why can this be null?', id)
+    }
 
     if (id in this.cacheElements && this.cacheElements[id]) {
       ob = this.cacheElements[id]
