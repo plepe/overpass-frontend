@@ -131,9 +131,8 @@ class RequestExtMembers {
     if (countRemoveDoneFeatures) {
       query += '(' + queryRemoveDoneFeatures + ')->.doneMembers;\n'
       query += '(.resultMembers; - .doneMembers);\n'
-    } else {
-      query += '(.resultMembers);\n'
     }
+    query += '(.resultMembers; - .extMembersNoDuplicates);\n'
 
     this.part = {
       properties: this.options.memberProperties,
@@ -143,6 +142,7 @@ class RequestExtMembers {
     }
 
     query += 'out ' + overpassOutOptions(this.part) + ';'
+    query += '.resultMembers->.extMembersNoDuplicates;'
 
     this.loadFinish = true
 
