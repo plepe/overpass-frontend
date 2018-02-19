@@ -69,6 +69,10 @@ class RequestGet extends Request {
   minMaxEffort () {
     var todo = this.ids.filter(x => x)
 
+    if (todo.length === 0) {
+      return { minEffort: 0, maxEffort: 0 }
+    }
+
     let minEffort = Math.min.apply(this, todo.map(id => this._effortForId(id)))
     let maxEffort = todo.map(id => this._effortForId(id)).reduce((a, b) => a + b)
 
@@ -237,11 +241,13 @@ class RequestGet extends Request {
       query += '.r out ' + outOptions + ';\n'
     }
 
-    requestParts.push({
-      properties: this.options.properties,
-      receiveObject: this.receiveObject.bind(this),
-      featureCallback: this._featureCallback.bind(this, this.featureCallback)
-    })
+    if (query) {
+      requestParts.push({
+        properties: this.options.properties,
+        receiveObject: this.receiveObject.bind(this),
+        featureCallback: this._featureCallback.bind(this, this.featureCallback)
+      })
+    }
 
     var subRequest = {
       query,
