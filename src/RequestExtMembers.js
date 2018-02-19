@@ -21,8 +21,10 @@ class RequestExtMembers {
 
     this.master.compileQuery = this.compileQuery.bind(this, this.master.compileQuery)
     this.master.needLoad = this.needLoad.bind(this, this.master.needLoad)
+    this.master.mayFinish = this.mayFinish.bind(this, this.master.mayFinish)
     this.master.preprocess = this.preprocess.bind(this, this.master.preprocess)
     this.master.willInclude = this.willInclude.bind(this, this.master.willInclude)
+    this.master.minMaxEffort = this.minMaxEffort.bind(this, this.master.minMaxEffort)
     this.master.finishSubRequest = this.finishSubRequest.bind(this, this.master.finishSubRequest)
     this.master.featureCallback = this.receiveMasterObject.bind(this, this.master.featureCallback)
 
@@ -40,6 +42,17 @@ class RequestExtMembers {
     }
 
     return result
+  }
+
+  minMaxEffort (fun) {
+    let { minEffort, maxEffort } = fun.call(this.master)
+
+    if (!this.loadFinish) {
+      minEffort += 64
+      maxEffort = null
+    }
+
+    return { minEffort, maxEffort }
   }
 
   preprocess (fun) {
