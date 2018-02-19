@@ -147,6 +147,11 @@ class OverpassFrontend {
       context.maxEffort = Math.ceil(effortAvailable / remainingRequestsAtPriority.length)
       var subRequest = request.compileQuery(context)
 
+      if (subRequest.parts.length === 0) {
+        console.log('subRequest has no parts! Why was willInclude true?', subRequest)
+        continue
+      }
+
       context.subRequests.push(subRequest)
 
       if (context.query !== '') {
