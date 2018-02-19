@@ -144,6 +144,7 @@ class RequestExtMembers {
 
   receiveMasterObject (fun, err, result, index) {
     this.relations[result.id] = result
+    this.loadFinish = false
     fun(err, result, index)
   }
 
@@ -167,6 +168,16 @@ class RequestExtMembers {
     }
 
     return !this.loadFinish
+  }
+
+  mayFinish (fun) {
+    var result = fun.call(this.master)
+
+    if (result === false) {
+      return false
+    }
+
+    return this.loadFinish
   }
 }
 
