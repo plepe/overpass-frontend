@@ -1,10 +1,9 @@
 const Request = require('./Request')
 const overpassOutOptions = require('./overpassOutOptions')
 const defines = require('./defines')
-const turf = require('./turf')
 const toQuadtreeLookupBox = require('./toQuadtreeLookupBox')
-const BoundingBox = require('boundingbox')
 const Quadtree = require('quadtree-lookup')
+const KnownArea = require('./knownArea')
 
 /**
  * A BBox request
@@ -48,7 +47,7 @@ class RequestBBox extends Request {
         )
       )
 
-      this.cache.requested = null
+      this.cache.requested = new KnownArea()
       this.cache.timestamp = 0
     }
   }
@@ -199,12 +198,7 @@ class RequestBBox extends Request {
       this.loadFinish = true
 
       if (!this.aborted) {
-        var toRequest = this.remainingBounds.toGeoJSON()
-        if (this.cache.requested === null) {
-          this.cache.requested = toRequest
-        } else {
-          this.cache.requested = turf.union(toRequest, this.cache.requested)
-        }
+        this.cache.requested.add(this.remainingBounds)
       }
     }
   }
@@ -219,20 +213,7 @@ class RequestBBox extends Request {
     }
 
     // check if we need to call Overpass API (whole area known?)
-    var remainingBounds = this.bounds
-    if (this.cache.requested !== null) {
-      var toRequest = this.bounds.toGeoJSON()
-      remainingBounds = turf.difference(toRequest, this.cache.requested)
-
-      if (remainingBounds === undefined) {
-        return false
-      } else {
-        this.remainingBounds = new BoundingBox(remainingBounds)
-        return true
-      }
-    }
-
-    return true
+    return !this.cache.requested.check(this.bounds)
   }
 
   mayFinish () {
