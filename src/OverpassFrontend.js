@@ -256,21 +256,21 @@ OverpassFrontend.prototype._overpassProcess = function () {
     if (nodeQuery !== '') {
       query += '((' + nodeQuery + ');)->.n;\n'
       if (BBoxQuery) {
-        query += '(node.n; - node.n' + BBoxQuery + '->.n);\nout ids bb qt;\n'
+        query += '(node.n; - node.n' + BBoxQuery + '->.n;);\nout ids bb qt;\n'
       }
     }
 
     if (wayQuery !== '') {
       query += '((' + wayQuery + ');)->.w;\n'
       if (BBoxQuery) {
-        query += '(way.w; - way.w' + BBoxQuery + '->.w);\nout ids bb qt;\n'
+        query += '(way.w; - way.w' + BBoxQuery + '->.w;);\nout ids bb qt;\n'
       }
     }
 
     if (relationQuery !== '') {
       query += '((' + relationQuery + ');)->.r;\n'
       if (BBoxQuery) {
-        query += '(relation.r; - relation.r' + BBoxQuery + '->.r);\nout ids bb qt;\n'
+        query += '(relation.r; - relation.r' + BBoxQuery + '->.r;);\nout ids bb qt;\n'
       }
     }
 
@@ -580,7 +580,7 @@ OverpassFrontend.prototype._processBBoxQuery = function (request) {
 
   if (countRemoveDoneFeatures) {
     query += '(' + queryRemoveDoneFeatures + ')->.done;\n'
-    query += '(.result; - .done);\n'
+    query += '(.result; - .done;);\n'
   }
 
   query += 'out ' + overpassOutOptions(request.options) + ';'
