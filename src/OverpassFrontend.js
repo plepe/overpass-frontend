@@ -433,6 +433,11 @@ OverpassFrontend.prototype.BBoxQuery = function (query, bounds, options, feature
     options.split = 0
   }
 
+  // make sure the request ends with ';'
+  if (!query.match(/;\s*$/)) {
+    query += ';'
+  }
+
   var request = new OverpassRequest(this, {
     type: 'BBoxQuery',
     query: query,
