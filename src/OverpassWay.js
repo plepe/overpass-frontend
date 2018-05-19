@@ -3,7 +3,7 @@
 var util = require('util')
 var OverpassObject = require('./OverpassObject')
 var turf = {
-  bboxClip: require('turf-bbox-clip')
+  bboxClip: require('@turf/bbox-clip').default
 }
 
 util.inherits(OverpassWay, OverpassObject)

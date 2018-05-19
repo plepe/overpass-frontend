@@ -5,7 +5,7 @@ var osmtogeojson = require('osmtogeojson')
 var OverpassObject = require('./OverpassObject')
 var OverpassFrontend = require('./defines')
 var turf = {
-  bboxClip: require('turf-bbox-clip')
+  bboxClip: require('@turf/bbox-clip').default
 }
 
 util.inherits(OverpassRelation, OverpassObject)

@@ -2,7 +2,7 @@ var BoundingBox = require('boundingbox')
 var OverpassFrontend = require('./defines')
 var turf = {
   difference: require('@turf/difference'),
-  intersect: require('@turf/intersect')
+  intersect: require('@turf/intersect').default
 }
 
 function OverpassObject () {
