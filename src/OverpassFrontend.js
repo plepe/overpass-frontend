@@ -4,7 +4,7 @@ var BoundingBox = require('boundingbox')
 var Quadtree = require('quadtree-lookup')
 var turf = {
   difference: require('@turf/difference'),
-  union: require('@turf/union')
+  union: require('@turf/union').default
 }
 
 var httpLoad = require('./httpLoad')
