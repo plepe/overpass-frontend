@@ -37,11 +37,25 @@ class RequestExtMembers {
   willInclude (fun, context) {
     let result = fun.call(this.master, context)
 
-    if (!this.loadFinish) {
-      return true
+    if (this.loadFinish) {
+      return false
     }
 
-    return result
+    if (!result) {
+      return false
+    }
+
+    if (!('extMembersList' in context)) {
+      context.extMembersList = this.relations
+      context.extMembersRequests = [ this ]
+      return true
+    } else {
+      keys(this.relations).forEach(id => {
+        context.extMembersList[id] = this.relations[id]
+      })
+      context.extMembersRequests.push(this)
+      return false
+    }
   }
 
   minMaxEffort (fun) {
@@ -94,7 +108,7 @@ class RequestExtMembers {
     }
 
     let query = '(\n'
-    query += map(this.relations, ob => {
+    query += map(context.extMembersList, ob => {
       if (ob.type === 'relation') {
         return 'relation(' + ob.osm_id + ');\n'
       }
@@ -116,23 +130,32 @@ class RequestExtMembers {
 
     var queryRemoveDoneFeatures = ''
     var countRemoveDoneFeatures = 0
-    for (var id in this.doneFeatures) {
-      var ob = this.doneFeatures[id]
+    var listedDoneFeatures = {}
+    context.extMembersRequests.forEach(request => {
+      for (var id in request.doneFeatures) {
+        if (id in listedDoneFeatures) {
+          continue
+        }
 
-      if (countRemoveDoneFeatures % 1000 === 999) {
-        query += '(' + queryRemoveDoneFeatures + ')->.doneMembers;\n'
-        queryRemoveDoneFeatures = '.doneMembers;'
+        var ob = request.doneFeatures[id]
+
+        if (countRemoveDoneFeatures % 1000 === 999) {
+          query += '(' + queryRemoveDoneFeatures + ')->.doneMembers;\n'
+          queryRemoveDoneFeatures = '.doneMembers;'
+        }
+
+        queryRemoveDoneFeatures += ob.type + '(' + ob.osm_id + ');'
+        countRemoveDoneFeatures++
+        listedDoneFeatures[id] = true
       }
 
-      queryRemoveDoneFeatures += ob.type + '(' + ob.osm_id + ');'
-      countRemoveDoneFeatures++
-    }
+      request.loadFinish = true
+    })
 
     if (countRemoveDoneFeatures) {
       query += '(' + queryRemoveDoneFeatures + ')->.doneMembers;\n'
-      query += '(.resultMembers; - .doneMembers);\n'
+      query += '(.resultMembers; - .doneMembers;)->.resultMembers;\n'
     }
-    query += '(.resultMembers; - .extMembersNoDuplicates);\n'
 
     this.part = {
       properties: this.options.memberProperties,
@@ -141,10 +164,7 @@ class RequestExtMembers {
       count: 0
     }
 
-    query += 'out ' + overpassOutOptions(this.part) + ';'
-    query += '.resultMembers->.extMembersNoDuplicates;'
-
-    this.loadFinish = true
+    query += '.resultMembers out ' + overpassOutOptions(this.part) + ';'
 
     if (subRequest.parts.length) {
       subRequest.query += '\nout count;\n'
@@ -162,7 +182,6 @@ class RequestExtMembers {
   }
 
   receiveObject (ob) {
-    this.doneFeatures[ob.id] = ob
   }
 
   finishSubRequest (fun, subRequest) {
