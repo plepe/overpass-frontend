@@ -48,8 +48,9 @@ class RequestGetMembers {
     if (!('extMembersList' in context)) {
       context.extMembersList = this.relations
       context.extMembersRequests = [ this ]
+      context.extMembersPriority = this.master.priority
       return true
-    } else {
+    } else if (this.master.priority <= context.extMembersPriority) {
       keys(this.relations).forEach(id => {
         context.extMembersList[id] = this.relations[id]
       })
