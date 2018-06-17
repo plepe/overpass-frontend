@@ -130,9 +130,8 @@ class RequestBBoxMembers {
 
     if (countRemoveDoneFeatures) {
       query += '(' + queryRemoveDoneFeatures + ')->.doneMembers;\n'
-      query += '(.resultMembers; - .doneMembers);\n'
+      query += '(.resultMembers; - .doneMembers)->.resultMembers;\n'
     }
-    query += '(.resultMembers; - .extMembersNoDuplicates);\n'
 
     this.part = {
       properties: this.options.memberProperties,
@@ -141,8 +140,7 @@ class RequestBBoxMembers {
       count: 0
     }
 
-    query += 'out ' + overpassOutOptions(this.part) + ';'
-    query += '.resultMembers->.extMembersNoDuplicates;'
+    query += '.resultMembers out ' + overpassOutOptions(this.part) + ';'
 
     this.loadFinish = true
 
