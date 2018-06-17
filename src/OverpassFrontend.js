@@ -27,13 +27,17 @@ class OverpassFrontend {
       this.options[k] = options[k]
     }
 
-    this.cacheElements = {}
-    this.cacheElementsMemberOf = {}
-    this.cacheBBoxQueries = {}
+    this.clearCache()
 
     this.requests = []
     this.requestIsActive = false
     this.errorCount = 0
+  }
+
+  clearCache () {
+    this.cacheElements = {}
+    this.cacheElementsMemberOf = {}
+    this.cacheBBoxQueries = {}
   }
 
   /**
