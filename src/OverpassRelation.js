@@ -122,13 +122,15 @@ class OverpassRelation extends OverpassObject {
       for (i = 0; i < this.geometry.features.length; i++) {
         var g = this.geometry.features[i]
 
-        var intersects = turf.bboxClip(g, [ bbox.minlon, bbox.minlat, bbox.maxlon, bbox.maxlat ])
-
         if (g.geometry.type === 'Point') {
-          if (intersects) {
+          if (bbox.intersects(g)) {
             return 2
           }
+          continue
         }
+
+        var intersects = turf.bboxClip(g, [ bbox.minlon, bbox.minlat, bbox.maxlon, bbox.maxlat ])
+
         if (g.geometry.type === 'LineString' || g.geometry.type === 'Polygon') {
           if (intersects.geometry.coordinates.length) {
             return 2
