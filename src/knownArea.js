@@ -34,7 +34,7 @@ class KnownArea {
     bbox = new BoundingBox(bbox).toGeoJSON()
 
     let remaining = turf.difference(bbox, this.area)
-    console.log(JSON.stringify(this.area), JSON.stringify(bbox), !remaining)
+    // console.log(JSON.stringify(this.area), JSON.stringify(bbox), !remaining)
 
     return !remaining
   }
