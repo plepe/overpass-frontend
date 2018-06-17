@@ -76,6 +76,10 @@ class RequestBBox extends Request {
 
     for (var i = 0; i < items.length; i++) {
       var id = items[i].value
+
+      if (!(id in this.overpass.cacheElements)) {
+        continue
+      }
       var ob = this.overpass.cacheElements[id]
 
       if (id in this.doneFeatures) {
