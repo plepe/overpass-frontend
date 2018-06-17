@@ -4,7 +4,7 @@ const defines = require('./defines')
 const toQuadtreeLookupBox = require('./toQuadtreeLookupBox')
 const Quadtree = require('quadtree-lookup')
 const KnownArea = require('./knownArea')
-const RequestExtMembers = require('./RequestExtMembers')
+const RequestBBoxMembers = require('./RequestBBoxMembers')
 
 /**
  * A BBox request
@@ -34,7 +34,7 @@ class RequestBBox extends Request {
     this.lastChecked = 0
 
     if ('members' in this.options) {
-      RequestExtMembers(this)
+      RequestBBoxMembers(this)
     }
 
     if (this.query in this.overpass.cacheBBoxQueries) {

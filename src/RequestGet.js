@@ -2,7 +2,7 @@ const Request = require('./Request')
 const defines = require('./defines')
 const BoundingBox = require('boundingbox')
 const overpassOutOptions = require('./overpassOutOptions')
-const RequestExtMembers = require('./RequestExtMembers')
+const RequestGetMembers = require('./RequestGetMembers')
 
 /**
  * A get request (request list of map features by id)
@@ -42,7 +42,7 @@ class RequestGet extends Request {
     this.done = {}
 
     if ('members' in this.options) {
-      RequestExtMembers(this)
+      RequestGetMembers(this)
     }
   }
 

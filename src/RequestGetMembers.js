@@ -5,7 +5,7 @@ const map = require('lodash/map')
 const keys = require('lodash/keys')
 const BoundingBox = require('boundingbox')
 
-class RequestExtMembers {
+class RequestGetMembers {
   constructor (request) {
     this.master = request
     this.options = this.master.options
@@ -214,5 +214,5 @@ class RequestExtMembers {
 }
 
 module.exports = function (request) {
-  return new RequestExtMembers(request)
+  return new RequestGetMembers(request)
 }
