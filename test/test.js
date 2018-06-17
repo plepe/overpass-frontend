@@ -1619,7 +1619,7 @@ describe('Overpass objects structure', function() {
           if(err === null)
             done('Query wrong, should not be successful')
 
-          else if(err == "line 2: parse error: ']' expected - ')' found.\n" +
+          else if(err == "line 2: parse error: ']' expected - ';' found.\n" +
             "line 4: parse error: Unexpected end of input.\n" +
             "line 4: parse error: Unexpected end of input.\n" +
             "line 4: parse error: Unexpected end of input.\n\n")
