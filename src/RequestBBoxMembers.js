@@ -4,6 +4,7 @@ const each = require('lodash/forEach')
 const map = require('lodash/map')
 const keys = require('lodash/keys')
 const BoundingBox = require('boundingbox')
+const KnownArea = require('./knownArea')
 
 class RequestBBoxMembers {
   constructor (request) {
@@ -60,6 +61,14 @@ class RequestBBoxMembers {
 
     this.todo = {}
     each(this.relations, ob => {
+      if (!ob.knownMemberArea) {
+        ob.knownMemberArea = new KnownArea()
+      }
+
+      if (ob.knownMemberArea.check(this.options.membersBounds)) {
+        return
+      }
+
       each(ob.members, member => {
         if (!(member.id in this.doneFeatures)) {
           this.todo[member.id] = undefined
@@ -67,6 +76,7 @@ class RequestBBoxMembers {
       })
     })
 
+    let allKnown = true
     each(this.todo, (value, id) => {
       if (id in this.overpass.cacheElements) {
         var ob = this.overpass.cacheElements[id]
@@ -95,6 +105,12 @@ class RequestBBoxMembers {
 
     let query = '(\n'
     query += map(this.relations, ob => {
+      if (this.options.memberBounds) {
+        result.knownMemberArea.add(this.options.memberBounds)
+      } else {
+        result.knownMemberArea = true
+      }
+
       if (ob.type === 'relation') {
         return 'relation(' + ob.osm_id + ');\n'
       }
@@ -154,6 +170,7 @@ class RequestBBoxMembers {
   }
 
   receiveMasterObject (fun, err, result, index) {
+    //console.log('receive', result.id, result.knownMemberArea)
     this.relations[result.id] = result
     this.loadFinish = false
     fun(err, result, index)

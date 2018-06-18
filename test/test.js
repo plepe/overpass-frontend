@@ -1504,6 +1504,7 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
         "memberBounds": bbox,
         "memberCallback": function (err, result) {
           foundMembers.push(result.id)
+        console.log(result.id)
 
           if (expectedMembers.indexOf(result.id) === -1) {
             error += 'Unexpected member result ' + result.id + '\n'
