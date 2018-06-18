@@ -4,7 +4,6 @@ var async = require('async')
 var BoundingBox = require('boundingbox')
 var KnownArea = require('../src/knownArea')
 
-return
 describe('KnownArea', function() {
   describe('add', function() {
     it('single add', function () {
@@ -17,6 +16,7 @@ describe('KnownArea', function() {
             maxlat: 49
           })
       
+
       assert.deepEqual(
         area.toGeoJSON(),
         {"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[16,48],[17,48],[17,49],[16,49],[16,48]]]}}
@@ -41,7 +41,7 @@ describe('KnownArea', function() {
       
       assert.deepEqual(
         area.toGeoJSON(),
-        {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[16,48],[15.5,48],[15.5,49],[16,49],[17,49],[17,48],[16,48]]]},"properties":{}}
+        {"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[15.5,48],[16,48],[17,48],[17,49],[16,49],[15.5,49],[15.5,48]]]}}
       )
     })
 
@@ -56,7 +56,7 @@ describe('KnownArea', function() {
       
       assert.deepEqual(
         area.toGeoJSON(),
-        {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[16,48],[15.5,48],[15.5,49],[16,49],[17,49],[17,48],[16,48]]]},"properties":{}}
+        {"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[15.5,48],[16,48],[17,48],[17,49],[16,49],[15.5,49],[15.5,48]]]}}
       )
     })
 
@@ -78,7 +78,7 @@ describe('KnownArea', function() {
       
       assert.deepEqual(
         area.toGeoJSON(),
-        {"type":"Feature","geometry":{"type":"MultiPolygon","coordinates":[[[[14,48],[14,49],[15,49],[15,48],[14,48]]],[[[16,48],[16,49],[17,49],[17,48],[16,48]]]]},"properties":{}}
+        {"type":"Feature","properties":{},"geometry":{"type":"MultiPolygon","coordinates":[[[[14,48],[15,48],[15,49],[14,49],[14,48]]],[[[16,48],[17,48],[17,49],[16,49],[16,48]]]]}}
       )
     })
 
@@ -106,7 +106,7 @@ describe('KnownArea', function() {
       
       assert.deepEqual(
         area.toGeoJSON(),
-        {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[16,48.4],[15,48.4],[15,48],[14,48],[14,49],[15,49],[15,48.6],[16,48.6],[16,49],[17,49],[17,48],[16,48],[16,48.4]]]},"properties":{}}
+        {"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[14,48],[15,48],[15,48.4],[16,48.4],[16,48],[17,48],[17,49],[16,49],[16,48.6],[15,48.6],[15,49],[14,49],[14,48]]]}}
       )
     })
   })
