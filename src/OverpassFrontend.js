@@ -387,6 +387,7 @@ class OverpassFrontend {
       ob = new OverpassObject(id)
     }
 
+    ob.overpass = this
     ob.updateData(el, options)
 
     this.cacheElements[id] = ob

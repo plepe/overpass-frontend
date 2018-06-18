@@ -155,7 +155,19 @@ class OverpassRelation extends OverpassObject {
 
       // if there's no relation member we can be sure there's no intersection
       return 0
+    } else if (this.members) {
+      for (i in this.members) {
+        let memberId = this.members[i].id
+        let member = this.overpass.cacheElements[memberId]
+
+        if (member) {
+          if (member.intersects(bbox) === 2) {
+            return 2
+          }
+        }
+      }
     }
+
 
     return super.intersects(bbox)
   }
