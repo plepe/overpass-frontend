@@ -1187,7 +1187,14 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
 	"minlon": 16.32581,
       }
 
-    overpassFrontend.BBoxQuery(
+    var expectedSubRequestCount = 2
+    var foundSubRequestCount = 0
+
+    function compileListener (subRequest) {
+      foundSubRequestCount++
+    }
+
+    var request = overpassFrontend.BBoxQuery(
       "relation[type=route][route=tram]",
       bbox,
       {
@@ -1231,9 +1238,15 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
                'Found: ' + foundMembers.join(', '))
         }
 
+        assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
+
+        request.off('subrequest-compile', compileListener)
+
         done()
       }
     )
+
+    request.on('subrequest-compile', compileListener)
   })
 
   it('Simple queries - routes (with empty cache)', function (done) {
@@ -1250,7 +1263,14 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
 	"minlon": 16.32581,
       }
 
-    overpassFrontend.BBoxQuery(
+    var expectedSubRequestCount = 2
+    var foundSubRequestCount = 0
+
+    function compileListener (subRequest) {
+      foundSubRequestCount++
+    }
+
+    var request = overpassFrontend.BBoxQuery(
       "relation[type=route][route=tram]",
       bbox,
       {
@@ -1295,9 +1315,14 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
                'Found: ' + foundMembers.join(', '))
         }
 
+        assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
+
+        request.off('subrequest-compile', compileListener)
+
         done()
-      }
-    )
+      })
+
+      request.on('subrequest-compile', compileListener)
   })
 
   it('Simple queries - routes (fully cached)', function (done) {
@@ -1313,7 +1338,14 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
 	"minlon": 16.32581,
       }
 
-    overpassFrontend.BBoxQuery(
+    var expectedSubRequestCount = 0
+    var foundSubRequestCount = 0
+
+    function compileListener (subRequest) {
+      foundSubRequestCount++
+    }
+
+    var request = overpassFrontend.BBoxQuery(
       "relation[type=route][route=tram]",
       bbox,
       {
@@ -1357,9 +1389,13 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
                'Found: ' + foundMembers.join(', '))
         }
 
+        request.off('subrequest-compile', compileListener)
+
         done()
       }
     )
+
+    request.on('subrequest-compile', compileListener)
   })
 
   it('Simple queries - routes with different area', function (done) {
@@ -1375,7 +1411,14 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
         "minlon": 16.32281,
       }
 
-    overpassFrontend.BBoxQuery(
+    var expectedSubRequestCount = 1
+    var foundSubRequestCount = 0
+
+    function compileListener (subRequest) {
+      foundSubRequestCount++
+    }
+
+    var request = overpassFrontend.BBoxQuery(
       "relation[type=route][route=tram]",
       bbox,
       {
@@ -1419,9 +1462,15 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
                'Found: ' + foundMembers.join(', '))
         }
 
+        assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
+
+        request.off('subrequest-compile', compileListener)
+
         done()
       }
     )
+
+    request.on('subrequest-compile', compileListener)
   })
 
   it('Simple queries - routes with split', function (done) {
@@ -1438,7 +1487,14 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
 	"minlon": 16.32581,
       }
 
-    overpassFrontend.BBoxQuery(
+    var expectedSubRequestCount = 1
+    var foundSubRequestCount = 0
+
+    function compileListener (subRequest) {
+      foundSubRequestCount++
+    }
+
+    var request = overpassFrontend.BBoxQuery(
       "relation[type=route][route=tram]",
       bbox,
       {
@@ -1483,9 +1539,15 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
                'Found: ' + foundMembers.join(', '))
         }
 
+        assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
+
+        request.off('subrequest-compile', compileListener)
+
         done()
       }
     )
+
+    request.on('subrequest-compile', compileListener)
   })
 
   it('Simple queries - routes with memberSplit', function (done) {
@@ -1502,7 +1564,14 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
 	"minlon": 16.32581,
       }
 
-    overpassFrontend.BBoxQuery(
+    var expectedSubRequestCount = 1
+    var foundSubRequestCount = 0
+
+    function compileListener (subRequest) {
+      foundSubRequestCount++
+    }
+
+    var request = overpassFrontend.BBoxQuery(
       "relation[type=route][route=tram]",
       bbox,
       {
@@ -1547,9 +1616,15 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
                'Found: ' + foundMembers.join(', '))
         }
 
+        assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
+
+        request.off('subrequest-compile', compileListener)
+
         done()
       }
     )
+
+    request.on('subrequest-compile', compileListener)
   })
 
   it('Simple queries - routes with split and memberSplit', function (done) {
@@ -1566,7 +1641,14 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
 	"minlon": 16.32581,
       }
 
-    overpassFrontend.BBoxQuery(
+    var expectedSubRequestCount = 1
+    var foundSubRequestCount = 0
+
+    function compileListener (subRequest) {
+      foundSubRequestCount++
+    }
+
+    var request = overpassFrontend.BBoxQuery(
       "relation[type=route][route=tram]",
       bbox,
       {
@@ -1612,9 +1694,15 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
                'Found: ' + foundMembers.join(', '))
         }
 
+        assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
+
+        request.off('subrequest-compile', compileListener)
+
         done()
       }
     )
+
+    request.on('subrequest-compile', compileListener)
   })
 
   it('Simple queries - routes without members to fill cache', function (done) {
@@ -1629,7 +1717,14 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
 	"minlon": 16.32581,
       }
 
-    overpassFrontend.BBoxQuery(
+    var expectedSubRequestCount = 0
+    var foundSubRequestCount = 0
+
+    function compileListener (subRequest) {
+      foundSubRequestCount++
+    }
+
+    var request = overpassFrontend.BBoxQuery(
       "relation[type=route][route=tram]",
       bbox,
       {
@@ -1658,9 +1753,15 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
                'Found: ' + found.join(', '))
         }
 
+        assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
+
+        request.off('subrequest-compile', compileListener)
+
         done()
       }
     )
+
+    request.on('subrequest-compile', compileListener)
   })
 
   it('Simple queries - routes with members after cache for parents full', function (done) {
@@ -1676,7 +1777,14 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
 	"minlon": 16.32581,
       }
 
-    overpassFrontend.BBoxQuery(
+    var expectedSubRequestCount = 1
+    var foundSubRequestCount = 0
+
+    function compileListener (subRequest) {
+      foundSubRequestCount++
+    }
+
+    var request = overpassFrontend.BBoxQuery(
       "relation[type=route][route=tram]",
       bbox,
       {
@@ -1720,9 +1828,15 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
                'Found: ' + foundMembers.join(', '))
         }
 
+        assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
+
+        request.off('subrequest-compile', compileListener)
+
         done()
       }
     )
+
+    request.on('subrequest-compile', compileListener)
   })
 
   it('Simple queries - routes with members - default properties', function (done) {
@@ -1742,7 +1856,14 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
 	"minlon": 16.32581,
       }
 
-    overpassFrontend.BBoxQuery(
+    var expectedSubRequestCount = 2
+    var foundSubRequestCount = 0
+
+    function compileListener (subRequest) {
+      foundSubRequestCount++
+    }
+
+    var request = overpassFrontend.BBoxQuery(
       "relation[type=route][route=tram]",
       bbox,
       {
@@ -1788,9 +1909,15 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
                'Found: ' + foundMembers.join(', '))
         }
 
+        assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
+
+        request.off('subrequest-compile', compileListener)
+
         done()
       }
     )
+
+    request.on('subrequest-compile', compileListener)
   })
 
   it('Simple queries - without memberBounds', function (done) {
@@ -1806,7 +1933,14 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
 	"minlon": 16.32581,
       }
 
-    overpassFrontend.BBoxQuery(
+    var expectedSubRequestCount = 1
+    var foundSubRequestCount = 0
+
+    function compileListener (subRequest) {
+      foundSubRequestCount++
+    }
+
+    var request = overpassFrontend.BBoxQuery(
       "relation[type=route][route=tram]",
       bbox,
       {
@@ -1849,9 +1983,15 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
                'Found: ' + foundMembers.join(', '))
         }
 
+        assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
+
+        request.off('subrequest-compile', compileListener)
+
         done()
       }
     )
+
+    request.on('subrequest-compile', compileListener)
   })
 })
 
