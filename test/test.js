@@ -421,8 +421,14 @@ describe('Overpass get', function() {
       var finalCalled = 0
       var found = []
       var expected = [ 'n3037893162', 'n3037893163', 'n3037893164' ]
+      var expectedSubRequestCount = 1
+      var foundSubRequestCount = 0
 
-      overpassFrontend.BBoxQuery(
+      function compileListener (subrequest) {
+        foundSubRequestCount++
+      }
+
+      var request = overpassFrontend.BBoxQuery(
         'node[amenity=bench];',
         {
           minlon: 16.3384616,
@@ -442,10 +448,14 @@ describe('Overpass get', function() {
         function(err) {
           assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
           assert.equal(expected.length, found.length, 'Wrong count of objects found!')
+          assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
 
+          request.off('subrequest-compile', compileListener)
           done()
         }
       )
+
+      request.on('subrequest-compile', compileListener)
     })
 
     it('should return a list of node features (2nd try, partly cached)', function(done) {
@@ -454,7 +464,14 @@ describe('Overpass get', function() {
       var found = []
       var expected = [ 'n3037893162', 'n3037893163', 'n3037893164', 'n3037893159', 'n3037893160' ]
 
-      overpassFrontend.BBoxQuery(
+      var expectedSubRequestCount = 0
+      var foundSubRequestCount = 0
+
+      function compileListener (subrequest) {
+        foundSubRequestCount++
+      }
+
+      var request = overpassFrontend.BBoxQuery(
         'node[amenity=bench];',
         {
           minlon: 16.3382616,
@@ -474,10 +491,55 @@ describe('Overpass get', function() {
         function(err) {
           assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
           assert.deepEqual(expected.sort(), found.sort(), 'Wrong count of objects found!')
+          assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
 
+          request.off('subrequest-compile', compileListener)
           done()
         }
       )
+
+      request.on('subrequest-compile', compileListener)
+    })
+
+    it('should return a list of node features (3rd try, partly cached)', function(done) {
+      var finalCalled = 0
+      var found = []
+      var expected = [ 'n3037893162', 'n3037893163', 'n3037893164' ]
+      var expectedSubRequestCount = 0
+      var foundSubRequestCount = 0
+
+      function compileListener (subrequest) {
+        foundSubRequestCount++
+      }
+
+      var request = overpassFrontend.BBoxQuery(
+        'node[amenity=bench];',
+        {
+          minlon: 16.3384816,
+          minlat: 48.1990547,
+          maxlon: 16.3386018,
+          maxlat: 48.1991237
+        },
+        {
+          properties: OverpassFrontend.ID_ONLY
+        },
+        function(err, result, index) {
+          found.push(result.id)
+
+          if(expected.indexOf(result.id) == -1)
+            assert(false, 'Object ' + result.id + ' should not be found!')
+        },
+        function(err) {
+          assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
+          assert.equal(expected.length, found.length, 'Wrong count of objects found!')
+          assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
+
+          request.off('subrequest-compile', compileListener)
+          done()
+        }
+      )
+
+      request.on('subrequest-compile', compileListener)
     })
 
     it('should return a list of way features', function(done) {
@@ -653,7 +715,7 @@ describe('Overpass get', function() {
         function(err) {
           assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
           assert.deepEqual(expected.sort(), found.sort(), 'Wrong count of objects found!')
-          assert.equal(expectedSubRequestCount, foundSubRequestCount, 'Wrong count of subrequests')
+          assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of subrequests')
 
           done()
         }
