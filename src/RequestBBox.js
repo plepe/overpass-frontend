@@ -141,9 +141,7 @@ class RequestBBox extends Request {
    * @param {OverpassFrontend#Context} context - Current context
    * @return {Request#SubRequest|false} - the compiled query or false if the bbox does not match
    */
-  compileQuery (context) {
-    super.compileQuery(context)
-
+  _compileQuery (context) {
     if (this.loadFinish || (context.bbox && context.bbox.toLatLonString() !== this.bounds.toLatLonString())) {
       return {
         query: '',
@@ -195,7 +193,6 @@ class RequestBBox extends Request {
       ],
       effort: this.options.split ? this.options.split * 4 : effortAvailable // TODO: configure bbox effort
     }
-    this.emit('subrequest-compile', subRequest)
     return subRequest
   }
 

@@ -19,7 +19,7 @@ class RequestGetMembers {
       this.bounds = new BoundingBox(this.options.memberBounds)
     }
 
-    this.master.compileQuery = this.compileQuery.bind(this, this.master.compileQuery)
+    this.master._compileQuery = this._compileQuery.bind(this, this.master._compileQuery)
     this.master.needLoad = this.needLoad.bind(this, this.master.needLoad)
     this.master.mayFinish = this.mayFinish.bind(this, this.master.mayFinish)
     this.master.preprocess = this.preprocess.bind(this, this.master.preprocess)
@@ -101,7 +101,7 @@ class RequestGetMembers {
     return
   }
 
-  compileQuery (fun, context) {
+  _compileQuery (fun, context) {
     var subRequest = fun.call(this.master, context)
 
     if (keys(this.relations).length === 0) {

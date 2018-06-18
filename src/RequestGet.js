@@ -140,9 +140,7 @@ class RequestGet extends Request {
    * @param {OverpassFrontend#Context} context - Current context
    * @return {Request#SubRequest} - the compiled query
    */
-  compileQuery (context) {
-    super.compileQuery(context)
-
+  _compileQuery (context) {
     var query = ''
     var nodeQuery = ''
     var wayQuery = ''

@@ -106,7 +106,12 @@ class Request {
    * @return {Request#SubRequest} - the compiled query
    */
   compileQuery (context) {
+    let subRequest = this._compileQuery(context)
+    this.emit('subrequest-compile', subRequest)
+
     this.callCount++
+
+    return subRequest
   }
 
   /**
