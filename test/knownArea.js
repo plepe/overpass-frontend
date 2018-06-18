@@ -177,6 +177,31 @@ describe('KnownArea', function() {
       assert.equal(result, false)
     })
 
+    it('another example', function () {
+      var area = new KnownArea()
+      area.add({
+        maxlat: 48.19953,
+        maxlon: 16.33506,
+        minlat: 48.198,
+        minlon: 16.32581
+      })
+      area.add({
+        maxlat: 48.204,
+        maxlon: 16.33106,
+        minlat: 48.1994,
+        minlon: 16.32281
+      })
+
+      var result = area.check({
+        maxlat: 48.1998,
+        maxlon: 16.33106,
+        minlat: 48.1994,
+        minlon: 16.32281
+      })
+
+      assert.equal(result, true)
+    })
+
   })
 })
 
