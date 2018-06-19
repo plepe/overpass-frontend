@@ -130,7 +130,7 @@ class RequestBBoxMembers {
 
     if (countRemoveDoneFeatures) {
       query += '(' + queryRemoveDoneFeatures + ')->.doneMembers;\n'
-      query += '(.resultMembers; - .doneMembers)->.resultMembers;\n'
+      query += '(.resultMembers; - .doneMembers;)->.resultMembers;\n'
     }
 
     this.part = {
