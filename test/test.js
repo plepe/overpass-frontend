@@ -2559,7 +2559,7 @@ describe('Overpass objects structure', function() {
 
   describe('Relation', function() {
     it('Overpass.BBOX', function(done) {
-      overpassFrontend.removeFromCache('r1980077')
+      overpassFrontend.clearCache()
       overpassFrontend.get('r1980077', { properties: OverpassFrontend.BBOX },
         function(err, result, index) {
           assert.deepEqual({
@@ -2600,6 +2600,11 @@ describe('Overpass objects structure', function() {
 	      }
 	    ]
           )
+
+          assert.equal('w4583442' in overpassFrontend.cacheElements, true, 'should have loaded member feature w4583442')
+
+          let member = overpassFrontend.cacheElements['w4583442']
+          assert.equal(member.properties, OverpassFrontend.ID_ONLY, 'member w4583442 should have ID_ONLY info')
         },
         function(err) {
           done()
@@ -2696,6 +2701,11 @@ describe('Overpass objects structure', function() {
               ]
             }
           )
+
+          assert.equal('w4583442' in overpassFrontend.cacheElements, true, 'should have loaded member feature w4583442')
+
+          let member = overpassFrontend.cacheElements['w4583442']
+          assert.equal(member.properties, OverpassFrontend.GEOM, 'member w4583442 should have GEOM info')
         },
         function(err) {
           done()

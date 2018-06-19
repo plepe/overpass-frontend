@@ -23,6 +23,21 @@ class OverpassRelation extends OverpassObject {
       }
     }
 
+    if (options.properties & OverpassFrontend.MEMBERS) {
+      this.memberFeatures = data.members.map(
+        (member) => {
+          let ob = JSON.parse(JSON.stringify(member))
+          ob.id = ob.ref
+          delete ob.ref
+          delete ob.role
+
+          return this.overpass.createOrUpdateOSMObject(ob, {
+            properties: options.properties & OverpassFrontend.GEOM
+          })
+        }
+      )
+    }
+
     if ((options.properties & OverpassFrontend.MEMBERS) &&
         (options.properties & OverpassFrontend.GEOM) &&
         data.members) {
