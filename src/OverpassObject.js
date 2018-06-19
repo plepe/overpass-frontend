@@ -9,6 +9,7 @@ class OverpassObject {
   constructor () {
     this.data = {}
     this.properties = 0
+    this.memberOf = []
   }
 
   memberIds () {
@@ -18,6 +19,10 @@ class OverpassObject {
   member_ids () { // eslint-disable-line
     console.log('called deprecated OverpassObject.member_ids() function - replace by memberIds()')
     return this.memberIds()
+  }
+
+  notifyMemberOf (relation, role, sequence) {
+    this.memberOf.push({ relation, role, sequence })
   }
 
   updateData (data, options) {
