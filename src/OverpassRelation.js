@@ -80,6 +80,54 @@ class OverpassRelation extends OverpassObject {
       return null
     }
 
+    // no geometry? use the member features instead
+    if (!this.geometry) {
+      let feature = L.featureGroup()
+      feature._updateCallbacks = []
+
+      // create an event handler on the 'update' event, so that member features
+      // get added to the featureGroup when they are loaded
+      this.memberFeatures.forEach(
+        (member, index) => {
+          if (member) {
+            let memberFeature = member.leafletFeature(options)
+            if (memberFeature) {
+              memberFeature.setStyle(options)
+              memberFeature.addTo(feature)
+            } else {
+              let updFun = member => {
+                let memberFeature = member.leafletFeature(options)
+                if (memberFeature) {
+                  memberFeature.setStyle(options)
+                  memberFeature.addTo(feature)
+                  member.off('update', updFun)
+                }
+              }
+
+              member.on('update', updFun)
+              feature._updateCallbacks[index] = updFun
+            }
+          }
+        }
+      )
+
+      // when the feature gets removed from the map, remove all event handlers
+      feature.on('remove', () => {
+        this.memberFeatures.forEach(
+          (member, index) => {
+            if (member) {
+              let updFun = feature._updateCallbacks[index]
+              if (updFun) {
+                member.off('update', updFun)
+              }
+            }
+          }
+        )
+      })
+
+      return feature
+    }
+
     var feature = L.geoJSON(this.geometry, {
       pointToLayer: function (options, geoJsonPoint, member) {
         switch (options.nodeFeature) {
