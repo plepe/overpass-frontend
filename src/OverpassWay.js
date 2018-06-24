@@ -55,20 +55,25 @@ class OverpassWay extends OverpassObject {
   }
 
   GeoJSON () {
-    var coordinates = []
-    for (var i = 0; i < this.geometry.length; i++) {
-      coordinates.push([ this.geometry[i].lon, this.geometry[i].lat ])
-    }
-
-    return {
+    var result = {
       type: 'Feature',
       id: this.type + '/' + this.osm_id,
-      geometry: {
-        type: 'LineString',
-        coordinates: coordinates
-      },
       properties: this.GeoJSONProperties()
     }
+
+    if (this.geometry) {
+      let coordinates = []
+      for (var i = 0; i < this.geometry.length; i++) {
+        coordinates.push([ this.geometry[i].lon, this.geometry[i].lat ])
+      }
+
+      result.geometry = {
+        type: 'LineString',
+        coordinates: coordinates
+      }
+    }
+
+    return result
   }
 
   leafletFeature (options) {
