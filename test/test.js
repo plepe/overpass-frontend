@@ -365,6 +365,13 @@ describe('Overpass get', function() {
                   ]
                 },
                 {
+                  "type": "Point",
+                  "coordinates": [
+                    16.3401188,
+                    48.1943668
+                  ]
+                },
+                {
                   "type": "LineString",
                   "coordinates": [
                     [
@@ -383,13 +390,6 @@ describe('Overpass get', function() {
                       16.3401188,
                       48.1943668
                     ]
-                  ]
-                },
-                {
-                  "type": "Point",
-                  "coordinates": [
-                    16.3401188,
-                    48.1943668
                   ]
                 }
               ]

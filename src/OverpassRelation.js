@@ -158,17 +158,14 @@ class OverpassRelation extends OverpassObject {
       properties: this.GeoJSONProperties()
     }
 
-    if (this.geometry && this.geometry.features && this.geometry.features.length) {
-      if (this.geometry.features.length === 1) {
-        ret.geometry = this.geometry.features[0].geometry
-      } else {
-        ret.geometry = {
-          type: 'GeometryCollection',
-          geometries: []
-        }
-
-        this.geometry.features.forEach(function (x) {
-          ret.geometry.geometries.push(x.geometry)
+    if (this.members) {
+      ret.geometry = {
+        type: 'GeometryCollection',
+        geometries: this.memberFeatures.map(member => {
+          let geojson = member.GeoJSON()
+          if ('geometry' in geojson) {
+            return geojson.geometry
+          }
         })
       }
     }
