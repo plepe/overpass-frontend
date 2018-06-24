@@ -1,3 +1,4 @@
+const ee = require('event-emitter')
 var BoundingBox = require('boundingbox')
 var OverpassFrontend = require('./defines')
 var turf = {
@@ -92,6 +93,8 @@ class OverpassObject {
     if (data.tags) {
       this.tags = data.tags
     }
+
+    this.emit('update', this)
   }
 
   title () {
@@ -159,5 +162,7 @@ class OverpassObject {
     return null
   }
 }
+
+ee(OverpassObject.prototype)
 
 module.exports = OverpassObject
