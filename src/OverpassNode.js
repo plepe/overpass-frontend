@@ -5,15 +5,20 @@ var BoundingBox = require('boundingbox')
 
 class OverpassNode extends OverpassObject {
   GeoJSON () {
-    return {
+    let result = {
       type: 'Feature',
       id: this.type + '/' + this.osm_id,
-      geometry: {
-        type: 'Point',
-        coordinates: [ this.geometry.lon, this.geometry.lat ]
-      },
       properties: this.GeoJSONProperties()
     }
+
+    if (this.geometry) {
+      result.geometry = {
+        type: 'Point',
+        coordinates: [ this.geometry.lon, this.geometry.lat ]
+      }
+    }
+
+    return result
   }
 
   updateData (data, options) {
@@ -31,6 +36,10 @@ class OverpassNode extends OverpassObject {
   }
 
   leafletFeature (options) {
+    if (!this.geometry) {
+      return null
+    }
+
     switch ('nodeFeature' in options ? options.nodeFeature : null) {
       case 'Marker':
         return L.marker(this.geometry, options)
