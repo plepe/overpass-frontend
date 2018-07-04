@@ -97,7 +97,7 @@ class RequestGet extends Request {
         var ready = true
 
         // Feature does not exists!
-        if (ob === null) {
+        if (ob.missingObject) {
           this.featureCallback(null, null, i)
           this.ids[i] = null
           continue

@@ -254,6 +254,7 @@ class OverpassFrontend {
       }
 
       var ob = this.createOrUpdateOSMObject(el, part)
+      delete context.todo[ob.id]
 
       var members = this.cacheElements[ob.id].memberIds()
       if (members) {
@@ -281,8 +282,15 @@ class OverpassFrontend {
 
     for (var id in context.todo) {
       if (!(id in this.cacheElements)) {
-        this.cacheElements[id] = null
+        let ob = new OverpassObject()
+        ob.id = id
+        ob.type = { n: 'node', w: 'way', r: 'relation' }[id.substr(0, 1)]
+        ob.osm_id = id.substr(1)
+        ob.properties = OverpassFrontend.ALL
+        this.cacheElements[id] = ob
       }
+
+      this.cacheElements[id].missingObject = true
     }
 
     request.finishSubRequest(subRequest)
