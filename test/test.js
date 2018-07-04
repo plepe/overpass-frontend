@@ -2144,6 +2144,97 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
 
     request.on('subrequest-compile', compileListener)
   })
+
+  describe('DB objects, which are referenced by Relation', function() {
+    it('check that missing elements are in the cache after loading parent relation', function (done) {
+      overpassFrontend.clearCache()
+
+      overpassFrontend.get('r1306966',
+        {
+          properties: OverpassFrontend.MEMBERS
+        },
+        function(err, result, index) {
+        },
+        function(err) {
+          assert.equal('n1476773069' in overpassFrontend.cacheElements, true, 'Member object should exist in cache')
+          assert.equal('n1022300101' in overpassFrontend.cacheElements, true, 'Member object should exist in cache')
+
+          done(err)
+        })
+    })
+
+    it('load member object via id', function(done) {
+      var finalCalled = 0
+      var expectedSubRequestCount = 1
+      var foundSubRequestCount = 0
+      var expected = [ 'n1022300101' ]
+      var expectedNullCount = 1
+      var found = []
+      var foundNullCount = 0
+
+      function compileListener (subrequest) {
+        foundSubRequestCount++
+      }
+
+      let request = overpassFrontend.get([ 'n1476773069', 'n1022300101' ],
+        {
+          properties: OverpassFrontend.ALL
+        },
+        function(err, result, index) {
+          if (result === null) {
+            foundNullCount++
+          } else {
+            assert.equal(expected.indexOf(result.id) === -1, false, 'Object ' + result.id + ' should not be found')
+          }
+        },
+        function(err) {
+          assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
+          assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
+          assert.equal(foundNullCount, expectedNullCount, 'Wrong count of null objects')
+
+          request.off('subrequest-compile', compileListener)
+          done(err)
+        })
+
+      request.on('subrequest-compile', compileListener)
+    })
+
+    it('load member object via id (all cached)', function(done) {
+      var finalCalled = 0
+      var expectedSubRequestCount = 0
+      var foundSubRequestCount = 0
+      var expected = [ 'n1022300101' ]
+      var expectedNullCount = 1
+      var found = []
+      var foundNullCount = 0
+
+      function compileListener (subrequest) {
+        foundSubRequestCount++
+      }
+
+      let request = overpassFrontend.get([ 'n1476773069', 'n1022300101' ],
+        {
+          properties: OverpassFrontend.ALL
+        },
+        function(err, result, index) {
+          if (result === null) {
+            foundNullCount++
+          } else {
+            assert.equal(expected.indexOf(result.id) === -1, false, 'Object ' + result.id + ' should not be found')
+          }
+        },
+        function(err) {
+          assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
+          assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
+          assert.equal(foundNullCount, expectedNullCount, 'Wrong count of null objects')
+
+          request.off('subrequest-compile', compileListener)
+          done(err)
+        })
+
+      request.on('subrequest-compile', compileListener)
+    })
+  })
 })
 
 describe('Overpass Get - Relation with members in BBOX', function() {
