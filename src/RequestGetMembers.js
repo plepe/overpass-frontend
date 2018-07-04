@@ -183,6 +183,7 @@ class RequestGetMembers {
   }
 
   receiveObject (ob) {
+    this.doneFeatures[ob.id] = ob
   }
 
   finishSubRequest (fun, subRequest) {
