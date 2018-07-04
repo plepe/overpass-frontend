@@ -253,7 +253,7 @@ class RequestGet extends Request {
       request: this,
       parts: requestParts
     }
-    this.emit('subrequest-compile', subRequest)
+
     return subRequest
   }
 
