@@ -21,6 +21,7 @@
     "xmlhttprequest": "*"
   },
   "devDependencies": {
+    "brfs": "^2.0.0",
     "browserify": "*",
     "escape-html": "*",
     "eslint": "^3.6.1",
@@ -35,7 +36,9 @@
   "scripts": {
     "test": "mocha --bail",
     "build": "browserify index.js -o dist/overpass-frontend.js",
+    "build-test": "browserify -t brfs --debug test/knownArea.js test/test.js -o dist/test.js",
     "watch": "watchify --debug index.js -o dist/overpass-frontend.js -v",
+    "watch-test": "watchify -t brfs --debug test/knownArea.js test/test.js -o dist/test.js",
     "prepublish": "npm run build && npm run lint",
     "lint": "eslint src/*.js index.js",
     "doc": "jsdoc -d doc/ src/*.js"
