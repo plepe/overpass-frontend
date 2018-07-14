@@ -802,6 +802,83 @@ describe('Overpass get', function() {
   })
 })
 
+describe('Overpass getCached()', function () {
+  it('an existing feature (after cache clear)', function () {
+    overpassFrontend.clearCache()
+
+    let ob = overpassFrontend.getCached('r910885',
+      {
+        properties: OverpassFrontend.TAGS
+      }
+    )
+
+    assert.equal(ob, false, 'Cache clear -> false')
+  })
+
+  it('a non-existing feature (after cache clear)', function () {
+    let ob = overpassFrontend.getCached('n123456',
+      {
+        properties: OverpassFrontend.TAGS
+      }
+    )
+
+    assert.equal(ob, false, 'Cache clear -> false')
+  })
+
+  it('load features via async call', function (done) {
+    let ob = overpassFrontend.get([ 'r910885', 'n123456' ],
+      {
+        properties: OverpassFrontend.TAGS
+      },
+      function (err, ob) {
+      },
+      function (err) {
+        done()
+      }
+    )
+  })
+
+  it('an existing feature (after load)', function () {
+    let ob = overpassFrontend.getCached('r910885',
+      {
+        properties: OverpassFrontend.TAGS
+      }
+    )
+
+    assert.equal(ob.id, 'r910885', 'wrong id')
+  })
+
+  it('a non-existing feature (after load)', function () {
+    let ob = overpassFrontend.getCached('n123456',
+      {
+        properties: OverpassFrontend.ALL
+      }
+    )
+
+    assert.equal(ob, null, 'Non existant: null')
+  })
+
+  it('an existing feature - wrong properties (after load)', function () {
+    let ob = overpassFrontend.getCached('r910885',
+      {
+        properties: OverpassFrontend.META
+      }
+    )
+
+    assert.equal(ob, false, 'not fully loaded')
+  })
+
+  it('a non-existing feature - wrong properties (after load)', function () {
+    let ob = overpassFrontend.getCached('n123456',
+      {
+        properties: OverpassFrontend.META
+      }
+    )
+
+    assert.equal(ob, null, 'Non existant: null')
+  })
+})
+
 describe('Overpass query by id with bbox option', function() {
   it('First call', function(done) {
     var finalCalled = 0

@@ -64,6 +64,39 @@ class OverpassFrontend {
   }
 
   /**
+   * return an OSM object, if it is already in the cache
+   * @param {string} id - Id of an OSM map feature
+   * @param {object} options
+   * @param {int} [options.properties] - Which properties have to be known (default: OverpassFrontend.DEFAULT)
+   * @return {null|false|OverpassObject} - null: does not exist in the database; false: may exist, but has not been loaded yet (or not enough properties known); OverpassObject: sucessful object
+   */
+  getCached (id, options) {
+    if (typeof options === 'undefined') {
+      options = {}
+    }
+
+    if (typeof this.options.properties === 'undefined') {
+      this.options.properties = defines.DEFAULT
+    }
+
+    if (!(id in this.cacheElements)) {
+      return false
+    }
+
+    let ob = this.cacheElements[id]
+
+    if (ob.missingObject) {
+      return null
+    }
+
+    if ((options.properties & ob.properties) !== options.properties) {
+      return false
+    }
+
+    return ob
+  }
+
+  /**
    * Current request context
    * @typedef {Object} OverpassFrontend#Context
    * @property {string} query - The compiled code of all sub requests
