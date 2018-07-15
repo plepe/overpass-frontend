@@ -24,6 +24,8 @@ class OverpassObject {
 
   notifyMemberOf (relation, role, sequence) {
     this.memberOf.push({ relation, role, sequence })
+
+    this.emit('update', this)
   }
 
   updateData (data, options) {
@@ -95,6 +97,8 @@ class OverpassObject {
     }
 
     this.emit('update', this)
+
+    this.memberOf.forEach(memberOf => memberOf.relation.notifyMemberFound())
   }
 
   title () {

@@ -2489,6 +2489,69 @@ describe('Overpass Get - Relation with members in BBOX', function() {
   })
 })
 
+describe('Events', function () {
+  describe('OverpassRelation', function () {
+    it('Should emit "update" when loading member elements', function (done) {
+      overpassFrontend.clearCache()
+
+      let updateCalls = 0
+      function countUpdateCalls () {
+        if (updateCalls === null) {
+          throw new Error('Function should not have been called after finishing test')
+        }
+
+        updateCalls++
+      }
+      
+      overpassFrontend.get('r910885',
+        {
+          properties: OverpassFrontend.MEMBERS | OverpassFrontend.GEOM
+        },
+        function (err, result) {
+          if (err) {
+            done(err)
+          }
+
+          assert.equal(result.memberFeatures.length, 63, 'Wrong count of member features')
+          assert.equal(result.memberFeatures[0].properties, OverpassFrontend.GEOM, 'Member features has more than GEOM properties')
+
+          result.on('update', countUpdateCalls)
+
+          overpassFrontend.get([ 'w58993078', 'n2329827456' ],
+            {
+              properties: OverpassFrontend.TAGS
+            },
+            function (err, result) {
+              if (err) {
+                done(err)
+              }
+
+              assert.equal(result.properties, OverpassFrontend.GEOM | OverpassFrontend.TAGS, 'Should know GEOM from relation and TAGS from direct request')
+            },
+            function (err) {
+              if (err) {
+                done(err)
+              }
+
+              assert.equal(updateCalls, 1, 'Event "update" should have been called once on relation')
+
+              updateCalls = null
+              result.off('update', countUpdateCalls)
+
+              done()
+            }
+          )
+        },
+        function (err) {
+          if (err) {
+            done(err)
+          }
+        }
+      )
+    })
+  })
+})
+
 describe('Overpass objects structure', function() {
   describe('Node', function() {
     it('Overpass.ID_ONLY', function(done) {
