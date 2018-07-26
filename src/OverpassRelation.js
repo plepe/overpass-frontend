@@ -125,20 +125,6 @@ class OverpassRelation extends OverpassObject {
         }
       )
 
-      // when the feature gets removed from the map, remove all event handlers
-      feature.on('remove', () => {
-        this.memberFeatures.forEach(
-          (member, index) => {
-            if (member) {
-              let updFun = feature._updateCallbacks[index]
-              if (updFun) {
-                member.off('update', updFun)
-              }
-            }
-          }
-        )
-      })
-
       return feature
     }
 
@@ -163,6 +149,22 @@ class OverpassRelation extends OverpassObject {
     feature.setStyle(options)
 
     return feature
+  }
+
+  removeLeafletFeature (feature) {
+    // when the feature gets removed from the map, remove all event handlers
+    feature.on('remove', () => {
+      this.memberFeatures.forEach(
+        (member, index) => {
+          if (member) {
+            let updFun = feature._updateCallbacks[index]
+            if (updFun) {
+              member.off('update', updFun)
+            }
+          }
+        }
+      )
+    })
   }
 
   GeoJSON () {
