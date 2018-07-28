@@ -32,6 +32,7 @@ class RequestBBoxMembers {
     this.relations = {}
     this.currentRelations = []
     this.todo = {}
+    this.loadFinish = true
   }
 
   willInclude (fun, context) {

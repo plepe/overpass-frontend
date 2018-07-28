@@ -1248,6 +1248,81 @@ describe('Overpass BBoxQuery', function() {
       }
     )
   })
+
+  it('Bug: Query without results does not call finalCallback', function (done) {
+    var expected = []
+    var expectedMembers = []
+    var found = []
+    var foundMembers = []
+    var error = ''
+    var bbox = {
+	"maxlat": 48.19953,
+	"maxlon": 15.33506,
+	"minlat": 48.19800,
+	"minlon": 15.32581,
+      }
+
+    var expectedSubRequestCount = 1
+    var foundSubRequestCount = 0
+
+    function compileListener (subRequest) {
+      foundSubRequestCount++
+    }
+
+    var request = overpassFrontend.BBoxQuery(
+      "relation[type=route][route=bicycle]",
+      bbox,
+      {
+        "members": true,
+        "properties": OverpassFrontend.TAGS | OverpassFrontend.MEMBERS,
+        "memberProperties": OverpassFrontend.ALL,
+        "memberBounds": bbox,
+        "memberCallback": function (err, result) {
+          foundMembers.push(result.id)
+
+          if (expectedMembers.indexOf(result.id) === -1) {
+            error += 'Unexpected member result ' + result.id + '\n'
+          }
+        }
+      },
+      function (err, result) {
+        found.push(result.id)
+
+        if (expected.indexOf(result.id) === -1) {
+          error += 'Unexpected result ' + result.id + '\n'
+        }
+      },
+      function (err) {
+        if (err) {
+          return done(err)
+        }
+
+        if (error) {
+          return done(error)
+        }
+
+        if (found.length !== expected.length) {
+          return done('Wrong count of objects returned:\n' +
+               'Expected: ' + expected.join(', ') + '\n' +
+               'Found: ' + found.join(', '))
+        }
+
+        if (foundMembers.length !== expectedMembers.length) {
+          return done('Wrong count of member objects returned:\n' +
+               'Expected: ' + expectedMembers.join(', ') + '\n' +
+               'Found: ' + foundMembers.join(', '))
+        }
+
+        assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
+
+        request.off('subrequest-compile', compileListener)
+
+        done()
+      }
+    )
+
+    request.on('subrequest-compile', compileListener)
+  })
 })
 
 describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
