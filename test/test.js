@@ -3434,6 +3434,27 @@ describe('Overpass objects structure', function() {
       req.abort()
     })
 
+    it('abortAllRequests() should abort requests', function (done) {
+      var finalCalled = 0
+      var req = overpassFrontend.get([ 'n3037893161' ],
+        {
+          properties: OverpassFrontend.ID_ONLY
+        },
+        function(err, result, index) {
+          assert(false, 'Should not call feature_callback, as request gets aborted.')
+        },
+        function(err) {
+          done('finalCallback should not be called')
+        }
+      )
+
+      req.on('abort', () => {
+        done()
+      })
+
+      overpassFrontend.abortAllRequests()
+    })
+
     it('request list should be empty', function () {
       var finalCalled = 0
       removeNullEntries(overpassFrontend.requests)
