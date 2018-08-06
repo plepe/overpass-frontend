@@ -13,18 +13,22 @@
     "@turf/union": "^6.0.0",
     "async": "*",
     "boundingbox": "^0.1.0",
+    "event-emitter": "^0.3.5",
+    "lodash": "^4.17.5",
     "osmtogeojson": "^3.0.0-beta.2",
     "quadtree-lookup": "https://github.com/petrbrzek/quadtree-lookup",
     "weight-sort": "*",
     "xmlhttprequest": "*"
   },
   "devDependencies": {
+    "brfs": "^2.0.0",
     "browserify": "*",
     "escape-html": "*",
     "eslint": "^3.6.1",
     "eslint-config-standard": "^6.2.0",
     "eslint-plugin-promise": "^3.3.0",
     "eslint-plugin-standard": "^2.0.1",
+    "jsdoc": "^3.5.5",
     "leaflet": "^0.7.0",
     "mocha": "*",
     "watchify": "^3.9.0"
@@ -32,9 +36,12 @@
   "scripts": {
     "test": "mocha --bail",
     "build": "browserify index.js -o dist/overpass-frontend.js",
+    "build-test": "browserify -t brfs --debug test/knownArea.js test/test.js -o dist/test.js",
     "watch": "watchify --debug index.js -o dist/overpass-frontend.js -v",
+    "watch-test": "watchify -t brfs --debug test/knownArea.js test/test.js -o dist/test.js",
     "prepublish": "npm run build && npm run lint",
-    "lint": "eslint src/*.js index.js"
+    "lint": "eslint src/*.js index.js",
+    "doc": "jsdoc -d doc/ src/*.js"
   },
   "repository": {
     "type": "git",

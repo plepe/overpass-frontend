@@ -1,103 +1,109 @@
 /* global L:false */
 
-var util = require('util')
 var OverpassObject = require('./OverpassObject')
 var turf = {
   bboxClip: require('@turf/bbox-clip').default
 }
 
-util.inherits(OverpassWay, OverpassObject)
-function OverpassWay () {
-  OverpassObject.call(this)
-}
-
-OverpassWay.prototype.updateData = function (data, request) {
-  if (data.nodes) {
-    this.nodes = data.nodes
-  }
-
-  if (data.geometry) {
-    this.geometry = data.geometry
-  }
-
-  this.constructor.super_.prototype.updateData.call(this, data, request)
-
-  if (typeof this.data.nodes !== 'undefined') {
-    this.members = []
-
-    for (var i = 0; i < this.data.nodes.length; i++) {
-      this.members.push({
-        id: 'n' + this.data.nodes[i],
-        ref: this.data.nodes[i],
-        type: 'node'
-      })
+class OverpassWay extends OverpassObject {
+  updateData (data, options) {
+    if (data.nodes) {
+      this.nodes = data.nodes
     }
-  }
-}
 
-OverpassWay.prototype.member_ids = function () {
-  if (this._member_ids) {
-    return this._member_ids
-  }
+    if (data.geometry) {
+      this.geometry = data.geometry
+    }
 
-  if (!this.nodes) {
-    return null
-  }
+    super.updateData(data, options)
 
-  this._member_ids = []
-  for (var i = 0; i < this.nodes.length; i++) {
-    var member = this.nodes[i]
+    if (typeof this.data.nodes !== 'undefined') {
+      this.members = []
 
-    this._member_ids.push('n' + member)
-  }
-
-  return this._member_ids
-}
-
-OverpassWay.prototype.GeoJSON = function () {
-  var coordinates = []
-  for (var i = 0; i < this.geometry.length; i++) {
-    coordinates.push([ this.geometry[i].lon, this.geometry[i].lat ])
-  }
-
-  return {
-    type: 'Feature',
-    id: this.type + '/' + this.osm_id,
-    geometry: {
-      type: 'LineString',
-      coordinates: coordinates
-    },
-    properties: this.GeoJSONProperties()
-  }
-}
-
-OverpassWay.prototype.leafletFeature = function (options) {
-  if (!this.geometry) {
-    return null
-  }
-
-  if (this.geometry[this.geometry.length - 1].lat === this.geometry[0].lat &&
-     this.geometry[this.geometry.length - 1].lon === this.geometry[0].lon) {
-    return L.polygon(this.geometry, options)
-  }
-
-  return L.polyline(this.geometry, options)
-}
-
-OverpassWay.prototype.intersects = function (bbox) {
-  if (this.bounds) {
-    if (!bbox.intersects(this.bounds)) {
-      return 0
+      for (var i = 0; i < this.data.nodes.length; i++) {
+        this.members.push({
+          id: 'n' + this.data.nodes[i],
+          ref: this.data.nodes[i],
+          type: 'node'
+        })
+      }
     }
   }
 
-  if (this.geometry) {
-    var intersects = turf.bboxClip(this.GeoJSON(), [ bbox.minlon, bbox.minlat, bbox.maxlon, bbox.maxlat ])
+  memberIds () {
+    if (this._memberIds) {
+      return this._memberIds
+    }
 
-    return intersects.geometry.coordinates.length ? 2 : 0
+    if (!this.nodes) {
+      return null
+    }
+
+    this._memberIds = []
+    for (var i = 0; i < this.nodes.length; i++) {
+      var member = this.nodes[i]
+
+      this._memberIds.push('n' + member)
+    }
+
+    return this._memberIds
   }
 
-  return this.constructor.super_.prototype.intersects.call(this, bbox)
+  member_ids () { // eslint-disable-line
+    console.log('called deprecated OverpassWay.member_ids() function - replace by memberIds()')
+    return this.memberIds()
+  }
+
+  GeoJSON () {
+    var result = {
+      type: 'Feature',
+      id: this.type + '/' + this.osm_id,
+      properties: this.GeoJSONProperties()
+    }
+
+    if (this.geometry) {
+      let coordinates = []
+      for (var i = 0; i < this.geometry.length; i++) {
+        coordinates.push([ this.geometry[i].lon, this.geometry[i].lat ])
+      }
+
+      result.geometry = {
+        type: 'LineString',
+        coordinates: coordinates
+      }
+    }
+
+    return result
+  }
+
+  leafletFeature (options) {
+    if (!this.geometry) {
+      return null
+    }
+
+    if (this.geometry[this.geometry.length - 1].lat === this.geometry[0].lat &&
+       this.geometry[this.geometry.length - 1].lon === this.geometry[0].lon) {
+      return L.polygon(this.geometry, options)
+    }
+
+    return L.polyline(this.geometry, options)
+  }
+
+  intersects (bbox) {
+    if (this.bounds) {
+      if (!bbox.intersects(this.bounds)) {
+        return 0
+      }
+    }
+
+    if (this.geometry) {
+      var intersects = turf.bboxClip(this.GeoJSON(), [ bbox.minlon, bbox.minlat, bbox.maxlon, bbox.maxlat ])
+
+      return intersects.geometry.coordinates.length ? 2 : 0
+    }
+
+    return super.intersects(bbox)
+  }
 }
 
 module.exports = OverpassWay
