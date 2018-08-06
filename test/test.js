@@ -3344,10 +3344,13 @@ describe('Overpass objects structure', function() {
           assert(false, 'Should not call feature_callback, as request gets aborted.')
         },
         function(err) {
-          assert.equal('abort', err)
-          done()
+          done('finalCallback should not be called')
         }
       )
+
+      req.on('abort', () => {
+        done()
+      })
 
       req.abort()
     })
@@ -3362,10 +3365,13 @@ describe('Overpass objects structure', function() {
           assert(false, 'Should not call feature_callback, as request gets aborted.')
         },
         function(err) {
-          assert.equal('abort', err)
-          done()
+          done('finalCallback should not be called')
         }
       )
+
+      req.on('abort', () => {
+        done()
+      })
 
       req.abort()
     })
@@ -3388,10 +3394,13 @@ describe('Overpass objects structure', function() {
           assert(false, 'Should not call feature_callback, as request gets aborted.')
         },
         function(err) {
-          assert.equal('abort', err)
-          done()
+          done('finalCallback should not be called')
         }
       )
+
+      req.on('abort', () => {
+        done()
+      })
 
       req.abort()
     })
@@ -3414,10 +3423,13 @@ describe('Overpass objects structure', function() {
           assert(false, 'Should not call feature_callback, as request gets aborted.')
         },
         function(err) {
-          assert.equal('abort', err)
-          done()
+          done('finalCallback should not be called')
         }
       )
+
+      req.on('abort', () => {
+        done()
+      })
 
       req.abort()
     })

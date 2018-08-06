@@ -391,8 +391,6 @@ class OverpassFrontend {
       if (this.requests[j] === null) {
         continue
       }
-
-      this.requests[j].finalCallback('abort')
     }
 
     this.requests = []
