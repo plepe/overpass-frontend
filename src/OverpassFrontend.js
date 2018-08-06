@@ -392,7 +392,7 @@ class OverpassFrontend {
         continue
       }
 
-      this.requests[j].finalCallback('abort')
+      this.requests[j].abort()
     }
 
     this.requests = []
