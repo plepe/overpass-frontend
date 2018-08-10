@@ -34,4 +34,14 @@ Filter.prototype.toString = function () {
   return this.def.map(compile).join('')
 }
 
+Filter.prototype.toQl = function (options = {}) {
+  if (!options.inputSet) {
+    options.inputSet = ''
+  }
+
+  return '(node' + options.inputSet + this.toString() + ';' +
+    'way' + options.inputSet + this.toString() + ';' +
+    'relation' + options.inputSet + this.toString() + ';)'
+}
+
 module.exports = Filter
