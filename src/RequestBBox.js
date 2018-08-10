@@ -5,6 +5,7 @@ const toQuadtreeLookupBox = require('./toQuadtreeLookupBox')
 const Quadtree = require('quadtree-lookup')
 const KnownArea = require('./knownArea')
 const RequestBBoxMembers = require('./RequestBBoxMembers')
+const Filter = require('./Filter')
 
 /**
  * A BBox request
@@ -28,6 +29,10 @@ class RequestBBox extends Request {
     // make sure the request ends with ';'
     if (!this.query.match(/;\s*$/)) {
       this.query += ';'
+    }
+
+    if ((typeof this.options.filter !== 'undefined') && !(this.options.filter instanceof Filter)) {
+      this.options.filter = new Filter(this.options.filter)
     }
 
     this.loadFinish = false
@@ -88,6 +93,10 @@ class RequestBBox extends Request {
 
       // also check the object directly if it intersects the bbox - if possible
       if (ob.intersects(this.bounds) < 2) {
+        continue
+      }
+
+      if (this.options.filter && !this.options.filter.match(ob)) {
         continue
       }
 
@@ -173,13 +182,19 @@ class RequestBBox extends Request {
 
     if (countRemoveDoneFeatures) {
       query += '(' + queryRemoveDoneFeatures + ')->.done;\n'
-      query += '(.result; - .done;);\n'
+      query += '(.result; - .done;)->.result;\n'
+    }
+
+    if (this.options.filter) {
+      query += this.options.filter.toQl({
+        inputSet: '.result'
+      }) + '->.result;\n'
     }
 
     if (!('split' in this.options)) {
       this.options.effortSplit = Math.ceil(effortAvailable / 4)
     }
-    query += 'out ' + overpassOutOptions(this.options) + ';'
+    query += '.result out ' + overpassOutOptions(this.options) + ';'
 
     var subRequest = {
       query,

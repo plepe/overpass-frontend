@@ -1325,6 +1325,107 @@ describe('Overpass BBoxQuery', function() {
   })
 })
 
+describe('Overpass BBoxQuery - with filter', function() {
+  it('Simple queries - all restaurants with additional filter (has cuisine tag)', function (done) {
+    console.log('here')
+    overpassFrontend.clearCache()
+
+    var expected = [ 'n441576820', 'n442066582', 'n355123976', 'n1955278832', 'n2083468740', 'n2099023017' ]
+    var found = []
+    var error = ''
+
+    overpassFrontend.BBoxQuery(
+      "(node[amenity=restaurant];way[amenity=restaurant];relation[amenity=restaurant];)",
+      {
+	"maxlat": 48.200,
+	"maxlon": 16.345,
+	"minlat": 48.195,
+	"minlon": 16.335
+      },
+      {
+        'filter': [
+          {
+            'key': 'cuisine',
+            'op': 'has_key'
+          }
+        ]
+      },
+      function (err, result) {
+        found.push(result.id)
+
+        if (expected.indexOf(result.id) === -1) {
+          error += 'Unexpected result ' + result.id + '\n'
+        }
+      },
+      function (err) {
+        if (err) {
+          return done(err)
+        }
+
+        if (error) {
+          return done(error)
+        }
+
+        if (found.length !== expected.length) {
+          return done('Wrong count of objects returned:\n' +
+               'Expected: ' + expected.join(', ') + '\n' +
+               'Found: ' + found.join(', '))
+        }
+
+        done()
+      }
+    )
+  })
+
+  it('Simple queries - all restaurants with additional filter (has cuisine tag) (cached)', function (done) {
+    var expected = [ 'n441576820', 'n442066582', 'n355123976', 'n1955278832', 'n2083468740', 'n2099023017' ]
+    var found = []
+    var error = ''
+
+    overpassFrontend.BBoxQuery(
+      "(node[amenity=restaurant];way[amenity=restaurant];relation[amenity=restaurant];)",
+      {
+	"maxlat": 48.200,
+	"maxlon": 16.345,
+	"minlat": 48.195,
+	"minlon": 16.335
+      },
+      {
+        'filter': [
+          {
+            'key': 'cuisine',
+            'op': 'has_key'
+          }
+        ]
+      },
+      function (err, result) {
+        found.push(result.id)
+
+        if (expected.indexOf(result.id) === -1) {
+          error += 'Unexpected result ' + result.id + '\n'
+        }
+      },
+      function (err) {
+        if (err) {
+          return done(err)
+        }
+
+        if (error) {
+          return done(error)
+        }
+
+        if (found.length !== expected.length) {
+          return done('Wrong count of objects returned:\n' +
+               'Expected: ' + expected.join(', ') + '\n' +
+               'Found: ' + found.join(', '))
+        }
+
+        done()
+      }
+    )
+  })
+})
+
 describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
   it('Simple queries - routes', function (done) {
     var expected = [ 'r910885', 'r910886', 'r1306732', 'r1306733' ]

@@ -213,6 +213,7 @@ class OverpassFrontend {
     }
 
     query += ';\n' + context.query
+    console.log(query)
 
     setTimeout(function () {
       httpLoad(
