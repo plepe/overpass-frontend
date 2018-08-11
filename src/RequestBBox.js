@@ -42,8 +42,27 @@ class RequestBBox extends Request {
       RequestBBoxMembers(this)
     }
 
+    let filterId = null
+    if (this.options.filter) {
+      filterId = this.options.filter.toString()
+    }
+
     if (this.query in this.overpass.cacheBBoxQueries) {
       this.cache = this.overpass.cacheBBoxQueries[this.query]
+
+      if (this.options.filter) {
+        let filterId = this.options.filter.toString()
+
+        if (!('filter' in this.cache)) {
+          this.cache.filter[filterId] = {}
+        }
+
+        if (!(filterId in this.cache.filter)) {
+          this.cache.filter[filterId] = new KnownArea()
+        }
+
+        this.cacheFilter = this.cache.filter[filterId]
+      }
 
       this.preprocess()
     } else {
@@ -59,6 +78,12 @@ class RequestBBox extends Request {
 
       this.cache.requested = new KnownArea()
       this.cache.timestamp = 0
+
+      if (filterId) {
+        this.cache.filter = {}
+        this.cache.filter[filterId] = new KnownArea()
+        this.cacheFilter = this.cache.filter[filterId]
+      }
     }
   }
 
@@ -236,7 +261,11 @@ class RequestBBox extends Request {
       this.loadFinish = true
 
       if (!this.aborted) {
-        this.cache.requested.add(this.remainingBounds)
+        if (this.options.filter) {
+          this.cacheFilter.add(this.remainingBounds)
+        } else {
+          this.cache.requested.add(this.remainingBounds)
+        }
       }
     }
   }
@@ -251,6 +280,10 @@ class RequestBBox extends Request {
     }
 
     // check if we need to call Overpass API (whole area known?)
+    if (this.options.filter && this.cacheFilter.check(this.bounds)) {
+      return false
+    }
+
     return !this.cache.requested.check(this.bounds)
   }
 
