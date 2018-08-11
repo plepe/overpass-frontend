@@ -54,7 +54,7 @@ class RequestBBox extends Request {
         let filterId = this.options.filter.toString()
 
         if (!('filter' in this.cache)) {
-          this.cache.filter[filterId] = {}
+          this.cache.filter = {}
         }
 
         if (!(filterId in this.cache.filter)) {
