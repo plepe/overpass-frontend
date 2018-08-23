@@ -135,6 +135,15 @@ class Request {
   finishSubRequest (subRequest) {
     this.emit('subrequest-finish', subRequest)
   }
+
+  /**
+   * the initial request is finished and the response is getting consumed
+   * errors where handled - results will be some usable structure
+   * @param {} results - the actual response
+   */
+  receivedResults (results) {
+    this.emit('osm3s-results', results)
+  }
 }
 
 ee(Request.prototype)

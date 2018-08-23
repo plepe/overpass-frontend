@@ -253,6 +253,9 @@ class OverpassFrontend {
     var partIndex = 0
     var subRequest = context.subRequests[0]
     var request = subRequest.request
+
+    request.receivedResults(results)
+
     var part = subRequest.parts[0]
     if (!('count' in part)) {
       part.count = 0
