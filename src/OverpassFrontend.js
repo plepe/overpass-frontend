@@ -249,6 +249,13 @@ class OverpassFrontend {
       this.errorCount = 0
     }
 
+    let osm3sMeta = {
+      osm3s_version: results.version,
+      generator: results.generator,
+      osm_timestamp: results.osm3s.timestamp_osm_base,
+      copyright: results.osm3s.copyright
+    }
+
     var subRequestsIndex = 0
     var partIndex = 0
     var subRequest = context.subRequests[0]
@@ -286,6 +293,7 @@ class OverpassFrontend {
         continue
       }
 
+      part.osm3sMeta = osm3sMeta
       var ob = this.createOrUpdateOSMObject(el, part)
       delete context.todo[ob.id]
 
