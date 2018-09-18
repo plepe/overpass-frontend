@@ -165,6 +165,21 @@ class OverpassObject {
   leafletFeature (options) {
     return null
   }
+
+  dbInsert () {
+    if (!this.dbData) {
+      this.dbData = {}
+    }
+
+    if (this.tags) for (var k in this.tags) {
+      this.dbData['tag:' + k] = this.tags[k]
+    }
+
+    this.dbData.id = this.id
+    this.dbData.type = this.type
+
+    return this.dbData
+  }
 }
 
 ee(OverpassObject.prototype)
