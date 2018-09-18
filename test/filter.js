@@ -130,4 +130,26 @@ describe('Filter', function () {
       assert.equal(r, '(node.result["cuisine"~"^(.*;|)asian(|;.*)$"];way.result["cuisine"~"^(.*;|)asian(|;.*)$"];relation.result["cuisine"~"^(.*;|)asian(|;.*)$"];)')
     })
   })
+
+  describe ('parse', function () {
+    it ('[amenity]', function () {
+      var f = new Filter('[amenity]')
+      assert.equal(f.toString(), '["amenity"]')
+    })
+
+    it ('[amenity=restaurant]', function () {
+      var f = new Filter('[amenity=restaurant]')
+      assert.equal(f.toString(), '["amenity"="restaurant"]')
+    })
+
+    it ('[amenity=restaurant][shop]', function () {
+      var f = new Filter('[amenity=restaurant][shop]')
+      assert.equal(f.toString(), '["amenity"="restaurant"]["shop"]')
+    })
+
+    it ('[cuisine^asian]', function () {
+      var f = new Filter('[cuisine^asian]')
+      assert.equal(f.toString(), '["cuisine"~"^(.*;|)asian(|;.*)$"]')
+    })
+  })
 })
