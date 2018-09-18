@@ -1,6 +1,7 @@
 var async = require('async')
 var weightSort = require('weight-sort')
 var BoundingBox = require('boundingbox')
+const LokiJS = require('lokijs')
 
 var httpLoad = require('./httpLoad')
 var removeNullEntries = require('./removeNullEntries')
@@ -38,6 +39,9 @@ class OverpassFrontend {
     this.cacheElements = {}
     this.cacheElementsMemberOf = {}
     this.cacheBBoxQueries = {}
+
+    let db = new LokiJS()
+    this.db = db.addCollection('osm', { unique: [ 'id'] })
   }
 
   /**
@@ -321,10 +325,15 @@ class OverpassFrontend {
         ob.type = { n: 'node', w: 'way', r: 'relation' }[id.substr(0, 1)]
         ob.osm_id = id.substr(1)
         ob.properties = OverpassFrontend.ALL
+        ob.missingObject = true
         this.cacheElements[id] = ob
+        this.db.insert(ob.dbInsert())
+      } else {
+        let ob = this.cacheElements[id] = ob
+        ob.missingObject = true
+        this.db.update(ob.dbInsert())
       }
 
-      this.cacheElements[id].missingObject = true
     }
 
     request.finishSubRequest(subRequest)
@@ -412,6 +421,7 @@ class OverpassFrontend {
   createOrUpdateOSMObject (el, options) {
     var id = el.type.substr(0, 1) + el.id
     var ob = null
+    let create = true
 
     if (id in this.cacheElements && !this.cacheElements[id]) {
       console.log('why can this be null?', id)
@@ -419,6 +429,7 @@ class OverpassFrontend {
 
     if (id in this.cacheElements && this.cacheElements[id]) {
       ob = this.cacheElements[id]
+      create = false
     } else if (el.type === 'relation') {
       ob = new OverpassRelation(id)
     } else if (el.type === 'way') {
@@ -431,6 +442,12 @@ class OverpassFrontend {
 
     ob.overpass = this
     ob.updateData(el, options)
+
+    if (create) {
+      this.db.insert(ob.dbInsert())
+    } else {
+      this.db.update(ob.dbInsert())
+    }
 
     this.cacheElements[id] = ob
     return ob
