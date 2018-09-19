@@ -32,12 +32,26 @@ class OverpassFrontend {
     this.requests = []
     this.requestIsActive = false
     this.errorCount = 0
+
+    if (url.match(/\.(osm|json)$/)) {
+      this.options.localOnly = true
+      this.options.isInit = false
+      this.init()
+    }
   }
 
   clearCache () {
     this.cacheElements = {}
     this.cacheElementsMemberOf = {}
     this.cacheBBoxQueries = {}
+  }
+
+  init () {
+    loadOsmFile(this.url,
+      (err, result) => {
+        console.log(result)
+      }
+    )
   }
 
   /**

@@ -35,11 +35,12 @@
     "watchify": "^3.9.0"
   },
   "scripts": {
-    "test": "mocha --bail",
+    "test": "mocha --bail test/loadOsmFile.js",
     "build": "browserify index.js -o dist/overpass-frontend.js",
-    "build-test": "browserify -t brfs --debug test/filter.js test/knownArea.js test/test.js -o dist/test.js",
+    "build-test-1": "browserify -t brfs --debug test/filter.js test/knownArea.js test/test.js -o dist/test.js",
+    "build-test": "browserify -t brfs --debug test/loadOsmFile.js -o dist/test.js",
     "watch": "watchify --debug index.js -o dist/overpass-frontend.js -v",
-    "watch-test": "watchify -t brfs --debug test/filter.js test/knownArea.js test/test.js -o dist/test.js -v",
+    "watch-test": "watchify -t brfs --debug test/loadOsmFile.js -o dist/test.js -v",
     "prepublish": "npm run build && npm run lint",
     "lint": "eslint src/*.js index.js",
     "doc": "jsdoc -d doc/ src/*.js"

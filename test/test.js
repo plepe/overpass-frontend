@@ -6,7 +6,7 @@ var async = require('async')
 
 var OverpassFrontend = require('../src/OverpassFrontend')
 var BoundingBox = require('boundingbox')
-var overpassFrontend = new OverpassFrontend(conf.url)
+var overpassFrontend = new OverpassFrontend('test/data.osm')
 var removeNullEntries = require('../src/removeNullEntries')
 
 describe('Overpass get', function() {
