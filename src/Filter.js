@@ -1,5 +1,5 @@
 function qlesc (str) {
-  return '"' + str + '"'
+  return '"' + str.replace(/"/g, '\\"') + '"'
 }
 
 function compile (part) {
@@ -26,6 +26,28 @@ function test (ob, part) {
   }
 }
 
+function parseString (str) {
+  let result = ''
+  let chr = str[0]
+  str = str.slice(1)
+
+  while (str.length) {
+    let m = str.match('^[^\\\\' + chr + ']+')
+    if (m) {
+      result += m[0]
+      str = str.slice(m[0].length)
+    } else if (str[0] === '\\') {
+      result += str[1]
+      str = str.slice(2)
+    } else if (str[0] === chr) {
+      str = str.slice(1)
+      return [ result, str ]
+    } else {
+      throw new Error("Can't parse string from query: " + str)
+    }
+  }
+}
+
 function Filter (def) {
   if (typeof def === 'string') {
     this.def = []
@@ -49,6 +71,9 @@ function Filter (def) {
           key = m[0]
           def = def.slice(m[0].length)
           mode = 2
+        } else if (def[0] === '"' || def[0] === "'") {
+          [ key, def ] = parseString(def)
+          mode = 2
         } else {
           throw new Error("Can't parse query, expected key: " + def)
         }
@@ -70,6 +95,9 @@ function Filter (def) {
         if (m) {
           value = m[0]
           def = def.slice(m[0].length)
+          mode = 4
+        } else if (def[0] === '"' || def[0] === "'") {
+          [ value, def ] = parseString(def)
           mode = 4
         } else {
           throw new Error("Can't parse query, expected value: " + def)

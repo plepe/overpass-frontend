@@ -23,6 +23,11 @@ describe('Filter', function () {
       var f = new Filter([ { op: 'has', key: 'cuisine', value: 'asian' } ])
       assert.equal(f.toString(), '["cuisine"~"^(.*;|)asian(|;.*)$"]')
     })
+
+    it ('["amenity"=\'restaurant\']["sh\\"op"]', function () {
+      var f = new Filter([ { op: '=', key: 'amenity', value: 'restaurant' }, { op: 'has_key', key: 'sh\"op' } ])
+      assert.equal(f.toString(), '["amenity"="restaurant"]["sh\\"op"]')
+    })
   })
 
   describe ('match', function () {
@@ -150,6 +155,11 @@ describe('Filter', function () {
     it ('[cuisine^asian]', function () {
       var f = new Filter('[cuisine^asian]')
       assert.equal(f.toString(), '["cuisine"~"^(.*;|)asian(|;.*)$"]')
+    })
+
+    it ('["amenity"=\'restaurant\']["sh\\"op"]', function () {
+      var f = new Filter('["amenity"=\'restaurant\']["sh\\"op"]')
+      assert.equal(f.toString(), '["amenity"="restaurant"]["sh\\"op"]')
     })
   })
 })
