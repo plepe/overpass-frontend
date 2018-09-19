@@ -102,6 +102,9 @@ class RequestBBox extends Request {
     // TODO: bounds
     let items = this.overpass.osm.find({ 'tag:amenity': 'restaurant' })
 
+    items = items.map(item => this.overpass.cacheElements[item.id])
+    console.log(items)
+
     /* old code
 
     var quadtreeBounds = toQuadtreeLookupBox(this.bounds)
@@ -109,14 +112,17 @@ class RequestBBox extends Request {
     var items = this.cache.elements.queryRange(quadtreeBounds)
 
     // TODO: do something with 'items'
+    */
 
     for (var i = 0; i < items.length; i++) {
-      var id = items[i].value
-
-      if (!(id in this.overpass.cacheElements)) {
-        continue
-      }
-      var ob = this.overpass.cacheElements[id]
+//      var id = items[i].value
+//
+//      if (!(id in this.overpass.cacheElements)) {
+//        continue
+//      }
+//      var ob = this.overpass.cacheElements[id]
+      var ob = items[i]
+      var id = ob.id
 
       if (id in this.doneFeatures) {
         continue
@@ -137,8 +143,6 @@ class RequestBBox extends Request {
         this.featureCallback(null, ob)
       }
     }
-
-    */
   }
 
   /**

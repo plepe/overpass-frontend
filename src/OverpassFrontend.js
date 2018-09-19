@@ -13,6 +13,7 @@ var OverpassRelation = require('./OverpassRelation')
 var RequestGet = require('./RequestGet')
 var RequestBBox = require('./RequestBBox')
 var defines = require('./defines')
+var loadOsmFile = require('./loadOsmFile')
 
 class OverpassFrontend {
   constructor (url, options) {
@@ -53,7 +54,21 @@ class OverpassFrontend {
   init () {
     loadOsmFile(this.url,
       (err, result) => {
-        console.log(result)
+        this.cacheElements = result.elements
+
+        async.eachOfLimit(
+          result.elements,
+          1024,
+          (element, index, done) => {
+            let ob = this.createOrUpdateOSMObject(element, {
+              properties: OverpassFrontend.TAGS | OverpassFrontend.META | OverpassFrontend.MEMBERS
+            })
+            window.setTimeout(done, 0)
+          },
+          (err) => {
+            console.log('loaded')
+          }
+        )
       }
     )
   }
@@ -232,6 +247,10 @@ class OverpassFrontend {
 
     query += ';\n' + context.query
     console.log(query)
+
+    if (this.localOnly) {
+      return
+    }
 
     setTimeout(function () {
       httpLoad(
