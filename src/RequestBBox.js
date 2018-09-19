@@ -99,9 +99,15 @@ class RequestBBox extends Request {
     this.lastChecked = new Date().getTime()
 
     // if we already have cached objects, check if we have immediate results
+    // TODO: bounds
+    let items = this.overpass.osm.find({ 'tag:amenity': 'restaurant' })
+
+    /* old code
+
     var quadtreeBounds = toQuadtreeLookupBox(this.bounds)
 
     var items = this.cache.elements.queryRange(quadtreeBounds)
+
     // TODO: do something with 'items'
 
     for (var i = 0; i < items.length; i++) {
@@ -131,6 +137,8 @@ class RequestBBox extends Request {
         this.featureCallback(null, ob)
       }
     }
+
+    */
   }
 
   /**
