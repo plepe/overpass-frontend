@@ -7,7 +7,10 @@ function compile (part) {
     case 'has_key':
       return '[' + qlesc(part.key) + ']'
     case '=':
-      return '[' + qlesc(part.key) + '=' + qlesc(part.value) + ']'
+    case '!=':
+    case '~':
+    case '!~':
+      return '[' + qlesc(part.key) + part.op + qlesc(part.value) + ']'
     case 'has':
       return '[' + qlesc(part.key) + '~' + qlesc('^(.*;|)' + part.value + '(|;.*)$') + ']'
   }
@@ -19,6 +22,12 @@ function test (ob, part) {
       return ob.tags && (part.key in ob.tags)
     case '=':
       return ob.tags && (part.key in ob.tags) && (ob.tags[part.key] === part.value)
+    case '!=':
+      return ob.tags && (part.key in ob.tags) && (ob.tags[part.key] !== part.value)
+    case '~':
+      return ob.tags && (part.key in ob.tags) && (ob.tags[part.key].match(part.value))
+    case '!~':
+      return ob.tags && (part.key in ob.tags) && (!ob.tags[part.key].match(part.value))
     case 'has':
       return ob.tags && (part.key in ob.tags) && (ob.tags[part.key].split(/;/).indexOf(part.value) !== -1)
     default:

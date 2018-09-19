@@ -28,6 +28,11 @@ describe('Filter', function () {
       var f = new Filter([ { op: '=', key: 'amenity', value: 'restaurant' }, { op: 'has_key', key: 'sh\"op' } ])
       assert.equal(f.toString(), '["amenity"="restaurant"]["sh\\"op"]')
     })
+
+    it ('["amenity"=\'restaurant\']["shop"~"super"]', function () {
+      var f = new Filter([ { op: '=', key: 'amenity', value: 'restaurant' }, { op: '~', key: 'shop', value: 'super' } ])
+      assert.equal(f.toString(), '["amenity"="restaurant"]["shop"~"super"]')
+    })
   })
 
   describe ('match', function () {
@@ -84,6 +89,22 @@ describe('Filter', function () {
       var r = f.match({ tags: { amenity: 'supermarket', cuisine: 'kebab;asian;regional' } })
       assert.equal(r, true, 'Object should match')
     })
+
+    it ('[amenity=restaurant][shop~super]', function () {
+      var f = new Filter([ { op: '=', key: 'amenity', value: 'restaurant' }, { op: '~', key: 'shop', value: 'super' } ])
+
+      var r = f.match({ tags: { amenity: 'restaurant' } })
+      assert.equal(r, false, 'Object should not match')
+      var r = f.match({ tags: { amenity: 'cafe' } })
+      assert.equal(r, false, 'Object should not match')
+      var r = f.match({ tags: { shop: 'supermarket' } })
+      assert.equal(r, false, 'Object should not match')
+      var r = f.match({ tags: { amenity: 'restaurant', shop: 'supermarket' } })
+      assert.equal(r, true, 'Object should match')
+      var r = f.match({ tags: { amenity: 'restaurant', shop: 'grocery' } })
+      assert.equal(r, false, 'Object should not match')
+    })
+
   })
 
   describe('toQl', function () {
