@@ -435,7 +435,7 @@ class OverpassFrontend {
   createOrUpdateOSMObject (el, options) {
     var id = el.type.substr(0, 1) + el.id
     var ob = null
-    let create = false
+    let create = true
 
     if (id in this.cacheElements && !this.cacheElements[id]) {
       console.log('why can this be null?', id)
@@ -443,7 +443,7 @@ class OverpassFrontend {
 
     if (id in this.cacheElements && this.cacheElements[id]) {
       ob = this.cacheElements[id]
-      create = true
+      create = false
     } else if (el.type === 'relation') {
       ob = new OverpassRelation(id)
     } else if (el.type === 'way') {
