@@ -33,6 +33,12 @@ class OverpassFrontend {
     this.requests = []
     this.requestIsActive = false
     this.errorCount = 0
+
+    if (url.match(/\.(osm|json)$/)) {
+      this.options.localOnly = true
+      this.options.isInit = false
+      this.init()
+    }
   }
 
   clearCache () {
@@ -42,6 +48,14 @@ class OverpassFrontend {
 
     let db = new LokiJS()
     this.osm = db.addCollection('osm', { unique: [ 'id '] })
+  }
+
+  init () {
+    loadOsmFile(this.url,
+      (err, result) => {
+        console.log(result)
+      }
+    )
   }
 
   /**

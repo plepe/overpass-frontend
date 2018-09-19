@@ -37,9 +37,9 @@
   "scripts": {
     "test": "mocha --bail",
     "build": "browserify --external xmlhttprequest index.js -o dist/overpass-frontend.js",
-    "build-test": "browserify --external xmlhttprequest -t brfs --debug test/filter.js test/knownArea.js test/test.js -o dist/test.js",
+    "build-test": "browserify --external xmlhttprequest -t brfs --debug test/loadOsmFile.js test/filter.js test/knownArea.js test/test.js -o dist/test.js",
     "watch": "watchify --debug --external xmlhttprequest index.js -o dist/overpass-frontend.js -v",
-    "watch-test": "watchify -t brfs --external xmlhttprequest --debug test/filter.js test/knownArea.js test/test.js -o dist/test.js",
+    "watch-test": "watchify -t brfs --external xmlhttprequest --debug test/loadOsmFile.js test/filter.js test/knownArea.js test/test.js -o dist/test.js",
     "prepublish": "npm run build && npm run lint",
     "lint": "eslint src/*.js index.js",
     "doc": "jsdoc -d doc/ src/*.js"
