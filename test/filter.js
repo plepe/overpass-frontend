@@ -4,39 +4,39 @@ const Filter = require('../src/Filter')
 
 describe('Filter', function () {
   describe ('input exploded', function () {
-    it ('[amenity]', function () {
+    it ('nwr[amenity]', function () {
       var f = new Filter([ { op: 'has_key', key: 'amenity' } ])
-      assert.equal(f.toString(), '["amenity"]')
+      assert.equal(f.toString(), 'nwr["amenity"]')
     })
 
-    it ('[amenity=restaurant]', function () {
+    it ('nwr[amenity=restaurant]', function () {
       var f = new Filter([ { op: '=', key: 'amenity', value: 'restaurant' } ])
-      assert.equal(f.toString(), '["amenity"="restaurant"]')
+      assert.equal(f.toString(), 'nwr["amenity"="restaurant"]')
     })
 
-    it ('[amenity=restaurant][shop]', function () {
+    it ('nwr[amenity=restaurant][shop]', function () {
       var f = new Filter([ { op: '=', key: 'amenity', value: 'restaurant' }, { op: 'has_key', key: 'shop' } ])
-      assert.equal(f.toString(), '["amenity"="restaurant"]["shop"]')
+      assert.equal(f.toString(), 'nwr["amenity"="restaurant"]["shop"]')
     })
 
-    it ('[cuisine^asian]', function () {
+    it ('nwr[cuisine^asian]', function () {
       var f = new Filter([ { op: 'has', key: 'cuisine', value: 'asian' } ])
-      assert.equal(f.toString(), '["cuisine"~"^(.*;|)asian(|;.*)$"]')
+      assert.equal(f.toString(), 'nwr["cuisine"~"^(.*;|)asian(|;.*)$"]')
     })
 
-    it ('["amenity"=\'restaurant\']["sh\\"op"]', function () {
+    it ('nwr["amenity"=\'restaurant\']["sh\\"op"]', function () {
       var f = new Filter([ { op: '=', key: 'amenity', value: 'restaurant' }, { op: 'has_key', key: 'sh\"op' } ])
-      assert.equal(f.toString(), '["amenity"="restaurant"]["sh\\"op"]')
+      assert.equal(f.toString(), 'nwr["amenity"="restaurant"]["sh\\"op"]')
     })
 
-    it ('["amenity"=\'restaurant\']["shop"~"super"]', function () {
+    it ('nwr["amenity"=\'restaurant\']["shop"~"super"]', function () {
       var f = new Filter([ { op: '=', key: 'amenity', value: 'restaurant' }, { op: '~', key: 'shop', value: 'super' } ])
-      assert.equal(f.toString(), '["amenity"="restaurant"]["shop"~"super"]')
+      assert.equal(f.toString(), 'nwr["amenity"="restaurant"]["shop"~"super"]')
     })
   })
 
   describe ('match', function () {
-    it ('[amenity]', function () {
+    it ('nwr[amenity]', function () {
       var f = new Filter([ { op: 'has_key', key: 'amenity' } ])
 
       var r = f.match({ tags: { amenity: 'restaurant' } })
@@ -47,18 +47,20 @@ describe('Filter', function () {
       assert.equal(r, false, 'Object should not match')
     })
 
-    it ('[amenity=restaurant]', function () {
-      var f = new Filter([ { op: '=', key: 'amenity', value: 'restaurant' } ])
+    it ('node[amenity=restaurant]', function () {
+      var f = new Filter([ { type: 'node' }, { op: '=', key: 'amenity', value: 'restaurant' } ])
 
-      var r = f.match({ tags: { amenity: 'restaurant' } })
+      var r = f.match({ type: 'node', tags: { amenity: 'restaurant' } })
       assert.equal(r, true, 'Object should match')
-      var r = f.match({ tags: { amenity: 'cafe' } })
+      var r = f.match({ type: 'way', tags: { amenity: 'restaurant' } })
       assert.equal(r, false, 'Object should not match')
-      var r = f.match({ tags: { shop: 'supermarket' } })
+      var r = f.match({ type: 'node', tags: { amenity: 'cafe' } })
+      assert.equal(r, false, 'Object should not match')
+      var r = f.match({ type: 'node', tags: { shop: 'supermarket' } })
       assert.equal(r, false, 'Object should not match')
     })
 
-    it ('[amenity=restaurant][shop]', function () {
+    it ('nwr[amenity=restaurant][shop]', function () {
       var f = new Filter([ { op: '=', key: 'amenity', value: 'restaurant' }, { op: 'has_key', key: 'shop' } ])
 
       var r = f.match({ tags: { amenity: 'restaurant' } })
@@ -71,7 +73,7 @@ describe('Filter', function () {
       assert.equal(r, true, 'Object should match')
     })
 
-    it ('[cuisine^asian]', function () {
+    it ('nwr[cuisine^asian]', function () {
       var f = new Filter([ { op: 'has', key: 'cuisine', value: 'asian' } ])
 
       var r = f.match({ tags: { amenity: 'restaurant' } })
@@ -90,7 +92,7 @@ describe('Filter', function () {
       assert.equal(r, true, 'Object should match')
     })
 
-    it ('[amenity=restaurant][shop~super]', function () {
+    it ('nwr[amenity=restaurant][shop~super]', function () {
       var f = new Filter([ { op: '=', key: 'amenity', value: 'restaurant' }, { op: '~', key: 'shop', value: 'super' } ])
 
       var r = f.match({ tags: { amenity: 'restaurant' } })
@@ -108,7 +110,7 @@ describe('Filter', function () {
   })
 
   describe('toQl', function () {
-    it ('[amenity]', function () {
+    it ('nwr[amenity]', function () {
       var f = new Filter([ { op: 'has_key', key: 'amenity' } ])
 
       var r = f.toQl()
@@ -120,7 +122,7 @@ describe('Filter', function () {
       assert.equal(r, '(node.result["amenity"];way.result["amenity"];relation.result["amenity"];)')
     })
 
-    it ('[amenity=restaurant]', function () {
+    it ('nwr[amenity=restaurant]', function () {
       var f = new Filter([ { op: '=', key: 'amenity', value: 'restaurant' } ])
 
       var r = f.toQl()
@@ -132,7 +134,7 @@ describe('Filter', function () {
       assert.equal(r, '(node.result["amenity"="restaurant"];way.result["amenity"="restaurant"];relation.result["amenity"="restaurant"];)')
     })
 
-    it ('[amenity=restaurant][shop]', function () {
+    it ('nwr[amenity=restaurant][shop]', function () {
       var f = new Filter([ { op: '=', key: 'amenity', value: 'restaurant' }, { op: 'has_key', key: 'shop' } ])
 
       var r = f.toQl()
@@ -158,29 +160,29 @@ describe('Filter', function () {
   })
 
   describe ('parse', function () {
-    it ('[amenity]', function () {
-      var f = new Filter('[amenity]')
-      assert.equal(f.toString(), '["amenity"]')
+    it ('nwr[amenity]', function () {
+      var f = new Filter('nwr[amenity]')
+      assert.equal(f.toString(), 'nwr["amenity"]')
     })
 
-    it ('[amenity=restaurant]', function () {
-      var f = new Filter('[amenity=restaurant]')
-      assert.equal(f.toString(), '["amenity"="restaurant"]')
+    it ('nwr[amenity=restaurant]', function () {
+      var f = new Filter('nwr[amenity=restaurant]')
+      assert.equal(f.toString(), 'nwr["amenity"="restaurant"]')
     })
 
-    it ('[amenity=restaurant][shop]', function () {
-      var f = new Filter('[amenity=restaurant][shop]')
-      assert.equal(f.toString(), '["amenity"="restaurant"]["shop"]')
+    it ('nwr[amenity=restaurant][shop]', function () {
+      var f = new Filter('nwr[amenity=restaurant][shop]')
+      assert.equal(f.toString(), 'nwr["amenity"="restaurant"]["shop"]')
     })
 
-    it ('[cuisine^asian]', function () {
-      var f = new Filter('[cuisine^asian]')
-      assert.equal(f.toString(), '["cuisine"~"^(.*;|)asian(|;.*)$"]')
+    it ('nwr[cuisine^asian]', function () {
+      var f = new Filter('nwr[cuisine^asian]')
+      assert.equal(f.toString(), 'nwr["cuisine"~"^(.*;|)asian(|;.*)$"]')
     })
 
-    it ('["amenity"=\'restaurant\']["sh\\"op"]', function () {
-      var f = new Filter('["amenity"=\'restaurant\']["sh\\"op"]')
-      assert.equal(f.toString(), '["amenity"="restaurant"]["sh\\"op"]')
+    it ('nwr["amenity"=\'restaurant\']["sh\\"op"]', function () {
+      var f = new Filter('nwr["amenity"=\'restaurant\']["sh\\"op"]')
+      assert.equal(f.toString(), 'nwr["amenity"="restaurant"]["sh\\"op"]')
     })
   })
 })
