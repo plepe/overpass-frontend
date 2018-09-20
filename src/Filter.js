@@ -153,13 +153,22 @@ function parse (def) {
     return [ result, def ]
 }
 
-Filter.prototype.match = function (ob) {
-  return this.def.filter(test.bind(this, ob)).length === this.def.length
+Filter.prototype.match = function (ob, def) {
+  if (!def) {
+    def = this.def
+  }
+
+  return def.filter(test.bind(this, ob)).length === def.length
 }
 
-Filter.prototype.toString = function () {
+Filter.prototype.toString = function (def) {
   let result = ''
-  let parts = this.def.filter(part => part.type)
+
+  if (!def) {
+    def = this.def
+  }
+
+  let parts = def.filter(part => part.type)
 
   switch (parts.length) {
     case 0:
@@ -172,19 +181,23 @@ Filter.prototype.toString = function () {
       throw new Error('Filter: only one type query allowed!')
   }
 
-  result += this.def
+  result += def
     .filter(part => !part.type)
     .map(compile).join('')
 
   return result
 }
 
-Filter.prototype.toQl = function (options = {}) {
+Filter.prototype.toQl = function (options = {}, def) {
+  if (!def) {
+    def = this.def
+  }
+
   if (!options.inputSet) {
     options.inputSet = ''
   }
 
-  let parts = this.def.filter(part => part.type)
+  let parts = def.filter(part => part.type)
   let types
 
   switch (parts.length) {
@@ -198,7 +211,7 @@ Filter.prototype.toQl = function (options = {}) {
       throw new Error('Filter: only one type query allowed!')
   }
 
-  let filters = this.def.filter(part => !part.type)
+  let filters = def.filter(part => !part.type)
 
   return '(' + types.map(type => type + options.inputSet + filters.map(compile).join('')).join(';') + ';)'
 }
