@@ -103,7 +103,7 @@ function parse (def) {
           throw new Error("Can't parse query, expected '[': " + def)
         }
       } else if (mode === 11) {
-        m = def.match(/^[a-zA-Z0-9]+/)
+        m = def.match(/^[a-zA-Z0-9_]+/)
         if (m) {
           key = m[0]
           def = def.slice(m[0].length)
@@ -128,7 +128,7 @@ function parse (def) {
           throw new Error("Can't parse query, expected operator or ']': " + def)
         }
       } else if (mode === 13) {
-        m = def.match(/^[a-zA-Z0-9]+/)
+        m = def.match(/^[a-zA-Z0-9_]+/)
         if (m) {
           value = m[0]
           def = def.slice(m[0].length)
