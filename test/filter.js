@@ -33,6 +33,16 @@ describe('Filter', function () {
       var f = new Filter([ { op: '=', key: 'amenity', value: 'restaurant' }, { op: '~', key: 'shop', value: 'super' } ])
       assert.equal(f.toString(), 'nwr["amenity"="restaurant"]["shop"~"super"]')
     })
+
+    it ('(node[amenity=cafe][cuisine=ice_cream];node[amenity=ice_cream];node[shop=ice_cream];)', function () {
+      var f = new Filter({ "or": [
+	[ { "type": "node" }, { "key": "amenity", "op": "=", "value": "cafe" }, { "key": "cuisine", "op": "=", "value": "ice_cream" } ],
+	[ { "type": "node" }, { "key": "amenity", "op": "=", "value": "ice_cream" } ],
+	[ { "type": "node" }, { "key": "shop", "op": "=", "value": "ice_cream" } ]
+      ] })
+
+      assert.equal(f.toString(), '(node["amenity"="cafe"]["cuisine"="ice_cream"];node["amenity"="ice_cream"];node["shop"="ice_cream"];)')
+    })
   })
 
   describe ('match', function () {
@@ -107,6 +117,30 @@ describe('Filter', function () {
       assert.equal(r, false, 'Object should not match')
     })
 
+    it ('(node[amenity=cafe][cuisine=ice_cream];node[amenity=ice_cream];node[shop=ice_cream];)', function () {
+      var f = new Filter({ "or": [
+	[ { "type": "node" }, { "key": "amenity", "op": "=", "value": "cafe" }, { "key": "cuisine", "op": "=", "value": "ice_cream" } ],
+	[ { "type": "node" }, { "key": "amenity", "op": "=", "value": "ice_cream" } ],
+	[ { "type": "node" }, { "key": "shop", "op": "=", "value": "ice_cream" } ]
+      ] })
+
+      var r = f.match({ type: 'node', tags: { amenity: 'restaurant' } })
+      assert.equal(r, false, 'Object should not match')
+      var r = f.match({ type: 'way', tags: { amenity: 'restaurant' } })
+      assert.equal(r, false, 'Object should not match')
+      var r = f.match({ type: 'node', tags: { amenity: 'ice_cream' } })
+      assert.equal(r, true, 'Object should match')
+      var r = f.match({ type: 'way', tags: { amenity: 'ice_cream' } })
+      assert.equal(r, false, 'Object should not match')
+      var r = f.match({ type: 'node', tags: { amenity: 'cafe' } })
+      assert.equal(r, false, 'Object should not match')
+      var r = f.match({ type: 'node', tags: { amenity: 'cafe', cuisine: 'kebab' } })
+      assert.equal(r, false, 'Object should not match')
+      var r = f.match({ type: 'node', tags: { amenity: 'cafe', cuisine: 'ice_cream' } })
+      assert.equal(r, true, 'Object should match')
+      var r = f.match({ type: 'node', tags: { shop: 'supermarket' } })
+      assert.equal(r, false, 'Object should not match')
+    })
   })
 
   describe('toQl', function () {
@@ -157,6 +191,19 @@ describe('Filter', function () {
       })
       assert.equal(r, '(node.result["cuisine"~"^(.*;|)asian(|;.*)$"];way.result["cuisine"~"^(.*;|)asian(|;.*)$"];relation.result["cuisine"~"^(.*;|)asian(|;.*)$"];)')
     })
+
+    it ('(node[amenity=cafe][cuisine=ice_cream];node[amenity=ice_cream];nwr[shop=ice_cream];)', function () {
+      var f = new Filter({ "or": [
+	[ { "type": "node" }, { "key": "amenity", "op": "=", "value": "cafe" }, { "key": "cuisine", "op": "=", "value": "ice_cream" } ],
+	[ { "type": "node" }, { "key": "amenity", "op": "=", "value": "ice_cream" } ],
+	[ { "key": "shop", "op": "=", "value": "ice_cream" } ]
+      ] })
+
+      r = f.toQl({
+        inputSet: '.result'
+      })
+      assert.equal(r, '(node.result["amenity"="cafe"]["cuisine"="ice_cream"];node.result["amenity"="ice_cream"];node.result["shop"="ice_cream"];way.result["shop"="ice_cream"];relation.result["shop"="ice_cream"];)')
+    })
   })
 
   describe ('parse', function () {
@@ -184,5 +231,11 @@ describe('Filter', function () {
       var f = new Filter('nwr["amenity"=\'restaurant\']["sh\\"op"]')
       assert.equal(f.toString(), 'nwr["amenity"="restaurant"]["sh\\"op"]')
     })
+
+    it ('(node[amenity=cafe][cuisine=ice_cream];node[amenity=ice_cream];node[shop=ice_cream];)', function () {
+      var f = new Filter('(node[amenity=cafe][cuisine=ice_cream];node[amenity=ice_cream];node[shop=ice_cream];)')
+      assert.equal(f.toString(), '(node["amenity"="cafe"]["cuisine"="ice_cream"];node["amenity"="ice_cream"];node["shop"="ice_cream"];)')
+    })
+
   })
 })

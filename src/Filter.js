@@ -64,7 +64,7 @@ function parseString (str) {
 function Filter (def) {
   if (typeof def === 'string') {
     let dummy
-    [ this.def, dummy ] = parse(def)
+    [ this.def , dummy ] = parse(def)
     return
   }
 
@@ -92,6 +92,21 @@ function parse (def) {
           }
           mode = 10
           def = def.slice(m[0].length)
+        } else if (def[0] === '(') {
+          def = def.slice(1)
+          let parts = []
+
+          do {
+            let cont = false
+            let part
+
+            [ part, def ] = parse(def)
+            parts.push(part)
+
+          } while (def[0] !== ')')
+
+          return [ { or: parts }, def ]
+
         } else {
           throw new Error("Can't parse query, expected type of object (e.g. 'node'): " + def)
         }
@@ -99,6 +114,9 @@ function parse (def) {
         if (def[0] === '[') {
           def = def.slice(1)
           mode = 11
+        } else if (def[0] === ';') {
+          def = def.slice(1)
+          return [ result, def ]
         } else {
           throw new Error("Can't parse query, expected '[': " + def)
         }
@@ -158,6 +176,10 @@ Filter.prototype.match = function (ob, def) {
     def = this.def
   }
 
+  if (def.or) {
+    return def.or.some(part => this.match(ob, part))
+  }
+
   return def.filter(test.bind(this, ob)).length === def.length
 }
 
@@ -166,6 +188,10 @@ Filter.prototype.toString = function (def) {
 
   if (!def) {
     def = this.def
+  }
+
+  if (def.or) {
+    return '(' + def.or.map(part => this.toString(part)) . join(';') + ';)'
   }
 
   let parts = def.filter(part => part.type)
@@ -195,6 +221,13 @@ Filter.prototype.toQl = function (options = {}, def) {
 
   if (!options.inputSet) {
     options.inputSet = ''
+  }
+
+  if (def.or) {
+    return '(' + def.or.map(part => {
+      let r = this.toQl(options, part)
+      return r.slice(1, -1)
+    }).join('') + ')'
   }
 
   let parts = def.filter(part => part.type)
