@@ -63,7 +63,16 @@ function parseString (str) {
 
 function Filter (def) {
   if (typeof def === 'string') {
-    this.def = []
+    let dummy
+    [ this.def, dummy ] = parse(def)
+    return
+  }
+
+  this.def = def
+}
+
+function parse (def) {
+    result = []
 
     let mode = 0
     let key
@@ -75,11 +84,11 @@ function Filter (def) {
         m = def.match(/^(node|way|relation|rel|nwr)/)
         if (m) {
           if (m[0] === 'rel') {
-            this.def.push({ type: 'relation' })
+            result.push({ type: 'relation' })
           } else if (m[0] === 'nwr') {
             // nothing
           } else {
-            this.def.push({ type: m[0] })
+            result.push({ type: m[0] })
           }
           mode = 10
           def = def.slice(m[0].length)
@@ -112,7 +121,7 @@ function Filter (def) {
           mode = 13
           def = def.slice(m[1].length)
         } else if (def[0] === ']') {
-          this.def.push({ key, op: 'has_key' })
+          result.push({ key, op: 'has_key' })
           def = def.slice(1)
           mode = 10
         } else {
@@ -132,7 +141,7 @@ function Filter (def) {
         }
       } else if (mode === 14) {
         if (def[0] === ']') {
-          this.def.push({ key, op, value })
+          result.push({ key, op, value })
           mode = 10
           def = def.slice(1)
         } else {
@@ -141,10 +150,7 @@ function Filter (def) {
       }
     }
 
-    return
-  }
-
-  this.def = def
+    return [ result, def ]
 }
 
 Filter.prototype.match = function (ob) {
