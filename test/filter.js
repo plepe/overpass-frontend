@@ -34,7 +34,7 @@ describe('Filter', function () {
       assert.equal(f.toString(), 'nwr["amenity"="restaurant"]["shop"~"super"]')
     })
 
-    it ('(node[amenity=cafe][cuisine=ice_cream];node[amenity=ice_cream];node[shop=ice_cream];)', function () {
+    it ('  (node[amenity=cafe][cuisine=ice_cream];node[amenity=ice_cream];node[shop=ice_cream];)', function () {
       var f = new Filter({ "or": [
 	[ { "type": "node" }, { "key": "amenity", "op": "=", "value": "cafe" }, { "key": "cuisine", "op": "=", "value": "ice_cream" } ],
 	[ { "type": "node" }, { "key": "amenity", "op": "=", "value": "ice_cream" } ],
@@ -208,7 +208,12 @@ describe('Filter', function () {
 
   describe ('parse', function () {
     it ('nwr[amenity]', function () {
-      var f = new Filter('nwr[amenity]')
+      var f = new Filter(' nwr [amenity]')
+      assert.equal(f.toString(), 'nwr["amenity"]')
+    })
+
+    it (' nwr [ amenity ] ', function () {
+      var f = new Filter(' nwr [ amenity ] ')
       assert.equal(f.toString(), 'nwr["amenity"]')
     })
 
@@ -219,6 +224,11 @@ describe('Filter', function () {
 
     it ('nwr[amenity=restaurant][shop]', function () {
       var f = new Filter('nwr[amenity=restaurant][shop]')
+      assert.equal(f.toString(), 'nwr["amenity"="restaurant"]["shop"]')
+    })
+
+    it (' nwr [ amenity = restaurant ] [ shop ] ', function () {
+      var f = new Filter(' nwr [ amenity = restaurant ] [ shop ]')
       assert.equal(f.toString(), 'nwr["amenity"="restaurant"]["shop"]')
     })
 
@@ -233,7 +243,7 @@ describe('Filter', function () {
     })
 
     it ('(node[amenity=cafe][cuisine=ice_cream];node[amenity=ice_cream];node[shop=ice_cream];)', function () {
-      var f = new Filter('(node[amenity=cafe][cuisine=ice_cream];node[amenity=ice_cream];node[shop=ice_cream];)')
+      var f = new Filter(' (\nnode[amenity=cafe][cuisine=ice_cream] ; node[amenity=ice_cream];node[shop=ice_cream];\n)')
       assert.equal(f.toString(), '(node["amenity"="cafe"]["cuisine"="ice_cream"];node["amenity"="ice_cream"];node["shop"="ice_cream"];)')
     })
 
