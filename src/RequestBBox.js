@@ -30,10 +30,10 @@ class RequestBBox extends Request {
     }
 
     this.lokiQuery = new Filter(this.query).toLokijs()
-    this.lokiQuery.minlat = { $gte: this.bounds.minlat }
-    this.lokiQuery.minlon = { $gte: this.bounds.minlon }
-    this.lokiQuery.maxlat = { $lte: this.bounds.maxlat }
-    this.lokiQuery.maxlon = { $lte: this.bounds.maxlon }
+    this.lokiQuery.minlat = { $lte: this.bounds.maxlat }
+    this.lokiQuery.minlon = { $lte: this.bounds.maxlon }
+    this.lokiQuery.maxlat = { $gte: this.bounds.minlat }
+    this.lokiQuery.maxlon = { $gte: this.bounds.minlon }
 
     if ((typeof this.options.filter !== 'undefined') && !(this.options.filter instanceof Filter)) {
       this.options.filter = new Filter(this.options.filter)
