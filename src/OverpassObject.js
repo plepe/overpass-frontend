@@ -172,14 +172,16 @@ class OverpassObject {
     }
 
     this.dbData.tags = this.tags
-    this.dbData.meta = this.meta
+    this.dbData.osmMeta = this.meta
     this.dbData.id = this.id
     this.dbData.type = this.type
 
-    this.dbData.minlat = this.bounds.minlat
-    this.dbData.minlon = this.bounds.minlon
-    this.dbData.maxlat = this.bounds.maxlat
-    this.dbData.maxlon = this.bounds.maxlon
+    if (this.bounds && this.bounds.minlat) {
+      this.dbData.minlat = this.bounds.minlat
+      this.dbData.minlon = this.bounds.minlon
+      this.dbData.maxlat = this.bounds.maxlat
+      this.dbData.maxlon = this.bounds.maxlon
+    }
 
     return this.dbData
   }
