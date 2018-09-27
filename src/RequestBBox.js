@@ -1,8 +1,6 @@
 const Request = require('./Request')
 const overpassOutOptions = require('./overpassOutOptions')
 const defines = require('./defines')
-const toQuadtreeLookupBox = require('./toQuadtreeLookupBox')
-const Quadtree = require('quadtree-lookup')
 const KnownArea = require('./knownArea')
 const RequestBBoxMembers = require('./RequestBBoxMembers')
 const Filter = require('./Filter')
@@ -30,6 +28,12 @@ class RequestBBox extends Request {
     if (!this.query.match(/;\s*$/)) {
       this.query += ';'
     }
+
+    this.lokiQuery = new Filter(this.query).toLokijs()
+    this.lokiQuery.minlat = { $gte: this.bounds.minlat }
+    this.lokiQuery.minlon = { $gte: this.bounds.minlon }
+    this.lokiQuery.maxlat = { $lte: this.bounds.maxlat }
+    this.lokiQuery.maxlon = { $lte: this.bounds.maxlon }
 
     if ((typeof this.options.filter !== 'undefined') && !(this.options.filter instanceof Filter)) {
       this.options.filter = new Filter(this.options.filter)
@@ -69,13 +73,6 @@ class RequestBBox extends Request {
       // otherwise initialize cache
       this.overpass.cacheBBoxQueries[this.query] = {}
       this.cache = this.overpass.cacheBBoxQueries[this.query]
-      this.cache.elements = new Quadtree.Quadtree(
-        new Quadtree.Box(
-          new Quadtree.Point(-90, -180),
-          new Quadtree.Point(90, 180)
-        )
-      )
-
       this.cache.requested = new KnownArea()
       this.cache.timestamp = 0
 
@@ -98,14 +95,10 @@ class RequestBBox extends Request {
     }
     this.lastChecked = new Date().getTime()
 
-    // if we already have cached objects, check if we have immediate results
-    var quadtreeBounds = toQuadtreeLookupBox(this.bounds)
-
-    var items = this.cache.elements.queryRange(quadtreeBounds)
-    // TODO: do something with 'items'
+    var items = this.overpass.db.find(this.lokiQuery)
 
     for (var i = 0; i < items.length; i++) {
-      var id = items[i].value
+      var id = items[i].id
 
       if (!(id in this.overpass.cacheElements)) {
         continue
@@ -244,7 +237,6 @@ class RequestBBox extends Request {
    */
   receiveObject (ob) {
     this.doneFeatures[ob.id] = ob
-    this.cache.elements.insert(toQuadtreeLookupBox(ob.bounds), ob.id)
   }
 
   /**
