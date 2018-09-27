@@ -206,6 +206,51 @@ describe('Filter', function () {
     })
   })
 
+  describe('toLokijs', function () {
+    it ('nwr[amenity]', function () {
+      var f = new Filter([ { op: 'has_key', key: 'amenity' } ])
+
+      var r = f.toLokijs()
+      assert.deepEqual(r, { 'tags.amenity': { $exists: true }})
+    })
+
+    it ('nwr[amenity=restaurant]', function () {
+      var f = new Filter([ { op: '=', key: 'amenity', value: 'restaurant' } ])
+
+      var r = f.toLokijs()
+      assert.deepEqual(r, { 'tags.amenity': 'restaurant' })
+    })
+
+    it ('nwr[amenity=restaurant][shop]', function () {
+      var f = new Filter([ { op: '=', key: 'amenity', value: 'restaurant' }, { op: 'has_key', key: 'shop' } ])
+
+      var r = f.toLokijs()
+      assert.deepEqual(r, { 'tags.amenity': 'restaurant', 'tags.shop': { $exists: true } })
+    })
+
+    it ('[cuisine^asian]', function () {
+      var f = new Filter([ { op: 'has', key: 'cuisine', value: 'asian' } ])
+
+      var r = f.toLokijs()
+      assert.deepEqual(r, { 'tags.cuisine': { $regex: '^(.*;|)asian(|;.*)$' } })
+    })
+
+    it ('(node[amenity=cafe][cuisine=ice_cream];node[amenity=ice_cream];nwr[shop=ice_cream];)', function () {
+      var f = new Filter({ "or": [
+	[ { "type": "node" }, { "key": "amenity", "op": "=", "value": "cafe" }, { "key": "cuisine", "op": "=", "value": "ice_cream" } ],
+	[ { "type": "node" }, { "key": "amenity", "op": "=", "value": "ice_cream" } ],
+	[ { "key": "shop", "op": "=", "value": "ice_cream" } ]
+      ] })
+
+      var r = f.toLokijs()
+      assert.deepEqual(r, { $or: [
+        { 'type': 'node', 'tags.amenity': 'cafe', 'tags.cuisine': 'ice_cream' },
+        { 'type': 'node', 'tags.amenity': 'ice_cream' },
+        { 'tags.shop': 'ice_cream' }
+      ]})
+    })
+  })
+
   describe ('parse', function () {
     it ('nwr[amenity]', function () {
       var f = new Filter(' nwr [amenity]')

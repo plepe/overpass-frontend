@@ -258,4 +258,42 @@ Filter.prototype.toQl = function (options = {}, def) {
   return '(' + types.map(type => type + options.inputSet + filters.map(compile).join('')).join(';') + ';)'
 }
 
+Filter.prototype.toLokijs = function (options = {}, def) {
+  if (!def) {
+    def = this.def
+  }
+
+  if (def.or) {
+    return { $or:
+      def.or.map(part => {
+        return this.toLokijs(options, part)
+      })
+    }
+  }
+
+  let query = {}
+
+  def.forEach(filter => {
+    if (filter.op === '=') {
+      query["tags." + filter.key] = filter.value
+    } else if (filter.op === '!=') {
+      query["tags." + filter.key] = { $ne: filter.value }
+    } else if (filter.op === 'has_key') {
+      query["tags." + filter.key] = { $exists: true }
+    } else if (filter.op === 'has') {
+      query["tags." + filter.key] = { $regex: '^(.*;|)' + filter.value + '(|;.*)$' }
+    } else if (filter.op === '~') {
+      query["tags." + filter.key] = { $regex: filter.value }
+    } else if (filter.op === '!~') {
+      query["tags." + filter.key] = { $not: { $regex: filter.value } }
+    } else if (filter.type) {
+      query.type = filter.type
+    } else {
+      console.log('unknown filter', filter)
+    }
+  })
+
+  return query
+}
+
 module.exports = Filter
