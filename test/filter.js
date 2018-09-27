@@ -221,6 +221,20 @@ describe('Filter', function () {
       assert.deepEqual(r, { 'tags.amenity': 'restaurant' })
     })
 
+    it ('nwr[amenity][amenity!=restaurant]', function () {
+      var f = new Filter([ { op: 'has_key', key: 'amenity' }, { op: '!=', key: 'amenity', value: 'restaurant' } ])
+
+      var r = f.toLokijs()
+      assert.deepEqual(r, { 'tags.amenity': { $and: [ { $exists: true }, { $ne: 'restaurant' } ] } } )
+    })
+
+    it ('nwr[amenity][amenity!=cafe][amenity!=restaurant]', function () {
+      var f = new Filter([ { op: 'has_key', key: 'amenity' }, { op: '!=', key: 'amenity', value: 'cafe' }, { op: '!=', key: 'amenity', value: 'restaurant' } ])
+
+      var r = f.toLokijs()
+      assert.deepEqual(r, { 'tags.amenity': { $and: [ { $exists: true }, { $ne: 'cafe' }, { $ne: 'restaurant' } ] } } )
+    })
+
     it ('nwr[amenity=restaurant][shop]', function () {
       var f = new Filter([ { op: '=', key: 'amenity', value: 'restaurant' }, { op: 'has_key', key: 'shop' } ])
 

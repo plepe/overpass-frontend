@@ -274,22 +274,41 @@ Filter.prototype.toLokijs = function (options = {}, def) {
   let query = {}
 
   def.forEach(filter => {
+    let k, v
     if (filter.op === '=') {
-      query["tags." + filter.key] = filter.value
+      k = "tags." + filter.key
+      v = filter.value
     } else if (filter.op === '!=') {
-      query["tags." + filter.key] = { $ne: filter.value }
+      k = "tags." + filter.key
+      v = { $ne: filter.value }
     } else if (filter.op === 'has_key') {
-      query["tags." + filter.key] = { $exists: true }
+      k = "tags." + filter.key
+      v = { $exists: true }
     } else if (filter.op === 'has') {
-      query["tags." + filter.key] = { $regex: '^(.*;|)' + filter.value + '(|;.*)$' }
+      k = "tags." + filter.key
+      v = { $regex: '^(.*;|)' + filter.value + '(|;.*)$' }
     } else if (filter.op === '~') {
-      query["tags." + filter.key] = { $regex: filter.value }
+      k = "tags." + filter.key
+      v = { $regex: filter.value }
     } else if (filter.op === '!~') {
-      query["tags." + filter.key] = { $not: { $regex: filter.value } }
+      k = "tags." + filter.key
+      v = { $not: { $regex: filter.value } }
     } else if (filter.type) {
-      query.type = filter.type
+      k = "type"
+      v = filter.type
     } else {
       console.log('unknown filter', filter)
+    }
+
+    if (k && v) {
+      if (k in query) {
+        if (!('$and' in query[k])) {
+          query[k] = { $and: [ query[k] ] }
+        }
+        query[k].$and.push(v)
+      } else {
+        query[k] = v
+      }
     }
   })
 
