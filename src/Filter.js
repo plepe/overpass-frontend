@@ -72,7 +72,7 @@ function Filter (def) {
 }
 
 function parse (def) {
-    result = []
+    let result = []
 
     let mode = 0
     let key

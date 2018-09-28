@@ -199,7 +199,7 @@ describe('Filter', function () {
 	[ { "key": "shop", "op": "=", "value": "ice_cream" } ]
       ] })
 
-      r = f.toQl({
+      var r = f.toQl({
         inputSet: '.result'
       })
       assert.equal(r, '(node.result["amenity"="cafe"]["cuisine"="ice_cream"];node.result["amenity"="ice_cream"];node.result["shop"="ice_cream"];way.result["shop"="ice_cream"];relation.result["shop"="ice_cream"];)')
