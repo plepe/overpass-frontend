@@ -3456,6 +3456,7 @@ describe('Overpass objects structure', function() {
           maxlat: 48.1991437
         },
         {
+          noCacheQuery: true,
           properties: OverpassFrontend.ID_ONLY
         },
         function(err, result, index) {
