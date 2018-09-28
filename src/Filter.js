@@ -64,7 +64,7 @@ function parseString (str) {
 function Filter (def) {
   if (typeof def === 'string') {
     let dummy
-    [ this.def , dummy ] = parse(def)
+    [ this.def, dummy ] = parse(def)
     return
   }
 
@@ -72,112 +72,111 @@ function Filter (def) {
 }
 
 function parse (def) {
-    let result = []
+  let result = []
 
-    let mode = 0
-    let key
-    let value
-    let op
-    let m
-    while (def.length) {
-      if (mode === 0) {
-        m = def.match(/^\s*(node|way|relation|rel|nwr|\()/)
-        if (m && m[1] === '(') {
-          def = def.slice(m[0].length)
-          let parts = []
+  let mode = 0
+  let key
+  let value
+  let op
+  let m
+  while (def.length) {
+    if (mode === 0) {
+      m = def.match(/^\s*(node|way|relation|rel|nwr|\()/)
+      if (m && m[1] === '(') {
+        def = def.slice(m[0].length)
+        let parts = []
 
-          do {
-            let cont = false
-            let part
+        do {
+          let cont = false
+          let part
 
-            [ part, def ] = parse(def)
-            parts.push(part)
+          [ part, def ] = parse(def)
+          parts.push(part)
+        } while (!def.match(/^\s*\)/))
 
-          } while (!def.match(/^\s*\)/))
-
-          return [ { or: parts }, def ]
-        } else if (m) {
-          if (m[1] === 'rel') {
-            result.push({ type: 'relation' })
-          } else if (m[1] === 'nwr') {
+        return [ { or: parts }, def ]
+      } else if (m) {
+        if (m[1] === 'rel') {
+          result.push({ type: 'relation' })
+        } else if (m[1] === 'nwr') {
             // nothing
-          } else {
-            result.push({ type: m[1] })
-          }
-          mode = 10
-          def = def.slice(m[0].length)
         } else {
-          throw new Error("Can't parse query, expected type of object (e.g. 'node'): " + def)
+          result.push({ type: m[1] })
         }
-      } else if (mode === 10) {
-        let m = def.match(/^\s*(\[|;)/)
-        if (m && m[1] === '[') {
-          def = def.slice(m[0].length)
-          mode = 11
-        } else if (m && m[1] === ';') {
-          def = def.slice(m[0].length)
-          return [ result, def ]
-        } else if (!m && def.match(/^\s*$/)) {
-          return [ result, '' ]
-        } else {
-          throw new Error("Can't parse query, expected '[' or ';': " + def)
-        }
-      } else if (mode === 11) {
-        m = def.match(/^(\s*)([a-zA-Z0-9_]+|"|')/)
-        if (m[2] === '"' || m[2] === "'") {
-          def = def.slice(m[1].length)
-          let x = parseString(def)
-          key = x[0]
-          def = x[1]
-          mode = 12
-        } else if (m) {
-          key = m[2]
-          def = def.slice(m[0].length)
-          mode = 12
-        } else {
-          throw new Error("Can't parse query, expected key: " + def)
-        }
-      } else if (mode === 12) {
-        m = def.match(/^\s*(=|!=|~|!~|\^|])/)
-        if (m && m[1] === ']') {
-          result.push({ key, op: 'has_key' })
-          def = def.slice(m[0].length)
-          mode = 10
-        } else if (m) {
-          op = m[1] === '^' ? 'has' : m[1]
-          mode = 13
-          def = def.slice(m[0].length)
-        } else {
-          throw new Error("Can't parse query, expected operator or ']': " + def)
-        }
-      } else if (mode === 13) {
-        m = def.match(/^(\s*)([a-zA-Z0-9_]+|"|')/)
-        if (m && (m[2] === '"' || m[2] === "'")) {
-          def = def.slice(m[1].length)
-          let x = parseString(def)
-          value = x[0]
-          def = x[1]
-          mode = 14
-        } else if (m) {
-          value = m[2]
-          def = def.slice(m[0].length)
-          mode = 14
-        } else {
-          throw new Error("Can't parse query, expected value: " + def)
-        }
-      } else if (mode === 14) {
-        m = def.match(/^\s*\]/)
-        if (m) {
-          result.push({ key, op, value })
-          mode = 10
-          def = def.slice(m[0].length)
-        } else {
-          throw new Error("Can't parse query, expected ']': " + def)
-        }
+        mode = 10
+        def = def.slice(m[0].length)
+      } else {
+        throw new Error("Can't parse query, expected type of object (e.g. 'node'): " + def)
+      }
+    } else if (mode === 10) {
+      let m = def.match(/^\s*(\[|;)/)
+      if (m && m[1] === '[') {
+        def = def.slice(m[0].length)
+        mode = 11
+      } else if (m && m[1] === ';') {
+        def = def.slice(m[0].length)
+        return [ result, def ]
+      } else if (!m && def.match(/^\s*$/)) {
+        return [ result, '' ]
+      } else {
+        throw new Error("Can't parse query, expected '[' or ';': " + def)
+      }
+    } else if (mode === 11) {
+      m = def.match(/^(\s*)([a-zA-Z0-9_]+|"|')/)
+      if (m[2] === '"' || m[2] === "'") {
+        def = def.slice(m[1].length)
+        let x = parseString(def)
+        key = x[0]
+        def = x[1]
+        mode = 12
+      } else if (m) {
+        key = m[2]
+        def = def.slice(m[0].length)
+        mode = 12
+      } else {
+        throw new Error("Can't parse query, expected key: " + def)
+      }
+    } else if (mode === 12) {
+      m = def.match(/^\s*(=|!=|~|!~|\^|])/)
+      if (m && m[1] === ']') {
+        result.push({ key, op: 'has_key' })
+        def = def.slice(m[0].length)
+        mode = 10
+      } else if (m) {
+        op = m[1] === '^' ? 'has' : m[1]
+        mode = 13
+        def = def.slice(m[0].length)
+      } else {
+        throw new Error("Can't parse query, expected operator or ']': " + def)
+      }
+    } else if (mode === 13) {
+      m = def.match(/^(\s*)([a-zA-Z0-9_]+|"|')/)
+      if (m && (m[2] === '"' || m[2] === "'")) {
+        def = def.slice(m[1].length)
+        let x = parseString(def)
+        value = x[0]
+        def = x[1]
+        mode = 14
+      } else if (m) {
+        value = m[2]
+        def = def.slice(m[0].length)
+        mode = 14
+      } else {
+        throw new Error("Can't parse query, expected value: " + def)
+      }
+    } else if (mode === 14) {
+      m = def.match(/^\s*\]/)
+      if (m) {
+        result.push({ key, op, value })
+        mode = 10
+        def = def.slice(m[0].length)
+      } else {
+        throw new Error("Can't parse query, expected ']': " + def)
       }
     }
+  }
 
-    return [ result, def ]
+  return [ result, def ]
 }
 
 Filter.prototype.match = function (ob, def) {
@@ -200,7 +199,7 @@ Filter.prototype.toString = function (def) {
   }
 
   if (def.or) {
-    return '(' + def.or.map(part => this.toString(part)) . join(';') + ';)'
+    return '(' + def.or.map(part => this.toString(part)).join(';') + ';)'
   }
 
   let parts = def.filter(part => part.type)
@@ -276,25 +275,25 @@ Filter.prototype.toLokijs = function (options = {}, def) {
   def.forEach(filter => {
     let k, v
     if (filter.op === '=') {
-      k = "tags." + filter.key
+      k = 'tags.' + filter.key
       v = filter.value
     } else if (filter.op === '!=') {
-      k = "tags." + filter.key
+      k = 'tags.' + filter.key
       v = { $ne: filter.value }
     } else if (filter.op === 'has_key') {
-      k = "tags." + filter.key
+      k = 'tags.' + filter.key
       v = { $exists: true }
     } else if (filter.op === 'has') {
-      k = "tags." + filter.key
+      k = 'tags.' + filter.key
       v = { $regex: '^(.*;|)' + filter.value + '(|;.*)$' }
     } else if (filter.op === '~') {
-      k = "tags." + filter.key
+      k = 'tags.' + filter.key
       v = { $regex: filter.value }
     } else if (filter.op === '!~') {
-      k = "tags." + filter.key
+      k = 'tags.' + filter.key
       v = { $not: { $regex: filter.value } }
     } else if (filter.type) {
-      k = "type"
+      k = 'type'
       v = filter.type
     } else {
       console.log('unknown filter', filter)
