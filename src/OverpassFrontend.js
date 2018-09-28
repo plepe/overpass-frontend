@@ -329,11 +329,10 @@ class OverpassFrontend {
         this.cacheElements[id] = ob
         this.db.insert(ob.dbInsert())
       } else {
-        let ob = this.cacheElements[id] = ob
+        let ob = this.cacheElements[id]
         ob.missingObject = true
         this.db.update(ob.dbInsert())
       }
-
     }
 
     request.finishSubRequest(subRequest)
