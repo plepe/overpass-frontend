@@ -63,8 +63,7 @@ function parseString (str) {
 
 function Filter (def) {
   if (typeof def === 'string') {
-    let dummy
-    [ this.def, dummy ] = parse(def)
+    [ this.def ] = parse(def)
     return
   }
 
@@ -87,7 +86,6 @@ function parse (def) {
         let parts = []
 
         do {
-          let cont = false
           let part
 
           [ part, def ] = parse(def)
