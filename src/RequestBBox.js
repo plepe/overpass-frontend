@@ -29,11 +29,13 @@ class RequestBBox extends Request {
       this.query += ';'
     }
 
-    this.lokiQuery = new Filter(this.query).toLokijs()
-    this.lokiQuery.minlat = { $lte: this.bounds.maxlat }
-    this.lokiQuery.minlon = { $lte: this.bounds.maxlon }
-    this.lokiQuery.maxlat = { $gte: this.bounds.minlat }
-    this.lokiQuery.maxlon = { $gte: this.bounds.minlon }
+    if (!('noCacheQuery' in this.options) || !this.options.noCacheQuery) {
+      this.lokiQuery = new Filter(this.query).toLokijs()
+      this.lokiQuery.minlat = { $lte: this.bounds.maxlat }
+      this.lokiQuery.minlon = { $lte: this.bounds.maxlon }
+      this.lokiQuery.maxlat = { $gte: this.bounds.minlat }
+      this.lokiQuery.maxlon = { $gte: this.bounds.minlon }
+    }
 
     if ((typeof this.options.filter !== 'undefined') && !(this.options.filter instanceof Filter)) {
       this.options.filter = new Filter(this.options.filter)
@@ -95,7 +97,10 @@ class RequestBBox extends Request {
     }
     this.lastChecked = new Date().getTime()
 
-    var items = this.overpass.db.find(this.lokiQuery)
+    var items = []
+    if (this.lokiQuery) {
+      items = this.overpass.db.find(this.lokiQuery)
+    }
 
     for (var i = 0; i < items.length; i++) {
       var id = items[i].id

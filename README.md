@@ -90,6 +90,7 @@ Options:
 | memberProperties | bit array | Which properties should be loaded for the members.
 | memberSplit | integer | If more than 'memberSplit' member elements would be returned, split into smaller requests (see 'split'). Default: 0 (do not split)
 | filter | Filter | Additional filter.
+| noCacheQuery | boolean | If true, the local cache will not be queried
 
 Returns an OverpassRequest object.
 
