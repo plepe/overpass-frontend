@@ -139,7 +139,7 @@ class OverpassObject {
     }
 
     for (k in this.osm3sMeta) {
-      ret['@' + k] = this.osm3sMeta[k]
+      ret['@osm3s:' + k] = this.osm3sMeta[k]
     }
 
     return ret
