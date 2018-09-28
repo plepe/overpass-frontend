@@ -30,6 +30,14 @@ class RequestBBox extends Request {
     }
 
     this.lokiQuery = new Filter(this.query).toLokijs()
+
+    // in cases where no tags are loaded, but we know that a particular
+    // object matches this query anyway, query the 'queryMatches' property,
+    // which is set in the receiveObject() method
+    let queryMatch = {}
+    queryMatch['queryMatches.' + this.query] = { $exists: true }
+    this.lokiQuery = { $or: [ queryMatch, this.lokiQuery ] }
+
     this.lokiQuery.minlat = { $lte: this.bounds.maxlat }
     this.lokiQuery.minlon = { $lte: this.bounds.maxlon }
     this.lokiQuery.maxlat = { $gte: this.bounds.minlat }
@@ -237,6 +245,10 @@ class RequestBBox extends Request {
    */
   receiveObject (ob) {
     this.doneFeatures[ob.id] = ob
+    if (!ob.dbData.queryMatches) {
+      ob.dbData.queryMatches = {}
+    }
+    ob.dbData.queryMatches[this.query] = true
   }
 
   /**
