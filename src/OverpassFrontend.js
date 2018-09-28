@@ -28,6 +28,9 @@ class OverpassFrontend {
       this.options[k] = options[k]
     }
 
+    let db = new LokiJS()
+    this.db = db.addCollection('osm', { unique: [ 'id' ] })
+
     this.clearCache()
 
     this.requests = []
@@ -39,9 +42,7 @@ class OverpassFrontend {
     this.cacheElements = {}
     this.cacheElementsMemberOf = {}
     this.cacheBBoxQueries = {}
-
-    let db = new LokiJS()
-    this.db = db.addCollection('osm', { unique: [ 'id'] })
+    this.db.clear()
   }
 
   /**
@@ -413,7 +414,11 @@ class OverpassFrontend {
     }
 
     for (var i = 0; i < ids.length; i++) {
-      delete this.cacheElements[ids[i]]
+      if (ids[i] in this.cacheElements) {
+        let lokiOb = this.cacheElements[ids[i]].dbData
+        delete this.cacheElements[ids[i]]
+        this.db.remove(lokiOb)
+      }
     }
   }
 
