@@ -6,7 +6,7 @@ if (typeof XMLHttpRequest === 'undefined') {
 
 describe('.osm', function () {
   it ('test', function (done) {
-    loadOsmFile('test/data.osm', (err, result) => {
+    loadOsmFile('test/data.osm.bz2', (err, result) => {
       console.log(result)
       done(err)
     })
