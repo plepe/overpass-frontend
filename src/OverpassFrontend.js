@@ -14,6 +14,7 @@ var OverpassRelation = require('./OverpassRelation')
 var RequestGet = require('./RequestGet')
 var RequestBBox = require('./RequestBBox')
 var defines = require('./defines')
+var loadOsmFile = require('./loadOsmFile')
 
 class OverpassFrontend {
   constructor (url, options) {
@@ -37,6 +38,15 @@ class OverpassFrontend {
     this.requests = []
     this.requestIsActive = false
     this.errorCount = 0
+
+    if (this.url.match(/\.(json|osm\.bz2|osm)$/)) {
+      this.localOnly = true
+      this.ready = false
+      this.loadFile()
+    } else {
+      this.remote = true
+      this.ready = true
+    }
   }
 
   clearCache () {
@@ -44,6 +54,41 @@ class OverpassFrontend {
     this.cacheElementsMemberOf = {}
     this.cacheBBoxQueries = {}
     this.db.clear()
+  }
+
+  loadFile () {
+    loadOsmFile(this.url,
+      (err, result) => {
+        if (err) {
+          console.log('Error loading file', err)
+          return this.emit('error', err)
+        }
+
+        this.cacheElements = result.elements
+
+        async.eachOfLimit(
+          result.elements,
+          1024,
+          (element, index, done) => {
+            this.createOrUpdateOSMObject(element, {
+              properties: OverpassFrontend.ALL
+            })
+            global.setTimeout(done, 0)
+          },
+          (err) => {
+            if (err) {
+              console.log('Error loading file', err)
+              return this.emit('error', err)
+            }
+
+            this.emit('load')
+
+            this.ready = true
+            this._overpassProcess()
+          }
+        )
+      }
+    )
   }
 
   /**
@@ -115,7 +160,7 @@ class OverpassFrontend {
 
   _overpassProcess () {
     // currently active - we'll come back later :-)
-    if (this.requestIsActive) {
+    if (this.requestIsActive || !this.ready) {
       return
     }
 
@@ -126,7 +171,7 @@ class OverpassFrontend {
       if (request) {
         request.preprocess()
 
-        if (request.mayFinish()) {
+        if (request.mayFinish() || this.localOnly) {
           request.finish()
         }
       }
@@ -219,7 +264,6 @@ class OverpassFrontend {
     }
 
     query += ';\n' + context.query
-    console.log(query)
 
     setTimeout(function () {
       httpLoad(
