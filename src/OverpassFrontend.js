@@ -1,3 +1,4 @@
+const ee = require('event-emitter')
 var async = require('async')
 var weightSort = require('weight-sort')
 var BoundingBox = require('boundingbox')
@@ -482,5 +483,7 @@ for (var k in defines) {
 function isSeparator (el) {
   return ('count' in el || ('type' in el && el.type === 'count'))
 }
+
+ee(OverpassFrontend.prototype)
 
 module.exports = OverpassFrontend
