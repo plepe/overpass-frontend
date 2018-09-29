@@ -2,16 +2,21 @@ module.exports = function convertFromXML (xml) {
   let result = {
     version: parseFloat(xml.getAttribute('version')),
     generator: xml.getAttribute('generator'),
-    osm3s: {
-      copyright: xml.getElementsByTagName('note')[0].textContent
-    },
+    osm3s: {},
     elements: []
   }
 
-  let meta = xml.getElementsByTagName('meta')[0]
-  result.osm3s['timestamp_osm_base'] = meta.getAttribute('osm_base')
-  if (meta.hasAttribute('areas')) {
-    result.osm3s['timestamp_areas_base'] = meta.getAttribute('areas')
+  let notes = xml.getElementsByTagName('note')
+  if (notes.length) {
+    result.osm3s.copyright = notes[0].textContent
+  }
+
+  let metas = xml.getElementsByTagName('meta')
+  if (metas.length) {
+    result.osm3s['timestamp_osm_base'] = metas[0].getAttribute('osm_base')
+    if (metas[0].hasAttribute('areas')) {
+      result.osm3s['timestamp_areas_base'] = metas[0].getAttribute('areas')
+    }
   }
 
   let current = xml.firstChild
