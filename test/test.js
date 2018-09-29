@@ -437,7 +437,7 @@ describe('Overpass get', function() {
           maxlat: 48.1991437
         },
         {
-          properties: OverpassFrontend.ID_ONLY
+          properties: OverpassFrontend.TAGS
         },
         function(err, result, index) {
           found.push(result.id)
@@ -480,7 +480,7 @@ describe('Overpass get', function() {
           maxlat: 48.1991437
         },
         {
-          properties: OverpassFrontend.ID_ONLY
+          properties: OverpassFrontend.TAGS
         },
         function(err, result, index) {
           found.push(result.id)
@@ -521,7 +521,7 @@ describe('Overpass get', function() {
           maxlat: 48.1991237
         },
         {
-          properties: OverpassFrontend.ID_ONLY
+          properties: OverpassFrontend.TAGS
         },
         function(err, result, index) {
           found.push(result.id)
