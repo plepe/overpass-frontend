@@ -29,6 +29,7 @@ Options:
 | effortWay | number | The effort for request a way. Default: 4.
 | effortRelation | number | The effort for request a relation. Default: 64.
 | timeGap | number (ms) | A short time gap between two requests to the Overpass API. Default: 10 milliseconds.
+| loadChunkSize | number | When loading a file (instead connecting to an Overpass URL) load elements in chunks of n items. Default: 1000.
 
 ## OverpassFrontend.get(ids, options, featureCallback, finalCallback)
 Get a list of OpenStreetMap objects from Overpass API.

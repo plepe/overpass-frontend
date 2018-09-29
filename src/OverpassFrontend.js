@@ -24,7 +24,8 @@ class OverpassFrontend {
       effortNode: 1,
       effortWay: 4,
       effortRelation: 64,
-      timeGap: 10
+      timeGap: 10,
+      loadChunkSize: 1000
     }
     for (var k in options) {
       this.options[k] = options[k]
@@ -66,13 +67,23 @@ class OverpassFrontend {
 
         this.cacheElements = result.elements
 
-        async.eachOfLimit(
-          result.elements,
-          1024,
-          (element, index, done) => {
-            this.createOrUpdateOSMObject(element, {
-              properties: OverpassFrontend.ALL
-            })
+        let chunks = []
+        for (var i = 0; i < result.elements.length; i += this.options.loadChunkSize) {
+          chunks.push(result.elements.slice(i, i + this.options.loadChunkSize))
+        }
+
+        async.eachLimit(
+          chunks,
+          1,
+          (chunk, done) => {
+            chunk.forEach(
+              (element) => {
+                this.createOrUpdateOSMObject(element, {
+                  properties: OverpassFrontend.ALL
+                })
+              }
+            )
+
             global.setTimeout(done, 0)
           },
           (err) => {
