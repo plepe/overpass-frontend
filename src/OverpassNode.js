@@ -2,6 +2,7 @@
 
 var OverpassObject = require('./OverpassObject')
 var BoundingBox = require('boundingbox')
+var OverpassFrontend = require('./defines')
 
 class OverpassNode extends OverpassObject {
   GeoJSON () {
@@ -22,6 +23,8 @@ class OverpassNode extends OverpassObject {
   }
 
   updateData (data, options) {
+    super.updateData(data, options)
+
     if (data.lat) {
       this.geometry = {
         lat: data.lat,
@@ -30,9 +33,9 @@ class OverpassNode extends OverpassObject {
 
       this.bounds = new BoundingBox(data)
       this.center = this.bounds.getCenter()
-    }
 
-    super.updateData(data, options)
+      this.properties = this.properties | OverpassFrontend.GEOM | OverpassFrontend.BBOX | OverpassFrontend.CENTER
+    }
   }
 
   leafletFeature (options) {
