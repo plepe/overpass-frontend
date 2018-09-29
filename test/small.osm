@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<osm version="0.6" generator="Overpass API 0.7.55.4 3079d8ea">
+<note>The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.</note>
+<meta osm_base="2018-09-29T15:06:02Z"/>
+
+  <bounds minlat="48.2076584" minlon="16.3382176" maxlat="48.2089847" maxlon="16.3395023"/>
+
+  <relation id="276122" version="5" timestamp="2015-01-25T19:01:10Z" changeset="28402799" uid="2675" user="Eckhart Wörner">
+    <member type="way" ref="47379824" role="from"/>
+    <member type="node" ref="17312837" role="via"/>
+    <member type="way" ref="324297228" role="to"/>
+    <tag k="restriction" v="only_straight_on"/>
+    <tag k="type" v="restriction"/>
+  </relation>
+  <node id="17312836" lat="48.2085805" lon="16.3381316" version="14" timestamp="2015-01-25T19:01:18Z" changeset="28402799" uid="2675" user="Eckhart Wörner"/>
+  <node id="17312837" lat="48.2084499" lon="16.3388375" version="10" timestamp="2015-01-25T19:01:18Z" changeset="28402799" uid="2675" user="Eckhart Wörner">
+    <tag k="highway" v="traffic_signals"/>
+  </node>
+  <node id="293269032" lat="48.2085393" lon="16.3382698" version="14" timestamp="2013-03-24T10:56:39Z" changeset="15476879" uid="303158" user="stefanct">
+    <tag k="bicycle" v="yes"/>
+    <tag k="crossing" v="traffic_signals"/>
+    <tag k="foot" v="yes"/>
+    <tag k="highway" v="crossing"/>
+  </node>
+  <node id="1538937640" lat="48.2084530" lon="16.3389884" version="3" timestamp="2017-02-16T14:01:24Z" changeset="46137877" uid="3080626" user="Weltstaat">
+    <tag k="crossing" v="traffic_signals"/>
+    <tag k="highway" v="crossing"/>
+  </node>
+  <node id="2076499330" lat="48.2084600" lon="16.3387307" version="2" timestamp="2013-03-24T10:56:39Z" changeset="15476879" uid="303158" user="stefanct">
+    <tag k="crossing" v="traffic_signals"/>
+    <tag k="highway" v="crossing"/>
+  </node>
+  <node id="3310442552" lat="48.2084566" lon="16.3391389" version="1" timestamp="2015-01-25T19:01:09Z" changeset="28402799" uid="2675" user="Eckhart Wörner"/>
+  <way id="47379824" version="10" timestamp="2018-07-01T19:31:07Z" changeset="60328723" uid="2641694" user="JM82">
+    <nd ref="17312836"/>
+    <nd ref="293269032"/>
+    <nd ref="2076499330"/>
+    <nd ref="17312837"/>
+    <tag k="highway" v="secondary"/>
+    <tag k="lit" v="yes"/>
+    <tag k="maxspeed" v="50"/>
+    <tag k="name" v="Lerchenfelder Gürtel"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="surface" v="asphalt"/>
+  </way>
+  <way id="324297228" version="3" timestamp="2017-12-06T17:30:22Z" changeset="54407099" uid="5140186" user="m3h4">
+    <nd ref="17312837"/>
+    <nd ref="1538937640"/>
+    <nd ref="3310442552"/>
+    <tag k="cycleway:right" v="no"/>
+    <tag k="highway" v="secondary"/>
+    <tag k="lit" v="yes"/>
+    <tag k="maxspeed" v="50"/>
+    <tag k="name" v="Lerchenfelder Straße"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="surface" v="asphalt"/>
+  </way>
+
+</osm>
