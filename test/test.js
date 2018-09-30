@@ -957,7 +957,8 @@ describe('Overpass query by id with bbox option', function() {
 
     overpassFrontend.get(query.concat([]), { properties: OverpassFrontend.ID_ONLY },
         function(err, result, index) {
-          assert.equal(OverpassFrontend.BBOX | OverpassFrontend.CENTER, result.properties, 'Element ' + result.id + ' which was loaded outside bbox, should only have BBOX data')
+          // has GEOM, because for nodes lat/lon is geom, bbox and center
+          assert.equal(OverpassFrontend.GEOM | OverpassFrontend.BBOX | OverpassFrontend.CENTER, result.properties, 'Element ' + result.id + ' which was loaded outside bbox, should only have BBOX data')
         },
         function(err) {
           assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
@@ -2829,7 +2830,7 @@ describe('Events', function () {
           }
 
           assert.equal(result.memberFeatures.length, 63, 'Wrong count of member features')
-          assert.equal(result.memberFeatures[0].properties, OverpassFrontend.GEOM, 'Member features has more than GEOM properties')
+          assert.equal(result.memberFeatures[0].properties, OverpassFrontend.GEOM | OverpassFrontend.BBOX | OverpassFrontend.CENTER, 'Member features has more than GEOM properties')
 
           result.on('update', countUpdateCalls)
 
@@ -2842,7 +2843,11 @@ describe('Events', function () {
                 done(err)
               }
 
-              assert.equal(result.properties, OverpassFrontend.GEOM | OverpassFrontend.TAGS, 'Should know GEOM from relation and TAGS from direct request')
+              if (result.type === 'node') {
+                assert.equal(result.properties, OverpassFrontend.GEOM | OverpassFrontend.BBOX | OverpassFrontend.CENTER | OverpassFrontend.TAGS, 'Should know GEOM from relation and TAGS from direct request (node)')
+              } else if (result.type === 'way') {
+                assert.equal(result.properties, OverpassFrontend.GEOM | OverpassFrontend.TAGS, 'Should know GEOM from relation and TAGS from direct request (way)')
+              }
             },
             function (err) {
               if (err) {
