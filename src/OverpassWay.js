@@ -1,7 +1,7 @@
 /* global L:false */
 
-var OverpassObject = require('./OverpassObject')
 var BoundingBox = require('boundingbox')
+var OverpassObject = require('./OverpassObject')
 var OverpassFrontend = require('./defines')
 var turf = {
   bboxClip: require('@turf/bbox-clip').default
@@ -46,6 +46,33 @@ class OverpassWay extends OverpassObject {
         })
 
         memberOb.notifyMemberOf(this, null, i)
+      }
+
+      if (!this.geometry) {
+        this.geometry = this.members.map(
+          member => {
+            let node = this.overpass.cacheElements[member.id]
+            if (node) {
+              return node.geometry
+            }
+          }
+        )
+        this.geometry = this.geometry.filter(geom => geom)
+
+        if (!this.geometry.length) {
+          delete this.geometry
+        }
+      }
+    }
+
+    if (this.geometry && this.geometry.filter(geom => geom).length === this.geometry.length) {
+      this.properties = this.properties | OverpassFrontend.GEOM
+
+      if (!this.bounds) {
+        this.bounds = new BoundingBox(this.geometry[0])
+        this.geometry.slice(1).forEach(geom => this.bounds.extend(geom))
+        this.center = this.bounds.getCenter()
+        this.properties = this.properties | OverpassFrontend.BBOX | OverpassFrontend.CENTER
       }
     }
   }

@@ -68,8 +68,6 @@ class OverpassFrontend {
           return this.emit('error', err)
         }
 
-        this.cacheElements = result.elements
-
         let chunks = []
         for (var i = 0; i < result.elements.length; i += this.options.loadChunkSize) {
           chunks.push(result.elements.slice(i, i + this.options.loadChunkSize))
@@ -82,7 +80,7 @@ class OverpassFrontend {
             chunk.forEach(
               (element) => {
                 this.createOrUpdateOSMObject(element, {
-                  properties: OverpassFrontend.ALL
+                  properties: OverpassFrontend.TAGS | OverpassFrontend.META | OverpassFrontend.MEMBERS
                 })
               }
             )

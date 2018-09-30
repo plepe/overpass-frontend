@@ -2934,7 +2934,7 @@ describe('Events', function () {
               if (result.type === 'node') {
                 assert.equal(result.properties, OverpassFrontend.GEOM | OverpassFrontend.BBOX | OverpassFrontend.CENTER | OverpassFrontend.TAGS, 'Should know GEOM from relation and TAGS from direct request (node)')
               } else if (result.type === 'way') {
-                assert.equal(result.properties, OverpassFrontend.GEOM | OverpassFrontend.TAGS, 'Should know GEOM from relation and TAGS from direct request (way)')
+                assert.equal(result.properties, OverpassFrontend.GEOM | OverpassFrontend.BBOX | OverpassFrontend.CENTER | OverpassFrontend.TAGS, 'Should know GEOM from relation and TAGS from direct request (way)')
               }
             },
             function (err) {
@@ -3401,7 +3401,7 @@ describe('Overpass objects structure', function() {
           assert.equal('w4583442' in overpassFrontend.cacheElements, true, 'should have loaded member feature w4583442')
 
           let member = overpassFrontend.cacheElements['w4583442']
-          assert.equal(member.properties, OverpassFrontend.GEOM, 'member w4583442 should have GEOM info')
+          assert.equal(member.properties, OverpassFrontend.GEOM | OverpassFrontend.BBOX | OverpassFrontend.CENTER, 'member w4583442 should have GEOM info')
         },
         function(err) {
           done()

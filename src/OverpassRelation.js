@@ -1,5 +1,6 @@
 /* global L:false */
 
+var BoundingBox = require('boundingbox')
 var osmtogeojson = require('osmtogeojson')
 var OverpassObject = require('./OverpassObject')
 var OverpassFrontend = require('./defines')
@@ -47,8 +48,88 @@ class OverpassRelation extends OverpassObject {
     if ((options.properties & OverpassFrontend.MEMBERS) &&
         (options.properties & OverpassFrontend.GEOM) &&
         data.members) {
-      this.geometry = osmtogeojson({ elements: [ data ] })
+      let elements = [ JSON.parse(JSON.stringify(data)) ]
+      this.geometry = osmtogeojson({ elements })
+    } else if ((options.properties & OverpassFrontend.MEMBERS) &&
+        data.members) {
+      this.updateGeometry()
     }
+  }
+
+  updateGeometry () {
+    if (!this.members) {
+      return
+    }
+
+    let allKnown = true
+    let elements = this.members
+      .map(member => {
+        if (!(member.id in this.overpass.cacheElements)) {
+          return allKnown = false
+        }
+
+        let ob = this.overpass.cacheElements[member.id]
+        let data = {
+          type: ob.type,
+          id: ob.osm_id
+        }
+
+        if (ob.type === 'node') {
+          if (ob.geometry) {
+            data.lat = ob.geometry.lat
+            data.lon = ob.geometry.lon
+          }
+        } else if (ob.type === 'way') {
+          data.geometry = ob.geometry
+        }
+
+        return data
+      })
+      .filter(member => member)
+    elements.push({
+      type: 'relation',
+      id: this.osm_id,
+      members: this.members.map(member => {
+        return {
+          ref: member.ref,
+          type: member.type,
+          role: member.role
+        }
+      })
+    })
+
+    this.geometry = osmtogeojson({ elements })
+    if (allKnown) {
+      this.properties = this.properties | OverpassFrontend.GEOM
+    }
+
+    if (!this.bounds) {
+      this.members.forEach(member => {
+        let ob = this.overpass.cacheElements[member.id]
+        if (ob.bounds) {
+          if (this.bounds) {
+            this.bounds.extend(ob.bounds)
+          } else {
+            this.bounds = new BoundingBox(ob.bounds)
+          }
+        }
+      })
+
+      if (this.bounds && allKnown) {
+        this.center = this.bounds.getCenter()
+        this.properties = this.properties | OverpassFrontend.BBOX | OverpassFrontend.CENTER
+      }
+    }
+  }
+
+  notifyMemberUpdate (memberObs) {
+    super.notifyMemberUpdate(memberObs)
+
+    if (!this.members) {
+      return
+    }
+
+    this.updateGeometry()
   }
 
   memberIds () {
