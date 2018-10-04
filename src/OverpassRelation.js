@@ -62,17 +62,23 @@ class OverpassRelation extends OverpassObject {
     }
 
     let allKnown = true
-    let elements = this.members
-      .map(member => {
+    let elements = [ {
+      type: 'relation',
+      id: this.osm_id,
+      tags: this.tags,
+      members: this.members.map(member => {
+        let data = {
+          ref: member.ref,
+          type: member.type,
+          role: member.role
+        }
+
         if (!(member.id in this.overpass.cacheElements)) {
-          return allKnown = false
+          allKnown = false
+          return data
         }
 
         let ob = this.overpass.cacheElements[member.id]
-        let data = {
-          type: ob.type,
-          id: ob.osm_id
-        }
 
         if (ob.type === 'node') {
           if (ob.geometry) {
@@ -85,18 +91,7 @@ class OverpassRelation extends OverpassObject {
 
         return data
       })
-      .filter(member => member)
-    elements.push({
-      type: 'relation',
-      id: this.osm_id,
-      members: this.members.map(member => {
-        return {
-          ref: member.ref,
-          type: member.type,
-          role: member.role
-        }
-      })
-    })
+    } ]
 
     this.geometry = osmtogeojson({ elements })
     if (allKnown) {
