@@ -41,6 +41,7 @@ class OverpassFrontend {
     this.errorCount = 0
 
     this.pendingNotifyMemberUpdate = {}
+    this.pendingUpdateEmit = {}
 
     if (this.url.match(/\.(json|osm\.bz2|osm)$/)) {
       this.localOnly = true
@@ -491,11 +492,18 @@ class OverpassFrontend {
     for (var k in todo) {
       let ob = this.cacheElements[k]
       ob.notifyMemberUpdate(todo[k])
+
+      this.pendingUpdateEmit[ob.id] = ob
     }
   }
 
   pendingNotifies () {
     this.notifyMemberUpdates()
+
+    let todo = Object.values(this.pendingUpdateEmit)
+    this.pendingUpdateEmit = {}
+
+    todo.forEach(ob => ob.emit('update', ob))
   }
 
   createOrUpdateOSMObject (el, options) {
@@ -530,6 +538,7 @@ class OverpassFrontend {
         this.pendingNotifyMemberUpdate[entry.relation.id] = [ ob ]
       }
     })
+    this.pendingUpdateEmit[ob.id] = ob
 
     if (create) {
       this.db.insert(ob.dbInsert())

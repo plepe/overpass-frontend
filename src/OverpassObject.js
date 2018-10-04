@@ -93,12 +93,9 @@ class OverpassObject {
     if (data.tags) {
       this.tags = data.tags
     }
-
-    this.emit('update', this)
   }
 
   notifyMemberUpdate (memberObs) {
-    this.emit('update', this)
   }
 
   title () {
