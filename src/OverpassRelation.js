@@ -1,6 +1,5 @@
 /* global L:false */
 
-var async = require('async')
 var osmtogeojson = require('osmtogeojson')
 var OverpassObject = require('./OverpassObject')
 var OverpassFrontend = require('./defines')
@@ -11,6 +10,8 @@ var turf = {
 class OverpassRelation extends OverpassObject {
   updateData (data, options) {
     var i
+
+    super.updateData(data, options)
 
     if ((options.properties & OverpassFrontend.MEMBERS) &&
         data.members) {
@@ -48,21 +49,6 @@ class OverpassRelation extends OverpassObject {
         data.members) {
       this.geometry = osmtogeojson({ elements: [ data ] })
     }
-
-    super.updateData(data, options)
-  }
-
-  notifyMemberFound (member) {
-    if (this.updatePending) {
-      return
-    }
-
-    async.nextTick(() => {
-      this.updatePending = false
-      this.emit('update', this)
-    })
-
-    this.updatePending = true
   }
 
   memberIds () {

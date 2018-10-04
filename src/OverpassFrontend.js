@@ -40,6 +40,8 @@ class OverpassFrontend {
     this.requestIsActive = false
     this.errorCount = 0
 
+    this.pendingNotifyMemberUpdate = {}
+
     if (this.url.match(/\.(json|osm\.bz2|osm)$/)) {
       this.localOnly = true
       this.ready = false
@@ -87,6 +89,8 @@ class OverpassFrontend {
             global.setTimeout(done, 0)
           },
           (err) => {
+            this.pendingNotifies()
+
             if (err) {
               console.log('Error loading file', err)
               return this.emit('error', err)
@@ -392,6 +396,8 @@ class OverpassFrontend {
       }
     }
 
+    this.pendingNotifies()
+
     request.finishSubRequest(subRequest)
 
     this._next()
@@ -478,6 +484,20 @@ class OverpassFrontend {
     }
   }
 
+  notifyMemberUpdates () {
+    let todo = this.pendingNotifyMemberUpdate
+    this.pendingNotifyMemberUpdate = {}
+
+    for (var k in todo) {
+      let ob = this.cacheElements[k]
+      ob.notifyMemberUpdate(todo[k])
+    }
+  }
+
+  pendingNotifies () {
+    this.notifyMemberUpdates()
+  }
+
   createOrUpdateOSMObject (el, options) {
     var id = el.type.substr(0, 1) + el.id
     var ob = null
@@ -502,6 +522,14 @@ class OverpassFrontend {
 
     ob.overpass = this
     ob.updateData(el, options)
+
+    ob.memberOf.forEach(entry => {
+      if (entry.relation.id in this.pendingNotifyMemberUpdate) {
+        this.pendingNotifyMemberUpdate[entry.relation.id].push(ob)
+      } else {
+        this.pendingNotifyMemberUpdate[entry.relation.id] = [ ob ]
+      }
+    })
 
     if (create) {
       this.db.insert(ob.dbInsert())
