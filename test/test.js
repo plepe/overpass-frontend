@@ -2806,6 +2806,94 @@ describe('Overpass Get - Relation with members in BBOX', function() {
   })
 })
 
+describe('notifyMemberUpdate', function () {
+  describe('OverpassWay', function () {
+    let expected
+    let way
+
+    it('First load the way to see final result', (done) => {
+      overpassFrontend.clearCache()
+
+      overpassFrontend.get('w272672836',
+        {
+          properties: OverpassFrontend.ALL
+        },
+        (err, result) => {
+          if (err) {
+            return done(err)
+          }
+
+          expected = result
+        },
+        done
+      )
+    })
+
+    it('Then cache clear and re-request way without GEOM', (done) => {
+      overpassFrontend.clearCache()
+
+      overpassFrontend.get('w272672836',
+        {
+          properties: OverpassFrontend.TAGS | OverpassFrontend.MEMBERS
+        },
+        (err, result) => {
+          if (err) {
+            return done(err)
+          }
+
+          way = result
+
+          assert.equal(way.properties, OverpassFrontend.TAGS | OverpassFrontend.MEMBERS, 'Way: Only TAGS and MEMBERS should be known')
+          assert.equal(way.geometry, undefined, 'Way: Geometry should not be known')
+          assert.equal(way.bounds, undefined, 'Way: Bounds should not be known')
+        },
+        done
+      )
+    })
+
+    it('Load one of the nodes -> geometry of way should be partly known', (done) => {
+      overpassFrontend.get('n252548491',
+        {
+          properties: OverpassFrontend.GEOM
+        },
+        (err, result) => {
+          if (err) {
+            return done(err)
+          }
+        },
+        (err) => {
+          assert.equal(way.properties, OverpassFrontend.TAGS | OverpassFrontend.MEMBERS, 'Way: Only TAGS and MEMBERS should be known')
+          assert.deepEqual(way.geometry[1], { lat: 48.1983261, lon: 16.3382355 }, 'Geometry should be partly known')
+          assert.deepEqual(way.bounds, { minlat: 48.1983261, maxlat: 48.1983261, minlon: 16.3382355, maxlon: 16.3382355 }, 'Bounds should not be known')
+
+          done(err)
+        }
+      )
+    })
+
+    it('Load the other nodes -> geometry of way should be fully known', (done) => {
+      overpassFrontend.get([ 'n378462', 'n2776073558' ],
+        {
+          properties: OverpassFrontend.GEOM
+        },
+        (err, result) => {
+          if (err) {
+            return done(err)
+          }
+        },
+        (err) => {
+          assert.equal(way.properties, OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.GEOM | OverpassFrontend.BBOX | OverpassFrontend.CENTER, 'Way: Now, also BBOX, CENTER and GEOM should be known')
+          assert.deepEqual(way.geometry, expected.geometry, 'Geometry should be fully known')
+          assert.deepEqual(way.bounds, expected.bounds, 'Bounds should be known')
+          assert.deepEqual(way.center, expected.center, 'Center should be known')
+
+          done(err)
+        }
+      )
+    })
+  })
+})
+
 describe('Events', function () {
   describe('OverpassRelation', function () {
     it('Should emit "update" when loading member elements', function (done) {
