@@ -1,6 +1,7 @@
 /* global L:false */
 
 var OverpassObject = require('./OverpassObject')
+var OverpassFrontend = require('./defines')
 var turf = {
   bboxClip: require('@turf/bbox-clip').default
 }
@@ -26,6 +27,24 @@ class OverpassWay extends OverpassObject {
           ref: this.data.nodes[i],
           type: 'node'
         })
+
+        let obProperties = OverpassFrontend.ID_ONLY
+        let ob = {
+          id: this.data.nodes[i],
+          type: 'node'
+        }
+
+        if (data.geometry) {
+          obProperties = obProperties | OverpassFrontend.GEOM
+          ob.lat = data.geometry[i].lat
+          ob.lon = data.geometry[i].lon
+        }
+
+        let memberOb = this.overpass.createOrUpdateOSMObject(ob, {
+          properties: obProperties
+        })
+
+        memberOb.notifyMemberOf(this, null, i)
       }
     }
   }
