@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Request.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Request.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const ee = require('event-emitter')
+const SortedCallbacks = require('./SortedCallbacks')
+
+/**
+ * A compiled query
+ * @typedef {Object} Request#SubRequest
+ * @property {string} query - The compiled code
+ * @property {object[]} parts - An entry for each part (separated by the 'out count' separator)
+ * @property {int} parts[].properties - The properties which each returned map feature has set (TAGS, BBOX, ...)
+ * @property {int} effort - Supposed "effort" of this query
+ * @property {Request} request - The request this compiled query belongs to
+ */
+
+/**
+ * An unspecified request
+ * @param {OverpassFrontend} overpass
+ * @param {object} options
+ */
+class Request {
+  constructor (overpass, data) {
+    this.overpass = overpass
+
+    for (var k in data) {
+      this[k] = data[k]
+    }
+
+    if (!this.options) {
+      this.options = {}
+    }
+
+    this.priority = 'priority' in this.options ? this.options.priority : 0
+
+    var callbacks = new SortedCallbacks(this.options, this.featureCallback, this.finalCallback)
+    this.featureCallback = callbacks.next.bind(callbacks)
+    this.finalCallback = callbacks.final.bind(callbacks)
+
+    this.callCount = 0
+  }
+
+  /**
+   * Request got aborted
+   * @event Request#abort
+   */
+
+  /**
+   * abort this request
+   */
+  abort () {
+    this.aborted = true
+    this.emit('abort')
+    this.overpass._abortRequest(this)
+  }
+
+  /**
+   * Request is finished
+   * @event Request#finish
+   * @param {Error|null} - null if no error occured
+   */
+
+  /**
+   * request is finished
+   * @param {Error|null} err - null if no error occured
+   */
+  finish (err) {
+    if (!this.aborted) {
+      this.finalCallback(err)
+    }
+
+    this.overpass._finishRequest(this)
+    this.emit('finish', err)
+  }
+
+  /**
+   * shall this Request be included in the current call?
+   * @param {OverpassFrontend#Context} context - Current context
+   * @return {boolean} - yes|no
+   */
+  willInclude (context) {
+    return true
+  }
+
+  /**
+   * @typedef {Object} Request#minMaxEffortResult
+   * @property {number} Remaining minimal effort of this request
+   * @property {number|null} Remaining maximum effort (or null if unknown)
+   */
+
+  /**
+   * how much effort can a call to this request use
+   * @return {Request#minMaxEffortResult} - minimum and maximum effort
+   */
+  minMaxEffort () {
+    return { minEffort: 0, maxEffort: 0 }
+  }
+
+  /**
+   * SubRequest got compiled
+   * @event Request#subrequest-compiile
+   * @param {Request#SubRequest} subRequest - the sub request
+   */
+
+  /**
+   * compile the query
+   * @param {OverpassFrontend#Context} context - Current context
+   * @return {Request#SubRequest} - the compiled query
+   */
+  compileQuery (context) {
+    let subRequest = this._compileQuery(context)
+    this.emit('subrequest-compile', subRequest)
+
+    this.callCount++
+
+    return subRequest
+  }
+
+  /**
+   * receive an object from OverpassFronted -> enter to cache, return to caller
+   * @param {OverpassObject} ob - Object which has been received
+   * @param {Request#SubRequest} subRequest - sub request which is being handled right now
+   * @param {int} partIndex - Which part of the subRequest is being received
+   */
+  receiveObject (ob) {
+  }
+
+  /**
+   * SubRequest got finished
+   * @event Request#subrequest-finished
+   * @param {Request#SubRequest} subRequest - the sub request
+   */
+
+  /**
+   * the current subrequest is finished -> update caches, check whether request is finished
+   * @param {Request#SubRequest} subRequest - the current sub request
+   */
+  finishSubRequest (subRequest) {
+    this.emit('subrequest-finish', subRequest)
+  }
+}
+
+ee(Request.prototype)
+
+module.exports = Request
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Filter.html">Filter</a></li><li><a href="KnownArea.html">KnownArea</a></li><li><a href="OverpassFrontend.html">OverpassFrontend</a></li><li><a href="OverpassNode.html">OverpassNode</a></li><li><a href="OverpassObject.html">OverpassObject</a></li><li><a href="OverpassRelation.html">OverpassRelation</a></li><li><a href="OverpassWay.html">OverpassWay</a></li><li><a href="Request.html">Request</a></li><li><a href="RequestBBox.html">RequestBBox</a></li><li><a href="RequestGet.html">RequestGet</a></li></ul><h3>Events</h3><ul><li><a href="OverpassFrontend.html#event:error">error</a></li><li><a href="OverpassFrontend.html#event:load">load</a></li><li><a href="OverpassFrontend.html#event:update">update</a></li><li><a href="Request.html#event:abort">abort</a></li><li><a href="Request.html#event:finish">finish</a></li><li><a href="Request.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="Request.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestBBox.html#event:abort">abort</a></li><li><a href="RequestBBox.html#event:finish">finish</a></li><li><a href="RequestBBox.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestBBox.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestGet.html#event:abort">abort</a></li><li><a href="RequestGet.html#event:finish">finish</a></li><li><a href="RequestGet.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestGet.html#event:subrequest-finished">subrequest-finished</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Oct 06 2018 22:54:44 GMT+0200 (CEST)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

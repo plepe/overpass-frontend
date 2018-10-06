@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: OverpassWay.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: OverpassWay.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/* global L:false */
+
+var BoundingBox = require('boundingbox')
+var OverpassObject = require('./OverpassObject')
+var OverpassFrontend = require('./defines')
+var turf = {
+  bboxClip: require('@turf/bbox-clip').default
+}
+
+/**
+ * A way
+ * @property {string} id ID of this object, starting with 'w'.
+ * @property {number} osm_id Numeric id.
+ * @property {string} type Type: 'way'.
+ * @property {object} tags OpenStreetMap tags.
+ * @property {object} meta OpenStreetMap meta information.
+ * @property {Point[]} geometry of the object
+ * @property {object} data Data as loaded from Overpass API.
+ * @property {bit_array} properties Which information about this object is known?
+ * @property {object[]} memberOf List of relations where this object is member of.
+ * @property {string} memberOf.id ID of the relation where this way is member of.
+ * @property {string} memberOf.role Role of this object in the relation.
+ * @property {number} memberOf.sequence This object is the nth member in the relation.
+ * @property {BoundingBox} bounds Bounding box of this object.
+ * @property {Point} center Centroid of the bounding box.
+ * @property {object[]} members Nodes of the way.
+ * @property {string} members.id ID of the member.
+ * @property {number} members.ref Numeric ID of the member.
+ * @property {string} members.type 'node'.
+ */
+class OverpassWay extends OverpassObject {
+  updateData (data, options) {
+    if (data.nodes) {
+      this.nodes = data.nodes
+    }
+
+    if (data.geometry) {
+      this.geometry = data.geometry
+    }
+
+    super.updateData(data, options)
+
+    if (typeof this.data.nodes !== 'undefined') {
+      this.members = []
+
+      for (var i = 0; i &lt; this.data.nodes.length; i++) {
+        this.members.push({
+          id: 'n' + this.data.nodes[i],
+          ref: this.data.nodes[i],
+          type: 'node'
+        })
+
+        let obProperties = OverpassFrontend.ID_ONLY
+        let ob = {
+          id: this.data.nodes[i],
+          type: 'node'
+        }
+
+        if (data.geometry) {
+          obProperties = obProperties | OverpassFrontend.GEOM
+          ob.lat = data.geometry[i].lat
+          ob.lon = data.geometry[i].lon
+        }
+
+        let memberOb = this.overpass.createOrUpdateOSMObject(ob, {
+          properties: obProperties
+        })
+
+        memberOb.notifyMemberOf(this, null, i)
+      }
+
+      if (!this.geometry) {
+        this.geometry = this.members.map(
+          member => {
+            let node = this.overpass.cacheElements[member.id]
+            if (node) {
+              return node.geometry
+            }
+          }
+        )
+        this.geometry = this.geometry.filter(geom => geom)
+
+        if (!this.geometry.length) {
+          delete this.geometry
+        }
+      }
+    }
+
+    if (this.geometry &amp;&amp; this.geometry.filter(geom => geom).length === this.geometry.length) {
+      this.properties = this.properties | OverpassFrontend.GEOM
+
+      if (!this.bounds) {
+        this.bounds = new BoundingBox(this.geometry[0])
+        this.geometry.slice(1).forEach(geom => this.bounds.extend(geom))
+        this.center = this.bounds.getCenter()
+        this.properties = this.properties | OverpassFrontend.BBOX | OverpassFrontend.CENTER
+      }
+    }
+  }
+
+  notifyMemberUpdate (memberObs) {
+    super.notifyMemberUpdate(memberObs)
+
+    if (!this.members) {
+      return
+    }
+
+    memberObs.forEach(memberOb => {
+      this.members.forEach((member, index) => {
+        if (memberOb.id === member.id) {
+          if (memberOb.geometry) {
+            if (!this.geometry) {
+              this.geometry = new Array(this.members.length)
+            }
+
+            this.geometry[index] = memberOb.geometry
+          }
+        }
+
+        if (this.bounds) {
+          this.bounds.extend(memberOb.geometry)
+        } else {
+          this.bounds = new BoundingBox(memberOb.geometry)
+        }
+      })
+    })
+
+    // all nodes known -> set bbox, geom and center
+    if (this.geometry &amp;&amp; this.geometry.filter(geom => geom).length === this.geometry.length) {
+      this.center = this.bounds.getCenter()
+      this.properties = this.properties | OverpassFrontend.BBOX | OverpassFrontend.GEOM | OverpassFrontend.CENTER
+    }
+  }
+
+  memberIds () {
+    if (this._memberIds) {
+      return this._memberIds
+    }
+
+    if (!this.nodes) {
+      return null
+    }
+
+    this._memberIds = []
+    for (var i = 0; i &lt; this.nodes.length; i++) {
+      var member = this.nodes[i]
+
+      this._memberIds.push('n' + member)
+    }
+
+    return this._memberIds
+  }
+
+  member_ids () { // eslint-disable-line
+    console.log('called deprecated OverpassWay.member_ids() function - replace by memberIds()')
+    return this.memberIds()
+  }
+
+  GeoJSON () {
+    var result = {
+      type: 'Feature',
+      id: this.type + '/' + this.osm_id,
+      properties: this.GeoJSONProperties()
+    }
+
+    if (this.geometry) {
+      let coordinates = []
+      for (var i = 0; i &lt; this.geometry.length; i++) {
+        coordinates.push([ this.geometry[i].lon, this.geometry[i].lat ])
+      }
+
+      result.geometry = {
+        type: 'LineString',
+        coordinates: coordinates
+      }
+    }
+
+    return result
+  }
+
+  /**
+   * return a leaflet feature for this object. If the ways is closed, a L.polygon will be returned, otherwise a L.polyline.
+   * @param {object} [options] options Options will be passed to the leaflet function
+   * @return {L.layer}
+   */
+  leafletFeature (options) {
+    if (!this.geometry) {
+      return null
+    }
+
+    if (this.geometry[this.geometry.length - 1].lat === this.geometry[0].lat &amp;&amp;
+       this.geometry[this.geometry.length - 1].lon === this.geometry[0].lon) {
+      return L.polygon(this.geometry, options)
+    }
+
+    return L.polyline(this.geometry, options)
+  }
+
+  intersects (bbox) {
+    if (this.bounds) {
+      if (!bbox.intersects(this.bounds)) {
+        return 0
+      }
+    }
+
+    if (this.geometry) {
+      var intersects = turf.bboxClip(this.GeoJSON(), [ bbox.minlon, bbox.minlat, bbox.maxlon, bbox.maxlat ])
+
+      return intersects.geometry.coordinates.length ? 2 : 0
+    }
+
+    return super.intersects(bbox)
+  }
+}
+
+module.exports = OverpassWay
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Filter.html">Filter</a></li><li><a href="KnownArea.html">KnownArea</a></li><li><a href="OverpassFrontend.html">OverpassFrontend</a></li><li><a href="OverpassNode.html">OverpassNode</a></li><li><a href="OverpassObject.html">OverpassObject</a></li><li><a href="OverpassRelation.html">OverpassRelation</a></li><li><a href="OverpassWay.html">OverpassWay</a></li><li><a href="Request.html">Request</a></li><li><a href="RequestBBox.html">RequestBBox</a></li><li><a href="RequestGet.html">RequestGet</a></li></ul><h3>Events</h3><ul><li><a href="OverpassFrontend.html#event:error">error</a></li><li><a href="OverpassFrontend.html#event:load">load</a></li><li><a href="OverpassFrontend.html#event:update">update</a></li><li><a href="Request.html#event:abort">abort</a></li><li><a href="Request.html#event:finish">finish</a></li><li><a href="Request.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="Request.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestBBox.html#event:abort">abort</a></li><li><a href="RequestBBox.html#event:finish">finish</a></li><li><a href="RequestBBox.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestBBox.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestGet.html#event:abort">abort</a></li><li><a href="RequestGet.html#event:finish">finish</a></li><li><a href="RequestGet.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestGet.html#event:subrequest-finished">subrequest-finished</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Oct 06 2018 22:54:44 GMT+0200 (CEST)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
