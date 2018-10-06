@@ -32,6 +32,7 @@
     "jsdoc": "^3.5.5",
     "leaflet": "^0.7.0",
     "mocha": "*",
+    "require-self": "^0.2.1",
     "watchify": "^3.9.0"
   },
   "scripts": {
@@ -41,6 +42,7 @@
     "watch": "watchify --debug index.js -o dist/overpass-frontend.js -v",
     "watch-test": "watchify -t brfs --debug test/filter.js test/knownArea.js test/test.js test/loadOsmFile.js test/frontendFile.js -o dist/test.js -v",
     "prepublish": "npm run build && npm run lint",
+    "prepare": "require-self",
     "lint": "eslint src/*.js index.js",
     "doc": "jsdoc -d doc/ src/*.js"
   },
