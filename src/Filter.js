@@ -61,15 +61,6 @@ function parseString (str) {
   }
 }
 
-function Filter (def) {
-  if (typeof def === 'string') {
-    [ this.def ] = parse(def)
-    return
-  }
-
-  this.def = def
-}
-
 function parse (def) {
   let result = []
 
@@ -177,139 +168,150 @@ function parse (def) {
   return [ result, def ]
 }
 
-Filter.prototype.match = function (ob, def) {
-  if (!def) {
-    def = this.def
-  }
-
-  if (def.or) {
-    return def.or.some(part => this.match(ob, part))
-  }
-
-  return def.filter(test.bind(this, ob)).length === def.length
-}
-
-Filter.prototype.toString = function (def) {
-  let result = ''
-
-  if (!def) {
-    def = this.def
-  }
-
-  if (def.or) {
-    return '(' + def.or.map(part => this.toString(part)).join(';') + ';)'
-  }
-
-  let parts = def.filter(part => part.type)
-
-  switch (parts.length) {
-    case 0:
-      result = 'nwr'
-      break
-    case 1:
-      result = parts[0].type
-      break
-    default:
-      throw new Error('Filter: only one type query allowed!')
-  }
-
-  result += def
-    .filter(part => !part.type)
-    .map(compile).join('')
-
-  return result
-}
-
-Filter.prototype.toQl = function (options = {}, def) {
-  if (!def) {
-    def = this.def
-  }
-
-  if (!options.inputSet) {
-    options.inputSet = ''
-  }
-
-  if (def.or) {
-    return '(' + def.or.map(part => {
-      let r = this.toQl(options, part)
-      return r.slice(1, -1)
-    }).join('') + ')'
-  }
-
-  let parts = def.filter(part => part.type)
-  let types
-
-  switch (parts.length) {
-    case 0:
-      types = [ 'node', 'way', 'relation' ]
-      break
-    case 1:
-      types = [ parts[0].type ]
-      break
-    default:
-      throw new Error('Filter: only one type query allowed!')
-  }
-
-  let filters = def.filter(part => !part.type)
-
-  return '(' + types.map(type => type + options.inputSet + filters.map(compile).join('')).join(';') + ';)'
-}
-
-Filter.prototype.toLokijs = function (options = {}, def) {
-  if (!def) {
-    def = this.def
-  }
-
-  if (def.or) {
-    return { $or:
-      def.or.map(part => {
-        return this.toLokijs(options, part)
-      })
-    }
-  }
-
-  let query = {}
-
-  def.forEach(filter => {
-    let k, v
-    if (filter.op === '=') {
-      k = 'tags.' + filter.key
-      v = filter.value
-    } else if (filter.op === '!=') {
-      k = 'tags.' + filter.key
-      v = { $ne: filter.value }
-    } else if (filter.op === 'has_key') {
-      k = 'tags.' + filter.key
-      v = { $exists: true }
-    } else if (filter.op === 'has') {
-      k = 'tags.' + filter.key
-      v = { $regex: '^(.*;|)' + filter.value + '(|;.*)$' }
-    } else if (filter.op === '~') {
-      k = 'tags.' + filter.key
-      v = { $regex: filter.value }
-    } else if (filter.op === '!~') {
-      k = 'tags.' + filter.key
-      v = { $not: { $regex: filter.value } }
-    } else if (filter.type) {
-      k = 'type'
-      v = filter.type
-    } else {
-      console.log('unknown filter', filter)
+class Filter {
+  constructor (def) {
+    if (typeof def === 'string') {
+      [ this.def ] = parse(def)
+      return
     }
 
-    if (k && v) {
-      if (k in query) {
-        if (!('$and' in query[k])) {
-          query[k] = { $and: [ query[k] ] }
-        }
-        query[k].$and.push(v)
-      } else {
-        query[k] = v
+    this.def = def
+  }
+
+  match (ob, def) {
+    if (!def) {
+      def = this.def
+    }
+
+    if (def.or) {
+      return def.or.some(part => this.match(ob, part))
+    }
+
+    return def.filter(test.bind(this, ob)).length === def.length
+  }
+
+  toString (def) {
+    let result = ''
+
+    if (!def) {
+      def = this.def
+    }
+
+    if (def.or) {
+      return '(' + def.or.map(part => this.toString(part)).join(';') + ';)'
+    }
+
+    let parts = def.filter(part => part.type)
+
+    switch (parts.length) {
+      case 0:
+        result = 'nwr'
+        break
+      case 1:
+        result = parts[0].type
+        break
+      default:
+        throw new Error('Filter: only one type query allowed!')
+    }
+
+    result += def
+      .filter(part => !part.type)
+      .map(compile).join('')
+
+    return result
+  }
+
+  toQl (options = {}, def) {
+    if (!def) {
+      def = this.def
+    }
+
+    if (!options.inputSet) {
+      options.inputSet = ''
+    }
+
+    if (def.or) {
+      return '(' + def.or.map(part => {
+        let r = this.toQl(options, part)
+        return r.slice(1, -1)
+      }).join('') + ')'
+    }
+
+    let parts = def.filter(part => part.type)
+    let types
+
+    switch (parts.length) {
+      case 0:
+        types = [ 'node', 'way', 'relation' ]
+        break
+      case 1:
+        types = [ parts[0].type ]
+        break
+      default:
+        throw new Error('Filter: only one type query allowed!')
+    }
+
+    let filters = def.filter(part => !part.type)
+
+    return '(' + types.map(type => type + options.inputSet + filters.map(compile).join('')).join(';') + ';)'
+  }
+
+  toLokijs (options = {}, def) {
+    if (!def) {
+      def = this.def
+    }
+
+    if (def.or) {
+      return { $or:
+        def.or.map(part => {
+          return this.toLokijs(options, part)
+        })
       }
     }
-  })
 
-  return query
+    let query = {}
+
+    def.forEach(filter => {
+      let k, v
+      if (filter.op === '=') {
+        k = 'tags.' + filter.key
+        v = filter.value
+      } else if (filter.op === '!=') {
+        k = 'tags.' + filter.key
+        v = { $ne: filter.value }
+      } else if (filter.op === 'has_key') {
+        k = 'tags.' + filter.key
+        v = { $exists: true }
+      } else if (filter.op === 'has') {
+        k = 'tags.' + filter.key
+        v = { $regex: '^(.*;|)' + filter.value + '(|;.*)$' }
+      } else if (filter.op === '~') {
+        k = 'tags.' + filter.key
+        v = { $regex: filter.value }
+      } else if (filter.op === '!~') {
+        k = 'tags.' + filter.key
+        v = { $not: { $regex: filter.value } }
+      } else if (filter.type) {
+        k = 'type'
+        v = filter.type
+      } else {
+        console.log('unknown filter', filter)
+      }
+
+      if (k && v) {
+        if (k in query) {
+          if (!('$and' in query[k])) {
+            query[k] = { $and: [ query[k] ] }
+          }
+          query[k].$and.push(v)
+        } else {
+          query[k] = v
+        }
+      }
+    })
+
+    return query
+  }
 }
 
 module.exports = Filter
