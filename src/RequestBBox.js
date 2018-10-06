@@ -12,7 +12,7 @@ const Filter = require('./Filter')
 class RequestBBox extends Request {
   /**
    * @param {OverpassFrontend} overpass
-   * @param {data} data
+   * @param {object} options
    */
   constructor (overpass, data) {
     super(overpass, data)

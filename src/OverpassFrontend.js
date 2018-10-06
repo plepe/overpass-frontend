@@ -16,6 +16,34 @@ var RequestBBox = require('./RequestBBox')
 var defines = require('./defines')
 var loadOsmFile = require('./loadOsmFile')
 
+/**
+ * An error occured
+ * @event OverpassFrontend#error
+ * @param {Error} error
+ */
+
+/**
+ * When a file is specified as URL, this event notifies, that the file has been completely loaded.
+ * @event OverpassFrontend#load
+ */
+
+/**
+ * When an object is updated (e.g. when loaded; additional information loaded; when a member object got loaded)
+ * @event OverpassFrontend#update
+ * @param {OverpassNode|OverpassWay|OverpassRelation} object The object which got updated.
+ */
+
+/**
+ * A connection to an Overpass API Server or an OpenStreetMap file
+ * @param {string} url The URL of the API, e.g. 'https://overpass-api.de/api/'. If you omit the protocol, it will use the protocol which is in use for the current page (or https: on nodejs): '//overpass-api.de/api/'. If the url ends in .json, .osm or .osm.bz2 it will load this OpenStreetMap file and use the data from there.
+ * @param {object} options Options
+ * @param {number} [options.effortPerRequest=1000] To avoid huge requests to the Overpass API, the request will be split into smaller chunks. This value defines, at which effort the request will be sent.
+ * @param {number} [options.effortNode=1] The effort for request a node. Default: 1.
+ * @param {number} [options.effortWay=4] The effort for request a way.
+ * @param {number} [options.effortRelation=64] The effort for request a relation.
+ * @param {number} [options.timeGap=10] A short time gap between two requests to the Overpass API (milliseconds).
+ * @param {number} [options.loadChunkSize=1000] When loading a file (instead connecting to an Overpass URL) load elements in chunks of n items.
+ */
 class OverpassFrontend {
   constructor (url, options) {
     this.url = url
@@ -46,13 +74,16 @@ class OverpassFrontend {
     if (this.url.match(/\.(json|osm\.bz2|osm)$/)) {
       this.localOnly = true
       this.ready = false
-      this.loadFile()
+      this._loadFile()
     } else {
       this.remote = true
       this.ready = true
     }
   }
 
+  /**
+   * clear all caches
+   */
   clearCache () {
     this.cacheElements = {}
     this.cacheElementsMemberOf = {}
@@ -60,7 +91,7 @@ class OverpassFrontend {
     this.db.clear()
   }
 
-  loadFile () {
+  _loadFile () {
     loadOsmFile(this.url,
       (err, result) => {
         if (err) {
@@ -106,12 +137,14 @@ class OverpassFrontend {
   }
 
   /**
-   * @param {string|string[]} ids - Id or array of Ids of OSM map features
-   * @param {object} options
+   * @param {string|string[]} ids - Id or array of Ids of OSM map features, e.g. [ 'n123', 'w2345', 'n123' ]. Illegal IDs will not produce an error but generate a 'null' object.
+   * @param {object} options Various options, see below
    * @param {number} [options.priority=0] - Priority for loading these objects. The lower the sooner they will be requested.
-   * @param {boolean} [options.sort=false] - When set to true, the function featureCallback will be called in some particular order
-   * @param {function} featureCallback Will be called for each object in the order of the IDs in parameter 'ids'. Will be passed: 1. err (if an error occured, otherwise null), 2. the object or null.
+   * @param {string|boolean} [options.sort=false] - When set to true or "index", the function featureCallback will be called in order of the "ids" array. When set to false or null, the featureCallback will be called as soon as the object is loaded (e.g. immediately, if it is cached). When set to "BBoxDiagonalLength", the objects are ordered by the length of the diagonal of the bounding box.
+   * @param {"asc"|"desc"} [options.sortDir="asc"] Sort direction.
+   * @param {function} featureCallback Will be called for each object which is passed in parameter 'ids'. Will be passed: 1. err (if an error occured, otherwise null), 2. the object or null, 3. index of the item in parameter ids.
    * @param {function} finalCallback Will be called after the last feature. Will be passed: 1. err (if an error occured, otherwise null).
+   * @return {RequestGet}
    */
   get (ids, options, featureCallback, finalCallback) {
     var request = new RequestGet(this, {
@@ -403,13 +436,22 @@ class OverpassFrontend {
   }
 
   /**
-   * @param {string} query - Query for requesting objects from Overpass API, e.g. "node[amenity=restaurant]"
-   * @param {L.latLngBounds} bounds - A Leaflet Bounds object, e.g. from map.getBounds()
+   * @param {string} query - Query for requesting objects from Overpass API, e.g. "node[amenity=restaurant]" or "(node[amenity];way[highway~'^(primary|secondary)$];)"
+   * @param {BoundingBox} bounds - A Leaflet Bounds object, e.g. from map.getBounds()
    * @param {object} options
    * @param {number} [options.priority=0] - Priority for loading these objects. The lower the sooner they will be requested.
-   * @param {boolean} [options.sort=false] - When set to true, the function featureCallback will be called in some particular order
-   * @param {function} featureCallback Will be called for each object in the order of the IDs in parameter 'ids'. Will be passed: 1. err (if an error occured, otherwise null), 2. the object or null.
+   * @param {boolean|string} [options.sort=false] - If false, it will be called as soon as the features are availabe (e.g. immediately when cached).
+   * @param {bit_array} [options.properties] Which properties of the features should be downloaded: OVERPASS_ID_ONLY, OVERPASS_BBOX, OVERPASS_TAGS, OVERPASS_GEOM, OVERPASS_META. Combine by binary OR: ``OVERPASS_ID | OVERPASS_BBOX``. Default: OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.BBOX
+   * @param {number} [options.split=0] If more than 'split' elements would be returned, split into several smaller requests, with 'split' elements each. Default: 0 (do not split)
+   * @param {boolean} [options.members=false] Query relation members of. Default: false
+   * @param {function} [options.memberCallback] For every member, call this callback function. (Requires options.members=true)
+   * @param {bit_array} [options.memberProperties] Which properties should be loaded for the members. Default: OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.BBOX
+   * @param {number} [options.memberSplit=0] If more than 'memberSplit' member elements would be returned, split into smaller requests (see 'split'). 0 = do not split.
+   * @param {string|Filter} [options.filter] Additional filter.
+   * @param {boolean} [options.noCacheQuery=false] If true, the local cache will not be queried
+   * @param {function} featureCallback Will be called for each matching object. Will be passed: 1. err (if an error occured, otherwise null), 2. the object or null.
    * @param {function} finalCallback Will be called after the last feature. Will be passed: 1. err (if an error occured, otherwise null).
+   * @return {RequestBBox}
    */
   BBoxQuery (query, bounds, options, featureCallback, finalCallback) {
     bounds = new BoundingBox(bounds)

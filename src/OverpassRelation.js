@@ -8,6 +8,28 @@ var turf = {
   bboxClip: require('@turf/bbox-clip').default
 }
 
+/**
+ * A relation
+ * @property {string} id ID of this object, starting with 'r'.
+ * @property {number} osm_id Numeric id.
+ * @property {string} type Type: 'relation'.
+ * @property {object} tags OpenStreetMap tags.
+ * @property {object} meta OpenStreetMap meta information.
+ * @property {GeoJSON} geometry of the object
+ * @property {object} data Data as loaded from Overpass API.
+ * @property {bit_array} properties Which information about this object is known?
+ * @property {object[]} memberOf List of relations where this object is member of.
+ * @property {string} memberOf.id ID of the relation where this object is member of.
+ * @property {string} memberOf.role Role of this object in the relation.
+ * @property {number} memberOf.sequence This object is the nth member in the relation.
+ * @property {BoundingBox} bounds Bounding box of this object.
+ * @property {Point} center Centroid of the bounding box.
+ * @property {object[]} members Nodes of the way.
+ * @property {string} members.id ID of the member.
+ * @property {number} members.ref Numeric ID of the member.
+ * @property {string} members.type 'node'.
+ * @property {string} members.role Role of the member.
+ */
 class OverpassRelation extends OverpassObject {
   updateData (data, options) {
     var i
@@ -127,6 +149,10 @@ class OverpassRelation extends OverpassObject {
     this.updateGeometry()
   }
 
+  /**
+   * Return list of member ids.
+   * @return {string[]}
+   */
   memberIds () {
     if (this._memberIds) {
       return this._memberIds
@@ -151,6 +177,11 @@ class OverpassRelation extends OverpassObject {
     return this.memberIds()
   }
 
+  /**
+   * return a leaflet feature for this object.
+   * @param {object} [options] options Options will be passed to the leaflet function
+   * @return {L.layer}
+   */
   leafletFeature (options) {
     if (!this.data.members) {
       return null

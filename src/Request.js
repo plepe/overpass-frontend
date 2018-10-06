@@ -14,7 +14,7 @@ const SortedCallbacks = require('./SortedCallbacks')
 /**
  * An unspecified request
  * @param {OverpassFrontend} overpass
- * @param {data} data
+ * @param {object} options
  */
 class Request {
   constructor (overpass, data) {

@@ -4,6 +4,24 @@ var OverpassObject = require('./OverpassObject')
 var BoundingBox = require('boundingbox')
 var OverpassFrontend = require('./defines')
 
+/**
+ * A node
+ * @extends OverpassObject
+ * @property {string} id ID of this object, starting with 'n'.
+ * @property {number} osm_id Numeric id.
+ * @property {string} type Type: 'node'
+ * @property {object} tags OpenStreetMap tags.
+ * @property {object} meta OpenStreetMap meta information.
+ * @property {Point} geometry of the object
+ * @property {object} data Data as loaded from Overpass API.
+ * @property {bit_array} properties Which information about this object is known?
+ * @property {object[]} memberOf List of ways and relations where this object is member of.
+ * @property {string} memberOf.id ID of the way or relation where this way is member of.
+ * @property {string} memberOf.role Role of this object in the relation.
+ * @property {number} memberOf.sequence This object is the nth member in the way resp. relation.
+ * @property {BoundingBox} bounds Bounding box of this object.
+ * @property {Point} center Centroid of the bounding box.
+ */
 class OverpassNode extends OverpassObject {
   GeoJSON () {
     let result = {
@@ -38,6 +56,12 @@ class OverpassNode extends OverpassObject {
     }
   }
 
+  /**
+   * return a leaflet feature for this object
+   * @param {object} [options] options Options will be passed to the leaflet function
+   * @param {string} [options.nodeFeature='CircleMarker'] Which type of object should be returned: 'Marker' (L.marker), 'Circle' (L.circle) or 'CircleMarker' (L.circleMarker).
+   * @return {L.layer}
+   */
   leafletFeature (options) {
     if (!this.geometry) {
       return null

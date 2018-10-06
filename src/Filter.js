@@ -168,6 +168,10 @@ function parse (def) {
   return [ result, def ]
 }
 
+/**
+ * A Filter into OSM data. A simplified version of Overpass QL.
+ * @param {string|object} query
+ */
 class Filter {
   constructor (def) {
     if (typeof def === 'string') {
@@ -178,6 +182,11 @@ class Filter {
     this.def = def
   }
 
+  /**
+   * Check of a object matches this filter
+   * @param {OverpassNode|OverpassWay|OverpassRelation} ob an object from Overpass API
+   * @return {boolean}
+   */
   match (ob, def) {
     if (!def) {
       def = this.def
@@ -190,6 +199,10 @@ class Filter {
     return def.filter(test.bind(this, ob)).length === def.length
   }
 
+  /**
+   * Convert query to a string representation
+   * @return {string}
+   */
   toString (def) {
     let result = ''
 
@@ -221,6 +234,12 @@ class Filter {
     return result
   }
 
+  /**
+   * Convert query to Overpass QL
+   * @param {object} [options] Additional options
+   * @param {string} [options.inputSet=''] Specify input set (e.g.'.foo').
+   * @return {string}
+   */
   toQl (options = {}, def) {
     if (!def) {
       def = this.def
@@ -256,6 +275,11 @@ class Filter {
     return '(' + types.map(type => type + options.inputSet + filters.map(compile).join('')).join(';') + ';)'
   }
 
+  /**
+   * Convert query to LokiJS query for local database
+   * @param {object} [options] Additional options
+   * @return {string}
+   */
   toLokijs (options = {}, def) {
     if (!def) {
       def = this.def

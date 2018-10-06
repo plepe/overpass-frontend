@@ -6,6 +6,23 @@ var turf = {
   intersect: require('@turf/intersect').default
 }
 
+/**
+ * Base class for representing map features.
+ * @property {string} id ID of this object.
+ * @property {number} osm_id Numeric id.
+ * @property {string} type Type: 'node', 'way' or 'relation'.
+ * @property {object} tags OpenStreetMap tags.
+ * @property {object} meta OpenStreetMap meta information.
+ * @property {object} geometry of the object
+ * @property {object} data Data as loaded from Overpass API.
+ * @property {bit_array} properties Which information about this object is known?
+ * @property {object[]} memberOf List of ways and relations where this object is member of.
+ * @property {string} memberOf.id ID of the way or relation where this way is member of.
+ * @property {string} memberOf.role Role of this object in the relation.
+ * @property {number} memberOf.sequence This object is the nth member in the way resp. relation.
+* @property {BoundingBox} bounds Bounding box of this object.
+ * @property {Point} center Centroid of the bounding box.
+ */
 class OverpassObject {
   constructor () {
     this.data = {}
@@ -98,14 +115,22 @@ class OverpassObject {
   notifyMemberUpdate (memberObs) {
   }
 
+  /**
+   * Title of of this object (default: name, operator or ref or the id of the object)
+   * @return {string}
+   */
   title () {
     if (!this.tags) {
       return this.id
     }
 
-    return this.tags.name || this.tags.operator || this.tags.ref
+    return this.tags.name || this.tags.operator || this.tags.ref || this.id
   }
 
+  /**
+   * GeoJSON representation of this object
+   * @return {object}
+   */
   GeoJSON () {
     return {
       type: 'Feature',
@@ -136,6 +161,11 @@ class OverpassObject {
     return ret
   }
 
+  /**
+   * Check whether this object intersects (or is within) the specified bounding box. Returns 0 if it does not match; 1 if the exact geometry is not known, but the object's bounding box matches; 2 exact match.
+   * @param {boundingbox:BoundingBox} bbox Bounding box
+   * @return {number}
+   */
   intersects (bbox) {
     if (!this.bounds) {
       return 0
@@ -159,6 +189,11 @@ class OverpassObject {
     return 1
   }
 
+  /**
+   * return a leaflet feature for this object.
+   * @param {object} [options] options Options will be passed to the leaflet function
+   * @return {L.layer}
+   */
   leafletFeature (options) {
     return null
   }
