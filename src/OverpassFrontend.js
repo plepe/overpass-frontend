@@ -501,7 +501,10 @@ class OverpassFrontend {
     let todo = Object.values(this.pendingUpdateEmit)
     this.pendingUpdateEmit = {}
 
-    todo.forEach(ob => ob.emit('update', ob))
+    todo.forEach(ob => {
+      ob.emit('update', ob)
+      this.db.update(ob.dbInsert())
+    })
   }
 
   createOrUpdateOSMObject (el, options) {
