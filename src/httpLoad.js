@@ -1,11 +1,11 @@
 /* global location:false */
 
 if (typeof XMLHttpRequest === 'undefined') {
-  var XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest
+  global.XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest
 }
 
 function httpLoad (url, getParam, postParam, callback) {
-  var req = new XMLHttpRequest()
+  var req = new global.XMLHttpRequest()
 
   req.onreadystatechange = function () {
     var data = null
