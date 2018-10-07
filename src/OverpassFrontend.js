@@ -23,8 +23,13 @@ var loadOsmFile = require('./loadOsmFile')
  */
 
 /**
- * When a file is specified as URL, this event notifies, that the file has been completely loaded.
+ * When a file is specified as URL, this event notifies, that the file has been completely loaded. When a Overpass API is used, every time when data has been received.
  * @event OverpassFrontend#load
+ * @param {object} osm3sMeta Meta data (not all properties of meta data might be set)
+ * @param {number} osm3sMeta.version OpenStreetMap API version (currently 0.6)
+ * @param {string} osm3sMeta.generator Data generator
+ * @param {string} osm3sMeta.timestamp_osm_base RFC8601 timestamp of OpenStreetMap data
+ * @param {string} osm3sMeta.copyright Copyright statement
  */
 
 /**
@@ -347,6 +352,18 @@ class OverpassFrontend {
       this.errorCount = 0
     }
 
+    let osm3sMeta = {}
+    for (let k in results) {
+      if (k !== 'elements' && k !== 'osm3s') {
+        osm3sMeta[k] = results[k]
+      }
+    }
+    for (let k in results.osm3s) {
+      osm3sMeta[k] = results.osm3s[k]
+    }
+
+    this.emit('load', osm3sMeta)
+
     var subRequestsIndex = 0
     var partIndex = 0
     var subRequest = context.subRequests[0]
@@ -384,6 +401,7 @@ class OverpassFrontend {
         continue
       }
 
+      part.osm3sMeta = osm3sMeta
       var ob = this.createOrUpdateOSMObject(el, part)
       delete context.todo[ob.id]
 

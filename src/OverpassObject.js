@@ -50,6 +50,8 @@ class OverpassObject {
       this.osm_id = data.id
     }
 
+    this.osm3sMeta = options.osm3sMeta
+
     for (var k in data) {
       this.data[k] = data[k]
     }
@@ -156,6 +158,10 @@ class OverpassObject {
       for (k in this.meta) {
         ret['@' + k] = this.meta[k]
       }
+    }
+
+    for (k in this.osm3sMeta) {
+      ret['@osm3s:' + k] = this.osm3sMeta[k]
     }
 
     return ret

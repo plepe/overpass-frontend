@@ -281,6 +281,10 @@ describe('Overpass get', function() {
 	      "source": "survey",
 	      "@changeset": 24967165,
 	      "@id": "node/3037893169",
+              "@osm3s:copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.",
+              "@osm3s:generator": "Overpass API",
+              "@osm3s:version": 0.6,
+              "@osm3s:timestamp_osm_base": "",
 	      "@timestamp": "2014-08-23T23:04:34Z",
 	      "@uid": 770238,
 	      "@user": "Kevin Kofler",
@@ -324,6 +328,10 @@ describe('Overpass get', function() {
 	      "source:maxspeed": "AT:zone:30",
 	      "@changeset": 18574192,
 	      "@id": "way/146678749",
+              "@osm3s:copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.",
+              "@osm3s:generator": "Overpass API",
+              "@osm3s:version": 0.6,
+              "@osm3s:timestamp_osm_base": "",
 	      "@timestamp": "2013-10-27T20:43:03Z",
 	      "@uid": 1066249,
 	      "@user": "Railjet",
@@ -397,6 +405,10 @@ describe('Overpass get', function() {
 	    "properties": {
 	      "@changeset": 32165173,
 	      "@id": "relation/3854502",
+              "@osm3s:copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.",
+              "@osm3s:generator": "Overpass API",
+              "@osm3s:version": 0.6,
+              "@osm3s:timestamp_osm_base": "",
 	      "@timestamp": "2015-06-23T16:09:42Z",
 	      "@uid": 161619,
 	      "@user": "FvGordon",
@@ -688,6 +700,11 @@ describe('Overpass get', function() {
     })
 
     it('should return a list of node features (request splitted)', function(done) {
+      var loadCount = 0
+      var expectedLoadCount = 3
+      overpassFrontend.on('load', function (osm3sMeta) {
+        loadCount++
+      })
       var finalCalled = 0
       var found = []
       var expected = [ 'n1853730762', 'n1853730763', 'n1853730777', 'n1853730779', 'n1853730785', 'n1853730792', 'n1853730797', 'n1853730821' ]
@@ -716,6 +733,7 @@ describe('Overpass get', function() {
           assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
           assert.deepEqual(expected.sort(), found.sort(), 'Wrong count of objects found!')
           assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of subrequests')
+          assert.equal(loadCount, expectedLoadCount, 'Wrong count of load events')
 
           done()
         }
