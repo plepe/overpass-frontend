@@ -700,6 +700,11 @@ describe('Overpass get', function() {
     })
 
     it('should return a list of node features (request splitted)', function(done) {
+      var loadCount = 0
+      var expectedLoadCount = 3
+      overpassFrontend.on('load', function (osm3sMeta) {
+        loadCount++
+      })
       var finalCalled = 0
       var found = []
       var expected = [ 'n1853730762', 'n1853730763', 'n1853730777', 'n1853730779', 'n1853730785', 'n1853730792', 'n1853730797', 'n1853730821' ]
@@ -728,6 +733,7 @@ describe('Overpass get', function() {
           assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
           assert.deepEqual(expected.sort(), found.sort(), 'Wrong count of objects found!')
           assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of subrequests')
+          assert.equal(loadCount, expectedLoadCount, 'Wrong count of load events')
 
           done()
         }
