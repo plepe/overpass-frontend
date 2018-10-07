@@ -2405,6 +2405,46 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
       request.on('subrequest-compile', compileListener)
     })
   })
+
+  describe('Check calling events on members', function (done) {
+    let member
+    let callCount = 0
+
+    function updateCall () {
+      callCount++
+    }
+
+    it('First request a member', function (done) {
+      overpassFrontend.clearCache()
+
+      var request = overpassFrontend.get(
+        'w141233631',
+        {
+          properties: OverpassFrontend.ALL
+        },
+        (err, result) => {
+          member = result
+          member.on('update', updateCall)
+        },
+        done
+      )
+    })
+
+    it('Now, request a relation', function (done) {
+      var request = overpassFrontend.get(
+        'r1990860',
+        {
+          properties: OverpassFrontend.MEMBERS | OverpassFrontend.TAGS
+        },
+        (err, result) => {
+        },
+        (err) => {
+          assert.equal(callCount, 2)
+          done(err)
+        }
+      )
+    })
+  })
 })
 
 describe('Overpass Get - Relation with members in BBOX', function() {
