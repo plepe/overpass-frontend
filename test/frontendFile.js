@@ -12,7 +12,10 @@ describe('load file', function() {
   it('wait until file is loaded', function (done) {
     this.timeout(20000)
     overpassFrontend = new OverpassFrontend('test/data.osm.bz2')
-    overpassFrontend.once('load', done)
+    overpassFrontend.once('load', (osm3sMeta) => {
+      assert.deepEqual(osm3sMeta, { version: 0.6, generator: 'JOSM' })
+      done()
+    })
   })
 })
 

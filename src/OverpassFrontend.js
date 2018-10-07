@@ -15,6 +15,7 @@ var RequestGet = require('./RequestGet')
 var RequestBBox = require('./RequestBBox')
 var defines = require('./defines')
 var loadOsmFile = require('./loadOsmFile')
+var copyOsm3sMetaFrom = require('./copyOsm3sMeta')
 
 /**
  * An error occured
@@ -97,12 +98,16 @@ class OverpassFrontend {
   }
 
   _loadFile () {
+    let osm3sMeta
+
     loadOsmFile(this.url,
       (err, result) => {
         if (err) {
           console.log('Error loading file', err)
           return this.emit('error', err)
         }
+
+        osm3sMeta = copyOsm3sMetaFrom(result)
 
         let chunks = []
         for (var i = 0; i < result.elements.length; i += this.options.loadChunkSize) {
@@ -116,6 +121,7 @@ class OverpassFrontend {
             chunk.forEach(
               (element) => {
                 this.createOrUpdateOSMObject(element, {
+                  osm3sMeta,
                   properties: OverpassFrontend.TAGS | OverpassFrontend.META | OverpassFrontend.MEMBERS
                 })
               }
@@ -131,7 +137,7 @@ class OverpassFrontend {
               return this.emit('error', err)
             }
 
-            this.emit('load')
+            this.emit('load', osm3sMeta)
 
             this.ready = true
             this._overpassProcess()
@@ -352,16 +358,7 @@ class OverpassFrontend {
       this.errorCount = 0
     }
 
-    let osm3sMeta = {}
-    for (let k in results) {
-      if (k !== 'elements' && k !== 'osm3s') {
-        osm3sMeta[k] = results[k]
-      }
-    }
-    for (let k in results.osm3s) {
-      osm3sMeta[k] = results.osm3s[k]
-    }
-
+    let osm3sMeta = copyOsm3sMetaFrom(results)
     this.emit('load', osm3sMeta)
 
     var subRequestsIndex = 0
