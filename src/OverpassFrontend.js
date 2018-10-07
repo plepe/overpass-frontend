@@ -1,3 +1,4 @@
+const ee = require('event-emitter')
 var async = require('async')
 var weightSort = require('weight-sort')
 var BoundingBox = require('boundingbox')
@@ -13,6 +14,18 @@ var RequestGet = require('./RequestGet')
 var RequestBBox = require('./RequestBBox')
 var defines = require('./defines')
 
+/**
+ * Data has been received from the Overpass API.
+ * @event OverpassFrontend#load
+ * @param {object} osm3sMeta Meta data (not all properties of meta data might be set)
+ * @param {number} osm3sMeta.version OpenStreetMap API version (currently 0.6)
+ * @param {string} osm3sMeta.generator Data generator
+ * @param {string} osm3sMeta.timestamp_osm_base RFC8601 timestamp of OpenStreetMap data
+ * @param {string} osm3sMeta.copyright Copyright statement
+ */
+
+/**
+ */
 class OverpassFrontend {
   constructor (url, options) {
     this.url = url
@@ -249,6 +262,18 @@ class OverpassFrontend {
       this.errorCount = 0
     }
 
+    let osm3sMeta = {}
+    for (let k in results) {
+      if (k !== 'elements' && k !== 'osm3s') {
+        osm3sMeta[k] = results[k]
+      }
+    }
+    for (let k in results.osm3s) {
+      osm3sMeta[k] = results.osm3s[k]
+    }
+
+    this.emit('load', osm3sMeta)
+
     var subRequestsIndex = 0
     var partIndex = 0
     var subRequest = context.subRequests[0]
@@ -286,6 +311,7 @@ class OverpassFrontend {
         continue
       }
 
+      part.osm3sMeta = osm3sMeta
       var ob = this.createOrUpdateOSMObject(el, part)
       delete context.todo[ob.id]
 
@@ -460,5 +486,7 @@ for (var k in defines) {
 function isSeparator (el) {
   return ('count' in el || ('type' in el && el.type === 'count'))
 }
+
+ee(OverpassFrontend.prototype)
 
 module.exports = OverpassFrontend
