@@ -13,10 +13,11 @@
     "@turf/union": "^6.0.0",
     "async": "*",
     "boundingbox": "^0.1.0",
+    "bzip2": "^0.1.1",
     "event-emitter": "^0.3.5",
     "lodash": "^4.17.5",
+    "lokijs": "^1.5.5",
     "osmtogeojson": "^3.0.0-beta.2",
-    "quadtree-lookup": "https://github.com/petrbrzek/quadtree-lookup",
     "weight-sort": "*",
     "xmlhttprequest": "*"
   },
@@ -31,15 +32,17 @@
     "jsdoc": "^3.5.5",
     "leaflet": "^0.7.0",
     "mocha": "*",
+    "require-self": "^0.2.1",
     "watchify": "^3.9.0"
   },
   "scripts": {
     "test": "mocha --bail",
     "build": "browserify index.js -o dist/overpass-frontend.js",
-    "build-test": "browserify -t brfs --debug test/knownArea.js test/test.js -o dist/test.js",
+    "build-test": "browserify -t brfs --debug test/filter.js test/knownArea.js test/test.js test/loadOsmFile.js test/frontendFile.js -o dist/test.js",
     "watch": "watchify --debug index.js -o dist/overpass-frontend.js -v",
-    "watch-test": "watchify -t brfs --debug test/knownArea.js test/test.js -o dist/test.js",
+    "watch-test": "watchify -t brfs --debug test/filter.js test/knownArea.js test/test.js test/loadOsmFile.js test/frontendFile.js -o dist/test.js -v",
     "prepublish": "npm run build && npm run lint",
+    "prepare": "require-self",
     "lint": "eslint src/*.js index.js",
     "doc": "jsdoc -d doc/ src/*.js"
   },

@@ -1,4 +1,32 @@
-const ee = require('event-emitter')
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: OverpassFrontend.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: OverpassFrontend.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const ee = require('event-emitter')
 var async = require('async')
 var weightSort = require('weight-sort')
 var BoundingBox = require('boundingbox')
@@ -100,7 +128,7 @@ class OverpassFrontend {
         }
 
         let chunks = []
-        for (var i = 0; i < result.elements.length; i += this.options.loadChunkSize) {
+        for (var i = 0; i &lt; result.elements.length; i += this.options.loadChunkSize) {
           chunks.push(result.elements.slice(i, i + this.options.loadChunkSize))
         }
 
@@ -187,7 +215,7 @@ class OverpassFrontend {
       return null
     }
 
-    if ((options.properties & ob.properties) !== options.properties) {
+    if ((options.properties &amp; ob.properties) !== options.properties) {
       return false
     }
 
@@ -248,10 +276,10 @@ class OverpassFrontend {
       maxEffort: 0
     }
 
-    for (j = 0; j < this.requests.length; j++) {
+    for (j = 0; j &lt; this.requests.length; j++) {
       request = this.requests[j]
 
-      if (request.priority > context.minPriority &&
+      if (request.priority > context.minPriority &amp;&amp;
          (context.maxEffort === null || context.maxEffort > this.options.effortPerRequest)) {
         break
       }
@@ -259,7 +287,7 @@ class OverpassFrontend {
       if (request.willInclude(context)) {
         let { minEffort, maxEffort } = request.minMaxEffort()
 
-        if (context.minEffort > 0 && context.minEffort + minEffort > this.options.effortPerRequest) {
+        if (context.minEffort > 0 &amp;&amp; context.minEffort + minEffort > this.options.effortPerRequest) {
           continue
         }
 
@@ -276,7 +304,7 @@ class OverpassFrontend {
 
     var effortAvailable = this.options.effortPerRequest
 
-    for (j = 0; j < context.requests.length; j++) {
+    for (j = 0; j &lt; context.requests.length; j++) {
       request = context.requests[j]
       let remainingRequestsAtPriority = context.requests.slice(j).filter(r => r.priority === request.priority)
       context.maxEffort = Math.ceil(effortAvailable / remainingRequestsAtPriority.length)
@@ -296,7 +324,7 @@ class OverpassFrontend {
       effortAvailable -= subRequest.effort
       context.query += subRequest.query
 
-      if (effortAvailable <= 0) {
+      if (effortAvailable &lt;= 0) {
         break
       }
     }
@@ -323,7 +351,7 @@ class OverpassFrontend {
   }
 
   _handleResult (context, err, results) {
-    if (!err && results.remark) {
+    if (!err &amp;&amp; results.remark) {
       err = results.remark
     }
 
@@ -331,7 +359,7 @@ class OverpassFrontend {
       this.errorCount++
       this.requestIsActive = false
 
-      if (this.errorCount <= 3) {
+      if (this.errorCount &lt;= 3) {
         // retry
         this._overpassProcess()
       } else {
@@ -356,7 +384,7 @@ class OverpassFrontend {
       part.count = 0
     }
 
-    for (var i = 0; i < results.elements.length; i++) {
+    for (var i = 0; i &lt; results.elements.length; i++) {
       var el = results.elements[i]
 
       if (isSeparator(el)) {
@@ -389,7 +417,7 @@ class OverpassFrontend {
 
       var members = this.cacheElements[ob.id].memberIds()
       if (members) {
-        for (var j = 0; j < members.length; j++) {
+        for (var j = 0; j &lt; members.length; j++) {
           if (!(members[j] in this.cacheElementsMemberOf)) {
             this.cacheElementsMemberOf[members[j]] = [ this.cacheElements[ob.id] ]
           } else {
@@ -402,7 +430,7 @@ class OverpassFrontend {
       if (part.receiveObject) {
         part.receiveObject(ob)
       }
-      if (!request.aborted && part.featureCallback) {
+      if (!request.aborted &amp;&amp; part.featureCallback) {
         part.featureCallback(err, ob)
       }
     }
@@ -500,7 +528,7 @@ class OverpassFrontend {
   }
 
   abortAllRequests () {
-    for (var j = 0; j < this.requests.length; j++) {
+    for (var j = 0; j &lt; this.requests.length; j++) {
       if (this.requests[j] === null) {
         continue
       }
@@ -516,7 +544,7 @@ class OverpassFrontend {
       ids = [ ids ]
     }
 
-    for (var i = 0; i < ids.length; i++) {
+    for (var i = 0; i &lt; ids.length; i++) {
       if (ids[i] in this.cacheElements) {
         let lokiOb = this.cacheElements[ids[i]].dbData
         delete this.cacheElements[ids[i]]
@@ -554,11 +582,11 @@ class OverpassFrontend {
     var ob = null
     let create = true
 
-    if (id in this.cacheElements && !this.cacheElements[id]) {
+    if (id in this.cacheElements &amp;&amp; !this.cacheElements[id]) {
       console.log('why can this be null?', id)
     }
 
-    if (id in this.cacheElements && this.cacheElements[id]) {
+    if (id in this.cacheElements &amp;&amp; this.cacheElements[id]) {
       ob = this.cacheElements[id]
       create = false
     } else if (el.type === 'relation') {
@@ -616,9 +644,32 @@ for (var k in defines) {
 }
 
 function isSeparator (el) {
-  return ('count' in el || ('type' in el && el.type === 'count'))
+  return ('count' in el || ('type' in el &amp;&amp; el.type === 'count'))
 }
 
 ee(OverpassFrontend.prototype)
 
 module.exports = OverpassFrontend
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Filter.html">Filter</a></li><li><a href="KnownArea.html">KnownArea</a></li><li><a href="OverpassFrontend.html">OverpassFrontend</a></li><li><a href="OverpassNode.html">OverpassNode</a></li><li><a href="OverpassObject.html">OverpassObject</a></li><li><a href="OverpassRelation.html">OverpassRelation</a></li><li><a href="OverpassWay.html">OverpassWay</a></li><li><a href="Request.html">Request</a></li><li><a href="RequestBBox.html">RequestBBox</a></li><li><a href="RequestGet.html">RequestGet</a></li></ul><h3>Events</h3><ul><li><a href="OverpassFrontend.html#event:error">error</a></li><li><a href="OverpassFrontend.html#event:load">load</a></li><li><a href="OverpassFrontend.html#event:update">update</a></li><li><a href="Request.html#event:abort">abort</a></li><li><a href="Request.html#event:finish">finish</a></li><li><a href="Request.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="Request.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestBBox.html#event:abort">abort</a></li><li><a href="RequestBBox.html#event:finish">finish</a></li><li><a href="RequestBBox.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestBBox.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestGet.html#event:abort">abort</a></li><li><a href="RequestGet.html#event:finish">finish</a></li><li><a href="RequestGet.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestGet.html#event:subrequest-finished">subrequest-finished</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Oct 06 2018 22:54:44 GMT+0200 (CEST)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
