@@ -455,7 +455,7 @@ describe('Overpass get', function() {
           found.push(result.id)
 
           if(expected.indexOf(result.id) == -1)
-            assert(false, 'Object ' + result.id + ' should not be found!')
+            assert.fail('Object ' + result.id + ' should not be found!')
         },
         function(err) {
           assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
@@ -498,7 +498,7 @@ describe('Overpass get', function() {
           found.push(result.id)
 
           if(expected.indexOf(result.id) == -1)
-            assert(false, 'Object ' + result.id + ' should not be found!')
+            assert.fail('Object ' + result.id + ' should not be found!')
         },
         function(err) {
           assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
@@ -539,7 +539,7 @@ describe('Overpass get', function() {
           found.push(result.id)
 
           if(expected.indexOf(result.id) == -1)
-            assert(false, 'Object ' + result.id + ' should not be found!')
+            assert.fail('Object ' + result.id + ' should not be found!')
         },
         function(err) {
           assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
@@ -574,7 +574,7 @@ describe('Overpass get', function() {
         function(err, result, index) {
           if(expected.indexOf(result.id) === -1 &&
              might.indexOf(result.id) === -1) {
-            assert(false, 'Object ' + result.id + ' should not be found!')
+            assert.fail('Object ' + result.id + ' should not be found!')
           }
 
           if (expected.indexOf(result.id) !== -1) {
@@ -612,7 +612,7 @@ describe('Overpass get', function() {
         function(err, result, index) {
           if(expected.indexOf(result.id) === -1 &&
              might.indexOf(result.id) === -1) {
-            assert(false, 'Object ' + result.id + ' should not be found!')
+            assert.fail('Object ' + result.id + ' should not be found!')
           }
 
           if (expected.indexOf(result.id) !== -1) {
@@ -653,13 +653,13 @@ describe('Overpass get', function() {
 
           if(expected.indexOf(result.id) === -1 &&
              might.indexOf(result.id) === -1)
-            assert(false, 'Object ' + result.id + ' should not be found!')
+            assert.fail('Object ' + result.id + ' should not be found!')
         },
         function(err) {
           assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
           assert.equal(0, request.callCount, 'Server should be not be called (fully cached)')
           if(expectedFound.length != expected.length)
-            assert(false, 'Wrong count of objects found!')
+            assert.fail('Wrong count of objects found!')
 
           done()
         }
@@ -687,12 +687,12 @@ describe('Overpass get', function() {
           found.push(result.id)
 
           if (expected.indexOf(result.id) === -1)
-            assert(false, 'Object ' + result.id + ' should not be found!')
+            assert.fail('Object ' + result.id + ' should not be found!')
         },
         function(err) {
           assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
           if (found.length != expected.length)
-            assert(false, 'Wrong count of objects found!')
+            assert.fail('Wrong count of objects found!')
 
           done()
         }
@@ -727,7 +727,7 @@ describe('Overpass get', function() {
           found.push(result.id)
 
           if(expected.indexOf(result.id) == -1)
-            assert(false, 'Object ' + result.id + ' should not be found!')
+            assert.fail('Object ' + result.id + ' should not be found!')
         },
         function(err) {
           assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
@@ -772,7 +772,7 @@ describe('Overpass get', function() {
               found1.push(result.id)
 
               if(expected1.indexOf(result.id) == -1)
-                assert(false, '(1) Object ' + result.id + ' should not be found!')
+                assert.fail('(1) Object ' + result.id + ' should not be found!')
             },
             function(err) {
               assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
@@ -800,7 +800,7 @@ describe('Overpass get', function() {
               found2.push(result.id)
 
               if(expected2.indexOf(result.id) == -1)
-                assert(false, '(2) Object ' + result.id + ' should not be found!')
+                assert.fail('(2) Object ' + result.id + ' should not be found!')
             },
             function(err) {
               assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
@@ -919,14 +919,14 @@ describe('Overpass query by id with bbox option', function() {
     overpassFrontend.get(query.concat([]), { properties: OverpassFrontend.ALL, bbox: bbox },
         function(err, result, index) {
           if (result === false && index_outside_bbox.indexOf(index) == -1)
-              assert(false, 'Index ' + index + ' should return a valid result (' + query[index] + ')')
+              assert.fail('Index ' + index + ' should return a valid result (' + query[index] + ')')
 
           if (result === null && index_non_existant.indexOf(index) === -1) {
-            assert(false, 'Index ' + index + ' should not return a non-existant object (' + query[index] + ')')
+            assert.fail('Index ' + index + ' should not return a non-existant object (' + query[index] + ')')
           }
 
           if (result !== false && result !== null && expected.indexOf(result.id) == -1) {
-            assert(false, 'Returning object ' + result.id + ' which should not be returned')
+            assert.fail('Returning object ' + result.id + ' which should not be returned')
           }
         },
         function(err) {
@@ -952,14 +952,14 @@ describe('Overpass query by id with bbox option', function() {
     overpassFrontend.get(query.concat([]), { properties: OverpassFrontend.ALL, bbox: bbox },
         function(err, result, index) {
           if (result === false && index_outside_bbox.indexOf(index) == -1)
-              assert(false, 'Index ' + index + ' should return a valid result (' + query[index] + ')')
+              assert.fail('Index ' + index + ' should return a valid result (' + query[index] + ')')
 
           if (result === null && index_non_existant.indexOf(index) === -1) {
-            assert(false, 'Index ' + index + ' should not return a non-existant object (' + query[index] + ')')
+            assert.fail('Index ' + index + ' should not return a non-existant object (' + query[index] + ')')
           }
 
           if (result !== false && result !== null && expected.indexOf(result.id) == -1) {
-            assert(false, 'Returning object ' + result.id + ' which should not be returned')
+            assert.fail('Returning object ' + result.id + ' which should not be returned')
           }
         },
         function(err) {
@@ -1619,7 +1619,7 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
 
           result.memberOf.forEach(memberOf => {
             if (found.indexOf(memberOf.relation.id) === -1) {
-              assert(false, 'memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.relation.id)
+              assert.fail('memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.relation.id)
             }
           })
 
@@ -1702,7 +1702,7 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
 
           result.memberOf.forEach(memberOf => {
             if (found.indexOf(memberOf.relation.id) === -1) {
-              assert(false, 'memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.relation.id)
+              assert.fail('memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.relation.id)
             }
           })
 
@@ -1782,7 +1782,7 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
 
           result.memberOf.forEach(memberOf => {
             if (found.indexOf(memberOf.relation.id) === -1) {
-              assert(false, 'memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.relation.id)
+              assert.fail('memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.relation.id)
             }
           })
 
@@ -1861,7 +1861,7 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
 
           result.memberOf.forEach(memberOf => {
             if (found.indexOf(memberOf.relation.id) === -1) {
-              assert(false, 'memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.relation.id)
+              assert.fail('memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.relation.id)
             }
           })
 
@@ -1943,7 +1943,7 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
 
           result.memberOf.forEach(memberOf => {
             if (found.indexOf(memberOf.relation.id) === -1) {
-              assert(false, 'memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.relation.id)
+              assert.fail('memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.relation.id)
             }
           })
 
@@ -2024,7 +2024,7 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
 
           result.memberOf.forEach(memberOf => {
             if (found.indexOf(memberOf.relation.id) === -1) {
-              assert(false, 'memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.relation.id)
+              assert.fail('memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.relation.id)
             }
           })
 
@@ -2107,7 +2107,7 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
 
           result.memberOf.forEach(memberOf => {
             if (found.indexOf(memberOf.relation.id) === -1) {
-              assert(false, 'memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.relation.id)
+              assert.fail('memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.relation.id)
             }
           })
 
@@ -2190,7 +2190,7 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
 
           result.memberOf.forEach(memberOf => {
             if (found.indexOf(memberOf.relation.id) === -1) {
-              assert(false, 'memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.relation.id)
+              assert.fail('memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.relation.id)
             }
           })
 
@@ -2274,7 +2274,7 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
 
           result.memberOf.forEach(memberOf => {
             if (found.indexOf(memberOf.relation.id) === -1) {
-              assert(false, 'memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.relation.id)
+              assert.fail('memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.relation.id)
             }
           })
 
@@ -2414,7 +2414,7 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
 
           result.memberOf.forEach(memberOf => {
             if (found.indexOf(memberOf.relation.id) === -1) {
-              assert(false, 'memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.relation.id)
+              assert.fail('memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.relation.id)
             }
           })
 
@@ -2502,7 +2502,7 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
 // TODO: when removing objects from cache remove memberOf references
 //          result.memberOf.forEach(memberOf => {
 //            if (found.indexOf(memberOf.relation.id) === -1) {
-//              assert(false, 'memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.relation.id)
+//              assert.fail('memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.relation.id)
 //            }
 //          })
 
@@ -2583,7 +2583,7 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
           result.memberOf.forEach(memberOf => {
             let relId = memberOf.relation.id
             if (expected.indexOf(relId) !== -1 && found.indexOf(relId) === -1) {
-              assert(false, 'memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.relation.id)
+              assert.fail('memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.relation.id)
             }
           })
 
@@ -3686,7 +3686,7 @@ describe('Overpass objects structure', function() {
           properties: OverpassFrontend.ID_ONLY
         },
         function(err, result, index) {
-          assert(false, 'Query wrong, feature_callback should not be called')
+          assert.fail('Query wrong, feature_callback should not be called')
         },
         function(err) {
           if(err === null)
@@ -3713,7 +3713,7 @@ describe('Overpass objects structure', function() {
           properties: OverpassFrontend.ID_ONLY
         },
         function(err, result, index) {
-          assert(false, 'feature_callback should not be called')
+          assert.fail('feature_callback should not be called')
         },
         function(err) {
           if(err === null) {
@@ -3740,7 +3740,7 @@ describe('Overpass objects structure', function() {
           properties: OverpassFrontend.ID_ONLY
         },
         function(err, result, index) {
-          assert(false, 'feature_callback should not be called')
+          assert.fail('feature_callback should not be called')
         },
         function(err) {
           if(err === null) {
@@ -3760,7 +3760,7 @@ describe('Overpass objects structure', function() {
           properties: OverpassFrontend.ID_ONLY
         },
         function(err, result, index) {
-          assert(false, 'feature_callback should not be called')
+          assert.fail('feature_callback should not be called')
         },
         function(err) {
           if(err === null) {
@@ -3809,7 +3809,7 @@ describe('Overpass objects structure', function() {
           properties: OverpassFrontend.ID_ONLY
         },
         function(err, result, index) {
-          assert(false, 'Should not call feature_callback, as request gets aborted.')
+          assert.fail('Should not call feature_callback, as request gets aborted.')
         },
         function(err) {
           done('finalCallback should not be called')
@@ -3830,7 +3830,7 @@ describe('Overpass objects structure', function() {
           properties: OverpassFrontend.ID_ONLY
         },
         function(err, result, index) {
-          assert(false, 'Should not call feature_callback, as request gets aborted.')
+          assert.fail('Should not call feature_callback, as request gets aborted.')
         },
         function(err) {
           done('finalCallback should not be called')
@@ -3859,7 +3859,7 @@ describe('Overpass objects structure', function() {
           properties: OverpassFrontend.ID_ONLY
         },
         function(err, result, index) {
-          assert(false, 'Should not call feature_callback, as request gets aborted.')
+          assert.fail('Should not call feature_callback, as request gets aborted.')
         },
         function(err) {
           done('finalCallback should not be called')
@@ -3888,7 +3888,7 @@ describe('Overpass objects structure', function() {
           properties: OverpassFrontend.ID_ONLY
         },
         function(err, result, index) {
-          assert(false, 'Should not call feature_callback, as request gets aborted.')
+          assert.fail('Should not call feature_callback, as request gets aborted.')
         },
         function(err) {
           done('finalCallback should not be called')
@@ -3909,7 +3909,7 @@ describe('Overpass objects structure', function() {
           properties: OverpassFrontend.ID_ONLY
         },
         function(err, result, index) {
-          assert(false, 'Should not call feature_callback, as request gets aborted.')
+          assert.fail('Should not call feature_callback, as request gets aborted.')
         },
         function(err) {
           done('finalCallback should not be called')
