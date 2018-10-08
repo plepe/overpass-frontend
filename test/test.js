@@ -1617,6 +1617,12 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
         "memberCallback": function (err, result) {
           foundMembers.push(result.id)
 
+          result.memberOf.forEach(memberOf => {
+            if (found.indexOf(memberOf.relation.id) === -1) {
+              assert(false, 'memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.relation.id)
+            }
+          })
+
           if (expectedMembers.indexOf(result.id) === -1) {
             error += 'Unexpected member result ' + result.id + '\n'
           }
@@ -1694,6 +1700,12 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
           console.log('got', result.id)
           foundMembers.push(result.id)
 
+          result.memberOf.forEach(memberOf => {
+            if (found.indexOf(memberOf.relation.id) === -1) {
+              assert(false, 'memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.relation.id)
+            }
+          })
+
           if (expectedMembers.indexOf(result.id) === -1) {
             error += 'Unexpected member result ' + result.id + '\n'
           }
@@ -1768,6 +1780,12 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
         "memberCallback": function (err, result) {
           foundMembers.push(result.id)
 
+          result.memberOf.forEach(memberOf => {
+            if (found.indexOf(memberOf.relation.id) === -1) {
+              assert(false, 'memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.relation.id)
+            }
+          })
+
           if (expectedMembers.indexOf(result.id) === -1) {
             error += 'Unexpected member result ' + result.id + '\n'
           }
@@ -1840,6 +1858,12 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
         "memberBounds": bbox,
         "memberCallback": function (err, result) {
           foundMembers.push(result.id)
+
+          result.memberOf.forEach(memberOf => {
+            if (found.indexOf(memberOf.relation.id) === -1) {
+              assert(false, 'memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.relation.id)
+            }
+          })
 
           if (expectedMembers.indexOf(result.id) === -1) {
             error += 'Unexpected member result ' + result.id + '\n'
@@ -1917,6 +1941,12 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
         "memberCallback": function (err, result) {
           foundMembers.push(result.id)
 
+          result.memberOf.forEach(memberOf => {
+            if (found.indexOf(memberOf.relation.id) === -1) {
+              assert(false, 'memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.relation.id)
+            }
+          })
+
           if (expectedMembers.indexOf(result.id) === -1) {
             error += 'Unexpected member result ' + result.id + '\n'
           }
@@ -1991,6 +2021,12 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
         "memberBounds": bbox,
         "memberCallback": function (err, result) {
           foundMembers.push(result.id)
+
+          result.memberOf.forEach(memberOf => {
+            if (found.indexOf(memberOf.relation.id) === -1) {
+              assert(false, 'memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.relation.id)
+            }
+          })
 
           if (expectedMembers.indexOf(result.id) === -1) {
             error += 'Unexpected member result ' + result.id + '\n'
@@ -2069,6 +2105,12 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
         "memberCallback": function (err, result) {
           foundMembers.push(result.id)
 
+          result.memberOf.forEach(memberOf => {
+            if (found.indexOf(memberOf.relation.id) === -1) {
+              assert(false, 'memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.relation.id)
+            }
+          })
+
           if (expectedMembers.indexOf(result.id) === -1) {
             error += 'Unexpected member result ' + result.id + '\n'
           }
@@ -2145,6 +2187,12 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
         "memberBounds": bbox,
         "memberCallback": function (err, result) {
           foundMembers.push(result.id)
+
+          result.memberOf.forEach(memberOf => {
+            if (found.indexOf(memberOf.relation.id) === -1) {
+              assert(false, 'memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.relation.id)
+            }
+          })
 
           if (expectedMembers.indexOf(result.id) === -1) {
             error += 'Unexpected member result ' + result.id + '\n'
@@ -2223,6 +2271,12 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
         "memberSplit": 5,
         "memberCallback": function (err, result) {
           foundMembers.push(result.id)
+
+          result.memberOf.forEach(memberOf => {
+            if (found.indexOf(memberOf.relation.id) === -1) {
+              assert(false, 'memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.relation.id)
+            }
+          })
 
           if (expectedMembers.indexOf(result.id) === -1) {
             error += 'Unexpected member result ' + result.id + '\n'
@@ -2358,6 +2412,12 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
         "memberCallback": function (err, result) {
           foundMembers.push(result.id)
 
+          result.memberOf.forEach(memberOf => {
+            if (found.indexOf(memberOf.relation.id) === -1) {
+              assert(false, 'memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.relation.id)
+            }
+          })
+
           if (expectedMembers.indexOf(result.id) === -1) {
             error += 'Unexpected member result ' + result.id + '\n'
           }
@@ -2439,6 +2499,13 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
             error += 'Unexpected member result ' + result.id + '\n'
           }
 
+// TODO: when removing objects from cache remove memberOf references
+//          result.memberOf.forEach(memberOf => {
+//            if (found.indexOf(memberOf.relation.id) === -1) {
+//              assert(false, 'memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.relation.id)
+//            }
+//          })
+
           assert.equal(OverpassFrontend.DEFAULT, result.properties&OverpassFrontend.DEFAULT)
         }
       },
@@ -2512,6 +2579,13 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
         "memberProperties": OverpassFrontend.TAGS | OverpassFrontend.GEOM,
         "memberCallback": function (err, result) {
           foundMembers.push(result.id)
+
+          result.memberOf.forEach(memberOf => {
+            let relId = memberOf.relation.id
+            if (expected.indexOf(relId) !== -1 && found.indexOf(relId) === -1) {
+              assert(false, 'memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.relation.id)
+            }
+          })
 
           if (expectedMembers.indexOf(result.id) === -1) {
             error += 'Unexpected member result ' + result.id + '\n'

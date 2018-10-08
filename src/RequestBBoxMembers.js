@@ -57,8 +57,6 @@ class RequestBBoxMembers {
   }
 
   preprocess (fun) {
-    fun.call(this.master)
-
     this.todo = {}
     each(this.relations, ob => {
       each(ob.members, member => {
@@ -83,6 +81,8 @@ class RequestBBoxMembers {
         }
       }
     })
+
+    fun.call(this.master)
 
     return
   }
