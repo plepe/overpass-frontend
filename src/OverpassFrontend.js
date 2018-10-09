@@ -533,6 +533,17 @@ class OverpassFrontend {
 
     for (var i = 0; i < ids.length; i++) {
       if (ids[i] in this.cacheElements) {
+        let ob = this.cacheElements[ids[i]]
+
+        // remove all memberOf references
+        if (ob.members) {
+          ob.members.forEach(member => {
+            let memberOb = this.cacheElements[member.id]
+            memberOb.memberOf = memberOb.memberOf
+              .filter(memberOf => memberOf.id !== ob.id)
+          })
+        }
+
         let lokiOb = this.cacheElements[ids[i]].dbData
         delete this.cacheElements[ids[i]]
         this.db.remove(lokiOb)
