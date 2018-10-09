@@ -40,7 +40,7 @@ class OverpassObject {
   }
 
   notifyMemberOf (relation, role, sequence) {
-    this.memberOf.push({ relation, role, sequence })
+    this.memberOf.push({ id: relation.id, role, sequence })
   }
 
   updateData (data, options) {

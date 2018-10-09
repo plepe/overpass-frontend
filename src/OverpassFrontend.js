@@ -590,10 +590,10 @@ class OverpassFrontend {
     ob.updateData(el, options)
 
     ob.memberOf.forEach(entry => {
-      if (entry.relation.id in this.pendingNotifyMemberUpdate) {
-        this.pendingNotifyMemberUpdate[entry.relation.id].push(ob)
+      if (entry.id in this.pendingNotifyMemberUpdate) {
+        this.pendingNotifyMemberUpdate[entry.id].push(ob)
       } else {
-        this.pendingNotifyMemberUpdate[entry.relation.id] = [ ob ]
+        this.pendingNotifyMemberUpdate[entry.id] = [ ob ]
       }
     })
     this.pendingUpdateEmit[ob.id] = ob
