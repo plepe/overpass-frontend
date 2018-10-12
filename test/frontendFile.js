@@ -91,3 +91,57 @@ describe('Overpass get', function() {
     })
   })
 })
+
+describe('Overpass get before load finishes', function() {
+  it ('get objects via get()', function (done) {
+    overpassFrontend = new OverpassFrontend('test/small.osm.bz2')
+    overpassFrontend.once('load', () => {
+      loadFinished = true
+    })
+    let loadFinished = false
+
+    // just load example objects from this database and check completeness
+    overpassFrontend.get([ 'r276122', 'n293269032', 'n17312837', 'w324297228' ],
+      {},
+      function (err, result) {
+        if (!loadFinished) {
+          assert.fail('Load has not been emitted yet - should have waited')
+        }
+
+        if (result.id === 'r276122') {
+          assert.deepEqual(result.members, [
+            { type: 'way', ref: 47379824, role: 'from', id: 'w47379824' },
+            { type: 'node', ref: 17312837, role: 'via', id: 'n17312837' },
+            { type: 'way', ref: 324297228, role: 'to', id: 'w324297228' }
+          ])
+        } else if (result.id === 'n293269032') {
+          assert.deepEqual(result.memberOf, [
+            { id: 'w47379824', sequence: 1, role: null }
+          ])
+        } else if (result.id === 'n17312837') {
+          assert.deepEqual(result.memberOf, [
+            { id: 'r276122', sequence: 1, role: 'via' },
+            { id: 'w47379824', sequence: 3, role: null },
+            { id: 'w324297228', sequence: 0, role: null }
+          ])
+        } else if (result.id === 'w324297228') {
+          assert.deepEqual(result.memberOf, [
+            { id: 'r276122', sequence: 2, role: 'to' }
+          ])
+          assert.deepEqual(result.members, [
+            { type: 'node', ref: 17312837, id: 'n17312837' },
+            { type: 'node', ref: 1538937640, id: 'n1538937640' },
+            { type: 'node', ref: 3310442552, id: 'n3310442552' }
+          ])
+        }
+      },
+      function (err) {
+        if (!loadFinished) {
+          assert.fail('Load has not been emitted yet - should have waited')
+        }
+
+        done()
+      }
+    )
+  })
+})
