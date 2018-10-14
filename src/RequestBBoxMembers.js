@@ -4,6 +4,7 @@ const each = require('lodash/forEach')
 const map = require('lodash/map')
 const keys = require('lodash/keys')
 const BoundingBox = require('boundingbox')
+const SortedCallbacks = require('./SortedCallbacks')
 
 class RequestBBoxMembers {
   constructor (request) {
@@ -33,6 +34,10 @@ class RequestBBoxMembers {
     this.currentRelations = []
     this.todo = {}
     this.loadFinish = true
+
+    var callbacks = new SortedCallbacks(this.options, this.options.memberCallback, this.finalCallback)
+    this.options.memberCallback = callbacks.next.bind(callbacks)
+    this.finalCallback = callbacks.final.bind(callbacks)
   }
 
   willInclude (fun, context) {
@@ -57,6 +62,8 @@ class RequestBBoxMembers {
   }
 
   preprocess (fun) {
+    fun.call(this.master)
+
     this.todo = {}
     each(this.relations, ob => {
       each(ob.members, member => {
@@ -81,8 +88,6 @@ class RequestBBoxMembers {
         }
       }
     })
-
-    fun.call(this.master)
 
     return
   }
