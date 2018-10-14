@@ -30,11 +30,14 @@ class RequestBBox extends Request {
     }
 
     if (!('noCacheQuery' in this.options) || !this.options.noCacheQuery) {
-      this.lokiQuery = new Filter(this.query).toLokijs()
+      this.filterQuery = new Filter(this.query)
+      this.lokiQuery = this.filterQuery.toLokijs()
       this.lokiQuery.minlat = { $lte: this.bounds.maxlat }
       this.lokiQuery.minlon = { $lte: this.bounds.maxlon }
       this.lokiQuery.maxlat = { $gte: this.bounds.minlat }
       this.lokiQuery.maxlon = { $gte: this.bounds.minlon }
+      this.lokiQueryNeedMatch = !!this.lokiQuery.needMatch
+      delete this.lokiQuery.needMatch
     }
 
     if ((typeof this.options.filter !== 'undefined') && !(this.options.filter instanceof Filter)) {
@@ -104,6 +107,10 @@ class RequestBBox extends Request {
 
     for (var i = 0; i < items.length; i++) {
       var id = items[i].id
+
+      if (this.lokiQueryNeedMatch && !this.filterQuery.match(items[i])) {
+        continue
+      }
 
       if (!(id in this.overpass.cacheElements)) {
         continue

@@ -3,22 +3,41 @@ function qlesc (str) {
 }
 
 function compile (part) {
+  let keyRegexp = (part.keyRegexp ? '~' : '')
+
   switch (part.op) {
     case 'has_key':
-      return '[' + qlesc(part.key) + ']'
+      if (keyRegexp) {
+        return '[~' + qlesc(part.key) + '~"."]'
+      } else {
+        return '[' + keyRegexp + qlesc(part.key) + ']'
+      }
     case '=':
     case '!=':
     case '~':
     case '!~':
-      return '[' + qlesc(part.key) + part.op + qlesc(part.value) + ']'
+      return '[' + keyRegexp + qlesc(part.key) + part.op + qlesc(part.value) + ']'
     case 'has':
-      return '[' + qlesc(part.key) + '~' + qlesc('^(.*;|)' + part.value + '(|;.*)$') + ']'
+      return '[' + keyRegexp + qlesc(part.key) + '~' + qlesc('^(.*;|)' + part.value + '(|;.*)$') + ']'
   }
 }
 
 function test (ob, part) {
   if (part.type) {
     return ob.type === part.type
+  }
+
+  if (part.keyRegexp) {
+    for (let k in ob.tags) {
+      if (k.match(part.key)) {
+        if (part.value) {
+          return ob.tags[k].match(part.value)
+        }
+
+        return true
+      }
+    }
+    return false
   }
 
   switch (part.op) {
@@ -69,6 +88,7 @@ function parse (def) {
   let value
   let op
   let m
+  let keyRegexp = false
   while (def.length) {
     if (mode === 0) {
       m = def.match(/^\s*(node|way|relation|rel|nwr|\()/)
@@ -111,15 +131,18 @@ function parse (def) {
         throw new Error("Can't parse query, expected '[' or ';': " + def)
       }
     } else if (mode === 11) {
-      m = def.match(/^(\s*)([a-zA-Z0-9_]+|"|')/)
-      if (m[2] === '"' || m[2] === "'") {
-        def = def.slice(m[1].length)
+      m = def.match(/^(\s*)(~\s*)?([a-zA-Z0-9_]+|"|')/)
+      if (m && m[2]) {
+        keyRegexp = true
+      }
+      if (m && (m[3] === '"' || m[3] === "'")) {
+        def = def.slice(m[1].length + (m[2] || '').length)
         let x = parseString(def)
         key = x[0]
         def = x[1]
         mode = 12
       } else if (m) {
-        key = m[2]
+        key = m[3]
         def = def.slice(m[0].length)
         mode = 12
       } else {
@@ -128,7 +151,11 @@ function parse (def) {
     } else if (mode === 12) {
       m = def.match(/^\s*(=|!=|~|!~|\^|])/)
       if (m && m[1] === ']') {
-        result.push({ key, op: 'has_key' })
+        let entry = { key, op: 'has_key' }
+        if (keyRegexp) {
+          entry.keyRegexp = true
+        }
+        result.push(entry)
         def = def.slice(m[0].length)
         mode = 10
       } else if (m) {
@@ -156,7 +183,11 @@ function parse (def) {
     } else if (mode === 14) {
       m = def.match(/^\s*\]/)
       if (m) {
-        result.push({ key, op, value })
+        let entry = { key, op, value }
+        if (keyRegexp) {
+          entry.keyRegexp = true
+        }
+        result.push(entry)
         mode = 10
         def = def.slice(m[0].length)
       } else {
@@ -276,9 +307,9 @@ class Filter {
   }
 
   /**
-   * Convert query to LokiJS query for local database
+   * Convert query to LokiJS query for local database. If the property 'needMatch' is set on the returned object, an additional match() should be executed for each returned object, as the query can't be fully compiled (and the 'needMatch' property removed).
    * @param {object} [options] Additional options
-   * @return {string}
+   * @return {object}
    */
   toLokijs (options = {}, def) {
     if (!def) {
@@ -286,18 +317,35 @@ class Filter {
     }
 
     if (def.or) {
-      return { $or:
+      let needMatch = false
+
+      let r = { $or:
         def.or.map(part => {
-          return this.toLokijs(options, part)
+          let r = this.toLokijs(options, part)
+          if (r.needMatch) {
+            needMatch = true
+          }
+          delete r.needMatch
+          return r
         })
       }
+
+      if (needMatch) {
+        r.needMatch = true
+      }
+
+      return r
     }
 
     let query = {}
 
     def.forEach(filter => {
       let k, v
-      if (filter.op === '=') {
+      if (filter.keyRegexp) {
+        k = 'needMatch'
+        v = true
+        // can't query for key regexp, skip
+      } else if (filter.op === '=') {
         k = 'tags.' + filter.key
         v = filter.value
       } else if (filter.op === '!=') {
@@ -323,7 +371,9 @@ class Filter {
       }
 
       if (k && v) {
-        if (k in query) {
+        if (k === 'needMatch') {
+          query.needMatch = true
+        } else if (k in query) {
           if (!('$and' in query[k])) {
             query[k] = { $and: [ query[k] ] }
           }

@@ -43,6 +43,16 @@ describe('Filter', function () {
 
       assert.equal(f.toString(), '(node["amenity"="cafe"]["cuisine"="ice_cream"];node["amenity"="ice_cream"];node["shop"="ice_cream"];)')
     })
+
+    it ('nwr[~wikipedia~"."]', function () {
+      var f = new Filter([ { keyRegexp: true, op: 'has_key', key: 'wikipedia' } ])
+      assert.equal(f.toString(), 'nwr[~"wikipedia"~"."]')
+    })
+
+    it ('nwr[~wikipedia~"foo"]', function () {
+      var f = new Filter([ { keyRegexp: true, op: '~', key: 'wikipedia', value: 'foo' } ])
+      assert.equal(f.toString(), 'nwr[~"wikipedia"~"foo"]')
+    })
   })
 
   describe ('match', function () {
@@ -141,6 +151,39 @@ describe('Filter', function () {
       var r = f.match({ type: 'node', tags: { shop: 'supermarket' } })
       assert.equal(r, false, 'Object should not match')
     })
+
+    it ('nwr[~wikipedia~"."]', function () {
+      var f = new Filter([ { keyRegexp: true, op: 'has_key', key: 'wikipedia' } ])
+
+      var r = f.match({ tags: { amenity: 'restaurant' } })
+      assert.equal(r, false, 'Object should not match')
+      var r = f.match({ tags: { wikipedia: 'test' } })
+      assert.equal(r, true, 'Object should match')
+      var r = f.match({ tags: { 'de:wikipedia': 'test' } })
+      assert.equal(r, true, 'Object should match')
+      var r = f.match({ tags: { 'wikipedia:de': 'test' } })
+      assert.equal(r, true, 'Object should match')
+    })
+
+    it ('nwr[~wikipedia~"foo"]', function () {
+      var f = new Filter([ { keyRegexp: true, op: '~', key: 'wikipedia', value: 'foo' } ])
+
+      var r = f.match({ tags: { amenity: 'restaurant' } })
+      assert.equal(r, false, 'Object should not match')
+      var r = f.match({ tags: { wikipedia: 'test' } })
+      assert.equal(r, false, 'Object should not match')
+      var r = f.match({ tags: { 'de:wikipedia': 'test' } })
+      assert.equal(r, false, 'Object should not match')
+      var r = f.match({ tags: { 'wikipedia:de': 'test' } })
+      assert.equal(r, false, 'Object should not match')
+      var r = f.match({ tags: { wikipedia: 'foobar' } })
+      assert.equal(r, true, 'Object should match')
+      var r = f.match({ tags: { 'de:wikipedia': 'foobar' } })
+      assert.equal(r, true, 'Object should match')
+      var r = f.match({ tags: { 'wikipedia:de': 'foobar' } })
+      assert.equal(r, true, 'Object should match')
+    })
+
   })
 
   describe('toQl', function () {
@@ -204,6 +247,20 @@ describe('Filter', function () {
       })
       assert.equal(r, '(node.result["amenity"="cafe"]["cuisine"="ice_cream"];node.result["amenity"="ice_cream"];node.result["shop"="ice_cream"];way.result["shop"="ice_cream"];relation.result["shop"="ice_cream"];)')
     })
+
+    it ('nwr[~wikipedia~"."]', function () {
+      var f = new Filter([ { keyRegexp: true, op: 'has_key', key: 'wikipedia' } ])
+
+      var r = f.toQl()
+      assert.equal(r, '(node[~"wikipedia"~"."];way[~"wikipedia"~"."];relation[~"wikipedia"~"."];)')
+    })
+
+    it ('nwr[~wikipedia~"foo"]', function () {
+      var f = new Filter([ { keyRegexp: true, op: '~', key: 'wikipedia', value: 'foo' } ])
+
+      var r = f.toQl()
+      assert.equal(r, '(node[~"wikipedia"~"foo"];way[~"wikipedia"~"foo"];relation[~"wikipedia"~"foo"];)')
+    })
   })
 
   describe('toLokijs', function () {
@@ -263,6 +320,45 @@ describe('Filter', function () {
         { 'tags.shop': 'ice_cream' }
       ]})
     })
+
+    it ('nwr[~wikipedia~"."]', function () {
+      var f = new Filter([ { keyRegexp: true, op: 'has_key', key: 'wikipedia' } ])
+
+      var r = f.toLokijs()
+      assert.deepEqual(r, { needMatch: true })
+    })
+
+    it ('node[amenity][~wikipedia~"."]', function () {
+      var f = new Filter([ { type: 'node' }, { key: 'amenity', 'op': 'has_key' }, { keyRegexp: true, op: 'has_key', key: 'wikipedia' } ])
+
+      var r = f.toLokijs()
+      assert.deepEqual(r, { "type": "node", "tags.amenity": { "$exists": true }, "needMatch": true })
+    })
+
+    it ('nwr[~wikipedia~"foo"]', function () {
+      var f = new Filter([ { keyRegexp: true, op: '~', key: 'wikipedia', value: 'foo' } ])
+
+      var r = f.toLokijs()
+      assert.deepEqual(r, { needMatch: true })
+    })
+
+    it ('nwr[~wikipedia~"foo"][~wikipedia~"bar"]', function () {
+      var f = new Filter([ { keyRegexp: true, op: '~', key: 'wikipedia', value: 'foo' }, { keyRegexp: true, op: '~', key: 'wikipedia', value: 'bar' } ])
+
+      var r = f.toLokijs()
+      assert.deepEqual(r, { needMatch: true })
+    })
+
+    it ('(nwr[~wikipedia~"foo"];node[amenity];)', function () {
+      var f = new Filter({ "or": [
+        [ { keyRegexp: true, op: '~', key: 'wikipedia', value: 'foo' } ],
+        [ { type: 'node' }, { key: 'amenity', 'op': 'has_key' } ]
+      ]})
+
+      var r = f.toLokijs()
+      assert.deepEqual(r, {"$or":[{},{"type":"node","tags.amenity":{"$exists":true}}],"needMatch":true})
+    })
+
   })
 
   describe ('parse', function () {
@@ -306,5 +402,19 @@ describe('Filter', function () {
       assert.equal(f.toString(), '(node["amenity"="cafe"]["cuisine"="ice_cream"];node["amenity"="ice_cream"];node["shop"="ice_cream"];)')
     })
 
+    it ('node[~wikipedia~"."]', function () {
+      var f = new Filter('node[~wikipedia]')
+      assert.equal(f.toString(), 'node[~"wikipedia"~"."]')
+    })
+
+    it ('node[~"wikipedia"~"."]', function () {
+      var f = new Filter('node[~"wikipedia"~"."]')
+      assert.equal(f.toString(), 'node[~"wikipedia"~"."]')
+    })
+
+    it ('node[~"wikipedia"~"foo"]', function () {
+      var f = new Filter('node[~"wikipedia"~"foo"]')
+      assert.equal(f.toString(), 'node[~"wikipedia"~"foo"]')
+    })
   })
 })
