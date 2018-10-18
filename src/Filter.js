@@ -200,7 +200,17 @@ function parse (def) {
 }
 
 /**
- * A Filter into OSM data. A simplified version of Overpass QL.
+ * A Filter into OSM data. A simplified version of <a href='https://wiki.openstreetmap.org/wiki/Overpass_API/Overpass_QL'>Overpass QL</a>.
+ *
+ * <p>Either a single query (e.g. <tt>node[amenity=restaurant];</tt>) or a combined query (e.g. <tt>(node[amenity=restaurant];way[amenity=restaurant];);</tt>).<br>
+ * A single query statement consists of a type (e.g. 'node', 'way', 'relation', 'nwr' (node, way or relation)) and optional filters:<ul>
+ * <li>(Not) Equals (=, !=): <tt>[amenity=restaurant]</tt> or <tt>["amenity"="restaurant"]</tt> resp. <tt>["amenity"!="restaurant"]</tt>.
+ * <li>Regular Expression: <tt>[amenity~"^(restaurant|cafe)$"]</tt> resp. negated: <tt>[amenity!~"^(restaurant|cafe)$"]</tt>
+ * <li>Key regular expression: <tt>[~"cycleway"~"left"]</tt> (key has to match cycleway and its value match left)
+ * <li>Key (not) exists: <tt>[amenity]</tt> or <tt>["amenity"]</tt> resp. <tt>[!amenity]</tt>
+ * </ul>
+ * More advanced queries are not supported.</p>
+ *
  * @param {string|object} query
  */
 class Filter {
@@ -214,7 +224,7 @@ class Filter {
   }
 
   /**
-   * Check of a object matches this filter
+   * Check if an object matches this filter
    * @param {OverpassNode|OverpassWay|OverpassRelation} ob an object from Overpass API
    * @return {boolean}
    */
