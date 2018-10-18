@@ -334,11 +334,11 @@ class OverpassFrontend {
   }
 
   _handleResult (context, err, results) {
-    if (!err && results.remark) {
+    if (err === null && results.remark) {
       err = results.remark
     }
 
-    if (err) {
+    if (err !== null) {
       this.errorCount++
       this.requestIsActive = false
 
