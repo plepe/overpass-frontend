@@ -429,7 +429,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line47">line 47</a>
+        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line53">line 53</a>
     </li></ul></dd>
     
 
@@ -539,7 +539,7 @@
 
             
 
-            <td class="description last">Query for requesting objects from Overpass API, e.g. "node[amenity=restaurant]" or "(node[amenity];way[highway~'^(primary|secondary)$];)"</td>
+            <td class="description last">Query for requesting objects from Overpass API, e.g. "node[amenity=restaurant]" or "(node[amenity];way[highway~'^(primary|secondary)$];)". See <a href='Filter.html'>Filter</a> for details.</td>
         </tr>
 
     
@@ -1090,7 +1090,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line456">line 456</a>
+        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line471">line 471</a>
     </li></ul></dd>
     
 
@@ -1194,7 +1194,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line87">line 87</a>
+        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line93">line 93</a>
     </li></ul></dd>
     
 
@@ -1550,7 +1550,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line149">line 149</a>
+        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line160">line 160</a>
     </li></ul></dd>
     
 
@@ -1787,7 +1787,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line171">line 171</a>
+        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line182">line 182</a>
     </li></ul></dd>
     
 
@@ -2072,7 +2072,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line197">line 197</a>
+        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line208">line 208</a>
     </li></ul></dd>
     
 
@@ -2201,7 +2201,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line19">line 19</a>
+        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line20">line 20</a>
     </li></ul></dd>
     
 
@@ -2243,7 +2243,7 @@
 
 
 <div class="description">
-    When a file is specified as URL, this event notifies, that the file has been completely loaded.
+    When a file is specified as URL, this event notifies, that the file has been completely loaded. When a Overpass API is used, every time when data has been received.
 </div>
 
 
@@ -2252,6 +2252,173 @@
 
 
 
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>osm3sMeta</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Meta data (not all properties of meta data might be set)
+                <h6>Properties</h6>
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>version</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">OpenStreetMap API version (currently 0.6)</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>generator</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Data generator</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>timestamp_osm_base</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">RFC8601 timestamp of OpenStreetMap data</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>copyright</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Copyright statement</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
 
 
 
@@ -2287,7 +2454,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line25">line 25</a>
+        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line26">line 26</a>
     </li></ul></dd>
     
 
@@ -2428,7 +2595,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line30">line 30</a>
+        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line36">line 36</a>
     </li></ul></dd>
     
 
@@ -2474,7 +2641,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Oct 06 2018 22:54:44 GMT+0200 (CEST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Oct 18 2018 09:51:28 GMT+0200 (GMT+02:00)
 </footer>
 
 <script> prettyPrint(); </script>

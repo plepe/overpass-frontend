@@ -451,7 +451,7 @@ class OverpassFrontend {
   }
 
   /**
-   * @param {string} query - Query for requesting objects from Overpass API, e.g. "node[amenity=restaurant]" or "(node[amenity];way[highway~'^(primary|secondary)$];)"
+   * @param {string} query - Query for requesting objects from Overpass API, e.g. "node[amenity=restaurant]" or "(node[amenity];way[highway~'^(primary|secondary)$];)". See <a href='Filter.html'>Filter</a> for details.
    * @param {BoundingBox} bounds - A Leaflet Bounds object, e.g. from map.getBounds()
    * @param {object} options
    * @param {number} [options.priority=0] - Priority for loading these objects. The lower the sooner they will be requested.
