@@ -6,8 +6,11 @@ module.exports = function copyOsm3sMetaFrom (results) {
       osm3sMeta[k] = results[k]
     }
   }
-  for (let k in results.osm3s) {
-    osm3sMeta[k] = results.osm3s[k]
+
+  if (results.osm3s) {
+    for (let k in results.osm3s) {
+      osm3sMeta[k] = results.osm3s[k]
+    }
   }
 
   return osm3sMeta
