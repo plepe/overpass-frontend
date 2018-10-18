@@ -37,7 +37,7 @@ module.exports = function loadOsmFile (url, callback) {
     return
   }
 
-  let req = new XMLHttpRequest()
+  let req = new window.XMLHttpRequest()
 
   req.onreadystatechange = function () {
     if (req.readyState === 4) {
@@ -72,7 +72,7 @@ module.exports = function loadOsmFile (url, callback) {
     if (typeof location === 'undefined') {
       url = 'https:' + url
     } else {
-      url = location.protocol + url
+      url = window.location.protocol + url
     }
   }
 
