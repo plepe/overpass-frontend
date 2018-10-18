@@ -449,13 +449,13 @@ describe('Overpass get', function() {
           maxlat: 48.1991437
         },
         {
-          properties: OverpassFrontend.ID_ONLY
+          properties: OverpassFrontend.TAGS
         },
         function(err, result, index) {
           found.push(result.id)
 
           if(expected.indexOf(result.id) == -1)
-            assert(false, 'Object ' + result.id + ' should not be found!')
+            assert.fail('Object ' + result.id + ' should not be found!')
         },
         function(err) {
           assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
@@ -492,13 +492,13 @@ describe('Overpass get', function() {
           maxlat: 48.1991437
         },
         {
-          properties: OverpassFrontend.ID_ONLY
+          properties: OverpassFrontend.TAGS
         },
         function(err, result, index) {
           found.push(result.id)
 
           if(expected.indexOf(result.id) == -1)
-            assert(false, 'Object ' + result.id + ' should not be found!')
+            assert.fail('Object ' + result.id + ' should not be found!')
         },
         function(err) {
           assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
@@ -533,13 +533,13 @@ describe('Overpass get', function() {
           maxlat: 48.1991237
         },
         {
-          properties: OverpassFrontend.ID_ONLY
+          properties: OverpassFrontend.TAGS
         },
         function(err, result, index) {
           found.push(result.id)
 
           if(expected.indexOf(result.id) == -1)
-            assert(false, 'Object ' + result.id + ' should not be found!')
+            assert.fail('Object ' + result.id + ' should not be found!')
         },
         function(err) {
           assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
@@ -574,7 +574,7 @@ describe('Overpass get', function() {
         function(err, result, index) {
           if(expected.indexOf(result.id) === -1 &&
              might.indexOf(result.id) === -1) {
-            assert(false, 'Object ' + result.id + ' should not be found!')
+            assert.fail('Object ' + result.id + ' should not be found!')
           }
 
           if (expected.indexOf(result.id) !== -1) {
@@ -612,7 +612,7 @@ describe('Overpass get', function() {
         function(err, result, index) {
           if(expected.indexOf(result.id) === -1 &&
              might.indexOf(result.id) === -1) {
-            assert(false, 'Object ' + result.id + ' should not be found!')
+            assert.fail('Object ' + result.id + ' should not be found!')
           }
 
           if (expected.indexOf(result.id) !== -1) {
@@ -653,13 +653,13 @@ describe('Overpass get', function() {
 
           if(expected.indexOf(result.id) === -1 &&
              might.indexOf(result.id) === -1)
-            assert(false, 'Object ' + result.id + ' should not be found!')
+            assert.fail('Object ' + result.id + ' should not be found!')
         },
         function(err) {
           assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
           assert.equal(0, request.callCount, 'Server should be not be called (fully cached)')
           if(expectedFound.length != expected.length)
-            assert(false, 'Wrong count of objects found!')
+            assert.fail('Wrong count of objects found!')
 
           done()
         }
@@ -687,12 +687,12 @@ describe('Overpass get', function() {
           found.push(result.id)
 
           if (expected.indexOf(result.id) === -1)
-            assert(false, 'Object ' + result.id + ' should not be found!')
+            assert.fail('Object ' + result.id + ' should not be found!')
         },
         function(err) {
           assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
           if (found.length != expected.length)
-            assert(false, 'Wrong count of objects found!')
+            assert.fail('Wrong count of objects found!')
 
           done()
         }
@@ -727,7 +727,7 @@ describe('Overpass get', function() {
           found.push(result.id)
 
           if(expected.indexOf(result.id) == -1)
-            assert(false, 'Object ' + result.id + ' should not be found!')
+            assert.fail('Object ' + result.id + ' should not be found!')
         },
         function(err) {
           assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
@@ -772,7 +772,7 @@ describe('Overpass get', function() {
               found1.push(result.id)
 
               if(expected1.indexOf(result.id) == -1)
-                assert(false, '(1) Object ' + result.id + ' should not be found!')
+                assert.fail('(1) Object ' + result.id + ' should not be found!')
             },
             function(err) {
               assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
@@ -800,7 +800,7 @@ describe('Overpass get', function() {
               found2.push(result.id)
 
               if(expected2.indexOf(result.id) == -1)
-                assert(false, '(2) Object ' + result.id + ' should not be found!')
+                assert.fail('(2) Object ' + result.id + ' should not be found!')
             },
             function(err) {
               assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
@@ -919,14 +919,14 @@ describe('Overpass query by id with bbox option', function() {
     overpassFrontend.get(query.concat([]), { properties: OverpassFrontend.ALL, bbox: bbox },
         function(err, result, index) {
           if (result === false && index_outside_bbox.indexOf(index) == -1)
-              assert(false, 'Index ' + index + ' should return a valid result (' + query[index] + ')')
+              assert.fail('Index ' + index + ' should return a valid result (' + query[index] + ')')
 
           if (result === null && index_non_existant.indexOf(index) === -1) {
-            assert(false, 'Index ' + index + ' should not return a non-existant object (' + query[index] + ')')
+            assert.fail('Index ' + index + ' should not return a non-existant object (' + query[index] + ')')
           }
 
           if (result !== false && result !== null && expected.indexOf(result.id) == -1) {
-            assert(false, 'Returning object ' + result.id + ' which should not be returned')
+            assert.fail('Returning object ' + result.id + ' which should not be returned')
           }
         },
         function(err) {
@@ -952,14 +952,14 @@ describe('Overpass query by id with bbox option', function() {
     overpassFrontend.get(query.concat([]), { properties: OverpassFrontend.ALL, bbox: bbox },
         function(err, result, index) {
           if (result === false && index_outside_bbox.indexOf(index) == -1)
-              assert(false, 'Index ' + index + ' should return a valid result (' + query[index] + ')')
+              assert.fail('Index ' + index + ' should return a valid result (' + query[index] + ')')
 
           if (result === null && index_non_existant.indexOf(index) === -1) {
-            assert(false, 'Index ' + index + ' should not return a non-existant object (' + query[index] + ')')
+            assert.fail('Index ' + index + ' should not return a non-existant object (' + query[index] + ')')
           }
 
           if (result !== false && result !== null && expected.indexOf(result.id) == -1) {
-            assert(false, 'Returning object ' + result.id + ' which should not be returned')
+            assert.fail('Returning object ' + result.id + ' which should not be returned')
           }
         },
         function(err) {
@@ -975,7 +975,8 @@ describe('Overpass query by id with bbox option', function() {
 
     overpassFrontend.get(query.concat([]), { properties: OverpassFrontend.ID_ONLY },
         function(err, result, index) {
-          assert.equal(OverpassFrontend.BBOX | OverpassFrontend.CENTER, result.properties, 'Element ' + result.id + ' which was loaded outside bbox, should only have BBOX data')
+          // has GEOM, because for nodes lat/lon is geom, bbox and center
+          assert.equal(OverpassFrontend.GEOM | OverpassFrontend.BBOX | OverpassFrontend.CENTER, result.properties, 'Element ' + result.id + ' which was loaded outside bbox, should only have BBOX data')
         },
         function(err) {
           assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
@@ -1343,6 +1344,247 @@ describe('Overpass BBoxQuery', function() {
   })
 })
 
+describe('Overpass BBoxQuery - with filter', function() {
+  it('Simple queries - all restaurants with additional filter (has cuisine tag)', function (done) {
+    overpassFrontend.clearCache()
+
+    var expected = [ 'n441576820', 'n442066582', 'n355123976', 'n1955278832', 'n2083468740', 'n2099023017' ]
+    var found = []
+    var error = ''
+
+    var expectedSubRequestCount = 1
+    var foundSubRequestCount = 0
+
+    function compileListener (subRequest) {
+      foundSubRequestCount++
+    }
+
+    var request = overpassFrontend.BBoxQuery(
+      "(node[amenity=restaurant];way[amenity=restaurant];relation[amenity=restaurant];)",
+      {
+	"maxlat": 48.200,
+	"maxlon": 16.345,
+	"minlat": 48.195,
+	"minlon": 16.335
+      },
+      {
+        'filter': [
+          {
+            'key': 'cuisine',
+            'op': 'has_key'
+          }
+        ]
+      },
+      function (err, result) {
+        found.push(result.id)
+
+        if (expected.indexOf(result.id) === -1) {
+          error += 'Unexpected result ' + result.id + '\n'
+        }
+      },
+      function (err) {
+        if (err) {
+          return done(err)
+        }
+
+        if (error) {
+          return done(error)
+        }
+
+        if (found.length !== expected.length) {
+          return done('Wrong count of objects returned:\n' +
+               'Expected: ' + expected.join(', ') + '\n' +
+               'Found: ' + found.join(', '))
+        }
+
+        assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
+
+        request.off('subrequest-compile', compileListener)
+
+        done()
+      }
+    )
+
+    request.on('subrequest-compile', compileListener)
+  })
+
+  it('Simple queries - all restaurants with additional filter (has cuisine tag) (fully cached)', function (done) {
+    var expected = [ 'n441576820', 'n442066582', 'n355123976', 'n1955278832', 'n2083468740', 'n2099023017' ]
+    var found = []
+    var error = ''
+
+    var expectedSubRequestCount = 0
+    var foundSubRequestCount = 0
+
+    function compileListener (subRequest) {
+      foundSubRequestCount++
+    }
+
+    var request = overpassFrontend.BBoxQuery(
+      "(node[amenity=restaurant];way[amenity=restaurant];relation[amenity=restaurant];)",
+      {
+	"maxlat": 48.200,
+	"maxlon": 16.345,
+	"minlat": 48.195,
+	"minlon": 16.335
+      },
+      {
+        'filter': [
+          {
+            'key': 'cuisine',
+            'op': 'has_key'
+          }
+        ]
+      },
+      function (err, result) {
+        found.push(result.id)
+
+        if (expected.indexOf(result.id) === -1) {
+          error += 'Unexpected result ' + result.id + '\n'
+        }
+      },
+      function (err) {
+        if (err) {
+          return done(err)
+        }
+
+        if (error) {
+          return done(error)
+        }
+
+        if (found.length !== expected.length) {
+          return done('Wrong count of objects returned:\n' +
+               'Expected: ' + expected.join(', ') + '\n' +
+               'Found: ' + found.join(', '))
+        }
+
+        assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
+
+        request.off('subrequest-compile', compileListener)
+
+        done()
+      }
+    )
+
+    request.on('subrequest-compile', compileListener)
+  })
+
+  it('Simple queries - all restaurants without additional filter (partly cached because of filter)', function (done) {
+    var expected = [ 'n441576820', 'n442066582', 'n442972880', 'n1467109667', 'n355123976', 'n1955278832', 'n441576823', 'n2083468740', 'n2099023017', 'w369989037', 'w370577069' ]
+    var found = []
+    var error = ''
+
+    var expectedSubRequestCount = 1
+    var foundSubRequestCount = 0
+
+    function compileListener (subRequest) {
+      foundSubRequestCount++
+    }
+
+    var request = overpassFrontend.BBoxQuery(
+      "(node[amenity=restaurant];way[amenity=restaurant];relation[amenity=restaurant];)",
+      {
+	"maxlat": 48.200,
+	"maxlon": 16.345,
+	"minlat": 48.195,
+	"minlon": 16.335
+      },
+      {},
+      function (err, result) {
+        found.push(result.id)
+
+        if (expected.indexOf(result.id) === -1) {
+          error += 'Unexpected result ' + result.id + '\n'
+        }
+      },
+      function (err) {
+        if (err) {
+          return done(err)
+        }
+
+        if (error) {
+          return done(error)
+        }
+
+        if (found.length !== expected.length) {
+          return done('Wrong count of objects returned:\n' +
+               'Expected: ' + expected.join(', ') + '\n' +
+               'Found: ' + found.join(', '))
+        }
+
+        assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
+
+        request.off('subrequest-compile', compileListener)
+
+        done()
+      }
+    )
+
+    request.on('subrequest-compile', compileListener)
+  })
+
+  it('Simple queries - all restaurants with additional filter (has cuisine tag; cached by previous full request)', function (done) {
+    var expected = [ 'n441576820', 'n442066582', 'n355123976', 'n1955278832', 'n2083468740', 'n2099023017' ]
+    var found = []
+    var error = ''
+
+    var expectedSubRequestCount = 0
+    var foundSubRequestCount = 0
+
+    function compileListener (subRequest) {
+      foundSubRequestCount++
+    }
+
+    var request = overpassFrontend.BBoxQuery(
+      "(node[amenity=restaurant];way[amenity=restaurant];relation[amenity=restaurant];)",
+      {
+	"maxlat": 48.200,
+	"maxlon": 16.345,
+	"minlat": 48.195,
+	"minlon": 16.335
+      },
+      {
+        'filter': [
+          {
+            'key': 'cuisine',
+            'op': 'has_key'
+          }
+        ]
+      },
+      function (err, result) {
+        found.push(result.id)
+
+        if (expected.indexOf(result.id) === -1) {
+          error += 'Unexpected result ' + result.id + '\n'
+        }
+      },
+      function (err) {
+        if (err) {
+          return done(err)
+        }
+
+        if (error) {
+          return done(error)
+        }
+
+        if (found.length !== expected.length) {
+          return done('Wrong count of objects returned:\n' +
+               'Expected: ' + expected.join(', ') + '\n' +
+               'Found: ' + found.join(', '))
+        }
+
+        assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
+
+        request.off('subrequest-compile', compileListener)
+
+        done()
+      }
+    )
+
+    request.on('subrequest-compile', compileListener)
+ })
+})
+
 describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
   it('Simple queries - routes', function (done) {
     var expected = [ 'r910885', 'r910886', 'r1306732', 'r1306733' ]
@@ -1374,6 +1616,12 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
         "memberBounds": bbox,
         "memberCallback": function (err, result) {
           foundMembers.push(result.id)
+
+          result.memberOf.forEach(memberOf => {
+            if (found.indexOf(memberOf.id) === -1) {
+              assert.fail('memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.id)
+            }
+          })
 
           if (expectedMembers.indexOf(result.id) === -1) {
             error += 'Unexpected member result ' + result.id + '\n'
@@ -1452,6 +1700,12 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
           console.log('got', result.id)
           foundMembers.push(result.id)
 
+          result.memberOf.forEach(memberOf => {
+            if (found.indexOf(memberOf.id) === -1) {
+              assert.fail('memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.id)
+            }
+          })
+
           if (expectedMembers.indexOf(result.id) === -1) {
             error += 'Unexpected member result ' + result.id + '\n'
           }
@@ -1526,6 +1780,12 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
         "memberCallback": function (err, result) {
           foundMembers.push(result.id)
 
+          result.memberOf.forEach(memberOf => {
+            if (found.indexOf(memberOf.id) === -1) {
+              assert.fail('memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.id)
+            }
+          })
+
           if (expectedMembers.indexOf(result.id) === -1) {
             error += 'Unexpected member result ' + result.id + '\n'
           }
@@ -1598,6 +1858,12 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
         "memberBounds": bbox,
         "memberCallback": function (err, result) {
           foundMembers.push(result.id)
+
+          result.memberOf.forEach(memberOf => {
+            if (found.indexOf(memberOf.id) === -1) {
+              assert.fail('memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.id)
+            }
+          })
 
           if (expectedMembers.indexOf(result.id) === -1) {
             error += 'Unexpected member result ' + result.id + '\n'
@@ -1675,6 +1941,12 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
         "memberCallback": function (err, result) {
           foundMembers.push(result.id)
 
+          result.memberOf.forEach(memberOf => {
+            if (found.indexOf(memberOf.id) === -1) {
+              assert.fail('memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.id)
+            }
+          })
+
           if (expectedMembers.indexOf(result.id) === -1) {
             error += 'Unexpected member result ' + result.id + '\n'
           }
@@ -1749,6 +2021,12 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
         "memberBounds": bbox,
         "memberCallback": function (err, result) {
           foundMembers.push(result.id)
+
+          result.memberOf.forEach(memberOf => {
+            if (found.indexOf(memberOf.id) === -1) {
+              assert.fail('memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.id)
+            }
+          })
 
           if (expectedMembers.indexOf(result.id) === -1) {
             error += 'Unexpected member result ' + result.id + '\n'
@@ -1827,6 +2105,12 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
         "memberCallback": function (err, result) {
           foundMembers.push(result.id)
 
+          result.memberOf.forEach(memberOf => {
+            if (found.indexOf(memberOf.id) === -1) {
+              assert.fail('memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.id)
+            }
+          })
+
           if (expectedMembers.indexOf(result.id) === -1) {
             error += 'Unexpected member result ' + result.id + '\n'
           }
@@ -1903,6 +2187,12 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
         "memberBounds": bbox,
         "memberCallback": function (err, result) {
           foundMembers.push(result.id)
+
+          result.memberOf.forEach(memberOf => {
+            if (found.indexOf(memberOf.id) === -1) {
+              assert.fail('memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.id)
+            }
+          })
 
           if (expectedMembers.indexOf(result.id) === -1) {
             error += 'Unexpected member result ' + result.id + '\n'
@@ -1981,6 +2271,12 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
         "memberSplit": 5,
         "memberCallback": function (err, result) {
           foundMembers.push(result.id)
+
+          result.memberOf.forEach(memberOf => {
+            if (found.indexOf(memberOf.id) === -1) {
+              assert.fail('memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.id)
+            }
+          })
 
           if (expectedMembers.indexOf(result.id) === -1) {
             error += 'Unexpected member result ' + result.id + '\n'
@@ -2116,6 +2412,12 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
         "memberCallback": function (err, result) {
           foundMembers.push(result.id)
 
+          result.memberOf.forEach(memberOf => {
+            if (found.indexOf(memberOf.id) === -1) {
+              assert.fail('memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.id)
+            }
+          })
+
           if (expectedMembers.indexOf(result.id) === -1) {
             error += 'Unexpected member result ' + result.id + '\n'
           }
@@ -2197,6 +2499,13 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
             error += 'Unexpected member result ' + result.id + '\n'
           }
 
+// TODO: when removing objects from cache remove memberOf references
+//          result.memberOf.forEach(memberOf => {
+//            if (found.indexOf(memberOf.id) === -1) {
+//              assert.fail('memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.id)
+//            }
+//          })
+
           assert.equal(OverpassFrontend.DEFAULT, result.properties&OverpassFrontend.DEFAULT)
         }
       },
@@ -2270,6 +2579,13 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
         "memberProperties": OverpassFrontend.TAGS | OverpassFrontend.GEOM,
         "memberCallback": function (err, result) {
           foundMembers.push(result.id)
+
+          result.memberOf.forEach(memberOf => {
+            let relId = memberOf.id
+            if (expected.indexOf(relId) !== -1 && found.indexOf(relId) === -1) {
+              assert.fail('memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.id)
+            }
+          })
 
           if (expectedMembers.indexOf(result.id) === -1) {
             error += 'Unexpected member result ' + result.id + '\n'
@@ -2439,7 +2755,8 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
         (err, result) => {
         },
         (err) => {
-          assert.equal(callCount, 2)
+          assert.equal(callCount, 1)
+          member.off('update', updateCall)
           done(err)
         }
       )
@@ -2622,6 +2939,94 @@ describe('Overpass Get - Relation with members in BBOX', function() {
   })
 })
 
+describe('notifyMemberUpdate', function () {
+  describe('OverpassWay', function () {
+    let expected
+    let way
+
+    it('First load the way to see final result', (done) => {
+      overpassFrontend.clearCache()
+
+      overpassFrontend.get('w272672836',
+        {
+          properties: OverpassFrontend.ALL
+        },
+        (err, result) => {
+          if (err) {
+            return done(err)
+          }
+
+          expected = result
+        },
+        done
+      )
+    })
+
+    it('Then cache clear and re-request way without GEOM', (done) => {
+      overpassFrontend.clearCache()
+
+      overpassFrontend.get('w272672836',
+        {
+          properties: OverpassFrontend.TAGS | OverpassFrontend.MEMBERS
+        },
+        (err, result) => {
+          if (err) {
+            return done(err)
+          }
+
+          way = result
+
+          assert.equal(way.properties, OverpassFrontend.TAGS | OverpassFrontend.MEMBERS, 'Way: Only TAGS and MEMBERS should be known')
+          assert.equal(way.geometry, undefined, 'Way: Geometry should not be known')
+          assert.equal(way.bounds, undefined, 'Way: Bounds should not be known')
+        },
+        done
+      )
+    })
+
+    it('Load one of the nodes -> geometry of way should be partly known', (done) => {
+      overpassFrontend.get('n252548491',
+        {
+          properties: OverpassFrontend.GEOM
+        },
+        (err, result) => {
+          if (err) {
+            return done(err)
+          }
+        },
+        (err) => {
+          assert.equal(way.properties, OverpassFrontend.TAGS | OverpassFrontend.MEMBERS, 'Way: Only TAGS and MEMBERS should be known')
+          assert.deepEqual(way.geometry[1], { lat: 48.1983261, lon: 16.3382355 }, 'Geometry should be partly known')
+          assert.deepEqual(way.bounds, { minlat: 48.1983261, maxlat: 48.1983261, minlon: 16.3382355, maxlon: 16.3382355 }, 'Bounds should not be known')
+
+          done(err)
+        }
+      )
+    })
+
+    it('Load the other nodes -> geometry of way should be fully known', (done) => {
+      overpassFrontend.get([ 'n378462', 'n2776073558' ],
+        {
+          properties: OverpassFrontend.GEOM
+        },
+        (err, result) => {
+          if (err) {
+            return done(err)
+          }
+        },
+        (err) => {
+          assert.equal(way.properties, OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.GEOM | OverpassFrontend.BBOX | OverpassFrontend.CENTER, 'Way: Now, also BBOX, CENTER and GEOM should be known')
+          assert.deepEqual(way.geometry, expected.geometry, 'Geometry should be fully known')
+          assert.deepEqual(way.bounds, expected.bounds, 'Bounds should be known')
+          assert.deepEqual(way.center, expected.center, 'Center should be known')
+
+          done(err)
+        }
+      )
+    })
+  })
+})
+
 describe('Events', function () {
   describe('OverpassRelation', function () {
     it('Should emit "update" when loading member elements', function (done) {
@@ -2646,7 +3051,7 @@ describe('Events', function () {
           }
 
           assert.equal(result.memberFeatures.length, 63, 'Wrong count of member features')
-          assert.equal(result.memberFeatures[0].properties, OverpassFrontend.GEOM, 'Member features has more than GEOM properties')
+          assert.equal(result.memberFeatures[0].properties, OverpassFrontend.GEOM | OverpassFrontend.BBOX | OverpassFrontend.CENTER, 'Member features has more than GEOM properties')
 
           result.on('update', countUpdateCalls)
 
@@ -2659,7 +3064,11 @@ describe('Events', function () {
                 done(err)
               }
 
-              assert.equal(result.properties, OverpassFrontend.GEOM | OverpassFrontend.TAGS, 'Should know GEOM from relation and TAGS from direct request')
+              if (result.type === 'node') {
+                assert.equal(result.properties, OverpassFrontend.GEOM | OverpassFrontend.BBOX | OverpassFrontend.CENTER | OverpassFrontend.TAGS, 'Should know GEOM from relation and TAGS from direct request (node)')
+              } else if (result.type === 'way') {
+                assert.equal(result.properties, OverpassFrontend.GEOM | OverpassFrontend.BBOX | OverpassFrontend.CENTER | OverpassFrontend.TAGS, 'Should know GEOM from relation and TAGS from direct request (way)')
+              }
             },
             function (err) {
               if (err) {
@@ -3125,7 +3534,7 @@ describe('Overpass objects structure', function() {
           assert.equal('w4583442' in overpassFrontend.cacheElements, true, 'should have loaded member feature w4583442')
 
           let member = overpassFrontend.cacheElements['w4583442']
-          assert.equal(member.properties, OverpassFrontend.GEOM, 'member w4583442 should have GEOM info')
+          assert.equal(member.properties, OverpassFrontend.GEOM | OverpassFrontend.BBOX | OverpassFrontend.CENTER, 'member w4583442 should have GEOM info')
         },
         function(err) {
           done()
@@ -3273,10 +3682,11 @@ describe('Overpass objects structure', function() {
           maxlat: 48.1991437
         },
         {
+          noCacheQuery: true,
           properties: OverpassFrontend.ID_ONLY
         },
         function(err, result, index) {
-          assert(false, 'Query wrong, feature_callback should not be called')
+          assert.fail('Query wrong, feature_callback should not be called')
         },
         function(err) {
           if(err === null)
@@ -3303,7 +3713,7 @@ describe('Overpass objects structure', function() {
           properties: OverpassFrontend.ID_ONLY
         },
         function(err, result, index) {
-          assert(false, 'feature_callback should not be called')
+          assert.fail('feature_callback should not be called')
         },
         function(err) {
           if(err === null) {
@@ -3330,7 +3740,7 @@ describe('Overpass objects structure', function() {
           properties: OverpassFrontend.ID_ONLY
         },
         function(err, result, index) {
-          assert(false, 'feature_callback should not be called')
+          assert.fail('feature_callback should not be called')
         },
         function(err) {
           if(err === null) {
@@ -3350,7 +3760,7 @@ describe('Overpass objects structure', function() {
           properties: OverpassFrontend.ID_ONLY
         },
         function(err, result, index) {
-          assert(false, 'feature_callback should not be called')
+          assert.fail('feature_callback should not be called')
         },
         function(err) {
           if(err === null) {
@@ -3399,7 +3809,7 @@ describe('Overpass objects structure', function() {
           properties: OverpassFrontend.ID_ONLY
         },
         function(err, result, index) {
-          assert(false, 'Should not call feature_callback, as request gets aborted.')
+          assert.fail('Should not call feature_callback, as request gets aborted.')
         },
         function(err) {
           done('finalCallback should not be called')
@@ -3420,7 +3830,7 @@ describe('Overpass objects structure', function() {
           properties: OverpassFrontend.ID_ONLY
         },
         function(err, result, index) {
-          assert(false, 'Should not call feature_callback, as request gets aborted.')
+          assert.fail('Should not call feature_callback, as request gets aborted.')
         },
         function(err) {
           done('finalCallback should not be called')
@@ -3449,7 +3859,7 @@ describe('Overpass objects structure', function() {
           properties: OverpassFrontend.ID_ONLY
         },
         function(err, result, index) {
-          assert(false, 'Should not call feature_callback, as request gets aborted.')
+          assert.fail('Should not call feature_callback, as request gets aborted.')
         },
         function(err) {
           done('finalCallback should not be called')
@@ -3478,7 +3888,7 @@ describe('Overpass objects structure', function() {
           properties: OverpassFrontend.ID_ONLY
         },
         function(err, result, index) {
-          assert(false, 'Should not call feature_callback, as request gets aborted.')
+          assert.fail('Should not call feature_callback, as request gets aborted.')
         },
         function(err) {
           done('finalCallback should not be called')
@@ -3499,7 +3909,7 @@ describe('Overpass objects structure', function() {
           properties: OverpassFrontend.ID_ONLY
         },
         function(err, result, index) {
-          assert(false, 'Should not call feature_callback, as request gets aborted.')
+          assert.fail('Should not call feature_callback, as request gets aborted.')
         },
         function(err) {
           done('finalCallback should not be called')

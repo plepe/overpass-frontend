@@ -1,0 +1,169 @@
+{
+  "version": 0.6,
+  "generator": "Overpass API 0.7.55.4 3079d8ea",
+  "osm3s": {
+    "timestamp_osm_base": "2018-09-29T15:06:02Z",
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+  },
+  "elements": [
+    {
+      "type": "relation",
+      "id": 276122,
+      "timestamp": "2015-01-25T19:01:10Z",
+      "version": 5,
+      "changeset": 28402799,
+      "user": "Eckhart Wörner",
+      "uid": 2675,
+      "members": [
+        {
+          "type": "way",
+          "ref": 47379824,
+          "role": "from"
+        },
+        {
+          "type": "node",
+          "ref": 17312837,
+          "role": "via"
+        },
+        {
+          "type": "way",
+          "ref": 324297228,
+          "role": "to"
+        }
+      ],
+      "tags": {
+        "restriction": "only_straight_on",
+        "type": "restriction"
+      }
+    },
+    {
+      "type": "node",
+      "id": 17312836,
+      "lat": 48.2085805,
+      "lon": 16.3381316,
+      "timestamp": "2015-01-25T19:01:18Z",
+      "version": 14,
+      "changeset": 28402799,
+      "user": "Eckhart Wörner",
+      "uid": 2675
+    },
+    {
+      "type": "node",
+      "id": 17312837,
+      "lat": 48.2084499,
+      "lon": 16.3388375,
+      "timestamp": "2015-01-25T19:01:18Z",
+      "version": 10,
+      "changeset": 28402799,
+      "user": "Eckhart Wörner",
+      "uid": 2675,
+      "tags": {
+        "highway": "traffic_signals"
+      }
+    },
+    {
+      "type": "node",
+      "id": 293269032,
+      "lat": 48.2085393,
+      "lon": 16.3382698,
+      "timestamp": "2013-03-24T10:56:39Z",
+      "version": 14,
+      "changeset": 15476879,
+      "user": "stefanct",
+      "uid": 303158,
+      "tags": {
+        "bicycle": "yes",
+        "crossing": "traffic_signals",
+        "foot": "yes",
+        "highway": "crossing"
+      }
+    },
+    {
+      "type": "node",
+      "id": 1538937640,
+      "lat": 48.208453,
+      "lon": 16.3389884,
+      "timestamp": "2017-02-16T14:01:24Z",
+      "version": 3,
+      "changeset": 46137877,
+      "user": "Weltstaat",
+      "uid": 3080626,
+      "tags": {
+        "crossing": "traffic_signals",
+        "highway": "crossing"
+      }
+    },
+    {
+      "type": "node",
+      "id": 2076499330,
+      "lat": 48.20846,
+      "lon": 16.3387307,
+      "timestamp": "2013-03-24T10:56:39Z",
+      "version": 2,
+      "changeset": 15476879,
+      "user": "stefanct",
+      "uid": 303158,
+      "tags": {
+        "crossing": "traffic_signals",
+        "highway": "crossing"
+      }
+    },
+    {
+      "type": "node",
+      "id": 3310442552,
+      "lat": 48.2084566,
+      "lon": 16.3391389,
+      "timestamp": "2015-01-25T19:01:09Z",
+      "version": 1,
+      "changeset": 28402799,
+      "user": "Eckhart Wörner",
+      "uid": 2675
+    },
+    {
+      "type": "way",
+      "id": 47379824,
+      "timestamp": "2018-07-01T19:31:07Z",
+      "version": 10,
+      "changeset": 60328723,
+      "user": "JM82",
+      "uid": 2641694,
+      "nodes": [
+        17312836,
+        293269032,
+        2076499330,
+        17312837
+      ],
+      "tags": {
+        "highway": "secondary",
+        "lit": "yes",
+        "maxspeed": "50",
+        "name": "Lerchenfelder Gürtel",
+        "oneway": "yes",
+        "surface": "asphalt"
+      }
+    },
+    {
+      "type": "way",
+      "id": 324297228,
+      "timestamp": "2017-12-06T17:30:22Z",
+      "version": 3,
+      "changeset": 54407099,
+      "user": "m3h4",
+      "uid": 5140186,
+      "nodes": [
+        17312837,
+        1538937640,
+        3310442552
+      ],
+      "tags": {
+        "cycleway:right": "no",
+        "highway": "secondary",
+        "lit": "yes",
+        "maxspeed": "50",
+        "name": "Lerchenfelder Straße",
+        "oneway": "yes",
+        "surface": "asphalt"
+      }
+    }
+  ]
+}

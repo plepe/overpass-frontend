@@ -1,4 +1,32 @@
-/* global L:false */
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: OverpassRelation.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: OverpassRelation.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/* global L:false */
 
 var BoundingBox = require('boundingbox')
 var osmtogeojson = require('osmtogeojson')
@@ -36,11 +64,11 @@ class OverpassRelation extends OverpassObject {
 
     super.updateData(data, options)
 
-    if ((options.properties & OverpassFrontend.MEMBERS) &&
+    if ((options.properties &amp; OverpassFrontend.MEMBERS) &amp;&amp;
         data.members) {
       this.members = []
 
-      for (i = 0; i < data.members.length; i++) {
+      for (i = 0; i &lt; data.members.length; i++) {
         var member = data.members[i]
 
         this.members.push(member)
@@ -48,7 +76,7 @@ class OverpassRelation extends OverpassObject {
       }
     }
 
-    if (options.properties & OverpassFrontend.MEMBERS) {
+    if (options.properties &amp; OverpassFrontend.MEMBERS) {
       this.memberFeatures = data.members.map(
         (member, sequence) => {
           let ob = JSON.parse(JSON.stringify(member))
@@ -57,7 +85,7 @@ class OverpassRelation extends OverpassObject {
           delete ob.role
 
           let memberOb = this.overpass.createOrUpdateOSMObject(ob, {
-            properties: options.properties & OverpassFrontend.GEOM
+            properties: options.properties &amp; OverpassFrontend.GEOM
           })
 
           memberOb.notifyMemberOf(this, member.role, sequence)
@@ -67,12 +95,12 @@ class OverpassRelation extends OverpassObject {
       )
     }
 
-    if ((options.properties & OverpassFrontend.MEMBERS) &&
-        (options.properties & OverpassFrontend.GEOM) &&
+    if ((options.properties &amp; OverpassFrontend.MEMBERS) &amp;&amp;
+        (options.properties &amp; OverpassFrontend.GEOM) &amp;&amp;
         data.members) {
       let elements = [ JSON.parse(JSON.stringify(data)) ]
       this.geometry = osmtogeojson({ elements })
-    } else if ((options.properties & OverpassFrontend.MEMBERS) &&
+    } else if ((options.properties &amp; OverpassFrontend.MEMBERS) &amp;&amp;
         data.members) {
       this.updateGeometry()
     }
@@ -132,7 +160,7 @@ class OverpassRelation extends OverpassObject {
         }
       })
 
-      if (this.bounds && allKnown) {
+      if (this.bounds &amp;&amp; allKnown) {
         this.center = this.bounds.getCenter()
         this.properties = this.properties | OverpassFrontend.BBOX | OverpassFrontend.CENTER
       }
@@ -163,7 +191,7 @@ class OverpassRelation extends OverpassObject {
     }
 
     this._memberIds = []
-    for (var i = 0; i < this.data.members.length; i++) {
+    for (var i = 0; i &lt; this.data.members.length; i++) {
       var member = this.data.members[i]
 
       this._memberIds.push(member.type.substr(0, 1) + member.ref)
@@ -292,7 +320,7 @@ class OverpassRelation extends OverpassObject {
     }
 
     if (this.geometry) {
-      for (i = 0; i < this.geometry.features.length; i++) {
+      for (i = 0; i &lt; this.geometry.features.length; i++) {
         var g = this.geometry.features[i]
 
         if (g.geometry.type === 'Point') {
@@ -310,7 +338,7 @@ class OverpassRelation extends OverpassObject {
           }
         }
         if (g.geometry.type === 'MultiPolygon' || g.geometry.type === 'MultiLineString') {
-          for (var j = 0; j < intersects.geometry.coordinates.length; j++) {
+          for (var j = 0; j &lt; intersects.geometry.coordinates.length; j++) {
             if (intersects.geometry.coordinates[j].length) {
               return 2
             }
@@ -320,7 +348,7 @@ class OverpassRelation extends OverpassObject {
 
       // if there's a relation member (where Overpass does not return the
       // geometry) we can't know if the geometry intersects -> return 1
-      for (i = 0; i < this.data.members.length; i++) {
+      for (i = 0; i &lt; this.data.members.length; i++) {
         if (this.data.members[i].type === 'relation') {
           return 1
         }
@@ -346,3 +374,26 @@ class OverpassRelation extends OverpassObject {
 }
 
 module.exports = OverpassRelation
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Filter.html">Filter</a></li><li><a href="KnownArea.html">KnownArea</a></li><li><a href="OverpassFrontend.html">OverpassFrontend</a></li><li><a href="OverpassNode.html">OverpassNode</a></li><li><a href="OverpassObject.html">OverpassObject</a></li><li><a href="OverpassRelation.html">OverpassRelation</a></li><li><a href="OverpassWay.html">OverpassWay</a></li><li><a href="Request.html">Request</a></li><li><a href="RequestBBox.html">RequestBBox</a></li><li><a href="RequestGet.html">RequestGet</a></li></ul><h3>Events</h3><ul><li><a href="OverpassFrontend.html#event:error">error</a></li><li><a href="OverpassFrontend.html#event:load">load</a></li><li><a href="OverpassFrontend.html#event:update">update</a></li><li><a href="Request.html#event:abort">abort</a></li><li><a href="Request.html#event:finish">finish</a></li><li><a href="Request.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="Request.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestBBox.html#event:abort">abort</a></li><li><a href="RequestBBox.html#event:finish">finish</a></li><li><a href="RequestBBox.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestBBox.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestGet.html#event:abort">abort</a></li><li><a href="RequestGet.html#event:finish">finish</a></li><li><a href="RequestGet.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestGet.html#event:subrequest-finished">subrequest-finished</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Oct 18 2018 09:51:28 GMT+0200 (GMT+02:00)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
