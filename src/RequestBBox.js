@@ -264,12 +264,10 @@ class RequestBBox extends Request {
         (this.options.split > subRequest.parts[0].count)) {
       this.loadFinish = true
 
-      if (!this.aborted) {
-        if (this.options.filter) {
-          this.cacheFilter.add(this.remainingBounds)
-        } else {
-          this.cache.requested.add(this.remainingBounds)
-        }
+      if (this.options.filter) {
+        this.cacheFilter.add(this.remainingBounds)
+      } else {
+        this.cache.requested.add(this.remainingBounds)
       }
     }
   }
