@@ -72,8 +72,6 @@ class RequestBBox extends Request {
 
         this.cacheFilter = this.cache.filter[filterId]
       }
-
-      this.preprocess()
     } else {
       // otherwise initialize cache
       this.overpass.cacheBBoxQueries[this.query] = {}
