@@ -106,16 +106,17 @@ class RequestBBox extends Request {
     for (var i = 0; i < items.length; i++) {
       var id = items[i].id
 
-      if (this.lokiQueryNeedMatch && !this.filterQuery.match(items[i])) {
-        continue
-      }
-
       if (!(id in this.overpass.cacheElements)) {
         continue
       }
       var ob = this.overpass.cacheElements[id]
 
       if (id in this.doneFeatures) {
+        continue
+      }
+
+      // maybe we need an additional check
+      if (this.lokiQueryNeedMatch && !this.filterQuery.match(ob)) {
         continue
       }
 
