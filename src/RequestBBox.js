@@ -29,19 +29,34 @@ class RequestBBox extends Request {
       this.query += ';'
     }
 
+    if ((typeof this.options.filter !== 'undefined') && !(this.options.filter instanceof Filter)) {
+      this.options.filter = new Filter(this.options.filter)
+    }
+
+    let filterId = null
+    if (this.options.filter) {
+      filterId = this.options.filter.toString()
+    }
+
     if (!('noCacheQuery' in this.options) || !this.options.noCacheQuery) {
       this.filterQuery = new Filter(this.query)
+
       this.lokiQuery = this.filterQuery.toLokijs()
+      this.lokiQueryNeedMatch = !!this.lokiQuery.needMatch
+      delete this.lokiQuery.needMatch
+
+      if (this.options.filter) {
+        let filterLokiQuery = this.options.filter.toLokijs()
+        this.lokiQueryFilterNeedMatch = !!filterLokiQuery.needMatch
+        delete filterLokiQuery.needMatch
+
+        this.lokiQuery = { $and: [ this.lokiQuery, filterLokiQuery ] }
+      }
+
       this.lokiQuery.minlat = { $lte: this.bounds.maxlat }
       this.lokiQuery.minlon = { $lte: this.bounds.maxlon }
       this.lokiQuery.maxlat = { $gte: this.bounds.minlat }
       this.lokiQuery.maxlon = { $gte: this.bounds.minlon }
-      this.lokiQueryNeedMatch = !!this.lokiQuery.needMatch
-      delete this.lokiQuery.needMatch
-    }
-
-    if ((typeof this.options.filter !== 'undefined') && !(this.options.filter instanceof Filter)) {
-      this.options.filter = new Filter(this.options.filter)
     }
 
     this.loadFinish = false
@@ -51,17 +66,10 @@ class RequestBBox extends Request {
       RequestBBoxMembers(this)
     }
 
-    let filterId = null
-    if (this.options.filter) {
-      filterId = this.options.filter.toString()
-    }
-
     if (this.query in this.overpass.cacheBBoxQueries) {
       this.cache = this.overpass.cacheBBoxQueries[this.query]
 
-      if (this.options.filter) {
-        let filterId = this.options.filter.toString()
-
+      if (filterId) {
         if (!('filter' in this.cache)) {
           this.cache.filter = {}
         }
@@ -120,12 +128,12 @@ class RequestBBox extends Request {
         continue
       }
 
-      // also check the object directly if it intersects the bbox - if possible
-      if (ob.intersects(this.bounds) < 2) {
+      if (this.lokiQueryFilterNeedMatch && !this.option.filter.match(ob)) {
         continue
       }
 
-      if (this.options.filter && !this.options.filter.match(ob)) {
+      // also check the object directly if it intersects the bbox - if possible
+      if (ob.intersects(this.bounds) < 2) {
         continue
       }
 
