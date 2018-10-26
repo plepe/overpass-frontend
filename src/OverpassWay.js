@@ -164,10 +164,9 @@ class OverpassWay extends OverpassObject {
     }
 
     if (this.geometry) {
-      let coordinates = []
-      for (var i = 0; i < this.geometry.length; i++) {
-        coordinates.push([ this.geometry[i].lon, this.geometry[i].lat ])
-      }
+      let coordinates = this.geometry
+        .filter(point => point) // discard non-loaded points
+        .map(point => [ point.lon, point.lat ])
 
       result.geometry = {
         type: 'LineString',
