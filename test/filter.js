@@ -275,7 +275,7 @@ describe('Filter', function () {
       var f = new Filter([ { op: '=', key: 'amenity', value: 'restaurant' } ])
 
       var r = f.toLokijs()
-      assert.deepEqual(r, { 'tags.amenity': 'restaurant' })
+      assert.deepEqual(r, { 'tags.amenity': { $eq: 'restaurant' } })
     })
 
     it ('nwr[amenity][amenity!=restaurant]', function () {
@@ -296,7 +296,7 @@ describe('Filter', function () {
       var f = new Filter([ { op: '=', key: 'amenity', value: 'restaurant' }, { op: 'has_key', key: 'shop' } ])
 
       var r = f.toLokijs()
-      assert.deepEqual(r, { 'tags.amenity': 'restaurant', 'tags.shop': { $exists: true } })
+      assert.deepEqual(r, { 'tags.amenity': { $eq: 'restaurant' }, 'tags.shop': { $exists: true } })
     })
 
     it ('[cuisine^asian]', function () {
@@ -315,9 +315,9 @@ describe('Filter', function () {
 
       var r = f.toLokijs()
       assert.deepEqual(r, { $or: [
-        { 'type': 'node', 'tags.amenity': 'cafe', 'tags.cuisine': 'ice_cream' },
-        { 'type': 'node', 'tags.amenity': 'ice_cream' },
-        { 'tags.shop': 'ice_cream' }
+        { 'type': { $eq: 'node' }, 'tags.amenity': { $eq: 'cafe' }, 'tags.cuisine': { $eq: 'ice_cream' } },
+        { 'type': { $eq: 'node' }, 'tags.amenity': { $eq: 'ice_cream' } },
+        { 'tags.shop': { $eq: 'ice_cream' } }
       ]})
     })
 
@@ -332,7 +332,7 @@ describe('Filter', function () {
       var f = new Filter([ { type: 'node' }, { key: 'amenity', 'op': 'has_key' }, { keyRegexp: true, op: 'has_key', key: 'wikipedia' } ])
 
       var r = f.toLokijs()
-      assert.deepEqual(r, { "type": "node", "tags.amenity": { "$exists": true }, "needMatch": true })
+      assert.deepEqual(r, { "type": { $eq: "node" }, "tags.amenity": { "$exists": true }, "needMatch": true })
     })
 
     it ('nwr[~wikipedia~"foo"]', function () {
@@ -356,9 +356,15 @@ describe('Filter', function () {
       ]})
 
       var r = f.toLokijs()
-      assert.deepEqual(r, {"$or":[{},{"type":"node","tags.amenity":{"$exists":true}}],"needMatch":true})
+      assert.deepEqual(r, {"$or":[{},{"type":{$eq:"node"},"tags.amenity":{"$exists":true}}],"needMatch":true})
     })
 
+    it ("way[railway=rail][railway!~'^(platform|abandoned|disused|station|proposed|subway_entrance)$'][usage~'^(main|branch)$'];", function () {
+      var f = new Filter("way[railway=rail][railway!~'^(platform|abandoned|disused|station|proposed|subway_entrance)$'][usage~'^(main|branch)$'];")
+
+      var r = f.toLokijs()
+      assert.deepEqual(r, {"type":{"$eq":"way"},"tags.railway":{"$and":[{"$eq":"rail"},{"$not":{"$regex":"^(platform|abandoned|disused|station|proposed|subway_entrance)$"}}]},"tags.usage":{"$regex":"^(main|branch)$"}})
+    })
   })
 
   describe ('parse', function () {

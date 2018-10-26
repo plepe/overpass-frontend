@@ -357,7 +357,7 @@ class Filter {
         // can't query for key regexp, skip
       } else if (filter.op === '=') {
         k = 'tags.' + filter.key
-        v = filter.value
+        v = { $eq: filter.value }
       } else if (filter.op === '!=') {
         k = 'tags.' + filter.key
         v = { $ne: filter.value }
@@ -375,7 +375,7 @@ class Filter {
         v = { $not: { $regex: filter.value } }
       } else if (filter.type) {
         k = 'type'
-        v = filter.type
+        v = { $eq: filter.type }
       } else {
         console.log('unknown filter', filter)
       }
