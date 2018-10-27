@@ -184,8 +184,8 @@ class OverpassFrontend {
       options = {}
     }
 
-    if (typeof this.options.properties === 'undefined') {
-      this.options.properties = defines.DEFAULT
+    if (typeof options.properties === 'undefined') {
+      options.properties = defines.DEFAULT
     }
 
     if (!(id in this.cacheElements)) {
