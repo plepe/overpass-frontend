@@ -587,6 +587,11 @@ class OverpassFrontend {
     if (id in this.cacheElements && this.cacheElements[id]) {
       ob = this.cacheElements[id]
       create = false
+
+      // no new information -> return
+      if (~ob.properties & options.properties === 0) {
+        return ob
+      }
     } else if (el.type === 'relation') {
       ob = new OverpassRelation(id)
     } else if (el.type === 'way') {
