@@ -29,6 +29,9 @@ var turf = {
  * @property {number} members.ref Numeric ID of the member.
  * @property {string} members.type 'node'.
  * @property {string} members.role Role of the member.
+ * @property {null|string} members.connectedPrev null (unknown), 'no' (connected), 'forward' (connected at the front end of this way), 'backward' (connected at the back end of this way)
+ * @property {null|string} members.connectedNext null (unknown), 'no' (connected), 'forward' (connected at the back end of this way), 'backward' (connected at the fornt end of this way)
+ * @property {null|string} members.dir null (unknown), 'forward', 'backward', 'loop'
  */
 class OverpassRelation extends OverpassObject {
   updateData (data, options) {
@@ -119,6 +122,56 @@ class OverpassRelation extends OverpassObject {
     if (allKnown) {
       this.properties = this.properties | OverpassFrontend.GEOM
     }
+
+    this.members.forEach(
+      (member, index) => {
+        if (member.type !== 'way') {
+          return
+        }
+
+        let memberOb = this.overpass.cacheElements[member.id]
+        if (!memberOb.members || member.type !== 'way') {
+          return
+        }
+
+        let firstMemberId = memberOb.members[0].id
+        let lastMemberId = memberOb.members[memberOb.members.length - 1].id
+
+        if (index > 0) {
+          let prevMember = this.overpass.cacheElements[this.members[index - 1].id]
+          if (prevMember.type === 'way' && prevMember.members) {
+            if (firstMemberId === prevMember.members[0].id || firstMemberId === prevMember.members[prevMember.members.length - 1].id) {
+              member.connectedPrev = 'forward'
+            } else if (lastMemberId === prevMember.members[0].id || lastMemberId === prevMember.members[prevMember.members.length - 1].id) {
+              member.connectedPrev = 'backward'
+            } else {
+              member.connectedPrev = 'no'
+            }
+          }
+        }
+
+        if (index < this.members.length - 1) {
+          let nextMember = this.overpass.cacheElements[this.members[index + 1].id]
+          if (nextMember.type === 'way' && nextMember.members) {
+            if (firstMemberId === nextMember.members[0].id || firstMemberId === nextMember.members[nextMember.members.length - 1].id) {
+              member.connectedNext = 'backward'
+            } else if (lastMemberId === nextMember.members[0].id || lastMemberId === nextMember.members[nextMember.members.length - 1].id) {
+              member.connectedNext = 'forward'
+            } else {
+              member.connectedNext = 'no'
+            }
+          }
+        }
+
+        if (!member.connectedPrev || !member.connectedNext) {
+          member.dir = member.connectedPrev || member.connectedNext || null
+        } else if (member.connectedPrev === member.connectedNext) {
+          member.dir = member.connectedPrev || member.connectedNext || null
+        } else {
+          member.dir = null
+        }
+      }
+    )
 
     if (!this.bounds) {
       this.members.forEach(member => {
