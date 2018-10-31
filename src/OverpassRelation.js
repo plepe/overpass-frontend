@@ -22,6 +22,9 @@ var turf = {
  * @property {string} memberOf.id ID of the relation where this object is member of.
  * @property {string} memberOf.role Role of this object in the relation.
  * @property {number} memberOf.sequence This object is the nth member in the relation.
+ * @property {null|string} memberOf.connectedPrev null (unknown), 'no' (connected), 'forward' (connected at the front end of this way), 'backward' (connected at the back end of this way)
+ * @property {null|string} memberOf.connectedNext null (unknown), 'no' (connected), 'forward' (connected at the back end of this way), 'backward' (connected at the front end of this way)
+ * @property {null|string} members.dir null (unknown), 'forward', 'backward'
  * @property {BoundingBox} bounds Bounding box of this object.
  * @property {Point} center Centroid of the bounding box.
  * @property {object[]} members Nodes of the way.
@@ -136,6 +139,7 @@ class OverpassRelation extends OverpassObject {
 
         let firstMemberId = memberOb.members[0].id
         let lastMemberId = memberOb.members[memberOb.members.length - 1].id
+        let revMemberOf = memberOb.memberOf.filter(memberOf => memberOf.sequence === index && memberOf.id === this.id)[0]
 
         if (index > 0) {
           let prevMember = this.overpass.cacheElements[this.members[index - 1].id]
@@ -169,6 +173,16 @@ class OverpassRelation extends OverpassObject {
           member.dir = member.connectedPrev || member.connectedNext || null
         } else {
           member.dir = null
+        }
+
+        if ('dir' in member) {
+          revMemberOf.dir = member.dir
+        }
+        if ('connectedPrev' in member) {
+          revMemberOf.connectedPrev = member.connectedPrev
+        }
+        if ('connectedNext' in member) {
+          revMemberOf.connectedNext = member.connectedNext
         }
       }
     )

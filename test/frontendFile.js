@@ -46,10 +46,10 @@ describe('Overpass get', function() {
 
     it('way', function(done) {
       var finalCalled = 0
-      var expected = [ 'w4583259', 'w52495764' ]
+      var expected = [ 'w4583259', 'w52495764', 'w244604983' ]
       var found = []
 
-      overpassFrontend.get([ 'w4583259', 'w52495764', 'w52495765' ],
+      overpassFrontend.get([ 'w4583259', 'w52495764', 'w52495765', 'w244604983' ],
         {
           properties: OverpassFrontend.ID_ONLY
         },
@@ -59,6 +59,12 @@ describe('Overpass get', function() {
           found.push(result.id)
           if(expected.indexOf(result.id) == -1)
             assert(false, 'Object ' + result.id + ' should not be found!')
+
+          if (result.id === 'w244604983') {
+            assert.deepEqual(result.memberOf, [
+              { "role": "forward", "id": "r26679", "connectedPrev": "forward", "connectedNext": "forward", "dir": "forward", "sequence": 6 }
+            ])
+          }
         },
         function(err) {
           assert.equal(found.length, expected.length, 'Wrong count of objects found!')
@@ -163,7 +169,7 @@ describe('Overpass get before load finishes', function() {
           ])
         } else if (result.id === 'w324297228') {
           assert.deepEqual(result.memberOf, [
-            { id: 'r276122', sequence: 2, role: 'to' }
+            { id: 'r276122', sequence: 2, role: 'to', dir: null }
           ])
           assert.deepEqual(result.members, [
             { type: 'node', ref: 17312837, id: 'n17312837' },
@@ -212,7 +218,7 @@ describe('Overpass BBoxQuery with members', function() {
               ])
             } else if (result.id === 'w324297228') {
               assert.deepEqual(result.memberOf, [
-                { id: 'r276122', sequence: 2, role: 'to' }
+                { id: 'r276122', sequence: 2, role: 'to', dir: null }
               ])
               assert.deepEqual(result.members, [
                 { type: 'node', ref: 17312837, id: 'n17312837' },
