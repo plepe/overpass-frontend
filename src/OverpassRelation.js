@@ -197,6 +197,8 @@ class OverpassRelation extends OverpassObject {
 
     var feature = L.geoJSON(this.geometry, {
       pointToLayer: function (options, geoJsonPoint, member) {
+        let feature
+
         switch (options.nodeFeature) {
           case 'Marker':
             feature = L.marker(member, options)
