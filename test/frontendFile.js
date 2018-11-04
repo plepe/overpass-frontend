@@ -271,7 +271,7 @@ describe('Overpass BBoxQuery with members', function() {
               ])
             } else if (result.id === 'w324297228') {
               assert.deepEqual(result.memberOf, [
-                { id: 'r276122', sequence: 2, role: 'to' }
+                { id: 'r276122', sequence: 2, role: 'to', dir: null }
               ])
               assert.deepEqual(result.members, [
                 { type: 'node', ref: 17312837, id: 'n17312837' },
