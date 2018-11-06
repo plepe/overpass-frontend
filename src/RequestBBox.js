@@ -136,7 +136,11 @@ class RequestBBox extends Request {
       if (intersects === 0) {
         continue
       } else if (intersects === 1) {
-        this.onlyPartlyKnown = true
+        if (!this.onlyPartlyKnown) {
+          this.onlyPartlyKnown = {}
+        }
+        this.onlyPartlyKnown[ob.id] = ob
+
         continue
       }
 

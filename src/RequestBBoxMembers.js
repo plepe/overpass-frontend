@@ -84,6 +84,10 @@ class RequestBBoxMembers {
   _compileQuery (fun, context) {
     var subRequest = fun.call(this.master, context)
 
+    if (this.master.onlyPartlyKnown) {
+      each(this.master.onlyPartlyKnown, rel => this.relations[rel.id] = rel)
+    }
+
     if (keys(this.relations).length === 0) {
       return subRequest
     }
