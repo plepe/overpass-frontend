@@ -150,7 +150,18 @@ class RequestBBoxMembers {
 
   receiveMasterObject (fun, err, result, index) {
     this.relations[result.id] = result
-    this.loadFinish = false
+
+    // when all members have their memberProperties, we don't need to load
+    if (result.memberFeatures.filter(member => !(member.properties & this.options.memberProperties)).length !== 0) {
+      if (!this.options.memberBounds) {
+        this.loadFinish = false
+      } else {
+        if (!result.knownMemberArea || !result.knownMemberArea.check(this.options.memberBounds)) {
+          this.loadFinish = false
+        }
+      }
+    }
+
     fun(err, result, index)
   }
 
@@ -160,6 +171,12 @@ class RequestBBoxMembers {
 
   finishSubRequest (fun, subRequest) {
     fun.call(this.master, subRequest)
+
+    if (this.options.memberBounds) {
+      each(this.relations, relation =>
+        relation.knownMemberArea.add(this.options.memberBounds)
+      )
+    }
 
     if (keys(this.relations).length !== this.currentRelations.length) {
       this.loadFinish = false

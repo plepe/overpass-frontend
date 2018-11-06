@@ -132,7 +132,11 @@ class RequestBBox extends Request {
       }
 
       // also check the object directly if it intersects the bbox - if possible
-      if (ob.intersects(this.bounds) < 2) {
+      let intersects = ob.intersects(this.bounds)
+      if (intersects === 0) {
+        continue
+      } else if (intersects === 1) {
+        this.onlyPartlyKnown = true
         continue
       }
 
@@ -290,6 +294,10 @@ class RequestBBox extends Request {
     // check if we need to call Overpass API (whole area known?)
     if (this.options.filter && this.cacheFilter.check(this.bounds)) {
       return false
+    }
+
+    if (this.onlyPartlyKnown) {
+      return true
     }
 
     return !this.cache.requested.check(this.bounds)

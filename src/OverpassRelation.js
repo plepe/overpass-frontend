@@ -4,9 +4,8 @@ var BoundingBox = require('boundingbox')
 var osmtogeojson = require('osmtogeojson')
 var OverpassObject = require('./OverpassObject')
 var OverpassFrontend = require('./defines')
-var turf = {
-  bboxClip: require('@turf/bbox-clip').default
-}
+var turf = require('./turf')
+const KnownArea = require('./knownArea')
 
 /**
  * A relation
@@ -23,6 +22,7 @@ var turf = {
  * @property {string} memberOf.role Role of this object in the relation.
  * @property {number} memberOf.sequence This object is the nth member in the relation.
  * @property {BoundingBox} bounds Bounding box of this object.
+ * @property {KnownArea} [knownMemberArea] Area where all members are already known.
  * @property {Point} center Centroid of the bounding box.
  * @property {object[]} members Nodes of the way.
  * @property {string} members.id ID of the member.
@@ -75,6 +75,12 @@ class OverpassRelation extends OverpassObject {
     } else if ((options.properties & OverpassFrontend.MEMBERS) &&
         data.members) {
       this.updateGeometry()
+    }
+
+    if (!this.knownMemberArea && this.bounds) {
+      let area = new BoundingBox({ minlat: -90, maxlat: 90, minlon: -180, maxlon: 180 }).toGeoJSON()
+      area = turf.difference(area, this.bounds.toGeoJSON())
+      this.knownMemberArea = new KnownArea(area)
     }
   }
 
@@ -301,6 +307,11 @@ class OverpassRelation extends OverpassObject {
         if (this.data.members[i].type === 'relation') {
           return 1
         }
+      }
+
+      // there's a relation member whose geometry is not known
+      if (!this.knownMemberArea.check(bbox) && this.memberFeatures.some(member => !(member.properties & OverpassFrontend.GEOM))) {
+        return 1
       }
 
       // if there's no relation member we can be sure there's no intersection

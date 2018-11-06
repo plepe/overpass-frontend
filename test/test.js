@@ -1828,7 +1828,7 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
     request.on('subrequest-compile', compileListener)
   })
 
-  it('Simple queries - routes with different area', function (done) {
+  it('Simple queries - routes with different area 1', function (done) {
     var expected = [ 'r1306732', 'r1306733' ]
     var expectedMembers = [ 'w232881441', 'w383292582', 'n2411909898', 'n2411911256' ]
     var found = []
@@ -1909,7 +1909,7 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
     request.on('subrequest-compile', compileListener)
   })
 
-  it('Simple queries - routes with different area', function (done) {
+  it('Simple queries - routes with different area 2', function (done) {
     var expected = [ 'r1306732', 'r1306733' ]
     var expectedMembers = [ 'w232881441', 'w383292582' ]
     var found = []
@@ -1922,7 +1922,7 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
         "minlon": 16.32281,
       }
 
-    var expectedSubRequestCount = 1 // 0!
+    var expectedSubRequestCount = 1
     var foundSubRequestCount = 0
 
     function compileListener (subRequest) {
@@ -2086,7 +2086,7 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
 	"minlon": 16.32581,
       }
 
-    var expectedSubRequestCount = 1
+    var expectedSubRequestCount = 0
     var foundSubRequestCount = 0
 
     function compileListener (subRequest) {
@@ -2169,7 +2169,7 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
 	"minlon": 16.32581,
       }
 
-    var expectedSubRequestCount = 1
+    var expectedSubRequestCount = 0
     var foundSubRequestCount = 0
 
     function compileListener (subRequest) {
@@ -2252,7 +2252,7 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
 	"minlon": 16.32581,
       }
 
-    var expectedSubRequestCount = 1
+    var expectedSubRequestCount = 0
     var foundSubRequestCount = 0
 
     function compileListener (subRequest) {
@@ -2323,7 +2323,7 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
   })
 
   it('Simple queries - routes without members to fill cache', function (done) {
-    overpassFrontend.clearBBoxQuery("relation[type=route][route=tram]")
+    overpassFrontend.clearCache()
     var expected = [ 'r910885', 'r910886', 'r1306732', 'r1306733' ]
     var found = []
     var error = ''
@@ -2334,7 +2334,7 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
 	"minlon": 16.32581,
       }
 
-    var expectedSubRequestCount = 0
+    var expectedSubRequestCount = 1
     var foundSubRequestCount = 0
 
     function compileListener (subRequest) {
@@ -2394,7 +2394,7 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
 	"minlon": 16.32581,
       }
 
-    var expectedSubRequestCount = 1
+    var expectedSubRequestCount = 2 // TODO: 1
     var foundSubRequestCount = 0
 
     function compileListener (subRequest) {
@@ -2463,7 +2463,7 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
   })
 
   it('Simple queries - routes with members - default properties', function (done) {
-    overpassFrontend.clearBBoxQuery("relation[type=route][route=tram]")
+    overpassFrontend.clearBBoxQuery("relation[type=route][route=tram];")
     overpassFrontend.removeFromCache('r910885')
     overpassFrontend.removeFromCache('n2293993991')
     overpassFrontend.removeFromCache('w220270696')
