@@ -59,7 +59,6 @@ class RequestBBox extends Request {
       this.lokiQuery.maxlon = { $gte: this.bounds.minlon }
     }
 
-    this.loadFinish = false
     this.lastChecked = 0
 
     if ('members' in this.options) {
@@ -151,7 +150,7 @@ class RequestBBox extends Request {
    * @return {boolean|int[]} - yes|no - or [ minEffort, maxEffort ]
    */
   willInclude (context) {
-    if (this.loadFinish) {
+    if (!this.needLoad()) {
       return false
     }
 
