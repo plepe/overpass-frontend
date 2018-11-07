@@ -16,6 +16,7 @@ var RequestBBox = require('./RequestBBox')
 var defines = require('./defines')
 var loadOsmFile = require('./loadOsmFile')
 var copyOsm3sMetaFrom = require('./copyOsm3sMeta')
+const Filter = require('./Filter')
 
 /**
  * An error occured
@@ -489,7 +490,9 @@ class OverpassFrontend {
   }
 
   clearBBoxQuery (query) {
-    delete this.cacheBBoxQueries[query]
+    let filterId = new Filter(query).toString()
+
+    delete this.cacheBBoxQueries[filterId]
   }
 
   _abortRequest (request) {
