@@ -175,14 +175,18 @@ class OverpassRelation extends OverpassObject {
           member.dir = null
         }
 
-        if ('dir' in member) {
-          revMemberOf.dir = member.dir
-        }
-        if ('connectedPrev' in member) {
-          revMemberOf.connectedPrev = member.connectedPrev
-        }
-        if ('connectedNext' in member) {
-          revMemberOf.connectedNext = member.connectedNext
+        if (revMemberOf) {
+          if ('dir' in member) {
+            revMemberOf.dir = member.dir
+          }
+          if ('connectedPrev' in member) {
+            revMemberOf.connectedPrev = member.connectedPrev
+          }
+          if ('connectedNext' in member) {
+            revMemberOf.connectedNext = member.connectedNext
+          }
+        } else {
+          console.log('Warning: memberOf reference ' + member.id + ' -> ' + this.id + ' (#' + index + ') does not exist.')
         }
       }
     )
