@@ -55,6 +55,8 @@ class OverpassRelation extends OverpassObject {
     }
 
     if (options.properties & OverpassFrontend.MEMBERS) {
+      let membersKnown = !!this.memberFeatures
+
       this.memberFeatures = data.members.map(
         (member, sequence) => {
           let ob = JSON.parse(JSON.stringify(member))
@@ -66,7 +68,10 @@ class OverpassRelation extends OverpassObject {
             properties: options.properties & OverpassFrontend.GEOM
           })
 
-          memberOb.notifyMemberOf(this, member.role, sequence)
+          // call notifyMemberOf only once per member
+          if (!membersKnown) {
+            memberOb.notifyMemberOf(this, member.role, sequence)
+          }
 
           return memberOb
         }
