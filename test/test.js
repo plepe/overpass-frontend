@@ -1702,7 +1702,6 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
         "memberProperties": OverpassFrontend.TAGS | OverpassFrontend.GEOM,
         "memberBounds": bbox,
         "memberCallback": function (err, result) {
-          console.log('got', result.id)
           foundMembers.push(result.id)
 
           result.memberOf.forEach(memberOf => {
@@ -2636,6 +2635,397 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
     request.on('subrequest-compile', compileListener)
   })
 
+  describe('Calculate way directions', function () {
+    it('Simple queries - routes with members - calculate directions', function (done) {
+      overpassFrontend.clearCache()
+      var expected = [ 'r910885', 'r910886', 'r1306732', 'r1306733' ]
+      var expectedMemberMemberOf = {
+        "n2293993991": [{"id":"r910885","role":"stop","sequence":12},{"id":"r1306733","role":"stop","sequence":4},{"id":"w220270706","role":null,"sequence":1}],
+        "n2293993859": [{"id":"r910886","role":"stop","sequence":19},{"id":"r1306732","role":"stop","sequence":22},{"id":"w220270714","role":null,"sequence":1}],
+        "n2293993867": [{"id":"r910885","role":"stop","sequence":11},{"id":"r1306733","role":"stop","sequence":3},{"id":"w220270696","role":null,"sequence":7}],
+        "n2293993929": [{"id":"r910886","role":"stop","sequence":21},{"id":"r1306732","role":"stop","sequence":24},{"id":"w220270713","role":null,"sequence":2}],
+        "w122580925": [{"id":"r910885","role":"platform","sequence":13,"dir":null},{"id":"r1306733","role":"platform","sequence":5,"dir":null}],
+        "w220270706": [{"id":"r910885","role":"","sequence":50,"dir":"forward","connectedPrev":"forward","connectedNext":"forward"},{"id":"r1306733","role":"","sequence":31,"dir":"forward","connectedPrev":"forward","connectedNext":"forward"}],
+        "w220270708": [{"id":"r910886","role":"","sequence":47,"dir":"forward","connectedNext":"forward"}],
+        "w220270709": [{"id":"r910885","role":"","sequence":51,"dir":"forward","connectedPrev":"forward"}],
+        "w220270714": [{"id":"r910886","role":"","sequence":48,"dir":"forward","connectedPrev":"forward","connectedNext":"forward"},{"id":"r1306732","role":"","sequence":60,"dir":"forward","connectedPrev":"forward","connectedNext":"forward"}],
+        "w232881263": [{"id":"r1306733","role":"","sequence":32,"dir":"backward","connectedPrev":"backward","connectedNext":"backward"}],
+        "w232881441": [{"id":"r1306732","role":"","sequence":59,"dir":"forward","connectedNext":"forward"}],
+        "w261111319": [{"id":"r910886","role":"platform","sequence":20,"dir":null},{"id":"r1306732","role":"platform","sequence":23,"dir":null}],
+        "w220270696": [{"id":"r910885","role":"","sequence":49,"dir":"forward","connectedNext":"forward"},{"id":"r1306733","role":"","sequence":30,"dir":"forward","connectedNext":"forward"}],
+        "w220270713": [{"id":"r910886","role":"","sequence":49,"dir":"forward","connectedPrev":"forward"},{"id":"r1306732","role":"","sequence":61,"dir":"forward","connectedPrev":"forward"}],
+        "w383292582": [{"id":"r1306733","role":"","sequence":33,"dir":"backward","connectedPrev":"backward"}]
+      }
+      var expectedMembers = Object.keys(expectedMemberMemberOf)
+      var found = []
+      var foundMembers = []
+      var error = ''
+      var bbox = {
+          "maxlat": 48.19953,
+          "maxlon": 16.33506,
+          "minlat": 48.19800,
+          "minlon": 16.32581,
+        }
+
+      var expectedSubRequestCount = 2
+      var foundSubRequestCount = 0
+      var isDone = false
+
+      function compileListener (subRequest) {
+        foundSubRequestCount++
+      }
+
+      var request = overpassFrontend.BBoxQuery(
+        "relation[type=route][route=tram]",
+        bbox,
+        {
+          "members": true,
+          "memberBounds": bbox,
+          "memberProperties": OverpassFrontend.MEMBERS|OverpassFrontend.GEOM,
+          "memberCallback": function (err, result) {
+            foundMembers.push(result.id)
+
+            if (expectedMembers.indexOf(result.id) === -1) {
+              error += 'Unexpected member result ' + result.id + '\n'
+            }
+
+            assert.deepEqual(expectedMemberMemberOf[result.id], result.memberOf, 'Member.memberOf for ' + result.id +' is wrong!')
+
+            assert.equal(OverpassFrontend.MEMBERS, result.properties&OverpassFrontend.MEMBERS, 'Member should known about sub members (nodes)')
+
+            assert.equal(false, isDone, 'Called memberCallback after finalCallback')
+          }
+        },
+        function (err, result) {
+          found.push(result.id)
+
+          if (expected.indexOf(result.id) === -1) {
+            error += 'Unexpected result ' + result.id + '\n'
+          }
+
+          assert.equal(OverpassFrontend.DEFAULT, result.properties&OverpassFrontend.DEFAULT)
+        },
+        function (err) {
+          isDone = true
+          if (err) {
+            return done(err)
+          }
+
+          if (error) {
+            return done(error)
+          }
+
+          if (found.length !== expected.length) {
+            return done('Wrong count of objects returned:\n' +
+                 'Expected: ' + expected.join(', ') + '\n' +
+                 'Found: ' + found.join(', '))
+          }
+
+          if (foundMembers.length !== expectedMembers.length) {
+            return done('Wrong count of member objects returned:\n' +
+                 'Expected: ' + expectedMembers.join(', ') + '\n' +
+                 'Found: ' + foundMembers.join(', '))
+          }
+
+          assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
+
+          request.off('subrequest-compile', compileListener)
+
+          done()
+        }
+      )
+
+      request.on('subrequest-compile', compileListener)
+    })
+
+    it('Simple queries - routes with members - calculate directions (different area)', function (done) {
+      var expected = [ 'r910885', 'r910886', 'r1306732', 'r1306733' ]
+      var expectedMemberMemberOf = {
+        "n2293993855": [{"id":"r910885","role":"stop","sequence":14},{"id":"w220270709","role":null,"sequence":25}],
+        "n2293993868": [{"id":"r910886","role":"stop","sequence":17},{"id":"w220270708","role":null,"sequence":19}],
+        "n2293993991": [{"id":"r910885","role":"stop","sequence":12},{"id":"r1306733","role":"stop","sequence":4},{"id":"w220270706","role":null,"sequence":1}],
+        "n2293993859": [{"id":"r910886","role":"stop","sequence":19},{"id":"r1306732","role":"stop","sequence":22},{"id":"w220270714","role":null,"sequence":1}],
+        "n2293993929": [{"id":"r910886","role":"stop","sequence":21},{"id":"r1306732","role":"stop","sequence":24},{"id":"w220270713","role":null,"sequence":2}],
+        "w122580925": [{"id":"r910885","role":"platform","sequence":13,"dir":null},{"id":"r1306733","role":"platform","sequence":5,"dir":null}],
+        "w220270706": [{"id":"r910885","role":"","sequence":50,"dir":"forward","connectedPrev":"forward","connectedNext":"forward"},{"id":"r1306733","role":"","sequence":31,"dir":"forward","connectedPrev":"forward","connectedNext":"forward"}],
+        "w220270708": [{"id":"r910886","role":"","sequence":47,"dir":"forward","connectedNext":"forward"}],
+        "w220270709": [{"id":"r910885","role":"","sequence":51,"dir":"forward","connectedPrev":"forward"}],
+        "w220270714": [{"id":"r910886","role":"","sequence":48,"dir":"forward","connectedPrev":"forward","connectedNext":"forward"},{"id":"r1306732","role":"","sequence":60,"dir":"forward","connectedPrev":"forward","connectedNext":"forward"}],
+        "w232881263": [{"id":"r1306733","role":"","sequence":32,"dir":"backward","connectedPrev":"backward","connectedNext":"backward"}],
+        "w232881441": [{"id":"r1306732","role":"","sequence":59,"dir":"forward","connectedNext":"forward"}],
+        "w261111319": [{"id":"r910886","role":"platform","sequence":20,"dir":null},{"id":"r1306732","role":"platform","sequence":23,"dir":null}],
+        "w122580876": [{"id":"r910886","role":"platform","sequence":18,"dir":null}],
+        "w122580924": [{"id":"r910885","role":"platform","sequence":15,"dir":null}],
+        "w220270696": [{"id":"r910885","role":"","sequence":49,"dir":"forward","connectedNext":"forward"},{"id":"r1306733","role":"","sequence":30,"dir":"forward","connectedNext":"forward"}],
+        "w220270713": [{"id":"r910886","role":"","sequence":49,"dir":"forward","connectedPrev":"forward"},{"id":"r1306732","role":"","sequence":61,"dir":"forward","connectedPrev":"forward"}],
+        "w383292582": [{"id":"r1306733","role":"","sequence":33,"dir":"backward","connectedPrev":"backward"}]
+      }
+      var expectedMembers = Object.keys(expectedMemberMemberOf)
+      var found = []
+      var foundMembers = []
+      var error = ''
+      var bbox = {
+          "maxlat": 48.2013,
+          "maxlon": 16.3325,
+          "minlat": 48.1970,
+          "minlon": 16.3240
+        }
+
+      var expectedSubRequestCount = 1
+      var foundSubRequestCount = 0
+      var isDone = false
+
+      function compileListener (subRequest) {
+        foundSubRequestCount++
+      }
+
+      var request = overpassFrontend.BBoxQuery(
+        "relation[type=route][route=tram]",
+        bbox,
+        {
+          "members": true,
+          "memberBounds": bbox,
+          "memberProperties": OverpassFrontend.MEMBERS|OverpassFrontend.GEOM,
+          "memberCallback": function (err, result) {
+            foundMembers.push(result.id)
+
+            if (expectedMembers.indexOf(result.id) === -1) {
+              error += 'Unexpected member result ' + result.id + '\n'
+            }
+
+            assert.deepEqual(expectedMemberMemberOf[result.id], result.memberOf, 'Member.memberOf for ' + result.id +' is wrong!')
+
+            assert.equal(OverpassFrontend.MEMBERS, result.properties&OverpassFrontend.MEMBERS, 'Member should known about sub members (nodes)')
+            assert.equal(false, isDone, 'Called memberCallback after finalCallback')
+          }
+        },
+        function (err, result) {
+          found.push(result.id)
+
+          if (expected.indexOf(result.id) === -1) {
+            error += 'Unexpected result ' + result.id + '\n'
+          }
+
+          assert.equal(OverpassFrontend.DEFAULT, result.properties&OverpassFrontend.DEFAULT)
+        },
+        function (err) {
+          isDone = true
+          if (err) {
+            return done(err)
+          }
+
+          if (error) {
+            return done(error)
+          }
+
+          if (found.length !== expected.length) {
+            return done('Wrong count of objects returned:\n' +
+                 'Expected: ' + expected.join(', ') + '\n' +
+                 'Found: ' + found.join(', '))
+          }
+
+          if (foundMembers.length !== expectedMembers.length) {
+            return done('Wrong count of member objects returned:\n' +
+                 'Expected: ' + expectedMembers.join(', ') + '\n' +
+                 'Found: ' + foundMembers.join(', '))
+          }
+
+          assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
+
+          request.off('subrequest-compile', compileListener)
+
+          done()
+        }
+      )
+
+      request.on('subrequest-compile', compileListener)
+    })
+
+    it('Simple queries - routes with members - calculate directions (small known area)', function (done) {
+      var expected = [ 'r910885', 'r910886' ]
+      var expectedMemberMemberOf = {
+        "n2293993855": [{"id":"r910885","role":"stop","sequence":14},{"id":"w220270709","role":null,"sequence":25}],
+        "n2293993868": [{"id":"r910886","role":"stop","sequence":17},{"id":"w220270708","role":null,"sequence":19}],
+        "w220270708": [{"id":"r910886","role":"","sequence":47,"dir":"forward","connectedNext":"forward"}],
+        "w220270709": [{"id":"r910885","role":"","sequence":51,"dir":"forward","connectedPrev":"forward"}],
+        "w122580876": [{"id":"r910886","role":"platform","sequence":18,"dir":null}],
+        "w122580924": [{"id":"r910885","role":"platform","sequence":15,"dir":null}]
+      }
+      var expectedMembers = Object.keys(expectedMemberMemberOf)
+      var found = []
+      var foundMembers = []
+      var error = ''
+      var bbox = {
+          "maxlat": 48.1984,
+          "maxlon": 16.3272,
+          "minlat": 48.1971,
+          "minlon": 16.3240
+        }
+
+      var expectedSubRequestCount = 1 // TODO: 0
+      var foundSubRequestCount = 0
+      var isDone = false
+
+      function compileListener (subRequest) {
+        foundSubRequestCount++
+      }
+
+      var request = overpassFrontend.BBoxQuery(
+        "relation[type=route][route=tram]",
+        bbox,
+        {
+          "members": true,
+          "memberBounds": bbox,
+          "memberProperties": OverpassFrontend.MEMBERS|OverpassFrontend.GEOM,
+          "memberCallback": function (err, result) {
+            foundMembers.push(result.id)
+
+            if (expectedMembers.indexOf(result.id) === -1) {
+              error += 'Unexpected member result ' + result.id + '\n'
+            }
+
+            assert.deepEqual(expectedMemberMemberOf[result.id], result.memberOf, 'Member.memberOf for ' + result.id +' is wrong!')
+
+            assert.equal(OverpassFrontend.MEMBERS, result.properties&OverpassFrontend.MEMBERS, 'Member should known about sub members (nodes)')
+
+            assert.equal(false, isDone, 'Called memberCallback after finalCallback')
+          }
+        },
+        function (err, result) {
+          found.push(result.id)
+
+          if (expected.indexOf(result.id) === -1) {
+            error += 'Unexpected result ' + result.id + '\n'
+          }
+
+          assert.equal(OverpassFrontend.DEFAULT, result.properties&OverpassFrontend.DEFAULT)
+        },
+        function (err) {
+          isDone = true
+          if (err) {
+            return done(err)
+          }
+
+          if (error) {
+            return done(error)
+          }
+
+          if (found.length !== expected.length) {
+            return done('Wrong count of objects returned:\n' +
+                 'Expected: ' + expected.join(', ') + '\n' +
+                 'Found: ' + found.join(', '))
+          }
+
+          if (foundMembers.length !== expectedMembers.length) {
+            return done('Wrong count of member objects returned:\n' +
+                 'Expected: ' + expectedMembers.join(', ') + '\n' +
+                 'Found: ' + foundMembers.join(', '))
+          }
+
+          assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
+
+          request.off('subrequest-compile', compileListener)
+
+          done()
+        }
+      )
+
+      request.on('subrequest-compile', compileListener)
+    })
+
+    it('Simple queries - routes with members - calculate directions (different area 2)', function (done) {
+      var expected = [ 'r1306733', 'r1809913', 'r1990861', 'r1809912', 'r1990860', 'r1306732' ]
+      var expectedMemberMemberOf = {
+  "w141233631": [{"id":"r1306732","role":"","sequence":65,"dir":"forward","connectedPrev":"forward"},{"id":"r1809912","role":"","sequence":31,"dir":"forward","connectedPrev":"forward"},{"id":"r1990860","role":"","sequence":47,"dir":"forward","connectedPrev":"forward"}],
+  "w210848994": [{"id":"r1306733","role":"","sequence":27,"dir":"forward","connectedNext":"forward"},{"id":"r1809913","role":"","sequence":57,"dir":"forward","connectedNext":"forward"},{"id":"r1990861","role":"","sequence":86,"dir":"forward","connectedNext":"forward"}],
+  "w24877453": [{"id":"r1306732","role":"","sequence":64,"dir":"forward","connectedNext":"forward"},{"id":"r1809912","role":"","sequence":30,"dir":"forward","connectedNext":"forward"},{"id":"r1990860","role":"","sequence":46,"dir":"forward","connectedNext":"forward"}],
+  "w26231338": [{"id":"r1809913","role":"","sequence":58,"dir":"forward","connectedPrev":"forward"},{"id":"r1990861","role":"","sequence":87,"dir":"forward","connectedPrev":"forward"}],
+  "w125586439": [{"id":"r1306733","role":"","sequence":28,"dir":"forward","connectedPrev":"forward"}]
+      }
+      var expectedMembers = Object.keys(expectedMemberMemberOf)
+      var found = []
+      var foundMembers = []
+      var error = ''
+      var bbox = {
+          "maxlat": 48.20016,
+          "maxlon": 16.33829,
+          "minlat": 48.19928,
+          "minlon": 16.33727
+        }
+
+      var expectedSubRequestCount = 2
+      var foundSubRequestCount = 0
+      var isDone = false
+
+      function compileListener (subRequest) {
+        foundSubRequestCount++
+      }
+
+      var request = overpassFrontend.BBoxQuery(
+        "relation[type=route][route=tram]",
+        bbox,
+        {
+          "members": true,
+          "memberBounds": bbox,
+          "memberProperties": OverpassFrontend.MEMBERS|OverpassFrontend.GEOM,
+          "memberCallback": function (err, result) {
+            foundMembers.push(result.id)
+
+            if (expectedMembers.indexOf(result.id) === -1) {
+              error += 'Unexpected member result ' + result.id + '\n'
+            }
+
+            console.log(result.memberOf)
+            assert.deepEqual(expectedMemberMemberOf[result.id], result.memberOf, 'Member.memberOf for ' + result.id +' is wrong!')
+
+            assert.equal(OverpassFrontend.MEMBERS, result.properties&OverpassFrontend.MEMBERS, 'Member should known about sub members (nodes)')
+
+            assert.equal(false, isDone, 'Called memberCallback after finalCallback')
+          }
+        },
+        function (err, result) {
+          found.push(result.id)
+
+          if (expected.indexOf(result.id) === -1) {
+            error += 'Unexpected result ' + result.id + '\n'
+          }
+
+          assert.equal(OverpassFrontend.DEFAULT, result.properties&OverpassFrontend.DEFAULT)
+        },
+        function (err) {
+          isDone = true
+          if (err) {
+            return done(err)
+          }
+
+          if (error) {
+            return done(error)
+          }
+
+          if (found.length !== expected.length) {
+            return done('Wrong count of objects returned:\n' +
+                 'Expected: ' + expected.join(', ') + '\n' +
+                 'Found: ' + found.join(', '))
+          }
+
+          if (foundMembers.length !== expectedMembers.length) {
+            return done('Wrong count of member objects returned:\n' +
+                 'Expected: ' + expectedMembers.join(', ') + '\n' +
+                 'Found: ' + foundMembers.join(', '))
+          }
+
+          assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
+
+          request.off('subrequest-compile', compileListener)
+
+          done()
+        }
+      )
+
+      request.on('subrequest-compile', compileListener)
+    })
+  })
+
   describe('DB objects, which are referenced by Relation', function() {
     it('check that missing elements are in the cache after loading parent relation', function (done) {
       overpassFrontend.clearCache()
@@ -2917,7 +3307,6 @@ describe('Overpass Get - Relation with members in BBOX', function() {
         }
       },
       function (err) {
-        console.log(foundMembers.join("', '"))
         if (err) {
           return done(err)
         }

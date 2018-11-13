@@ -22,6 +22,9 @@ var turf = {
  * @property {string} memberOf.id ID of the relation where this object is member of.
  * @property {string} memberOf.role Role of this object in the relation.
  * @property {number} memberOf.sequence This object is the nth member in the relation.
+ * @property {null|string} memberOf.connectedPrev null (unknown), 'no' (connected), 'forward' (connected at the front end of this way), 'backward' (connected at the back end of this way)
+ * @property {null|string} memberOf.connectedNext null (unknown), 'no' (connected), 'forward' (connected at the back end of this way), 'backward' (connected at the front end of this way)
+ * @property {null|string} members.dir null (unknown), 'forward', 'backward'
  * @property {BoundingBox} bounds Bounding box of this object.
  * @property {Point} center Centroid of the bounding box.
  * @property {object[]} members Nodes of the way.
@@ -29,6 +32,9 @@ var turf = {
  * @property {number} members.ref Numeric ID of the member.
  * @property {string} members.type 'node'.
  * @property {string} members.role Role of the member.
+ * @property {null|string} members.connectedPrev null (unknown), 'no' (connected), 'forward' (connected at the front end of this way), 'backward' (connected at the back end of this way)
+ * @property {null|string} members.connectedNext null (unknown), 'no' (connected), 'forward' (connected at the back end of this way), 'backward' (connected at the fornt end of this way)
+ * @property {null|string} members.dir null (unknown), 'forward', 'backward', 'loop'
  */
 class OverpassRelation extends OverpassObject {
   updateData (data, options) {
@@ -49,6 +55,8 @@ class OverpassRelation extends OverpassObject {
     }
 
     if (options.properties & OverpassFrontend.MEMBERS) {
+      let membersKnown = !!this.memberFeatures
+
       this.memberFeatures = data.members.map(
         (member, sequence) => {
           let ob = JSON.parse(JSON.stringify(member))
@@ -60,7 +68,10 @@ class OverpassRelation extends OverpassObject {
             properties: options.properties & OverpassFrontend.GEOM
           })
 
-          memberOb.notifyMemberOf(this, member.role, sequence)
+          // call notifyMemberOf only once per member
+          if (!membersKnown) {
+            memberOb.notifyMemberOf(this, member.role, sequence)
+          }
 
           return memberOb
         }
@@ -119,6 +130,71 @@ class OverpassRelation extends OverpassObject {
     if (allKnown) {
       this.properties = this.properties | OverpassFrontend.GEOM
     }
+
+    this.members.forEach(
+      (member, index) => {
+        if (member.type !== 'way') {
+          return
+        }
+
+        let memberOb = this.overpass.cacheElements[member.id]
+        if (!memberOb.members || member.type !== 'way') {
+          return
+        }
+
+        let firstMemberId = memberOb.members[0].id
+        let lastMemberId = memberOb.members[memberOb.members.length - 1].id
+        let revMemberOf = memberOb.memberOf.filter(memberOf => memberOf.sequence === index && memberOf.id === this.id)[0]
+
+        if (index > 0) {
+          let prevMember = this.overpass.cacheElements[this.members[index - 1].id]
+          if (prevMember.type === 'way' && prevMember.members) {
+            if (firstMemberId === prevMember.members[0].id || firstMemberId === prevMember.members[prevMember.members.length - 1].id) {
+              member.connectedPrev = 'forward'
+            } else if (lastMemberId === prevMember.members[0].id || lastMemberId === prevMember.members[prevMember.members.length - 1].id) {
+              member.connectedPrev = 'backward'
+            } else {
+              member.connectedPrev = 'no'
+            }
+          }
+        }
+
+        if (index < this.members.length - 1) {
+          let nextMember = this.overpass.cacheElements[this.members[index + 1].id]
+          if (nextMember.type === 'way' && nextMember.members) {
+            if (firstMemberId === nextMember.members[0].id || firstMemberId === nextMember.members[nextMember.members.length - 1].id) {
+              member.connectedNext = 'backward'
+            } else if (lastMemberId === nextMember.members[0].id || lastMemberId === nextMember.members[nextMember.members.length - 1].id) {
+              member.connectedNext = 'forward'
+            } else {
+              member.connectedNext = 'no'
+            }
+          }
+        }
+
+        if (!member.connectedPrev || !member.connectedNext) {
+          member.dir = member.connectedPrev || member.connectedNext || null
+        } else if (member.connectedPrev === member.connectedNext) {
+          member.dir = member.connectedPrev || member.connectedNext || null
+        } else {
+          member.dir = null
+        }
+
+        if (revMemberOf) {
+          if ('dir' in member) {
+            revMemberOf.dir = member.dir
+          }
+          if ('connectedPrev' in member) {
+            revMemberOf.connectedPrev = member.connectedPrev
+          }
+          if ('connectedNext' in member) {
+            revMemberOf.connectedNext = member.connectedNext
+          }
+        } else {
+          console.log('Warning: memberOf reference ' + member.id + ' -> ' + this.id + ' (#' + index + ') does not exist.')
+        }
+      }
+    )
 
     if (!this.bounds) {
       this.members.forEach(member => {
