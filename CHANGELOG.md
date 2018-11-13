@@ -1,4 +1,7 @@
-# Version 2.0.0 - release 2018-10-18
+# Version 2.1 - release 2018-11-13
+Calculate 'connectedPrev', 'connectedNext' and 'dir' for members of type way in relations.
+
+# Version 2.0 - release 2018-10-18
 overpass-frontend now internally uses the in-memory LokiJS database to look for
 matching objects in its cache. This also enables overpass-frontend to
 load a .osm or .osm.bz2 or .json file which works as an internal database - no
