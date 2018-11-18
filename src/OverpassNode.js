@@ -47,6 +47,10 @@ class OverpassNode extends OverpassObject {
           return callback(err)
         }
 
+        if (!result) { // already included
+          return callback(null)
+        }
+
         result.setAttribute('lat', this.geometry.lat)
         result.setAttribute('lon', this.geometry.lon)
 

@@ -168,6 +168,14 @@ class OverpassObject {
   }
 
   exportOSMXML (conf, parentNode, callback) {
+    if (!parentNode._alreadyIncluded) {
+      parentNode._alreadyIncluded = {}
+    }
+    if (this.id in parentNode._alreadyIncluded) {
+      return callback(null)
+    }
+    parentNode._alreadyIncluded[this.id] = true
+
     if ((this.properties & (OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.META)) !== (OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.META)) {
       return this.overpass.get(
         this.id,

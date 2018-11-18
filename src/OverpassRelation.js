@@ -343,6 +343,10 @@ class OverpassRelation extends OverpassObject {
           return callback(err)
         }
 
+        if (!result) { // already included
+          return callback(null)
+        }
+
         if (this.members) {
           async.each(this.members,
             (member, done) => {
