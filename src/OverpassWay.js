@@ -1,5 +1,6 @@
 /* global L:false */
 
+const async = require('async')
 var BoundingBox = require('boundingbox')
 var OverpassObject = require('./OverpassObject')
 var OverpassFrontend = require('./defines')
@@ -175,6 +176,35 @@ class OverpassWay extends OverpassObject {
     }
 
     return result
+  }
+
+  exportOSMXML (conf, parentNode, callback) {
+    super.exportOSMXML(conf, parentNode,
+      (err, result) => {
+        if (err) {
+          return callback(err)
+        }
+
+        if (this.members) {
+          async.each(this.members,
+            (member, done) => {
+              let memberOb = this.overpass.cacheElements[member.id]
+
+              let nd = parentNode.ownerDocument.createElement('nd')
+              nd.setAttribute('ref', memberOb.osm_id)
+              result.appendChild(nd)
+
+              memberOb.exportOSMXML(conf, parentNode, done)
+            },
+            (err) => {
+              callback(err, result)
+            }
+          )
+        } else {
+          callback(null, result)
+        }
+      }
+    )
   }
 
   /**

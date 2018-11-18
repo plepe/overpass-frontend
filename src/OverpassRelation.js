@@ -1,5 +1,6 @@
 /* global L:false */
 
+const async = require('async')
 var BoundingBox = require('boundingbox')
 var osmtogeojson = require('osmtogeojson')
 var OverpassObject = require('./OverpassObject')
@@ -333,6 +334,37 @@ class OverpassRelation extends OverpassObject {
     }
 
     return ret
+  }
+
+  exportOSMXML (conf, parentNode, callback) {
+    super.exportOSMXML(conf, parentNode,
+      (err, result) => {
+        if (err) {
+          return callback(err)
+        }
+
+        if (this.members) {
+          async.each(this.members,
+            (member, done) => {
+              let memberOb = this.overpass.cacheElements[member.id]
+
+              let nd = parentNode.ownerDocument.createElement('member')
+              nd.setAttribute('ref', memberOb.osm_id)
+              nd.setAttribute('type', memberOb.type)
+              nd.setAttribute('role', member.role)
+              result.appendChild(nd)
+
+              memberOb.exportOSMXML(conf, parentNode, done)
+            },
+            (err) => {
+              callback(err, result)
+            }
+          )
+        } else {
+          callback(null, result)
+        }
+      }
+    )
   }
 
   intersects (bbox) {

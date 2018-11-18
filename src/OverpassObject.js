@@ -167,6 +167,33 @@ class OverpassObject {
     return ret
   }
 
+  exportOSMXML (conf, parentNode, callback) {
+    let result = parentNode.ownerDocument.createElement(this.type)
+    result.setAttribute('id', this.osm_id)
+
+    if (this.meta) {
+      result.setAttribute('version', this.meta.version)
+      result.setAttribute('timestamp', this.meta.timestamp)
+      result.setAttribute('changeset', this.meta.changeset)
+      result.setAttribute('uid', this.meta.uid)
+      result.setAttribute('user', this.meta.user)
+    }
+
+    if (this.tags) {
+      for (var k in this.tags) {
+        let tag = parentNode.ownerDocument.createElement('tag')
+        tag.setAttribute('k', k)
+        tag.setAttribute('v', this.tags[k])
+
+        result.appendChild(tag)
+      }
+    }
+
+    parentNode.appendChild(result)
+
+    callback(null, result)
+  }
+
   /**
    * Check whether this object intersects (or is within) the specified bounding box. Returns 0 if it does not match; 1 if the exact geometry is not known, but the object's bounding box matches; 2 exact match.
    * @param {boundingbox:BoundingBox} bbox Bounding box
