@@ -168,6 +168,27 @@ class OverpassObject {
   }
 
   exportOSMXML (conf, parentNode, callback) {
+    if ((this.properties & (OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.META)) !== (OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.META)) {
+      return this.overpass.get(
+        this.id,
+        {
+          properties: OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.META
+        },
+        () => {},
+        (err) => {
+          if (err) {
+            return callback(err)
+          }
+
+          this._exportOSMXML(conf, parentNode, callback)
+        }
+      )
+    }
+
+    this._exportOSMXML(conf, parentNode, callback)
+  }
+
+  _exportOSMXML (conf, parentNode, callback) {
     let result = parentNode.ownerDocument.createElement(this.type)
     result.setAttribute('id', this.osm_id)
 
