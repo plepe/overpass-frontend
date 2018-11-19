@@ -380,7 +380,7 @@ class OverpassFrontend {
         if (partIndex >= subRequest.parts.length) {
           request.finishSubRequest(subRequest)
 
-          if (request.mayFinish()) {
+          if (request.mayFinish() && !request.finished) {
             request.finish()
           }
 
@@ -418,7 +418,7 @@ class OverpassFrontend {
       if (part.receiveObject) {
         part.receiveObject(ob)
       }
-      if (!request.aborted && part.featureCallback) {
+      if (!request.aborted && !request.finished && part.featureCallback) {
         part.featureCallback(err, ob)
       }
     }

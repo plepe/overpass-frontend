@@ -67,6 +67,7 @@ class Request {
     }
 
     this.overpass._finishRequest(this)
+    this.finished = true
     this.emit('finish', err)
   }
 
