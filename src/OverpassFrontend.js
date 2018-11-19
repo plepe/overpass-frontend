@@ -335,13 +335,14 @@ class OverpassFrontend {
   }
 
   _handleResult (context, err, results) {
+    this.requestIsActive = false
+
     if (err === null && results.remark) {
       err = results.remark
     }
 
     if (err !== null) {
       this.errorCount++
-      this.requestIsActive = false
 
       if (this.errorCount <= 3) {
         // retry
@@ -510,8 +511,6 @@ class OverpassFrontend {
   }
 
   _next () {
-    this.requestIsActive = false
-
     async.setImmediate(function () {
       this._overpassProcess()
     }.bind(this))
