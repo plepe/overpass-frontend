@@ -1,7 +1,7 @@
 {
   "name": "overpass-frontend",
   "description": "A JavaScript (NodeJS/Browser) library to easily access data from OpenStreetMap via Overpass API. The objects can directly be used with LeafletJS or exported to GeoJSON. Data will be cached locally, optionally by using LocalStorage (or similar).",
-  "version": "2.1.0",
+  "version": "2.1.2",
   "main": "src/OverpassFrontend.js",
   "directories": {
     "test": "test"
@@ -52,6 +52,7 @@
     "watch": "watchify -t browserify-shim --debug index.js -o dist/overpass-frontend.js -v",
     "watch-test": "watchify -t brfs --debug test/knownArea.js test/test.js test/frontendFile.js test/filter.js -o dist/test.js -v",
     "prepublish": "npm run build && npm run lint",
+    "bump-version": "npm run lint && npm run doc && npm run build && npm run build-test && git add doc/",
     "prepare": "require-self",
     "lint": "eslint src/*.js index.js",
     "doc": "jsdoc -d doc/ src/*.js"

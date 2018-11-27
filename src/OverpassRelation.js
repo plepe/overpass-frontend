@@ -114,6 +114,10 @@ class OverpassRelation extends OverpassObject {
 
         let ob = this.overpass.cacheElements[member.id]
 
+        if ((ob.properties & OverpassFrontend.GEOM) === 0) {
+          allKnown = false
+        }
+
         if (ob.type === 'node') {
           if (ob.geometry) {
             data.lat = ob.geometry.lat
