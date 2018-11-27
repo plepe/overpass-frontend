@@ -167,6 +167,23 @@ class OverpassObject {
     return ret
   }
 
+  exportGeoJSON (options, callback) {
+    this.overpass.get(
+      this.id,
+      {
+        properties: OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.META | OverpassFrontend.GEOM
+      },
+      () => {},
+      (err) => {
+        if (err) {
+          return callback(err)
+        }
+
+        callback(null, this.GeoJSON(options))
+      }
+    )
+  }
+
   exportOSMXML (conf, parentNode, callback) {
     if (!parentNode._alreadyIncluded) {
       parentNode._alreadyIncluded = {}
