@@ -52,6 +52,7 @@
     "watch": "watchify -t browserify-shim --debug index.js -o dist/overpass-frontend.js -v",
     "watch-test": "watchify -t brfs --debug test/knownArea.js test/test.js test/frontendFile.js test/filter.js -o dist/test.js -v",
     "prepublish": "npm run build && npm run lint",
+    "bump-version": "npm run lint && npm run doc && npm run build && npm run build-test && git add doc/",
     "prepare": "require-self",
     "lint": "eslint src/*.js index.js",
     "doc": "jsdoc -d doc/ src/*.js"
