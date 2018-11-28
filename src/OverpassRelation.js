@@ -344,8 +344,8 @@ class OverpassRelation extends OverpassObject {
     return ret
   }
 
-  exportOSMXML (conf, parentNode, callback) {
-    super.exportOSMXML(conf, parentNode,
+  exportOSMXML (options, parentNode, callback) {
+    super.exportOSMXML(options, parentNode,
       (err, result) => {
         if (err) {
           return callback(err)
@@ -366,7 +366,7 @@ class OverpassRelation extends OverpassObject {
               nd.setAttribute('role', member.role)
               result.appendChild(nd)
 
-              memberOb.exportOSMXML(conf, parentNode, done)
+              memberOb.exportOSMXML(options, parentNode, done)
             },
             (err) => {
               callback(err, result)

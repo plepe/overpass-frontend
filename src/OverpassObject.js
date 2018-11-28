@@ -167,6 +167,11 @@ class OverpassObject {
     return ret
   }
 
+  /**
+   * Export object as GeoJSON. Missing geometry will be loaded.
+   * @param object options Options
+   * @param function callback Function which will be called with (err, result)
+   */
   exportGeoJSON (options, callback) {
     this.overpass.get(
       this.id,
@@ -184,7 +189,13 @@ class OverpassObject {
     )
   }
 
-  exportOSMXML (conf, parentNode, callback) {
+  /**
+   * Export object (and members) as OpenStreetMap XML
+   * @param object options Options
+   * @param DOMNode parentNode a DOM Node where the object will be appended as child. Depending on object type and options, member objects will also be appended on the same level.
+   * @param function callback Function which will be called with (err, dom node)
+   */
+  exportOSMXML (options, parentNode, callback) {
     if (!parentNode._alreadyIncluded) {
       parentNode._alreadyIncluded = {}
     }
@@ -205,15 +216,15 @@ class OverpassObject {
             return callback(err)
           }
 
-          this._exportOSMXML(conf, parentNode, callback)
+          this._exportOSMXML(options, parentNode, callback)
         }
       )
     }
 
-    this._exportOSMXML(conf, parentNode, callback)
+    this._exportOSMXML(options, parentNode, callback)
   }
 
-  _exportOSMXML (conf, parentNode, callback) {
+  _exportOSMXML (options, parentNode, callback) {
     let result = parentNode.ownerDocument.createElement(this.type)
     result.setAttribute('id', this.osm_id)
 
@@ -240,6 +251,12 @@ class OverpassObject {
     callback(null, result)
   }
 
+  /**
+   * Export object (and members) as OpenStreetMap JSON
+   * @param object options Options
+   * @param object elements All exported elements, include member objects. Pass an empty object. If a member element would be exported multiple times it will appear only once.
+   * @param function callback Function which will be called with (err, result)
+   */
   exportOSMJSON (conf, elements, callback) {
     if (this.id in elements) {
       return callback(null)

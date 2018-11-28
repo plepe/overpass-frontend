@@ -186,8 +186,8 @@ class OverpassWay extends OverpassObject {
     return result
   }
 
-  exportOSMXML (conf, parentNode, callback) {
-    super.exportOSMXML(conf, parentNode,
+  exportOSMXML (options, parentNode, callback) {
+    super.exportOSMXML(options, parentNode,
       (err, result) => {
         if (err) {
           return callback(err)
@@ -206,7 +206,7 @@ class OverpassWay extends OverpassObject {
               nd.setAttribute('ref', memberOb.osm_id)
               result.appendChild(nd)
 
-              memberOb.exportOSMXML(conf, parentNode, done)
+              memberOb.exportOSMXML(options, parentNode, done)
             },
             (err) => {
               callback(err, result)

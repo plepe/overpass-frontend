@@ -40,8 +40,8 @@ class OverpassNode extends OverpassObject {
     return result
   }
 
-  exportOSMXML (conf, document, callback) {
-    super.exportOSMXML(conf, document,
+  exportOSMXML (options, document, callback) {
+    super.exportOSMXML(options, document,
       (err, result) => {
         if (err) {
           return callback(err)
