@@ -240,6 +240,52 @@ class OverpassObject {
     callback(null, result)
   }
 
+  exportOSMJSON (conf, elements, callback) {
+    if (this.id in elements) {
+      return callback(null)
+    }
+    elements[this.id] = {}
+
+    if ((this.properties & (OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.META)) !== (OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.META)) {
+      return this.overpass.get(
+        this.id,
+        {
+          properties: OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.META
+        },
+        () => {},
+        (err) => {
+          if (err) {
+            return callback(err)
+          }
+
+          this._exportOSMJSON(conf, elements, callback)
+        }
+      )
+    }
+
+    this._exportOSMJSON(conf, elements, callback)
+  }
+
+  _exportOSMJSON (conf, elements, callback) {
+    let result = elements[this.id]
+    result.type = this.type
+    result.id = this.osm_id
+
+    if (this.meta) {
+      result.version = this.meta.version
+      result.timestamp = this.meta.timestamp
+      result.changeset = this.meta.changeset
+      result.uid = this.meta.uid
+      result.user = this.meta.user
+    }
+
+    if (this.tags && Object.keys(this.tags).length) {
+      result.tags = this.tags
+    }
+
+    callback(null, result)
+  }
+
   /**
    * Check whether this object intersects (or is within) the specified bounding box. Returns 0 if it does not match; 1 if the exact geometry is not known, but the object's bounding box matches; 2 exact match.
    * @param {boundingbox:BoundingBox} bbox Bounding box

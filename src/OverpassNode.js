@@ -59,6 +59,25 @@ class OverpassNode extends OverpassObject {
     )
   }
 
+  exportOSMJSON (conf, elements, callback) {
+    super.exportOSMJSON(conf, elements,
+      (err, result) => {
+        if (err) {
+          return callback(err)
+        }
+
+        if (!result) { // already included
+          return callback(null)
+        }
+
+        result.lat = this.geometry.lat
+        result.lon = this.geometry.lon
+
+        callback(null, result)
+      }
+    )
+  }
+
   updateData (data, options) {
     super.updateData(data, options)
 

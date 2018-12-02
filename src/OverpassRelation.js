@@ -379,6 +379,43 @@ class OverpassRelation extends OverpassObject {
     )
   }
 
+  exportOSMJSON (conf, elements, callback) {
+    super.exportOSMJSON(conf, elements,
+      (err, result) => {
+        if (err) {
+          return callback(err)
+        }
+
+        if (!result) { // already included
+          return callback(null)
+        }
+
+        if (this.members) {
+          result.members = []
+
+          async.each(this.members,
+            (member, done) => {
+              let memberOb = this.overpass.cacheElements[member.id]
+
+              result.members.push({
+                ref: memberOb.osm_id,
+                type: memberOb.type,
+                role: member.role
+              })
+
+              memberOb.exportOSMJSON(conf, elements, done)
+            },
+            (err) => {
+              callback(err, result)
+            }
+          )
+        } else {
+          callback(null, result)
+        }
+      }
+    )
+  }
+
   intersects (bbox) {
     var i
 

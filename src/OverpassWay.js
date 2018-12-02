@@ -219,6 +219,39 @@ class OverpassWay extends OverpassObject {
     )
   }
 
+  exportOSMJSON (conf, elements, callback) {
+    super.exportOSMJSON(conf, elements,
+      (err, result) => {
+        if (err) {
+          return callback(err)
+        }
+
+        if (!result) { // already included
+          return callback(null)
+        }
+
+        if (this.members) {
+          result.nodes = []
+
+          async.each(this.members,
+            (member, done) => {
+              let memberOb = this.overpass.cacheElements[member.id]
+
+              result.nodes.push(memberOb.osm_id)
+
+              memberOb.exportOSMJSON(conf, elements, done)
+            },
+            (err) => {
+              callback(err, result)
+            }
+          )
+        } else {
+          callback(null, result)
+        }
+      }
+    )
+  }
+
   /**
    * return a leaflet feature for this object. If the ways is closed, a L.polygon will be returned, otherwise a L.polyline.
    * @param {object} [options] options Options will be passed to the leaflet function
