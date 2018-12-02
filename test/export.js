@@ -12,6 +12,9 @@ var async = require('async')
 var OverpassFrontend = require('../src/OverpassFrontend')
 var BoundingBox = require('boundingbox')
 var overpassFrontend = new OverpassFrontend(conf.url)
+var DOMParser = require('xmldom').DOMParser
+var XMLSerializer = require('xmldom').XMLSerializer
+var document = new DOMParser().parseFromString('<xml></xml>', 'text/xml').documentElement
 
 describe('Overpass exportGeoJSON', function() {
   describe('basic', function() {
@@ -35,6 +38,47 @@ describe('Overpass exportGeoJSON', function() {
               },
               (err, result) => {
                 assert.deepEqual(result, expected)
+
+                done()
+              }
+            )
+          },
+          (err) => {
+          }
+        )
+      }.bind(this, id, toTest[id]))
+    }
+  })
+})
+
+describe('Overpass exportOSMXML', function() {
+  describe('basic', function() {
+    let toTest = {
+      n647991: '<osm><node id="647991" version="21" timestamp="2016-05-06T21:44:24Z" changeset="39152658" uid="1832939" user="emergency99" lat="48.201554" lon="16.2623007"><tag k="bus" v="yes"/><tag k="highway" v="bus_stop"/><tag k="name" v="Bahnhofstraße"/><tag k="network" v="VOR"/><tag k="public_transport" v="stop_position"/><tag k="railway" v="tram_stop"/><tag k="wheelchair" v="yes"/></node></osm>',
+      w4583628: '<osm><way id="4583628" version="7" timestamp="2014-04-07T20:10:24Z" changeset="21559724" uid="908743" user="Girolamo"><tag k="cycleway" v="opposite_lane"/><tag k="highway" v="living_street"/><tag k="lanes" v="1"/><tag k="name" v="Pelzgasse"/><tag k="oneway" v="yes"/><nd ref="16617007"/><nd ref="31257545"/></way><node id="16617007" version="11" timestamp="2015-07-04T19:38:39Z" changeset="32413423" uid="298560" user="evod" lat="48.1978377" lon="16.3367061"><tag k="highway" v="traffic_signals"/></node><node id="31257545" version="5" timestamp="2014-12-13T18:46:59Z" changeset="27448959" uid="298560" user="evod" lat="48.1990173" lon="16.3359649"/></osm>',
+      w125586430: '<osm><way id="125586430" version="3" timestamp="2015-10-22T17:38:19Z" changeset="34804921" uid="42429" user="42429"><tag k="building" v="yes"/><tag k="location" v="indoor"/><tag k="name" v="Unterwerk Goldschlagstraße"/><tag k="note" v="für U6"/><tag k="power" v="substation"/><tag k="substation" v="traction"/><tag k="voltage" v="20000"/><nd ref="1394529557"/><nd ref="1853730873"/><nd ref="1394529559"/><nd ref="1394529555"/><nd ref="1394529554"/><nd ref="1394529557"/></way><node id="1394529557" version="2" timestamp="2012-08-06T03:08:11Z" changeset="12628312" uid="17047" user="KaiRo" lat="48.1995136" lon="16.3381123"/><node id="1853730873" version="1" timestamp="2012-08-06T03:07:51Z" changeset="12628312" uid="17047" user="KaiRo" lat="48.1995372" lon="16.3382679"/><node id="1394529559" version="2" timestamp="2012-08-06T03:08:11Z" changeset="12628312" uid="17047" user="KaiRo" lat="48.1995411" lon="16.3382937"/><node id="1394529555" version="2" timestamp="2012-08-06T03:08:11Z" changeset="12628312" uid="17047" user="KaiRo" lat="48.1993668" lon="16.3383551"/><node id="1394529554" version="2" timestamp="2012-08-06T03:08:11Z" changeset="12628312" uid="17047" user="KaiRo" lat="48.1993366" lon="16.3381763"/></osm>',
+      r1530340: '<osm><relation id="1530340" version="3" timestamp="2014-04-07T20:10:03Z" changeset="21559724" uid="908743" user="Girolamo"><tag k="restriction" v="only_straight_on"/><tag k="type" v="restriction"/><member ref="378462" type="node" role="via"/><member ref="4583442" type="way" role="to"/><member ref="272668388" type="way" role="from"/></relation><node id="378462" version="8" timestamp="2012-08-06T03:08:12Z" changeset="12628312" uid="17047" user="KaiRo" lat="48.1982148" lon="16.3382648"><tag k="highway" v="traffic_signals"/></node><way id="4583442" version="13" timestamp="2014-08-23T18:33:19Z" changeset="24962130" uid="770238" user="Kevin Kofler"><tag k="fixme" v="yes"/><tag k="highway" v="secondary"/><tag k="lanes" v="7"/><tag k="lanes:backward" v="3"/><tag k="lanes:forward" v="4"/><tag k="lit" v="yes"/><tag k="maxspeed" v="50"/><tag k="name" v="Neubaugürtel"/><tag k="ref" v="B224"/><tag k="turn:lanes:backward" v="left|left|left"/><tag k="turn:lanes:forward" v="left|left|through|through"/><nd ref="378459"/><nd ref="3037431688"/><nd ref="3037431653"/><nd ref="2208875391"/><nd ref="270328331"/><nd ref="2213568001"/><nd ref="378462"/></way><way id="272668388" version="1" timestamp="2014-04-07T20:10:02Z" changeset="21559724" uid="908743" user="Girolamo"><tag k="highway" v="secondary"/><tag k="lanes" v="2"/><tag k="lit" v="yes"/><tag k="maxspeed" v="50"/><tag k="name" v="Felberstraße"/><tag k="oneway" v="yes"/><tag k="ref" v="B224"/><tag k="turn:lanes" v="through|through"/><nd ref="451666730"/><nd ref="1965238268"/><nd ref="378462"/></way><node id="378459" version="6" timestamp="2012-08-06T03:08:12Z" changeset="12628312" uid="17047" user="KaiRo" lat="48.1983967" lon="16.3390104"><tag k="highway" v="traffic_signals"/></node><node id="3037431688" version="1" timestamp="2014-08-23T18:33:19Z" changeset="24962130" uid="770238" user="Kevin Kofler" lat="48.1983357" lon="16.3387535"/><node id="3037431653" version="1" timestamp="2014-08-23T18:33:18Z" changeset="24962130" uid="770238" user="Kevin Kofler" lat="48.1983024" lon="16.3386136"/><node id="2208875391" version="1" timestamp="2013-03-18T20:11:20Z" changeset="15412757" uid="129531" user="almich" lat="48.1982664" lon="16.3384619"/><node id="270328331" version="7" timestamp="2013-03-18T20:11:25Z" changeset="15412757" uid="129531" user="almich" lat="48.198255" lon="16.3384203"/><node id="2213568001" version="1" timestamp="2013-03-21T20:09:33Z" changeset="15447432" uid="46912" user="ircecho" lat="48.1982449" lon="16.3383811"/><node id="451666730" version="3" timestamp="2014-04-07T20:10:26Z" changeset="21559724" uid="908743" user="Girolamo" lat="48.1980324" lon="16.3377541"/><node id="1965238268" version="3" timestamp="2015-07-04T19:38:39Z" changeset="32413423" uid="298560" user="evod" lat="48.1981383" lon="16.338119"><tag k="crossing" v="traffic_signals"/><tag k="highway" v="crossing"/></node></osm>',
+      r2334391: '<osm><relation id="2334391" version="1" timestamp="2012-08-06T03:08:07Z" changeset="12628312" uid="17047" user="KaiRo"><tag k="building" v="yes"/><tag k="type" v="multipolygon"/><member ref="174711722" type="way" role="outer"/><member ref="174711721" type="way" role="inner"/></relation><way id="174711722" version="1" timestamp="2012-08-06T03:08:07Z" changeset="12628312" uid="17047" user="KaiRo"><nd ref="1853730919"/><nd ref="1853730863"/><nd ref="1853730867"/><nd ref="1853730872"/><nd ref="1853730957"/><nd ref="1853730951"/><nd ref="1853730947"/><nd ref="1853730945"/><nd ref="1853730950"/><nd ref="1853730919"/></way><way id="174711721" version="1" timestamp="2012-08-06T03:08:07Z" changeset="12628312" uid="17047" user="KaiRo"><nd ref="1853730891"/><nd ref="1853730882"/><nd ref="1853730902"/><nd ref="1853730898"/><nd ref="1853730911"/><nd ref="1853730920"/><nd ref="1853730931"/><nd ref="1853730932"/><nd ref="1853730891"/></way><node id="1853730919" version="1" timestamp="2012-08-06T03:07:53Z" changeset="12628312" uid="17047" user="KaiRo" lat="48.1997241" lon="16.3386374"/><node id="1853730863" version="1" timestamp="2012-08-06T03:07:51Z" changeset="12628312" uid="17047" user="KaiRo" lat="48.1994112" lon="16.3387568"/><node id="1853730867" version="1" timestamp="2012-08-06T03:07:51Z" changeset="12628312" uid="17047" user="KaiRo" lat="48.1994774" lon="16.3391364"/><node id="1853730872" version="1" timestamp="2012-08-06T03:07:51Z" changeset="12628312" uid="17047" user="KaiRo" lat="48.1995281" lon="16.3394272"/><node id="1853730957" version="1" timestamp="2012-08-06T03:07:55Z" changeset="12628312" uid="17047" user="KaiRo" lat="48.1998359" lon="16.3393112"/><node id="1853730951" version="1" timestamp="2012-08-06T03:07:54Z" changeset="12628312" uid="17047" user="KaiRo" lat="48.1998143" lon="16.3391813"/><node id="1853730947" version="1" timestamp="2012-08-06T03:07:54Z" changeset="12628312" uid="17047" user="KaiRo" lat="48.1997874" lon="16.3391895"/><node id="1853730945" version="1" timestamp="2012-08-06T03:07:54Z" changeset="12628312" uid="17047" user="KaiRo" lat="48.1997837" lon="16.3391645"/><node id="1853730950" version="1" timestamp="2012-08-06T03:07:54Z" changeset="12628312" uid="17047" user="KaiRo" lat="48.19981" lon="16.3391556"/><node id="1853730891" version="1" timestamp="2012-08-06T03:07:52Z" changeset="12628312" uid="17047" user="KaiRo" lat="48.199634" lon="16.3390834"/><node id="1853730882" version="1" timestamp="2012-08-06T03:07:52Z" changeset="12628312" uid="17047" user="KaiRo" lat="48.199601" lon="16.3388933"/><node id="1853730902" version="1" timestamp="2012-08-06T03:07:52Z" changeset="12628312" uid="17047" user="KaiRo" lat="48.1996538" lon="16.3388735"/><node id="1853730898" version="1" timestamp="2012-08-06T03:07:52Z" changeset="12628312" uid="17047" user="KaiRo" lat="48.1996494" lon="16.3388471"/><node id="1853730911" version="1" timestamp="2012-08-06T03:07:53Z" changeset="12628312" uid="17047" user="KaiRo" lat="48.1996972" lon="16.3388325"/><node id="1853730920" version="1" timestamp="2012-08-06T03:07:53Z" changeset="12628312" uid="17047" user="KaiRo" lat="48.1997271" lon="16.3390013"/><node id="1853730931" version="1" timestamp="2012-08-06T03:07:53Z" changeset="12628312" uid="17047" user="KaiRo" lat="48.1997462" lon="16.3389943"/><node id="1853730932" version="1" timestamp="2012-08-06T03:07:53Z" changeset="12628312" uid="17047" user="KaiRo" lat="48.1997532" lon="16.3390377"/></osm>'
+    }
+
+    for (var id in toTest) {
+      it(id, function (id, expected, done) {
+        overpassFrontend.get(id,
+          {
+            properties: OverpassFrontend.ID_ONLY
+          },
+          (err, result) => {
+            let osm = document.ownerDocument.createElement('osm')
+
+            result.exportOSMXML(
+              {
+              },
+              osm,
+              (err, result) => {
+                let serializer = new XMLSerializer()
+                let text = serializer.serializeToString(osm)
+
+                assert.deepEqual(text, expected)
 
                 done()
               }
