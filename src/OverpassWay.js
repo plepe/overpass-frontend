@@ -168,10 +168,18 @@ class OverpassWay extends OverpassObject {
       let coordinates = this.geometry
         .filter(point => point) // discard non-loaded points
         .map(point => [ point.lon, point.lat ])
+      let isClosed = this.members && this.members[0].id === this.members[this.members.length - 1].id
 
-      result.geometry = {
-        type: 'LineString',
-        coordinates: coordinates
+      if (isClosed) {
+        result.geometry = {
+          type: 'Polygon',
+          coordinates: [ coordinates ]
+        }
+      } else {
+        result.geometry = {
+          type: 'LineString',
+          coordinates: coordinates
+        }
       }
     }
 
