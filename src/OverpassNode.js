@@ -40,6 +40,44 @@ class OverpassNode extends OverpassObject {
     return result
   }
 
+  exportOSMXML (options, document, callback) {
+    super.exportOSMXML(options, document,
+      (err, result) => {
+        if (err) {
+          return callback(err)
+        }
+
+        if (!result) { // already included
+          return callback(null)
+        }
+
+        result.setAttribute('lat', this.geometry.lat)
+        result.setAttribute('lon', this.geometry.lon)
+
+        callback(null, result)
+      }
+    )
+  }
+
+  exportOSMJSON (conf, elements, callback) {
+    super.exportOSMJSON(conf, elements,
+      (err, result) => {
+        if (err) {
+          return callback(err)
+        }
+
+        if (!result) { // already included
+          return callback(null)
+        }
+
+        result.lat = this.geometry.lat
+        result.lon = this.geometry.lon
+
+        callback(null, result)
+      }
+    )
+  }
+
   updateData (data, options) {
     super.updateData(data, options)
 

@@ -1,5 +1,6 @@
 /* global L:false */
 
+const async = require('async')
 var BoundingBox = require('boundingbox')
 var osmtogeojson = require('osmtogeojson')
 var OverpassObject = require('./OverpassObject')
@@ -323,20 +324,96 @@ class OverpassRelation extends OverpassObject {
     }
 
     if (this.members) {
-      ret.geometry = {
-        type: 'GeometryCollection',
-        geometries: this.memberFeatures
-          .map(member => {
-            let geojson = member.GeoJSON()
-            if ('geometry' in geojson) {
-              return geojson.geometry
-            }
-          })
-          .filter(member => member)
+      if (this.geometry.features.length === 1) {
+        ret.geometry = this.geometry.features[0].geometry
+      } else {
+        ret.geometry = {
+          type: 'GeometryCollection',
+          geometries: this.memberFeatures
+            .map(member => {
+              let geojson = member.GeoJSON()
+              if ('geometry' in geojson) {
+                return geojson.geometry
+              }
+            })
+            .filter(member => member)
+        }
       }
     }
 
     return ret
+  }
+
+  exportOSMXML (options, parentNode, callback) {
+    super.exportOSMXML(options, parentNode,
+      (err, result) => {
+        if (err) {
+          return callback(err)
+        }
+
+        if (!result) { // already included
+          return callback(null)
+        }
+
+        if (this.members) {
+          async.each(this.members,
+            (member, done) => {
+              let memberOb = this.overpass.cacheElements[member.id]
+
+              let nd = parentNode.ownerDocument.createElement('member')
+              nd.setAttribute('ref', memberOb.osm_id)
+              nd.setAttribute('type', memberOb.type)
+              nd.setAttribute('role', member.role)
+              result.appendChild(nd)
+
+              memberOb.exportOSMXML(options, parentNode, done)
+            },
+            (err) => {
+              callback(err, result)
+            }
+          )
+        } else {
+          callback(null, result)
+        }
+      }
+    )
+  }
+
+  exportOSMJSON (conf, elements, callback) {
+    super.exportOSMJSON(conf, elements,
+      (err, result) => {
+        if (err) {
+          return callback(err)
+        }
+
+        if (!result) { // already included
+          return callback(null)
+        }
+
+        if (this.members) {
+          result.members = []
+
+          async.each(this.members,
+            (member, done) => {
+              let memberOb = this.overpass.cacheElements[member.id]
+
+              result.members.push({
+                ref: memberOb.osm_id,
+                type: memberOb.type,
+                role: member.role
+              })
+
+              memberOb.exportOSMJSON(conf, elements, done)
+            },
+            (err) => {
+              callback(err, result)
+            }
+          )
+        } else {
+          callback(null, result)
+        }
+      }
+    )
   }
 
   intersects (bbox) {

@@ -1,5 +1,6 @@
 /* global L:false */
 
+const async = require('async')
 var BoundingBox = require('boundingbox')
 var OverpassObject = require('./OverpassObject')
 var OverpassFrontend = require('./defines')
@@ -167,14 +168,88 @@ class OverpassWay extends OverpassObject {
       let coordinates = this.geometry
         .filter(point => point) // discard non-loaded points
         .map(point => [ point.lon, point.lat ])
+      let isClosed = this.members && this.members[0].id === this.members[this.members.length - 1].id
 
-      result.geometry = {
-        type: 'LineString',
-        coordinates: coordinates
+      if (isClosed) {
+        result.geometry = {
+          type: 'Polygon',
+          coordinates: [ coordinates ]
+        }
+      } else {
+        result.geometry = {
+          type: 'LineString',
+          coordinates: coordinates
+        }
       }
     }
 
     return result
+  }
+
+  exportOSMXML (options, parentNode, callback) {
+    super.exportOSMXML(options, parentNode,
+      (err, result) => {
+        if (err) {
+          return callback(err)
+        }
+
+        if (!result) { // already included
+          return callback(null)
+        }
+
+        if (this.members) {
+          async.each(this.members,
+            (member, done) => {
+              let memberOb = this.overpass.cacheElements[member.id]
+
+              let nd = parentNode.ownerDocument.createElement('nd')
+              nd.setAttribute('ref', memberOb.osm_id)
+              result.appendChild(nd)
+
+              memberOb.exportOSMXML(options, parentNode, done)
+            },
+            (err) => {
+              callback(err, result)
+            }
+          )
+        } else {
+          callback(null, result)
+        }
+      }
+    )
+  }
+
+  exportOSMJSON (conf, elements, callback) {
+    super.exportOSMJSON(conf, elements,
+      (err, result) => {
+        if (err) {
+          return callback(err)
+        }
+
+        if (!result) { // already included
+          return callback(null)
+        }
+
+        if (this.members) {
+          result.nodes = []
+
+          async.each(this.members,
+            (member, done) => {
+              let memberOb = this.overpass.cacheElements[member.id]
+
+              result.nodes.push(memberOb.osm_id)
+
+              memberOb.exportOSMJSON(conf, elements, done)
+            },
+            (err) => {
+              callback(err, result)
+            }
+          )
+        } else {
+          callback(null, result)
+        }
+      }
+    )
   }
 
   /**

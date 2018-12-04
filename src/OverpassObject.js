@@ -168,6 +168,142 @@ class OverpassObject {
   }
 
   /**
+   * Export object as GeoJSON. Missing geometry will be loaded.
+   * @param object options Options
+   * @param function callback Function which will be called with (err, result)
+   */
+  exportGeoJSON (options, callback) {
+    this.overpass.get(
+      this.id,
+      {
+        properties: OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.META | OverpassFrontend.GEOM
+      },
+      () => {},
+      (err) => {
+        if (err) {
+          return callback(err)
+        }
+
+        callback(null, this.GeoJSON(options))
+      }
+    )
+  }
+
+  /**
+   * Export object (and members) as OpenStreetMap XML
+   * @param object options Options
+   * @param DOMNode parentNode a DOM Node where the object will be appended as child. Depending on object type and options, member objects will also be appended on the same level.
+   * @param function callback Function which will be called with (err, dom node)
+   */
+  exportOSMXML (options, parentNode, callback) {
+    if (!parentNode._alreadyIncluded) {
+      parentNode._alreadyIncluded = {}
+    }
+    if (this.id in parentNode._alreadyIncluded) {
+      return callback(null)
+    }
+    parentNode._alreadyIncluded[this.id] = true
+
+    if ((this.properties & (OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.META)) !== (OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.META)) {
+      return this.overpass.get(
+        this.id,
+        {
+          properties: OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.META
+        },
+        () => {},
+        (err) => {
+          if (err) {
+            return callback(err)
+          }
+
+          this._exportOSMXML(options, parentNode, callback)
+        }
+      )
+    }
+
+    this._exportOSMXML(options, parentNode, callback)
+  }
+
+  _exportOSMXML (options, parentNode, callback) {
+    let result = parentNode.ownerDocument.createElement(this.type)
+    result.setAttribute('id', this.osm_id)
+
+    if (this.meta) {
+      result.setAttribute('version', this.meta.version)
+      result.setAttribute('timestamp', this.meta.timestamp)
+      result.setAttribute('changeset', this.meta.changeset)
+      result.setAttribute('uid', this.meta.uid)
+      result.setAttribute('user', this.meta.user)
+    }
+
+    if (this.tags) {
+      for (var k in this.tags) {
+        let tag = parentNode.ownerDocument.createElement('tag')
+        tag.setAttribute('k', k)
+        tag.setAttribute('v', this.tags[k])
+
+        result.appendChild(tag)
+      }
+    }
+
+    parentNode.appendChild(result)
+
+    callback(null, result)
+  }
+
+  /**
+   * Export object (and members) as OpenStreetMap JSON
+   * @param object options Options
+   * @param object elements All exported elements, include member objects. Pass an empty object. If a member element would be exported multiple times it will appear only once.
+   * @param function callback Function which will be called with (err, result)
+   */
+  exportOSMJSON (conf, elements, callback) {
+    if (this.id in elements) {
+      return callback(null)
+    }
+    elements[this.id] = {}
+
+    if ((this.properties & (OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.META)) !== (OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.META)) {
+      return this.overpass.get(
+        this.id,
+        {
+          properties: OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.META
+        },
+        () => {},
+        (err) => {
+          if (err) {
+            return callback(err)
+          }
+
+          this._exportOSMJSON(conf, elements, callback)
+        }
+      )
+    }
+
+    this._exportOSMJSON(conf, elements, callback)
+  }
+
+  _exportOSMJSON (conf, elements, callback) {
+    let result = elements[this.id]
+    result.type = this.type
+    result.id = this.osm_id
+
+    if (this.meta) {
+      result.version = this.meta.version
+      result.timestamp = this.meta.timestamp
+      result.changeset = this.meta.changeset
+      result.uid = this.meta.uid
+      result.user = this.meta.user
+    }
+
+    if (this.tags && Object.keys(this.tags).length) {
+      result.tags = this.tags
+    }
+
+    callback(null, result)
+  }
+
+  /**
    * Check whether this object intersects (or is within) the specified bounding box. Returns 0 if it does not match; 1 if the exact geometry is not known, but the object's bounding box matches; 2 exact match.
    * @param {boundingbox:BoundingBox} bbox Bounding box
    * @return {number}
