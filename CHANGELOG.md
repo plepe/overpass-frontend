@@ -1,3 +1,6 @@
+# Version 2.2 - release 2018-12-04
+All OverpassObjects (Node, Way, Relation) have new functions `exportGeoJSON()`, `exportOSMXML()` and `exportOSMJSON()` which export the object in the specified format. Check the documentation for further details.
+
 # Version 2.1 - release 2018-11-13
 Calculate 'connectedPrev', 'connectedNext' and 'dir' for members of type way in relations.
 
