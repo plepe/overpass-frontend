@@ -254,7 +254,7 @@ class OverpassObject {
   /**
    * Export object (and members) as OpenStreetMap JSON
    * @param object options Options
-   * @param object elements All exported elements, include member objects. Pass an empty object. If a member element would be exported multiple times it will appear only once.
+   * @param object elements All exported elements, include member objects. Pass an empty object. If a member element would be exported multiple times it will appear only once. For the final export, to be compatible to Overpass API, you should convert the object to an array via Object.values().
    * @param function callback Function which will be called with (err, result)
    */
   exportOSMJSON (conf, elements, callback) {
