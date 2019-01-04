@@ -54,7 +54,9 @@ class RequestBBox extends Request {
         this.lokiQuery = { $and: [this.lokiQuery, filterLokiQuery] }
       }
 
-      this.lokiQuery = { $and: [this.lokiQuery, boundsToLokiQuery(this.bbox, this.overpass)] }
+      if (this.bounds) {
+        this.lokiQuery = { $and: [this.lokiQuery, boundsToLokiQuery(this.bbox, this.overpass)] }
+      }
     }
 
     this.loadFinish = false
