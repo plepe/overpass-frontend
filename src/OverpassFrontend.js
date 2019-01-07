@@ -657,4 +657,6 @@ function isSeparator (el) {
 
 ee(OverpassFrontend.prototype)
 
+OverpassFrontend.Filter = Filter
+
 module.exports = OverpassFrontend
