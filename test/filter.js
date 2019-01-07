@@ -44,6 +44,15 @@ describe('Filter', function () {
       assert.equal(f.toString(), '(node["amenity"="cafe"]["cuisine"="ice_cream"];node["amenity"="ice_cream"];node["shop"="ice_cream"];)')
     })
 
+    it ('node["amenity"="cafe"];node._["cuisine"="ice_cream"]', function () {
+      var f = new Filter({ "and": [
+	[ { "type": "node" }, { "key": "amenity", "op": "=", "value": "cafe" } ],
+	[ { "type": "node" }, { "key": "cuisine", "op": "=", "value": "ice_cream" } ]
+      ] })
+
+      assert.equal(f.toString(), 'node["amenity"="cafe"]->.a0;node.a0["cuisine"="ice_cream"]')
+    })
+
     it ('nwr[~wikipedia~"."]', function () {
       var f = new Filter([ { keyRegexp: true, op: 'has_key', key: 'wikipedia' } ])
       assert.equal(f.toString(), 'nwr[~"wikipedia"~"."]')
@@ -152,6 +161,24 @@ describe('Filter', function () {
       assert.equal(r, false, 'Object should not match')
     })
 
+    it ('node["amenity"="cafe"];node._["cuisine"="ice_cream"]', function () {
+      var f = new Filter({ "and": [
+	[ { "type": "node" }, { "key": "amenity", "op": "=", "value": "cafe" } ],
+	[ { "type": "node" }, { "key": "cuisine", "op": "=", "value": "ice_cream" } ]
+      ] })
+
+      var r = f.match({ type: 'node', tags: { amenity: 'cafe' } })
+      assert.equal(r, false, 'Object should not match')
+      var r = f.match({ type: 'node', tags: { cuisine: 'ice_cream' } })
+      assert.equal(r, false, 'Object should not match')
+      var r = f.match({ type: 'node', tags: { amenity: 'cafe', cuisine: 'ice_cream' } })
+      assert.equal(r, true, 'Object should match')
+      var r = f.match({ type: 'way', tags: { amenity: 'cafe', cuisine: 'ice_cream', name: 'bar' } })
+      assert.equal(r, false, 'Object should not match')
+      var r = f.match({ type: 'node', tags: { amenity: 'restaurant', cuisine: 'ice_cream' } })
+      assert.equal(r, false, 'Object should not match')
+    })
+
     it ('nwr[~wikipedia~"."]', function () {
       var f = new Filter([ { keyRegexp: true, op: 'has_key', key: 'wikipedia' } ])
 
@@ -246,6 +273,25 @@ describe('Filter', function () {
         inputSet: '.result'
       })
       assert.equal(r, '(node.result["amenity"="cafe"]["cuisine"="ice_cream"];node.result["amenity"="ice_cream"];node.result["shop"="ice_cream"];way.result["shop"="ice_cream"];relation.result["shop"="ice_cream"];)')
+    })
+
+    it ('node["amenity"="cafe"];node._["cuisine"="ice_cream"]', function () {
+      var f = new Filter({ "and": [
+	[ { "type": "node" }, { "key": "amenity", "op": "=", "value": "cafe" } ],
+	[ { "type": "node" }, { "key": "cuisine", "op": "=", "value": "ice_cream" } ]
+      ] })
+
+      assert.equal(f.toQl(), '(node["amenity"="cafe"];)->.a0;(node.a0["cuisine"="ice_cream"];)')
+    })
+
+    it ('nwr["amenity"="cafe"];nwr._["cuisine"="ice_cream"]', function () {
+      var f = new Filter({ "and": [
+	[ { "key": "amenity", "op": "=", "value": "cafe" } ],
+        [ { "key": "name", "op": "has_key" } ],
+	[ { "key": "cuisine", "op": "=", "value": "ice_cream" } ]
+      ] })
+
+      assert.equal(f.toQl(), '(node["amenity"="cafe"];way["amenity"="cafe"];relation["amenity"="cafe"];)->.a0;(node.a0["name"];way.a0["name"];relation.a0["name"];)->.a0;(node.a0["cuisine"="ice_cream"];way.a0["cuisine"="ice_cream"];relation.a0["cuisine"="ice_cream"];)')
     })
 
     it ('nwr[~wikipedia~"."]', function () {
@@ -365,6 +411,28 @@ describe('Filter', function () {
       var r = f.toLokijs()
       assert.deepEqual(r, {"type":{"$eq":"way"},"tags.railway":{"$and":[{"$eq":"rail"},{"$not":{"$regex":"^(platform|abandoned|disused|station|proposed|subway_entrance)$"}}]},"tags.usage":{"$regex":"^(main|branch)$"}})
     })
+
+    it ('node["amenity"="cafe"];node._["cuisine"="ice_cream"]', function () {
+      var f = new Filter({ "and": [
+	[ { "type": "node" }, { "key": "amenity", "op": "=", "value": "cafe" } ],
+	[ { "type": "node" }, { "key": "cuisine", "op": "=", "value": "ice_cream" } ]
+      ] })
+
+      console.log(JSON.stringify(f.toLokijs()))
+      assert.deepEqual(f.toLokijs(), '(node["amenity"="cafe"];)->.a0;(node.a0["cuisine"="ice_cream"];)')
+    })
+
+    it ('nwr["amenity"="cafe"];nwr._["cuisine"="ice_cream"]', function () {
+      var f = new Filter({ "and": [
+	[ { "key": "amenity", "op": "=", "value": "cafe" } ],
+        [ { "key": "name", "op": "has_key" } ],
+	[ { "key": "cuisine", "op": "=", "value": "ice_cream" } ]
+      ] })
+
+      console.log(JSON.stringify(f.toLokijs()))
+      assert.deepEqual(f.toLokijs(), '(node["amenity"="cafe"];way["amenity"="cafe"];relation["amenity"="cafe"];)->.a0;(node.a0["name"];way.a0["name"];relation.a0["name"];)->.a0;(node.a0["cuisine"="ice_cream"];way.a0["cuisine"="ice_cream"];relation.a0["cuisine"="ice_cream"];)')
+    })
+
   })
 
   describe ('parse', function () {
@@ -421,6 +489,30 @@ describe('Filter', function () {
     it ('node[~"wikipedia"~"foo"]', function () {
       var f = new Filter('node[~"wikipedia"~"foo"]')
       assert.equal(f.toString(), 'node[~"wikipedia"~"foo"]')
+    })
+  })
+
+  describe('more tests', function () {
+    it ('(nwr[cuisine^asian];nwr[cuisine=chinese];)', function () {
+      var f = new Filter('(nwr[cuisine^asian];nwr[cuisine=chinese];)')
+
+      assert.equal(f.toString(), '(nwr["cuisine"~"^(.*;|)asian(|;.*)$"];nwr["cuisine"="chinese"];)')
+      assert.equal(f.toQl(), '(node["cuisine"~"^(.*;|)asian(|;.*)$"];way["cuisine"~"^(.*;|)asian(|;.*)$"];relation["cuisine"~"^(.*;|)asian(|;.*)$"];node["cuisine"="chinese"];way["cuisine"="chinese"];relation["cuisine"="chinese"];)')
+      var r = f.toLokijs()
+      assert.deepEqual(r, {"$or":[{"tags.cuisine":{"$regex":"^(.*;|)asian(|;.*)$"}},{"tags.cuisine":{"$eq":"chinese"}}]})
+
+      r = f.match({ tags: { amenity: 'restaurant', cuisine: 'asian' } })
+      assert.equal(r, true, 'Object should match')
+      r = f.match({ tags: { amenity: 'cafe', cuisine: 'asian;turkish' } })
+      assert.equal(r, true, 'Object should match')
+      r = f.match({ tags: { amenity: 'cafe', cuisine: 'argentinian;turkish' } })
+      assert.equal(r, false, 'Object should not match')
+      r = f.match({ tags: { amenity: 'cafe', cuisine: 'chinese' } })
+      assert.equal(r, true, 'Object should match')
+      r = f.match({ tags: { amenity: 'cafe', cuisine: 'asian;chinese' } })
+      assert.equal(r, true, 'Object should match')
+      r = f.match({ tags: { amenity: 'cafe', cuisine: 'turkish;chinese' } })
+      assert.equal(r, false, 'Object should not match')
     })
   })
 })

@@ -237,6 +237,10 @@ class Filter {
       return def.or.some(part => this.match(ob, part))
     }
 
+    if (def.and) {
+      return def.and.every(part => this.match(ob, part))
+    }
+
     return def.filter(test.bind(this, ob)).length === def.length
   }
 
@@ -244,15 +248,35 @@ class Filter {
    * Convert query to a string representation
    * @return {string}
    */
-  toString (def) {
+  toString (options = {}, def = null) {
     let result = ''
 
     if (!def) {
       def = this.def
+      this.sets = []
     }
 
     if (def.or) {
-      return '(' + def.or.map(part => this.toString(part)).join(';') + ';)'
+      return '(' + def.or.map(part => this.toString(options, part)).join(';') + ';)' +
+      (options.outputSet ? '->' + options.outputSet : '')
+    }
+
+    if (def.and) {
+      let set = '.a' + this.sets.length
+
+      return def.and.map(
+        (part, index) => {
+          let o = JSON.parse(JSON.stringify(options))
+          if (index !== 0) {
+            o.inputSet = set
+          }
+          if (index !== def.and.length - 1) {
+            o.outputSet = set
+          }
+
+          return this.toString(o, part)
+        }
+      ).join(';')
     }
 
     let parts = def.filter(part => part.type)
@@ -268,9 +292,14 @@ class Filter {
         throw new Error('Filter: only one type query allowed!')
     }
 
+    if (options.inputSet) {
+      result += options.inputSet
+    }
+
     result += def
       .filter(part => !part.type)
-      .map(compile).join('')
+      .map(compile).join('') +
+    (options.outputSet ? '->' + options.outputSet : '')
 
     return result
   }
@@ -284,6 +313,7 @@ class Filter {
   toQl (options = {}, def) {
     if (!def) {
       def = this.def
+      this.sets = []
     }
 
     if (!options.inputSet) {
@@ -294,7 +324,25 @@ class Filter {
       return '(' + def.or.map(part => {
         let r = this.toQl(options, part)
         return r.slice(1, -1)
-      }).join('') + ')'
+      }).join('') + ')' +
+      (options.outputSet ? '->' + options.outputSet : '')
+    }
+
+    if (def.and) {
+      let set = '.a' + this.sets.length
+
+      return def.and.map(
+        (part, index) => {
+          let o = JSON.parse(JSON.stringify(options))
+          if (index !== 0) {
+            o.inputSet = set
+          }
+          if (index !== def.and.length - 1) {
+            o.outputSet = set
+          }
+          return this.toQl(o, part)
+        }
+      ).join(';')
     }
 
     let parts = def.filter(part => part.type)
@@ -313,7 +361,7 @@ class Filter {
 
     let filters = def.filter(part => !part.type)
 
-    return '(' + types.map(type => type + options.inputSet + filters.map(compile).join('')).join(';') + ';)'
+    return '(' + types.map(type => type + options.inputSet + filters.map(compile).join('')).join(';') + ';)' + (options.outputSet ? '->' + options.outputSet : '')
   }
 
   /**
@@ -331,6 +379,27 @@ class Filter {
 
       let r = { $or:
         def.or.map(part => {
+          let r = this.toLokijs(options, part)
+          if (r.needMatch) {
+            needMatch = true
+          }
+          delete r.needMatch
+          return r
+        })
+      }
+
+      if (needMatch) {
+        r.needMatch = true
+      }
+
+      return r
+    }
+
+    if (def.and) {
+      let needMatch = false
+
+      let r = { $and:
+        def.and.map(part => {
           let r = this.toLokijs(options, part)
           if (r.needMatch) {
             needMatch = true
