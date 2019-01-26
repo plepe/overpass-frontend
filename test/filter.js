@@ -1,8 +1,20 @@
 const assert = require('assert')
+const loki = require('lokijs')
 
 const Filter = require('../src/Filter')
 
 describe('Filter', function () {
+  let db = new loki()
+  let lokidb = db.addCollection('db')
+  lokidb.insert([
+    { id: 1, type: 'node', tags: { amenity: 'restaurant' } },
+    { id: 2, type: 'node', tags: { name: 'foobar', amenity: 'cafe' } },
+    { id: 3, type: 'node', tags: { name: 'test', amenity: 'cafe' } },
+    { id: 4, type: 'node', tags: { name: 'TESTER', amenity: 'cafe' } },
+    { id: 5, type: 'node', tags: { name: 'tester', amenity: 'cafe' } },
+    { id: 6, type: 'node', tags: { name: 'Tester', amenity: 'cafe' } },
+  ])
+
   describe ('input exploded', function () {
     it ('nwr[amenity]', function () {
       var f = new Filter([ { op: 'has_key', key: 'amenity' } ])
@@ -445,6 +457,9 @@ describe('Filter', function () {
     assert.equal(r, true, 'Object 5 should match')
     r = f.match({ type: 'node', tags: { name: 'Tester', amenity: 'cafe' } })
     assert.equal(r, false, 'Object 6 should not match')
+
+    r = lokidb.find(f.toLokijs())
+    assert.deepEqual(r.map(o => o.id), [ 3, 5 ])
   })
 
   it('case-senstive !regexp', function () {
@@ -467,7 +482,10 @@ describe('Filter', function () {
     r = f.match({ type: 'node', tags: { name: 'tester', amenity: 'cafe' } })
     assert.equal(r, false, 'Object 5 should not match')
     r = f.match({ type: 'node', tags: { name: 'Tester', amenity: 'cafe' } })
-    assert.equal(r, true, 'Object 5 should match')
+    assert.equal(r, true, 'Object 6 should match')
+
+    r = lokidb.find(f.toLokijs())
+    assert.deepEqual(r.map(o => o.id), [ 1, 2, 4, 6 ])
   })
 
   it('case-insenstive regexp', function () {
@@ -487,8 +505,13 @@ describe('Filter', function () {
     assert.equal(r, true, 'Object 3 should match')
     r = f.match({ type: 'node', tags: { name: 'TESTER', amenity: 'cafe' } })
     assert.equal(r, true, 'Object 4 should match')
-    r = f.match({ type: 'node', tags: { name: 'Tester', amenity: 'cafe' } })
+    r = f.match({ type: 'node', tags: { name: 'tester', amenity: 'cafe' } })
     assert.equal(r, true, 'Object 5 should match')
+    r = f.match({ type: 'node', tags: { name: 'Tester', amenity: 'cafe' } })
+    assert.equal(r, true, 'Object 6 should match')
+
+    r = lokidb.find(f.toLokijs())
+    assert.deepEqual(r.map(o => o.id), [ 3, 4, 5, 6 ])
   })
 
   it('case-insenstive !regexp', function () {
@@ -508,8 +531,13 @@ describe('Filter', function () {
     assert.equal(r, false, 'Object 3 should not match')
     r = f.match({ type: 'node', tags: { name: 'TESTER', amenity: 'cafe' } })
     assert.equal(r, false, 'Object 4 should not match')
-    r = f.match({ type: 'node', tags: { name: 'Tester', amenity: 'cafe' } })
+    r = f.match({ type: 'node', tags: { name: 'tester', amenity: 'cafe' } })
     assert.equal(r, false, 'Object 5 should not match')
+    r = f.match({ type: 'node', tags: { name: 'Tester', amenity: 'cafe' } })
+    assert.equal(r, false, 'Object 6 should not match')
+
+    r = lokidb.find(f.toLokijs())
+    assert.deepEqual(r.map(o => o.id), [ 1, 2 ])
   })
 
   it('!=', function () {
@@ -529,7 +557,12 @@ describe('Filter', function () {
     assert.equal(r, false, 'Object 3 should not match')
     r = f.match({ type: 'node', tags: { name: 'TESTER', amenity: 'cafe' } })
     assert.equal(r, true, 'Object 4 should match')
-    r = f.match({ type: 'node', tags: { name: 'Tester', amenity: 'cafe' } })
+    r = f.match({ type: 'node', tags: { name: 'tester', amenity: 'cafe' } })
     assert.equal(r, true, 'Object 5 should match')
+    r = f.match({ type: 'node', tags: { name: 'Tester', amenity: 'cafe' } })
+    assert.equal(r, true, 'Object 6 should match')
+
+    r = lokidb.find(f.toLokijs())
+    assert.deepEqual(r.map(o => o.id), [ 1, 2, 4, 5, 6 ])
   })
 })
