@@ -436,6 +436,39 @@ describe('Filter', function () {
     })
   })
 
+  describe('or', function () {
+    it('or1', function () {
+      let f = new Filter({ or: [ [ { key: 'name', value: '49', op: '~' } ], [ { key: 'ref', value: '49', op: '=' } ] ] })
+
+      assert.equal(f.toString(), '(nwr["name"~"49"];nwr["ref"="49"];)')
+      assert.equal(f.toQl(), '(node["name"~"49"];way["name"~"49"];relation["name"~"49"];node["ref"="49"];way["ref"="49"];relation["ref"="49"];)')
+      assert.deepEqual(f.toLokijs(), {"$or":[{"tags.name":{"$regex":/49/}},{"tags.ref":{"$eq":"49"}}]})
+    })
+
+    it('or2', function () {
+      let f = new Filter([
+        { or: [ [ { key: 'name', value: '49', op: '~' } ], [ { key: 'ref', value: '49', op: '=' } ] ] },
+        { key: 'route', value: 'bus', op: '=' }
+      ])
+
+      assert.equal(f.toString(), '(nwr["name"~"49"]["route"="bus"];nwr["ref"="49"]["route"="bus"];)')
+      assert.equal(f.toQl(), '(node["name"~"49"]["route"="bus"];way["name"~"49"]["route"="bus"];relation["name"~"49"]["route"="bus"];node["ref"="49"]["route"="bus"];way["ref"="49"]["route"="bus"];relation["ref"="49"]["route"="bus"];)')
+      assert.deepEqual(f.toLokijs(), {"tags.route":{"$eq":"bus"},"$or":[{"tags.name":{"$regex":/49/}},{"tags.ref":{"$eq":"49"}}]})
+    })
+
+    it('or3', function () {
+      let f = new Filter([
+        { or: [ [ { key: 'name', value: '49', op: '~' } ], [ { key: 'ref', value: '49', op: '=' } ] ] },
+        { key: 'route', value: 'bus', op: '=' },
+        { or: [ { key: 'operator', op: '=', value: 'ÖBB' }, { key: 'operator', op: '=', value: 'WL' } ] }
+      ])
+
+      assert.equal(f.toString(), '(nwr["name"~"49"]["route"="bus"]["operator"="ÖBB"];nwr["name"~"49"]["route"="bus"]["operator"="WL"];nwr["ref"="49"]["route"="bus"]["operator"="ÖBB"];nwr["ref"="49"]["route"="bus"]["operator"="WL"];)')
+      assert.equal(f.toQl(), '(node["name"~"49"]["route"="bus"]["operator"="ÖBB"];way["name"~"49"]["route"="bus"]["operator"="ÖBB"];relation["name"~"49"]["route"="bus"]["operator"="ÖBB"];node["name"~"49"]["route"="bus"]["operator"="WL"];way["name"~"49"]["route"="bus"]["operator"="WL"];relation["name"~"49"]["route"="bus"]["operator"="WL"];node["ref"="49"]["route"="bus"]["operator"="ÖBB"];way["ref"="49"]["route"="bus"]["operator"="ÖBB"];relation["ref"="49"]["route"="bus"]["operator"="ÖBB"];node["ref"="49"]["route"="bus"]["operator"="WL"];way["ref"="49"]["route"="bus"]["operator"="WL"];relation["ref"="49"]["route"="bus"]["operator"="WL"];)')
+      assert.deepEqual(f.toLokijs(), {"tags.route":{"$eq":"bus"},"$and":[{"$or":[{"tags.name":{"$regex":{}}},{"tags.ref":{"$eq":"49"}}]},{"$or":[{"tags.operator":{"$eq":"ÖBB"}},{"tags.operator":{"$eq":"WL"}}]}]})
+    })
+  })
+
   it('case-senstive regexp', function () {
     var f = new Filter('node["name"~"test"]')
     let r

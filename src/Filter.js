@@ -1,8 +1,18 @@
+const filterJoin = require('./filterJoin')
+
 function qlesc (str) {
   return '"' + str.replace(/"/g, '\\"') + '"'
 }
 
 function compile (part) {
+  if (Array.isArray(part)) {
+    return part.map(compile).join('')
+  }
+
+  if (part.or) {
+    return { or: part.or.map(compile) }
+  }
+
   let keyRegexp = (part.keyRegexp ? '~' : '')
 
   switch (part.op) {
@@ -22,6 +32,8 @@ function compile (part) {
       return '[' + keyRegexp + qlesc(part.key) + part.op.substr(0, part.op.length - 1) + qlesc(part.value) + ',i]'
     case 'has':
       return '[' + keyRegexp + qlesc(part.key) + '~' + qlesc('^(.*;|)' + part.value + '(|;.*)$') + ']'
+    default:
+      throw new Error('unknown operator')
   }
 }
 
@@ -283,11 +295,15 @@ class Filter {
         throw new Error('Filter: only one type query allowed!')
     }
 
-    result += def
+    let queries = filterJoin(def
       .filter(part => !part.type)
-      .map(compile).join('')
+      .map(compile))
 
-    return result
+    if (queries.length > 1) {
+      return '(' + queries.map(q => result + q).join(';') + ';)'
+    } else {
+      return result + queries[0]
+    }
   }
 
   /**
@@ -326,9 +342,15 @@ class Filter {
         throw new Error('Filter: only one type query allowed!')
     }
 
-    let filters = def.filter(part => !part.type)
+    let queries = filterJoin(def
+      .filter(part => !part.type)
+      .map(compile))
 
-    return '(' + types.map(type => type + options.inputSet + filters.map(compile).join('')).join(';') + ';)'
+    if (queries.length > 1) {
+      return '(' + queries.map(q => types.map(type => type + options.inputSet + q).join(';')).join(';') + ';)'
+    } else {
+      return '(' + types.map(type => type + options.inputSet + queries[0]).join(';') + ';)'
+    }
   }
 
   /**
@@ -363,6 +385,11 @@ class Filter {
     }
 
     let query = {}
+    let orQueries = []
+
+    if (!Array.isArray(def)) {
+      def = [ def ]
+    }
 
     def.forEach(filter => {
       let k, v
@@ -391,6 +418,8 @@ class Filter {
       } else if (filter.type) {
         k = 'type'
         v = { $eq: filter.type }
+      } else if (filter.or) {
+        orQueries.push(filter.or.map(p => this.toLokijs(options, p)))
       } else {
         console.log('unknown filter', filter)
       }
@@ -408,6 +437,12 @@ class Filter {
         }
       }
     })
+
+    if (orQueries.length === 1) {
+      query.$or = orQueries[0]
+    } else if (orQueries.length > 1) {
+      query.$and = orQueries.map(q => { return { $or: q } })
+    }
 
     return query
   }
