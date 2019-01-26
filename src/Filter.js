@@ -17,6 +17,9 @@ function compile (part) {
     case '~':
     case '!~':
       return '[' + keyRegexp + qlesc(part.key) + part.op + qlesc(part.value) + ']'
+    case '~i':
+    case '!~i':
+      return '[' + keyRegexp + qlesc(part.key) + part.op.substr(0, part.op.length - 1) + qlesc(part.value) + ',i]'
     case 'has':
       return '[' + keyRegexp + qlesc(part.key) + '~' + qlesc('^(.*;|)' + part.value + '(|;.*)$') + ']'
   }
@@ -51,6 +54,10 @@ function test (ob, part) {
       return ob.tags && (part.key in ob.tags) && (ob.tags[part.key].match(part.value))
     case '!~':
       return ob.tags && (part.key in ob.tags) && (!ob.tags[part.key].match(part.value))
+    case '~i':
+      return ob.tags && (part.key in ob.tags) && (ob.tags[part.key].match(new RegExp(part.value, 'i')))
+    case '!~i':
+      return ob.tags && (part.key in ob.tags) && (!ob.tags[part.key].match(new RegExp(part.value, 'i')))
     case 'has':
       return ob.tags && (part.key in ob.tags) && (ob.tags[part.key].split(/;/).indexOf(part.value) !== -1)
     default:
@@ -181,8 +188,16 @@ function parse (def) {
         throw new Error("Can't parse query, expected value: " + def)
       }
     } else if (mode === 14) {
-      m = def.match(/^\s*\]/)
+      m = def.match(/^\s*(,i)?\]/)
       if (m) {
+        if (m[1] === ',i') {
+          if (op === '~' || op === '!~') {
+            op += 'i'
+          } else {
+            throw new Error("Can't parse query, expected ']': " + def)
+          }
+        }
+
         let entry = { key, op, value }
         if (keyRegexp) {
           entry.keyRegexp = true
@@ -367,12 +382,12 @@ class Filter {
       } else if (filter.op === 'has') {
         k = 'tags.' + filter.key
         v = { $regex: '^(.*;|)' + filter.value + '(|;.*)$' }
-      } else if (filter.op === '~') {
+      } else if ((filter.op === '~') || (filter.op === '~i')) {
         k = 'tags.' + filter.key
-        v = { $regex: filter.value }
-      } else if (filter.op === '!~') {
+        v = { $regex: new RegExp(filter.value, (filter.op === '~i' ? 'i' : '')) }
+      } else if ((filter.op === '!~') || (filter.op === '!~i')) {
         k = 'tags.' + filter.key
-        v = { $not: { $regex: filter.value } }
+        v = { $not: { $regex: new RegExp(filter.value, (filter.op === '!~i' ? 'i' : '')) } }
       } else if (filter.type) {
         k = 'type'
         v = { $eq: filter.type }

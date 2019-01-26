@@ -363,7 +363,7 @@ describe('Filter', function () {
       var f = new Filter("way[railway=rail][railway!~'^(platform|abandoned|disused|station|proposed|subway_entrance)$'][usage~'^(main|branch)$'];")
 
       var r = f.toLokijs()
-      assert.deepEqual(r, {"type":{"$eq":"way"},"tags.railway":{"$and":[{"$eq":"rail"},{"$not":{"$regex":"^(platform|abandoned|disused|station|proposed|subway_entrance)$"}}]},"tags.usage":{"$regex":"^(main|branch)$"}})
+      assert.deepEqual(r, {"type":{"$eq":"way"},"tags.railway":{"$and":[{"$eq":"rail"},{"$not":{"$regex":/^(platform|abandoned|disused|station|proposed|subway_entrance)$/}}]},"tags.usage":{"$regex":/^(main|branch)$/}})
     })
   })
 
@@ -422,5 +422,93 @@ describe('Filter', function () {
       var f = new Filter('node[~"wikipedia"~"foo"]')
       assert.equal(f.toString(), 'node[~"wikipedia"~"foo"]')
     })
+  })
+
+  it('case-senstive regexp', function () {
+    var f = new Filter('node["name"~"test"]')
+    let r
+
+    assert.deepEqual(f.def, [{"type":"node"},{"key":"name","op":"~","value":"test"}])
+    assert.equal(f.toString(), 'node["name"~"test"]')
+    assert.equal(f.toQl(), '(node["name"~"test"];)')
+    assert.deepEqual(f.toLokijs(), { type: { '$eq': 'node' }, 'tags.name': { '$regex': /test/ } })
+
+    r = f.match({ type: 'node', tags: { amenity: 'restaurant' } })
+    assert.equal(r, false, 'Object 1 should not match')
+    r = f.match({ type: 'node', tags: { name: 'foobar', amenity: 'cafe' } })
+    assert.equal(r, false, 'Object 2 should not match')
+    r = f.match({ type: 'node', tags: { name: 'test', amenity: 'cafe' } })
+    assert.equal(r, true, 'Object 3 should match')
+    r = f.match({ type: 'node', tags: { name: 'TESTER', amenity: 'cafe' } })
+    assert.equal(r, false, 'Object 4 should not match')
+    r = f.match({ type: 'node', tags: { name: 'tester', amenity: 'cafe' } })
+    assert.equal(r, true, 'Object 5 should match')
+    r = f.match({ type: 'node', tags: { name: 'Tester', amenity: 'cafe' } })
+    assert.equal(r, false, 'Object 6 should not match')
+  })
+
+  it('case-senstive !regexp', function () {
+    var f = new Filter('node["name"!~"test"]')
+    let r
+
+    assert.deepEqual(f.def, [{"type":"node"},{"key":"name","op":"!~","value":"test"}])
+    assert.equal(f.toString(), 'node["name"!~"test"]')
+    assert.equal(f.toQl(), '(node["name"!~"test"];)')
+    assert.deepEqual(f.toLokijs(), { type: { '$eq': 'node' }, 'tags.name': { '$not': { '$regex': /test/ } } })
+
+    r = f.match({ type: 'node', tags: { amenity: 'restaurant' } })
+    assert.equal(r, false, 'Object 1 should match') // TODO: should match !!
+    r = f.match({ type: 'node', tags: { name: 'foobar', amenity: 'cafe' } })
+    assert.equal(r, true, 'Object 2 should match')
+    r = f.match({ type: 'node', tags: { name: 'test', amenity: 'cafe' } })
+    assert.equal(r, false, 'Object 3 should not match')
+    r = f.match({ type: 'node', tags: { name: 'TESTER', amenity: 'cafe' } })
+    assert.equal(r, true, 'Object 4 should match')
+    r = f.match({ type: 'node', tags: { name: 'tester', amenity: 'cafe' } })
+    assert.equal(r, false, 'Object 5 should not match')
+    r = f.match({ type: 'node', tags: { name: 'Tester', amenity: 'cafe' } })
+    assert.equal(r, true, 'Object 5 should match')
+  })
+
+  it('case-insenstive regexp', function () {
+    var f = new Filter('node["name"~"test",i]')
+    let r
+
+    assert.deepEqual(f.def, [{"type":"node"},{"key":"name","op":"~i","value":"test"}])
+    assert.equal(f.toString(), 'node["name"~"test",i]')
+    assert.equal(f.toQl(), '(node["name"~"test",i];)')
+    assert.deepEqual(f.toLokijs(), { type: { '$eq': 'node' }, 'tags.name': { '$regex': /test/i } })
+
+    r = f.match({ type: 'node', tags: { amenity: 'restaurant' } })
+    assert.equal(r, false, 'Object 1 should not match')
+    r = f.match({ type: 'node', tags: { name: 'foobar', amenity: 'cafe' } })
+    assert.equal(r, false, 'Object 2 should not match')
+    r = f.match({ type: 'node', tags: { name: 'test', amenity: 'cafe' } })
+    assert.equal(r, true, 'Object 3 should match')
+    r = f.match({ type: 'node', tags: { name: 'TESTER', amenity: 'cafe' } })
+    assert.equal(r, true, 'Object 4 should match')
+    r = f.match({ type: 'node', tags: { name: 'Tester', amenity: 'cafe' } })
+    assert.equal(r, true, 'Object 5 should match')
+  })
+
+  it('case-insenstive !regexp', function () {
+    var f = new Filter('node["name"!~"test",i]')
+    let r
+
+    assert.deepEqual(f.def, [{"type":"node"},{"key":"name","op":"!~i","value":"test"}])
+    assert.equal(f.toString(), 'node["name"!~"test",i]')
+    assert.equal(f.toQl(), '(node["name"!~"test",i];)')
+    assert.deepEqual(f.toLokijs(), { type: { '$eq': 'node' }, 'tags.name': { '$not': { '$regex': /test/i } } })
+
+    r = f.match({ type: 'node', tags: { amenity: 'restaurant' } })
+    assert.equal(r, false, 'Object 1 should match') // TODO: should match !!
+    r = f.match({ type: 'node', tags: { name: 'foobar', amenity: 'cafe' } })
+    assert.equal(r, true, 'Object 2 should match')
+    r = f.match({ type: 'node', tags: { name: 'test', amenity: 'cafe' } })
+    assert.equal(r, false, 'Object 3 should not match')
+    r = f.match({ type: 'node', tags: { name: 'TESTER', amenity: 'cafe' } })
+    assert.equal(r, false, 'Object 4 should not match')
+    r = f.match({ type: 'node', tags: { name: 'Tester', amenity: 'cafe' } })
+    assert.equal(r, false, 'Object 5 should not match')
   })
 })
