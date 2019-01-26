@@ -49,15 +49,15 @@ function test (ob, part) {
     case '=':
       return ob.tags && (part.key in ob.tags) && (ob.tags[part.key] === part.value)
     case '!=':
-      return ob.tags && (part.key in ob.tags) && (ob.tags[part.key] !== part.value)
+      return ob.tags && (!(part.key in ob.tags) || (ob.tags[part.key] !== part.value))
     case '~':
       return ob.tags && (part.key in ob.tags) && (ob.tags[part.key].match(part.value))
     case '!~':
-      return ob.tags && (part.key in ob.tags) && (!ob.tags[part.key].match(part.value))
+      return ob.tags && (!(part.key in ob.tags) || (!ob.tags[part.key].match(part.value)))
     case '~i':
       return ob.tags && (part.key in ob.tags) && (ob.tags[part.key].match(new RegExp(part.value, 'i')))
     case '!~i':
-      return ob.tags && (part.key in ob.tags) && (!ob.tags[part.key].match(new RegExp(part.value, 'i')))
+      return ob.tags && (!(part.key in ob.tags) || !ob.tags[part.key].match(new RegExp(part.value, 'i')))
     case 'has':
       return ob.tags && (part.key in ob.tags) && (ob.tags[part.key].split(/;/).indexOf(part.value) !== -1)
     default:

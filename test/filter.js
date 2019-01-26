@@ -457,7 +457,7 @@ describe('Filter', function () {
     assert.deepEqual(f.toLokijs(), { type: { '$eq': 'node' }, 'tags.name': { '$not': { '$regex': /test/ } } })
 
     r = f.match({ type: 'node', tags: { amenity: 'restaurant' } })
-    assert.equal(r, false, 'Object 1 should match') // TODO: should match !!
+    assert.equal(r, true, 'Object 1 should match')
     r = f.match({ type: 'node', tags: { name: 'foobar', amenity: 'cafe' } })
     assert.equal(r, true, 'Object 2 should match')
     r = f.match({ type: 'node', tags: { name: 'test', amenity: 'cafe' } })
@@ -501,7 +501,7 @@ describe('Filter', function () {
     assert.deepEqual(f.toLokijs(), { type: { '$eq': 'node' }, 'tags.name': { '$not': { '$regex': /test/i } } })
 
     r = f.match({ type: 'node', tags: { amenity: 'restaurant' } })
-    assert.equal(r, false, 'Object 1 should match') // TODO: should match !!
+    assert.equal(r, true, 'Object 1 should match')
     r = f.match({ type: 'node', tags: { name: 'foobar', amenity: 'cafe' } })
     assert.equal(r, true, 'Object 2 should match')
     r = f.match({ type: 'node', tags: { name: 'test', amenity: 'cafe' } })
@@ -510,5 +510,26 @@ describe('Filter', function () {
     assert.equal(r, false, 'Object 4 should not match')
     r = f.match({ type: 'node', tags: { name: 'Tester', amenity: 'cafe' } })
     assert.equal(r, false, 'Object 5 should not match')
+  })
+
+  it('!=', function () {
+    var f = new Filter('node["name"!="test"]')
+    let r
+
+    assert.deepEqual(f.def, [{"type":"node"},{"key":"name","op":"!=","value":"test"}])
+    assert.equal(f.toString(), 'node["name"!="test"]')
+    assert.equal(f.toQl(), '(node["name"!="test"];)')
+    assert.deepEqual(f.toLokijs(), { type: { '$eq': 'node' }, 'tags.name': { '$ne': 'test' } })
+
+    r = f.match({ type: 'node', tags: { amenity: 'restaurant' } })
+    assert.equal(r, true, 'Object 1 should match')
+    r = f.match({ type: 'node', tags: { name: 'foobar', amenity: 'cafe' } })
+    assert.equal(r, true, 'Object 2 should match')
+    r = f.match({ type: 'node', tags: { name: 'test', amenity: 'cafe' } })
+    assert.equal(r, false, 'Object 3 should not match')
+    r = f.match({ type: 'node', tags: { name: 'TESTER', amenity: 'cafe' } })
+    assert.equal(r, true, 'Object 4 should match')
+    r = f.match({ type: 'node', tags: { name: 'Tester', amenity: 'cafe' } })
+    assert.equal(r, true, 'Object 5 should match')
   })
 })
