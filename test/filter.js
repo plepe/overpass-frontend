@@ -598,4 +598,32 @@ describe('Filter', function () {
     r = lokidb.find(f.toLokijs())
     assert.deepEqual(r.map(o => o.id), [ 1, 2, 4, 5, 6 ])
   })
+
+  it('key regexp', function () {
+    var f = new Filter('node[~"na"~"."]')
+    let r
+
+    assert.deepEqual(f.def, [{"type":"node"},{"key":"na","keyRegexp":true,"op":"~","value":"."}])
+    assert.equal(f.toString(), 'node[~"na"~"."]')
+    assert.equal(f.toQl(), '(node[~"na"~"."];)')
+    assert.deepEqual(f.toLokijs(), { type: { '$eq': 'node' }, needMatch: true })
+
+    r = f.match({ type: 'node', tags: { amenity: 'restaurant' } })
+    assert.equal(r, false, 'Object 1 should not match')
+    r = f.match({ type: 'node', tags: { name: 'foobar', amenity: 'cafe' } })
+    assert.equal(r, true, 'Object 2 should match')
+    r = f.match({ type: 'node', tags: { name: 'test', amenity: 'cafe' } })
+    assert.equal(r, true, 'Object 3 should match')
+    r = f.match({ type: 'node', tags: { name: 'TESTER', amenity: 'cafe' } })
+    assert.equal(r, true, 'Object 4 should match')
+    r = f.match({ type: 'node', tags: { name: 'tester', amenity: 'cafe' } })
+    assert.equal(r, true, 'Object 5 should match')
+    r = f.match({ type: 'node', tags: { name: 'Tester', amenity: 'cafe' } })
+    assert.equal(r, true, 'Object 6 should match')
+
+    let q = f.toLokijs()
+    delete q.needMatch
+    r = lokidb.find(q)
+    assert.deepEqual(r.map(o => o.id), [ 1, 2, 3, 4, 5, 6 ])
+  })
 })
