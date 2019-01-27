@@ -38,18 +38,33 @@ function compile (part) {
 }
 
 function test (ob, part) {
+  if (Array.isArray(part)) {
+    return part.every(part => test(ob, part))
+  }
+
   if (part.type) {
     return ob.type === part.type
   }
 
+  if (part.or) {
+    return part.or.some(part => test(ob, part))
+  }
+
   if (part.keyRegexp) {
+    let regex
+    if (part.value) {
+      regex = new RegExp(part.value, part.op.match(/i$/) ? 'i' : '')
+    }
+
     for (let k in ob.tags) {
       if (k.match(part.key)) {
-        if (part.value) {
-          return ob.tags[k].match(part.value)
+        if (regex) {
+          if (ob.tags[k].match(regex)) {
+            return true
+          }
+        } else {
+          return true
         }
-
-        return true
       }
     }
     return false
