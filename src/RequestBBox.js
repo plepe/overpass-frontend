@@ -128,7 +128,7 @@ class RequestBBox extends Request {
         continue
       }
 
-      if (this.lokiQueryFilterNeedMatch && !this.option.filter.match(ob)) {
+      if (this.lokiQueryFilterNeedMatch && !this.options.filter.match(ob)) {
         continue
       }
 
