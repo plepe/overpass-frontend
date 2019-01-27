@@ -434,7 +434,14 @@ class Filter {
         k = 'type'
         v = { $eq: filter.type }
       } else if (filter.or) {
-        orQueries.push(filter.or.map(p => this.toLokijs(options, p)))
+        orQueries.push(filter.or.map(p => {
+          let r = this.toLokijs(options, p)
+          if (r.needMatch) {
+            query.needMatch = true
+            delete r.needMatch
+          }
+          return r
+        }))
       } else {
         console.log('unknown filter', filter)
       }
@@ -453,6 +460,7 @@ class Filter {
       }
     })
 
+    orQueries = orQueries.filter(q => Object.keys(q).length)
     if (orQueries.length === 1) {
       query.$or = orQueries[0]
     } else if (orQueries.length > 1) {
