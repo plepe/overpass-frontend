@@ -1,3 +1,4 @@
+const strsearch2regexp = require('strsearch2regexp')
 const filterJoin = require('./filterJoin')
 
 function qlesc (str) {
@@ -32,6 +33,8 @@ function compile (part) {
       return '[' + keyRegexp + qlesc(part.key) + part.op.substr(0, part.op.length - 1) + qlesc(part.value) + ',i]'
     case 'has':
       return '[' + keyRegexp + qlesc(part.key) + '~' + qlesc('^(.*;|)' + part.value + '(|;.*)$') + ']'
+    case 'strsearch':
+      return '[' + keyRegexp + qlesc(part.key) + '~' + qlesc(strsearch2regexp(part.value)) + ',i]'
     default:
       throw new Error('unknown operator')
   }
@@ -87,6 +90,8 @@ function test (ob, part) {
       return ob.tags && (!(part.key in ob.tags) || !ob.tags[part.key].match(new RegExp(part.value, 'i')))
     case 'has':
       return ob.tags && (part.key in ob.tags) && (ob.tags[part.key].split(/;/).indexOf(part.value) !== -1)
+    case 'strsearch':
+      return ob.tags && (part.key in ob.tags) && (ob.tags[part.key].match(new RegExp(strsearch2regexp(part.value), 'i')))
     default:
       return false
   }
@@ -183,7 +188,7 @@ function parse (def) {
         throw new Error("Can't parse query, expected key: " + def)
       }
     } else if (mode === 12) {
-      m = def.match(/^\s*(=|!=|~|!~|\^|])/)
+      m = def.match(/^\s*(=|!=|~|!~|\^|]|%)/)
       if (m && m[1] === ']') {
         let entry = { key, op: 'has_key' }
         if (keyRegexp) {
@@ -193,7 +198,9 @@ function parse (def) {
         def = def.slice(m[0].length)
         mode = 10
       } else if (m) {
-        op = m[1] === '^' ? 'has' : m[1]
+        op = m[1] === '^' ? 'has'
+          : m[1] === '%' ? 'strsearch'
+          : m[1]
         mode = 13
         def = def.slice(m[0].length)
       } else {
@@ -250,6 +257,7 @@ function parse (def) {
  * <li>Regular Expression: <tt>[amenity~"^(restaurant|cafe)$"]</tt> resp. negated: <tt>[amenity!~"^(restaurant|cafe)$"]</tt>
  * <li>Key regular expression: <tt>[~"cycleway"~"left"]</tt> (key has to match cycleway and its value match left)
  * <li>Key (not) exists: <tt>[amenity]</tt> or <tt>["amenity"]</tt> resp. <tt>[!amenity]</tt>
+ * <li>String search: <tt>[name%cafe]</tt>: search for name tags which are similar to cafe, e.g. "café". (see https://github.com/plepe/strsearch2regexp for details).
  * </ul>
  * More advanced queries are not supported.</p>
  *
@@ -430,6 +438,9 @@ class Filter {
       } else if ((filter.op === '!~') || (filter.op === '!~i')) {
         k = 'tags.' + filter.key
         v = { $not: { $regex: new RegExp(filter.value, (filter.op === '!~i' ? 'i' : '')) } }
+      } else if (filter.op === 'strsearch') {
+        k = 'tags.' + filter.key
+        v = { $regex: new RegExp(strsearch2regexp(filter.value), 'i') }
       } else if (filter.type) {
         k = 'type'
         v = { $eq: filter.type }

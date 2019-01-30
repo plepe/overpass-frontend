@@ -13,6 +13,7 @@ describe('Filter', function () {
     { id: 4, type: 'node', tags: { name: 'TESTER', amenity: 'cafe' } },
     { id: 5, type: 'node', tags: { name: 'tester', amenity: 'cafe' } },
     { id: 6, type: 'node', tags: { name: 'Tester', amenity: 'cafe' } },
+    { id: 7, type: 'node', tags: { name: 'Tëster', amenity: 'cafe' } },
   ])
 
   describe ('input exploded', function () {
@@ -518,7 +519,7 @@ describe('Filter', function () {
     assert.equal(r, true, 'Object 6 should match')
 
     r = lokidb.find(f.toLokijs())
-    assert.deepEqual(r.map(o => o.id), [ 1, 2, 4, 6 ])
+    assert.deepEqual(r.map(o => o.id), [ 1, 2, 4, 6, 7 ])
   })
 
   it('case-insenstive regexp', function () {
@@ -570,7 +571,7 @@ describe('Filter', function () {
     assert.equal(r, false, 'Object 6 should not match')
 
     r = lokidb.find(f.toLokijs())
-    assert.deepEqual(r.map(o => o.id), [ 1, 2 ])
+    assert.deepEqual(r.map(o => o.id), [ 1, 2, 7 ])
   })
 
   it('!=', function () {
@@ -596,7 +597,7 @@ describe('Filter', function () {
     assert.equal(r, true, 'Object 6 should match')
 
     r = lokidb.find(f.toLokijs())
-    assert.deepEqual(r.map(o => o.id), [ 1, 2, 4, 5, 6 ])
+    assert.deepEqual(r.map(o => o.id), [ 1, 2, 4, 5, 6, 7 ])
   })
 
   it('key regexp', function () {
@@ -624,6 +625,36 @@ describe('Filter', function () {
     let q = f.toLokijs()
     delete q.needMatch
     r = lokidb.find(q)
-    assert.deepEqual(r.map(o => o.id), [ 1, 2, 3, 4, 5, 6 ])
+    assert.deepEqual(r.map(o => o.id), [ 1, 2, 3, 4, 5, 6, 7 ])
+  })
+
+  it('strsearch', function () {
+    var f = new Filter('node["name"%"test"]')
+    let r
+
+    assert.deepEqual(f.def, [{"type":"node"},{"key":"name","op":"strsearch","value":"test"}])
+    assert.equal(f.toString(), 'node["name"~"t[eèeéêëė][sß]t",i]')
+    assert.equal(f.toQl(), '(node["name"~"t[eèeéêëė][sß]t",i];)')
+    assert.deepEqual(f.toLokijs(), { type: { '$eq': 'node' }, "tags.name": { "$regex": /t[eèeéêëė][sß]t/i } })
+
+    r = f.match({ type: 'node', tags: { amenity: 'restaurant' } })
+    assert.equal(r, false, 'Object 1 should not match')
+    r = f.match({ type: 'node', tags: { name: 'foobar', amenity: 'cafe' } })
+    assert.equal(r, false, 'Object 2 should not match')
+    r = f.match({ type: 'node', tags: { name: 'test', amenity: 'cafe' } })
+    assert.equal(r, true, 'Object 3 should match')
+    r = f.match({ type: 'node', tags: { name: 'TESTER', amenity: 'cafe' } })
+    assert.equal(r, true, 'Object 4 should match')
+    r = f.match({ type: 'node', tags: { name: 'tester', amenity: 'cafe' } })
+    assert.equal(r, true, 'Object 5 should match')
+    r = f.match({ type: 'node', tags: { name: 'Tester', amenity: 'cafe' } })
+    assert.equal(r, true, 'Object 6 should match')
+    r = f.match({ type: 'node', tags: { name: 'Tëster', amenity: 'cafe' } })
+    assert.equal(r, true, 'Object 7 should match')
+
+    let q = f.toLokijs()
+    delete q.needMatch
+    r = lokidb.find(q)
+    assert.deepEqual(r.map(o => o.id), [ 3, 4, 5, 6, 7 ])
   })
 })
