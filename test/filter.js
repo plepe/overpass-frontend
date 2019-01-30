@@ -5,11 +5,11 @@ const Filter = require('../src/Filter')
 
 const objects = [
   { id: 1, type: 'node', tags: { amenity: 'restaurant' } },
-  { id: 2, type: 'node', tags: { name: 'foobar', amenity: 'cafe' } },
-  { id: 3, type: 'node', tags: { name: 'test', amenity: 'cafe' } },
-  { id: 4, type: 'node', tags: { name: 'TESTER', amenity: 'cafe' } },
-  { id: 5, type: 'node', tags: { name: 'tester', amenity: 'cafe' } },
-  { id: 6, type: 'node', tags: { name: 'Tester', amenity: 'cafe' } },
+  { id: 2, type: 'node', tags: { name: 'foobar', amenity: 'cafe', cuisine: 'ice_cream' } },
+  { id: 3, type: 'node', tags: { name: 'test', amenity: 'cafe', cuisine: 'ice_cream;dessert' } },
+  { id: 4, type: 'node', tags: { name: 'TESTER', amenity: 'cafe', cuisine: 'bagel;ice_cream' } },
+  { id: 5, type: 'node', tags: { name: 'tester', amenity: 'cafe', cuisine: 'bagel;ice_cream;dessert' } },
+  { id: 6, type: 'node', tags: { name: 'Tester', amenity: 'cafe', cuisine: 'bagel;dessert' } },
   { id: 7, type: 'node', tags: { name: 'Tëster', amenity: 'cafe' } }
 ]
 
@@ -573,5 +573,17 @@ describe('Filter', function () {
     assert.deepEqual(f.toLokijs(), { type: { '$eq': 'node' }, "tags.name": { "$regex": /t[eèeéêëė][sß]t/i } })
 
     check(f, [ 3, 4, 5, 6, 7 ])
+  })
+
+  it('has', function () {
+    var f = new Filter('node["cuisine"^"ice_cream"]')
+    let r
+
+    assert.deepEqual(f.def, [{"type":"node"},{"key":"cuisine","op":"has","value":"ice_cream"}])
+    assert.equal(f.toString(), 'node["cuisine"~"^(.*;|)ice_cream(|;.*)$"]')
+    assert.equal(f.toQl(), '(node["cuisine"~"^(.*;|)ice_cream(|;.*)$"];)')
+    assert.deepEqual(f.toLokijs(), { type: { '$eq': 'node' }, "tags.cuisine": { "$regex": "^(.*;|)ice_cream(|;.*)$" } })
+
+    check(f, [ 2, 3, 4, 5 ])
   })
 })
