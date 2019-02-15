@@ -26,11 +26,22 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>function qlesc (str) {
+            <pre class="prettyprint source linenums"><code>const strsearch2regexp = require('strsearch2regexp')
+const filterJoin = require('./filterJoin')
+
+function qlesc (str) {
   return '"' + str.replace(/"/g, '\\"') + '"'
 }
 
 function compile (part) {
+  if (Array.isArray(part)) {
+    return part.map(compile).join('')
+  }
+
+  if (part.or) {
+    return { or: part.or.map(compile) }
+  }
+
   let keyRegexp = (part.keyRegexp ? '~' : '')
 
   switch (part.op) {
@@ -45,24 +56,46 @@ function compile (part) {
     case '~':
     case '!~':
       return '[' + keyRegexp + qlesc(part.key) + part.op + qlesc(part.value) + ']'
+    case '~i':
+    case '!~i':
+      return '[' + keyRegexp + qlesc(part.key) + part.op.substr(0, part.op.length - 1) + qlesc(part.value) + ',i]'
     case 'has':
       return '[' + keyRegexp + qlesc(part.key) + '~' + qlesc('^(.*;|)' + part.value + '(|;.*)$') + ']'
+    case 'strsearch':
+      return '[' + keyRegexp + qlesc(part.key) + '~' + qlesc(strsearch2regexp(part.value)) + ',i]'
+    default:
+      throw new Error('unknown operator')
   }
 }
 
 function test (ob, part) {
+  if (Array.isArray(part)) {
+    return part.every(part => test(ob, part))
+  }
+
   if (part.type) {
     return ob.type === part.type
   }
 
+  if (part.or) {
+    return part.or.some(part => test(ob, part))
+  }
+
   if (part.keyRegexp) {
+    let regex
+    if (part.value) {
+      regex = new RegExp(part.value, part.op.match(/i$/) ? 'i' : '')
+    }
+
     for (let k in ob.tags) {
       if (k.match(part.key)) {
-        if (part.value) {
-          return ob.tags[k].match(part.value)
+        if (regex) {
+          if (ob.tags[k].match(regex)) {
+            return true
+          }
+        } else {
+          return true
         }
-
-        return true
       }
     }
     return false
@@ -74,13 +107,19 @@ function test (ob, part) {
     case '=':
       return ob.tags &amp;&amp; (part.key in ob.tags) &amp;&amp; (ob.tags[part.key] === part.value)
     case '!=':
-      return ob.tags &amp;&amp; (part.key in ob.tags) &amp;&amp; (ob.tags[part.key] !== part.value)
+      return ob.tags &amp;&amp; (!(part.key in ob.tags) || (ob.tags[part.key] !== part.value))
     case '~':
       return ob.tags &amp;&amp; (part.key in ob.tags) &amp;&amp; (ob.tags[part.key].match(part.value))
     case '!~':
-      return ob.tags &amp;&amp; (part.key in ob.tags) &amp;&amp; (!ob.tags[part.key].match(part.value))
+      return ob.tags &amp;&amp; (!(part.key in ob.tags) || (!ob.tags[part.key].match(part.value)))
+    case '~i':
+      return ob.tags &amp;&amp; (part.key in ob.tags) &amp;&amp; (ob.tags[part.key].match(new RegExp(part.value, 'i')))
+    case '!~i':
+      return ob.tags &amp;&amp; (!(part.key in ob.tags) || !ob.tags[part.key].match(new RegExp(part.value, 'i')))
     case 'has':
       return ob.tags &amp;&amp; (part.key in ob.tags) &amp;&amp; (ob.tags[part.key].split(/;/).indexOf(part.value) !== -1)
+    case 'strsearch':
+      return ob.tags &amp;&amp; (part.key in ob.tags) &amp;&amp; (ob.tags[part.key].match(new RegExp(strsearch2regexp(part.value), 'i')))
     default:
       return false
   }
@@ -177,7 +216,7 @@ function parse (def) {
         throw new Error("Can't parse query, expected key: " + def)
       }
     } else if (mode === 12) {
-      m = def.match(/^\s*(=|!=|~|!~|\^|])/)
+      m = def.match(/^\s*(=|!=|~|!~|\^|]|%)/)
       if (m &amp;&amp; m[1] === ']') {
         let entry = { key, op: 'has_key' }
         if (keyRegexp) {
@@ -187,7 +226,9 @@ function parse (def) {
         def = def.slice(m[0].length)
         mode = 10
       } else if (m) {
-        op = m[1] === '^' ? 'has' : m[1]
+        op = m[1] === '^' ? 'has'
+          : m[1] === '%' ? 'strsearch'
+          : m[1]
         mode = 13
         def = def.slice(m[0].length)
       } else {
@@ -209,8 +250,16 @@ function parse (def) {
         throw new Error("Can't parse query, expected value: " + def)
       }
     } else if (mode === 14) {
-      m = def.match(/^\s*\]/)
+      m = def.match(/^\s*(,i)?\]/)
       if (m) {
+        if (m[1] === ',i') {
+          if (op === '~' || op === '!~') {
+            op += 'i'
+          } else {
+            throw new Error("Can't parse query, expected ']': " + def)
+          }
+        }
+
         let entry = { key, op, value }
         if (keyRegexp) {
           entry.keyRegexp = true
@@ -236,6 +285,8 @@ function parse (def) {
  * &lt;li>Regular Expression: &lt;tt>[amenity~"^(restaurant|cafe)$"]&lt;/tt> resp. negated: &lt;tt>[amenity!~"^(restaurant|cafe)$"]&lt;/tt>
  * &lt;li>Key regular expression: &lt;tt>[~"cycleway"~"left"]&lt;/tt> (key has to match cycleway and its value match left)
  * &lt;li>Key (not) exists: &lt;tt>[amenity]&lt;/tt> or &lt;tt>["amenity"]&lt;/tt> resp. &lt;tt>[!amenity]&lt;/tt>
+ * &lt;li>Array search: &lt;tt>[cuisine^kebap]&lt;/tt>: search for cuisine tags which exactly include 'kebap' (semicolon-separated values, e.g. &lt;tt>cuisine=kebap;pizza&lt;/tt>).
+ * &lt;li>String search: &lt;tt>[name%cafe]&lt;/tt>: search for name tags which are similar to cafe, e.g. "café". (see https://github.com/plepe/strsearch2regexp for details).
  * &lt;/ul>
  * More advanced queries are not supported.&lt;/p>
  *
@@ -296,11 +347,15 @@ class Filter {
         throw new Error('Filter: only one type query allowed!')
     }
 
-    result += def
+    let queries = filterJoin(def
       .filter(part => !part.type)
-      .map(compile).join('')
+      .map(compile))
 
-    return result
+    if (queries.length > 1) {
+      return '(' + queries.map(q => result + q).join(';') + ';)'
+    } else {
+      return result + queries[0]
+    }
   }
 
   /**
@@ -339,9 +394,15 @@ class Filter {
         throw new Error('Filter: only one type query allowed!')
     }
 
-    let filters = def.filter(part => !part.type)
+    let queries = filterJoin(def
+      .filter(part => !part.type)
+      .map(compile))
 
-    return '(' + types.map(type => type + options.inputSet + filters.map(compile).join('')).join(';') + ';)'
+    if (queries.length > 1) {
+      return '(' + queries.map(q => types.map(type => type + options.inputSet + q).join(';')).join(';') + ';)'
+    } else {
+      return '(' + types.map(type => type + options.inputSet + queries[0]).join(';') + ';)'
+    }
   }
 
   /**
@@ -376,6 +437,11 @@ class Filter {
     }
 
     let query = {}
+    let orQueries = []
+
+    if (!Array.isArray(def)) {
+      def = [ def ]
+    }
 
     def.forEach(filter => {
       let k, v
@@ -395,15 +461,27 @@ class Filter {
       } else if (filter.op === 'has') {
         k = 'tags.' + filter.key
         v = { $regex: '^(.*;|)' + filter.value + '(|;.*)$' }
-      } else if (filter.op === '~') {
+      } else if ((filter.op === '~') || (filter.op === '~i')) {
         k = 'tags.' + filter.key
-        v = { $regex: filter.value }
-      } else if (filter.op === '!~') {
+        v = { $regex: new RegExp(filter.value, (filter.op === '~i' ? 'i' : '')) }
+      } else if ((filter.op === '!~') || (filter.op === '!~i')) {
         k = 'tags.' + filter.key
-        v = { $not: { $regex: filter.value } }
+        v = { $not: { $regex: new RegExp(filter.value, (filter.op === '!~i' ? 'i' : '')) } }
+      } else if (filter.op === 'strsearch') {
+        k = 'tags.' + filter.key
+        v = { $regex: new RegExp(strsearch2regexp(filter.value), 'i') }
       } else if (filter.type) {
         k = 'type'
         v = { $eq: filter.type }
+      } else if (filter.or) {
+        orQueries.push(filter.or.map(p => {
+          let r = this.toLokijs(options, p)
+          if (r.needMatch) {
+            query.needMatch = true
+            delete r.needMatch
+          }
+          return r
+        }))
       } else {
         console.log('unknown filter', filter)
       }
@@ -421,6 +499,13 @@ class Filter {
         }
       }
     })
+
+    orQueries = orQueries.filter(q => Object.keys(q).length)
+    if (orQueries.length === 1) {
+      query.$or = orQueries[0]
+    } else if (orQueries.length > 1) {
+      query.$and = orQueries.map(q => { return { $or: q } })
+    }
 
     return query
   }
@@ -443,7 +528,7 @@ module.exports = Filter
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Dec 04 2018 08:36:31 GMT+0100 (GMT+01:00)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Feb 15 2019 12:24:34 GMT+0100 (GMT+01:00)
 </footer>
 
 <script> prettyPrint(); </script>
