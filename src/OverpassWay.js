@@ -258,17 +258,21 @@ class OverpassWay extends OverpassObject {
    * @param {number} [options.shiftLon=0] Shift longitude by n (e.g. by 360 to show after turn-around)
    * @return {L.layer}
    */
-  leafletFeature (options) {
+  leafletFeature (options, opt) {
     if (!this.geometry) {
       return null
     }
 
+    let geom = this.geometry.map(g => {
+      return { lat: g.lat, lon: (g.lon < 0 ? g.lon + opt.shiftWesternWorld : g.lon) }
+    })
+
     if (this.geometry[this.geometry.length - 1].lat === this.geometry[0].lat &&
        this.geometry[this.geometry.length - 1].lon === this.geometry[0].lon) {
-      return L.polygon(this.geometry, options)
+      return L.polygon(geom, options)
     }
 
-    return L.polyline(this.geometry, options)
+    return L.polyline(geom, options)
   }
 
   intersects (bbox) {

@@ -5,6 +5,7 @@ var BoundingBox = require('boundingbox')
 var osmtogeojson = require('osmtogeojson')
 var OverpassObject = require('./OverpassObject')
 var OverpassFrontend = require('./defines')
+const geojsonShiftWesternWorld = require('./geojsonShiftWesternWorld')
 var turf = {
   bboxClip: require('@turf/bbox-clip').default
 }
@@ -263,7 +264,7 @@ class OverpassRelation extends OverpassObject {
    * @param {object} [options] options Options will be passed to the leaflet function
    * @return {L.layer}
    */
-  leafletFeature (options) {
+  leafletFeature (options, opt) {
     if (!this.data.members) {
       return null
     }
@@ -276,7 +277,7 @@ class OverpassRelation extends OverpassObject {
       return feature
     }
 
-    var feature = L.geoJSON(this.geometry, {
+    var feature = L.geoJSON(geojsonShiftWesternWorld(this.geometry, opt.shiftWesternWorld), {
       pointToLayer: function (options, geoJsonPoint, member) {
         let feature
 
