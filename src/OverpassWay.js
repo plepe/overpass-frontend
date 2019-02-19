@@ -255,6 +255,7 @@ class OverpassWay extends OverpassObject {
   /**
    * return a leaflet feature for this object. If the ways is closed, a L.polygon will be returned, otherwise a L.polyline.
    * @param {object} [options] options Options will be passed to the leaflet function
+   * @param {number} [options.shiftLon=0] Shift longitude by n (e.g. by 360 to show after turn-around)
    * @return {L.layer}
    */
   leafletFeature (options) {
