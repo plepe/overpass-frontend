@@ -423,6 +423,9 @@ class OverpassRelation extends OverpassObject {
       if (!bbox.intersects(this.bounds)) {
         return 0
       }
+      if (this.bounds.within(bbox)) {
+        return 2
+      }
     }
 
     if (this.geometry) {
