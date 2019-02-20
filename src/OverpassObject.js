@@ -355,6 +355,7 @@ class OverpassObject {
       this.dbData.minlon = this.bounds.minlon
       this.dbData.maxlat = this.bounds.maxlat
       this.dbData.maxlon = this.bounds.maxlon
+      this.dbData.stretchLon180 = this.bounds.minlon > this.bounds.maxlon
     }
 
     return this.dbData
