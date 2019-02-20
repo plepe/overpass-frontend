@@ -98,21 +98,28 @@ class OverpassNode extends OverpassObject {
    * return a leaflet feature for this object
    * @param {object} [options] options Options will be passed to the leaflet function
    * @param {string} [options.nodeFeature='CircleMarker'] Which type of object should be returned: 'Marker' (L.marker), 'Circle' (L.circle) or 'CircleMarker' (L.circleMarker).
+   * @param {[number]} [options.shiftWorld=[0, 0]] Shift western (negative) longitudes by shiftWorld[0], eastern (positive) longitudes by shiftWorld[1] (e.g. by 360, 0 to show objects around lon=180)
    * @return {L.layer}
    */
-  leafletFeature (options) {
+  leafletFeature (options = {}) {
     if (!this.geometry) {
       return null
     }
 
+    if (!('shiftWorld' in options)) {
+      options.shiftWorld = [ 0, 0 ]
+    }
+
+    let geom = { lat: this.geometry.lat, lon: this.geometry.lon + options.shiftWorld[this.geometry.lon < 0 ? 0 : 1] }
+
     switch ('nodeFeature' in options ? options.nodeFeature : null) {
       case 'Marker':
-        return L.marker(this.geometry, options)
+        return L.marker(geom, options)
       case 'Circle':
-        return L.circle(this.geometry, options.radius, options)
+        return L.circle(geom, options.radius, options)
       case 'CircleMarker':
       default:
-        return L.circleMarker(this.geometry, options)
+        return L.circleMarker(geom, options)
     }
   }
 

@@ -255,16 +255,20 @@ class OverpassWay extends OverpassObject {
   /**
    * return a leaflet feature for this object. If the ways is closed, a L.polygon will be returned, otherwise a L.polyline.
    * @param {object} [options] options Options will be passed to the leaflet function
-   * @param {number} [options.shiftLon=0] Shift longitude by n (e.g. by 360 to show after turn-around)
+   * @param {[number]} [options.shiftWorld=[0, 0]] Shift western (negative) longitudes by shiftWorld[0], eastern (positive) longitudes by shiftWorld[1] (e.g. by 360, 0 to show objects around lon=180)
    * @return {L.layer}
    */
-  leafletFeature (options, opt) {
+  leafletFeature (options = {}) {
     if (!this.geometry) {
       return null
     }
 
+    if (!('shiftWorld' in options)) {
+      options.shiftWorld = [ 0, 0 ]
+    }
+
     let geom = this.geometry.map(g => {
-      return { lat: g.lat, lon: (g.lon < 0 ? g.lon + opt.shiftWesternWorld : g.lon) }
+      return { lat: g.lat, lon: g.lon + options.shiftWorld[g.lon < 0 ? 0 : 1] }
     })
 
     if (this.geometry[this.geometry.length - 1].lat === this.geometry[0].lat &&
