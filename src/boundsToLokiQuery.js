@@ -16,6 +16,11 @@ module.exports = function boundsToLokiQuery (bounds) {
         minlat: { $lte: bounds.maxlat },
         maxlat: { $gte: bounds.minlat },
         minlon: { $lte: bounds.maxlon }
+      }, {
+        minlat: { $lte: bounds.maxlat },
+        maxlat: { $gte: bounds.minlat },
+        minlon: { $lte: 180 },
+        maxlon: { $gte: -180 }
       } ]
     }
   }
