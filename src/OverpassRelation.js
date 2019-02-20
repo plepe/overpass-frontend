@@ -435,8 +435,20 @@ class OverpassRelation extends OverpassObject {
     }
 
     if (this.geometry) {
-      for (i = 0; i < this.geometry.features.length; i++) {
-        var g = this.geometry.features[i]
+      let geometry = this.geometry
+      let bboxShifted = bbox
+      if (this.bounds && this.bounds.minlon > this.bounds.maxlon) {
+        geometry = geojsonShiftWorld(geometry, [ 360, 0 ])
+        bboxShifted = {
+          minlat: bbox.minlat,
+          maxlat: bbox.maxlat,
+          minlon: bbox.minlon,
+          maxlon: bbox.maxlon + 360
+        }
+      }
+
+      for (i = 0; i < geometry.features.length; i++) {
+        var g = geometry.features[i]
 
         if (g.geometry.type === 'Point') {
           if (bbox.intersects(g)) {
@@ -445,7 +457,7 @@ class OverpassRelation extends OverpassObject {
           continue
         }
 
-        var intersects = turf.bboxClip(g, [ bbox.minlon, bbox.minlat, bbox.maxlon, bbox.maxlat ])
+        var intersects = turf.bboxClip(g, [ bboxShifted.minlon, bboxShifted.minlat, bboxShifted.maxlon, bboxShifted.maxlat ])
 
         if (g.geometry.type === 'LineString' || g.geometry.type === 'Polygon') {
           if (intersects.geometry.coordinates.length) {
