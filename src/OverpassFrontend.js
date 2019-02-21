@@ -50,6 +50,7 @@ const Filter = require('./Filter')
  * @param {number} [options.effortRelation=64] The effort for request a relation.
  * @param {number} [options.timeGap=10] A short time gap between two requests to the Overpass API (milliseconds).
  * @param {number} [options.loadChunkSize=1000] When loading a file (instead connecting to an Overpass URL) load elements in chunks of n items.
+ * @property {boolean} hasStretchLon180=false Are there any map features in the cache which stretch over lon=180/-180?
  */
 class OverpassFrontend {
   constructor (url, options) {
@@ -96,6 +97,9 @@ class OverpassFrontend {
     this.cacheElementsMemberOf = {}
     this.cacheBBoxQueries = {}
     this.db.clear()
+
+    // Set default properties
+    this.hasStretchLon180 = false
   }
 
   _loadFile () {
