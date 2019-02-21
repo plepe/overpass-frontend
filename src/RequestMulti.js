@@ -17,6 +17,9 @@ class RequestMulti extends Request {
         this.requests.splice(this.requests.indexOf(req), 1)
       })
 
+      req.on('subrequest-compile', (subRequest) => this.emit('subrequest-compile', subRequest))
+      req.on('subrequest-finish', (subRequest) => this.emit('subrequest-finish', subRequest))
+
       req.featureCallback = (err, ob) => {
         if (!(ob.id in this.doneFeatures)) {
           this.doneFeatures[ob.id] = true
