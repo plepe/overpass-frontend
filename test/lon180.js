@@ -27,7 +27,14 @@ describe('Lon180 (query objects near lon180)', function() {
     var found = []
     var error = ''
 
-    overpassFrontend.BBoxQuery(
+    var expectedSubRequestCount = 2
+    var foundSubRequestCount = 0
+
+    function compileListener (subrequest) {
+      foundSubRequestCount++
+    }
+
+    let request = overpassFrontend.BBoxQuery(
       "nwr[natural=water]",
       {
 	"minlat": 65,
@@ -36,7 +43,7 @@ describe('Lon180 (query objects near lon180)', function() {
 	"maxlon": -179
       },
       {
-          properties: OverpassFrontend.GEOM
+          properties: OverpassFrontend.MEMBERS | OverpassFrontend.GEOM | OverpassFrontend.TAGS
       },
       function (err, result) {
         found.push(result.id)
@@ -63,20 +70,31 @@ describe('Lon180 (query objects near lon180)', function() {
 
         assert.equal(overpassFrontend.hasStretchLon180, true)
 
+        assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
+
+        request.off('subrequest-compile', compileListener)
+
         done()
       }
     )
+
+    request.on('subrequest-compile', compileListener)
   })
 
   it('All lakes (fully cached)', function (done) {
-    overpassFrontend.clearCache()
-
     var finalCalled = 0
     var expected = [ 'w660439767', 'r3237099', 'w62065034', 'w62065032' ]
     var found = []
     var error = ''
 
-    overpassFrontend.BBoxQuery(
+    var expectedSubRequestCount = 0
+    var foundSubRequestCount = 0
+
+    function compileListener (subrequest) {
+      foundSubRequestCount++
+    }
+
+    let request = overpassFrontend.BBoxQuery(
       "nwr[natural=water]",
       {
 	"minlat": 65,
@@ -85,6 +103,7 @@ describe('Lon180 (query objects near lon180)', function() {
 	"maxlon": -179
       },
       {
+          properties: OverpassFrontend.MEMBERS | OverpassFrontend.GEOM | OverpassFrontend.TAGS
       },
       function (err, result) {
         found.push(result.id)
@@ -109,8 +128,16 @@ describe('Lon180 (query objects near lon180)', function() {
                'Found: ' + found.join(', '))
         }
 
+        assert.equal(overpassFrontend.hasStretchLon180, true)
+
+        assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
+
+        request.off('subrequest-compile', compileListener)
+
         done()
       }
     )
+
+    request.on('subrequest-compile', compileListener)
   })
 })
