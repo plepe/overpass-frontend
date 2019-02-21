@@ -13,6 +13,7 @@ var OverpassWay = require('./OverpassWay')
 var OverpassRelation = require('./OverpassRelation')
 var RequestGet = require('./RequestGet')
 var RequestBBox = require('./RequestBBox')
+var RequestMulti = require('./RequestMulti')
 var defines = require('./defines')
 var loadOsmFile = require('./loadOsmFile')
 var copyOsm3sMetaFrom = require('./copyOsm3sMeta')
@@ -478,17 +479,47 @@ class OverpassFrontend {
    * @return {RequestBBox}
    */
   BBoxQuery (query, bounds, options, featureCallback, finalCallback) {
+    let request
     bounds = new BoundingBox(bounds)
 
-    var request = new RequestBBox(this, {
-      query: query,
-      bounds: bounds,
-      remainingBounds: bounds,
-      options: options,
-      doneFeatures: {},
-      featureCallback: featureCallback,
-      finalCallback: finalCallback
-    })
+    if (bounds.minlon > bounds.maxlon) {
+      let bounds1 = new BoundingBox(bounds)
+      bounds1.maxlon = 180
+      let bounds2 = new BoundingBox(bounds)
+      bounds2.minlon = -180
+
+      request = new RequestMulti(this,
+        {
+          featureCallback: featureCallback,
+          finalCallback: finalCallback
+        }, [
+          new RequestBBox(this, {
+            query: query,
+            bounds: bounds1,
+            remainingBounds: bounds1,
+            options: options,
+            doneFeatures: {}
+          }),
+          new RequestBBox(this, {
+            query: query,
+            bounds: bounds2,
+            remainingBounds: bounds2,
+            options: options,
+            doneFeatures: {}
+          })
+        ]
+      )
+    } else {
+      request = new RequestBBox(this, {
+        query: query,
+        bounds: bounds,
+        remainingBounds: bounds,
+        options: options,
+        doneFeatures: {},
+        featureCallback: featureCallback,
+        finalCallback: finalCallback
+      })
+    }
 
     this.requests.push(request)
 
