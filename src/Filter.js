@@ -23,6 +23,8 @@ function compile (part) {
       } else {
         return '[' + keyRegexp + qlesc(part.key) + ']'
       }
+    case 'not_exists':
+      return '[!' + qlesc(part.key) + ']'
     case '=':
     case '!=':
     case '~':
@@ -76,6 +78,8 @@ function test (ob, part) {
   switch (part.op) {
     case 'has_key':
       return ob.tags && (part.key in ob.tags)
+    case 'not_exists':
+      return ob.tags && (!(part.key in ob.tags))
     case '=':
       return ob.tags && (part.key in ob.tags) && (ob.tags[part.key] === part.value)
     case '!=':
@@ -129,6 +133,7 @@ function parse (def) {
   let op
   let m
   let keyRegexp = false
+  let notExists = null
   while (def.length) {
     if (mode === 0) {
       m = def.match(/^\s*(node|way|relation|rel|nwr|\()/)
@@ -171,18 +176,22 @@ function parse (def) {
         throw new Error("Can't parse query, expected '[' or ';': " + def)
       }
     } else if (mode === 11) {
-      m = def.match(/^(\s*)(~\s*)?([a-zA-Z0-9_]+|"|')/)
+      m = def.match(/^(\s*)(([~!])\s*)?([a-zA-Z0-9_]+|"|')/)
       if (m && m[2]) {
-        keyRegexp = true
+        if (m[3] === '~') {
+          keyRegexp = true
+        } else if (m[3] === '!') {
+          notExists = true
+        }
       }
-      if (m && (m[3] === '"' || m[3] === "'")) {
+      if (m && (m[4] === '"' || m[4] === "'")) {
         def = def.slice(m[1].length + (m[2] || '').length)
         let x = parseString(def)
         key = x[0]
         def = x[1]
         mode = 12
       } else if (m) {
-        key = m[3]
+        key = m[4]
         def = def.slice(m[0].length)
         mode = 12
       } else {
@@ -195,10 +204,17 @@ function parse (def) {
         if (keyRegexp) {
           entry.keyRegexp = true
         }
+        if (notExists) {
+          entry.op = 'not_exists'
+        }
         result.push(entry)
         def = def.slice(m[0].length)
         mode = 10
       } else if (m) {
+        if (notExists) {
+          throw new Error("Can't parse query, expected ']': " + def)
+        }
+
         op = m[1] === '^' ? 'has'
           : m[1] === '%' ? 'strsearch'
           : m[1]
@@ -431,6 +447,9 @@ class Filter {
       } else if (filter.op === 'has_key') {
         k = 'tags.' + filter.key
         v = { $exists: true }
+      } else if (filter.op === 'not_exists') {
+        k = 'tags.' + filter.key
+        v = { $exists: false }
       } else if (filter.op === 'has') {
         k = 'tags.' + filter.key
         v = { $regex: '^(.*;|)' + filter.value + '(|;.*)$' }
