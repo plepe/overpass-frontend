@@ -93,6 +93,7 @@ function test (ob, part) {
     case 'strsearch':
       return ob.tags && (part.key in ob.tags) && (ob.tags[part.key].match(new RegExp(strsearch2regexp(part.value), 'i')))
     default:
+      console.log('match: unknown operator in filter', part)
       return false
   }
 }
