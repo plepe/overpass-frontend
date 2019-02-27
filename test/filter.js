@@ -586,4 +586,16 @@ describe('Filter', function () {
 
     check(f, [ 2, 3, 4, 5 ])
   })
+
+  it('has_key', function () {
+    var f = new Filter('node["cuisine"]')
+    let r
+
+    assert.deepEqual(f.def, [{"type":"node"},{"key":"cuisine","op":"has_key"}])
+    assert.equal(f.toString(), 'node["cuisine"]')
+    assert.equal(f.toQl(), '(node["cuisine"];)')
+    assert.deepEqual(f.toLokijs(), { type: { '$eq': 'node' }, "tags.cuisine": { "$exists": true } })
+
+    check(f, [ 2, 3, 4, 5, 6 ])
+  })
 })
