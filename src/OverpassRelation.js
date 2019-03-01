@@ -5,6 +5,7 @@ var BoundingBox = require('boundingbox')
 var osmtogeojson = require('osmtogeojson')
 var OverpassObject = require('./OverpassObject')
 var OverpassFrontend = require('./defines')
+const geojsonShiftWorld = require('./geojsonShiftWorld')
 var turf = {
   bboxClip: require('@turf/bbox-clip').default
 }
@@ -261,11 +262,16 @@ class OverpassRelation extends OverpassObject {
   /**
    * return a leaflet feature for this object.
    * @param {object} [options] options Options will be passed to the leaflet function
+   * @param {[number]} [options.shiftWorld=[0, 0]] Shift western (negative) longitudes by shiftWorld[0], eastern (positive) longitudes by shiftWorld[1] (e.g. by 360, 0 to show objects around lon=180)
    * @return {L.layer}
    */
-  leafletFeature (options) {
+  leafletFeature (options = {}) {
     if (!this.data.members) {
       return null
+    }
+
+    if (!('shiftWorld' in options)) {
+      options.shiftWorld = [ 0, 0 ]
     }
 
     // no geometry? use the member features instead
@@ -276,7 +282,7 @@ class OverpassRelation extends OverpassObject {
       return feature
     }
 
-    var feature = L.geoJSON(this.geometry, {
+    var feature = L.geoJSON(geojsonShiftWorld(this.geometry, options.shiftWorld), {
       pointToLayer: function (options, geoJsonPoint, member) {
         let feature
 
@@ -423,11 +429,26 @@ class OverpassRelation extends OverpassObject {
       if (!bbox.intersects(this.bounds)) {
         return 0
       }
+      if (this.bounds.within(bbox)) {
+        return 2
+      }
     }
 
     if (this.geometry) {
-      for (i = 0; i < this.geometry.features.length; i++) {
-        var g = this.geometry.features[i]
+      let geometry = this.geometry
+      let bboxShifted = bbox
+      if (this.bounds && this.bounds.minlon > this.bounds.maxlon) {
+        geometry = geojsonShiftWorld(geometry, [ 360, 0 ])
+        bboxShifted = {
+          minlat: bbox.minlat,
+          maxlat: bbox.maxlat,
+          minlon: bbox.minlon,
+          maxlon: bbox.maxlon + 360
+        }
+      }
+
+      for (i = 0; i < geometry.features.length; i++) {
+        var g = geometry.features[i]
 
         if (g.geometry.type === 'Point') {
           if (bbox.intersects(g)) {
@@ -436,7 +457,7 @@ class OverpassRelation extends OverpassObject {
           continue
         }
 
-        var intersects = turf.bboxClip(g, [ bbox.minlon, bbox.minlat, bbox.maxlon, bbox.maxlat ])
+        var intersects = turf.bboxClip(g, [ bboxShifted.minlon, bboxShifted.minlat, bboxShifted.maxlon, bboxShifted.maxlat ])
 
         if (g.geometry.type === 'LineString' || g.geometry.type === 'Polygon') {
           if (intersects.geometry.coordinates.length) {

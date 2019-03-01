@@ -255,25 +255,37 @@ class OverpassWay extends OverpassObject {
   /**
    * return a leaflet feature for this object. If the ways is closed, a L.polygon will be returned, otherwise a L.polyline.
    * @param {object} [options] options Options will be passed to the leaflet function
+   * @param {[number]} [options.shiftWorld=[0, 0]] Shift western (negative) longitudes by shiftWorld[0], eastern (positive) longitudes by shiftWorld[1] (e.g. by 360, 0 to show objects around lon=180)
    * @return {L.layer}
    */
-  leafletFeature (options) {
+  leafletFeature (options = {}) {
     if (!this.geometry) {
       return null
     }
 
-    if (this.geometry[this.geometry.length - 1].lat === this.geometry[0].lat &&
-       this.geometry[this.geometry.length - 1].lon === this.geometry[0].lon) {
-      return L.polygon(this.geometry, options)
+    if (!('shiftWorld' in options)) {
+      options.shiftWorld = [ 0, 0 ]
     }
 
-    return L.polyline(this.geometry, options)
+    let geom = this.geometry.map(g => {
+      return { lat: g.lat, lon: g.lon + options.shiftWorld[g.lon < 0 ? 0 : 1] }
+    })
+
+    if (this.geometry[this.geometry.length - 1].lat === this.geometry[0].lat &&
+       this.geometry[this.geometry.length - 1].lon === this.geometry[0].lon) {
+      return L.polygon(geom, options)
+    }
+
+    return L.polyline(geom, options)
   }
 
   intersects (bbox) {
     if (this.bounds) {
       if (!bbox.intersects(this.bounds)) {
         return 0
+      }
+      if (this.bounds.within(bbox)) {
+        return 2
       }
     }
 

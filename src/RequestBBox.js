@@ -4,6 +4,7 @@ const defines = require('./defines')
 const KnownArea = require('./knownArea')
 const RequestBBoxMembers = require('./RequestBBoxMembers')
 const Filter = require('./Filter')
+const boundsToLokiQuery = require('./boundsToLokiQuery')
 
 /**
  * A BBox request
@@ -53,10 +54,7 @@ class RequestBBox extends Request {
         this.lokiQuery = { $and: [ this.lokiQuery, filterLokiQuery ] }
       }
 
-      this.lokiQuery.minlat = { $lte: this.bounds.maxlat }
-      this.lokiQuery.minlon = { $lte: this.bounds.maxlon }
-      this.lokiQuery.maxlat = { $gte: this.bounds.minlat }
-      this.lokiQuery.maxlon = { $gte: this.bounds.minlon }
+      this.lokiQuery = { $and: [ this.lokiQuery, boundsToLokiQuery(this.bounds, this.overpass) ] }
     }
 
     this.loadFinish = false
