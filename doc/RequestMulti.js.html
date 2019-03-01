@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: knownArea.js</title>
+    <title>JSDoc: Source: RequestMulti.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: knownArea.js</h1>
+    <h1 class="page-title">Source: RequestMulti.js</h1>
 
     
 
@@ -26,56 +26,61 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>const BoundingBox = require('boundingbox')
-const turf = require('./turf')
+            <pre class="prettyprint source linenums"><code>const Request = require('./Request')
 
 /**
- * When loading area after area of a map, it will be more and more complete.
- * This class manages which area is already known and which not.
+ * A request consisting of several requests - duplicate results will be filtered
+ * @extends Request
  */
-class KnownArea {
-  constructor (area = null) {
-    this.area = area
+class RequestMulti extends Request {
+  constructor (overpass, options, requests) {
+    super(overpass, options)
+    this.type = 'RequestMulti'
+
+    this.doneFeatures = {}
+    this.requests = requests
+
+    this.requests.forEach(req => {
+      req.on('finish', () => {
+        this.requests.splice(this.requests.indexOf(req), 1)
+      })
+
+      req.on('subrequest-compile', (subRequest) => this.emit('subrequest-compile', subRequest))
+      req.on('subrequest-finish', (subRequest) => this.emit('subrequest-finish', subRequest))
+
+      req.featureCallback = (err, ob) => {
+        if (!(ob.id in this.doneFeatures)) {
+          this.doneFeatures[ob.id] = true
+          this.featureCallback(err, ob)
+        }
+      }
+      req.finalCallback = () => {}
+
+      this.overpass.requests.push(req)
+    })
   }
 
   /**
-   * make another part of the map known
+   * abort this request and sub requests
    */
-  add (bbox) {
-    bbox = new BoundingBox(bbox).toGeoJSON()
-
-    if (this.area === null) {
-      this.area = bbox
-    } else {
-      this.area = turf.union(bbox, this.area)
-    }
+  abort () {
+    this.requests.forEach(req => req.abort())
+    super.abort()
   }
 
-  /**
-   * is the whole area known?
-   */
-  check (bbox) {
-    if (this.area === null) {
-      return false
-    }
-
-    bbox = new BoundingBox(bbox).toGeoJSON()
-
-    let remaining = turf.difference(bbox, this.area)
-    // console.log(JSON.stringify(this.area), JSON.stringify(bbox), !remaining)
-
-    return !remaining
+  willInclude () {
+    return false
   }
 
-  /**
-   * return area as (multi)polygon
-   */
-  toGeoJSON () {
-    return this.area
+  preprocess () {
+  }
+
+  mayFinish () {
+    return !this.requests.length
   }
 }
 
-module.exports = KnownArea
+module.exports = RequestMulti
 </code></pre>
         </article>
     </section>

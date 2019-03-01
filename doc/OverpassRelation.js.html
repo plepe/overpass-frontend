@@ -33,6 +33,7 @@ var BoundingBox = require('boundingbox')
 var osmtogeojson = require('osmtogeojson')
 var OverpassObject = require('./OverpassObject')
 var OverpassFrontend = require('./defines')
+const geojsonShiftWorld = require('./geojsonShiftWorld')
 var turf = {
   bboxClip: require('@turf/bbox-clip').default
 }
@@ -289,11 +290,16 @@ class OverpassRelation extends OverpassObject {
   /**
    * return a leaflet feature for this object.
    * @param {object} [options] options Options will be passed to the leaflet function
+   * @param {number[]} [options.shiftWorld=[0, 0]] Shift western (negative) longitudes by shiftWorld[0], eastern (positive) longitudes by shiftWorld[1] (e.g. by 360, 0 to show objects around lon=180)
    * @return {L.layer}
    */
-  leafletFeature (options) {
+  leafletFeature (options = {}) {
     if (!this.data.members) {
       return null
+    }
+
+    if (!('shiftWorld' in options)) {
+      options.shiftWorld = [ 0, 0 ]
     }
 
     // no geometry? use the member features instead
@@ -304,7 +310,7 @@ class OverpassRelation extends OverpassObject {
       return feature
     }
 
-    var feature = L.geoJSON(this.geometry, {
+    var feature = L.geoJSON(geojsonShiftWorld(this.geometry, options.shiftWorld), {
       pointToLayer: function (options, geoJsonPoint, member) {
         let feature
 
@@ -451,11 +457,26 @@ class OverpassRelation extends OverpassObject {
       if (!bbox.intersects(this.bounds)) {
         return 0
       }
+      if (this.bounds.within(bbox)) {
+        return 2
+      }
     }
 
     if (this.geometry) {
-      for (i = 0; i &lt; this.geometry.features.length; i++) {
-        var g = this.geometry.features[i]
+      let geometry = this.geometry
+      let bboxShifted = bbox
+      if (this.bounds &amp;&amp; this.bounds.minlon > this.bounds.maxlon) {
+        geometry = geojsonShiftWorld(geometry, [ 360, 0 ])
+        bboxShifted = {
+          minlat: bbox.minlat,
+          maxlat: bbox.maxlat,
+          minlon: bbox.minlon,
+          maxlon: bbox.maxlon + 360
+        }
+      }
+
+      for (i = 0; i &lt; geometry.features.length; i++) {
+        var g = geometry.features[i]
 
         if (g.geometry.type === 'Point') {
           if (bbox.intersects(g)) {
@@ -464,7 +485,7 @@ class OverpassRelation extends OverpassObject {
           continue
         }
 
-        var intersects = turf.bboxClip(g, [ bbox.minlon, bbox.minlat, bbox.maxlon, bbox.maxlat ])
+        var intersects = turf.bboxClip(g, [ bboxShifted.minlon, bboxShifted.minlat, bboxShifted.maxlon, bboxShifted.maxlat ])
 
         if (g.geometry.type === 'LineString' || g.geometry.type === 'Polygon') {
           if (intersects.geometry.coordinates.length) {
@@ -518,13 +539,13 @@ module.exports = OverpassRelation
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Filter.html">Filter</a></li><li><a href="KnownArea.html">KnownArea</a></li><li><a href="OverpassFrontend.html">OverpassFrontend</a></li><li><a href="OverpassNode.html">OverpassNode</a></li><li><a href="OverpassObject.html">OverpassObject</a></li><li><a href="OverpassRelation.html">OverpassRelation</a></li><li><a href="OverpassWay.html">OverpassWay</a></li><li><a href="Request.html">Request</a></li><li><a href="RequestBBox.html">RequestBBox</a></li><li><a href="RequestGet.html">RequestGet</a></li></ul><h3>Events</h3><ul><li><a href="OverpassFrontend.html#event:error">error</a></li><li><a href="OverpassFrontend.html#event:load">load</a></li><li><a href="OverpassFrontend.html#event:update">update</a></li><li><a href="Request.html#event:abort">abort</a></li><li><a href="Request.html#event:finish">finish</a></li><li><a href="Request.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="Request.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestBBox.html#event:abort">abort</a></li><li><a href="RequestBBox.html#event:finish">finish</a></li><li><a href="RequestBBox.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestBBox.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestGet.html#event:abort">abort</a></li><li><a href="RequestGet.html#event:finish">finish</a></li><li><a href="RequestGet.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestGet.html#event:subrequest-finished">subrequest-finished</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Filter.html">Filter</a></li><li><a href="KnownArea.html">KnownArea</a></li><li><a href="OverpassFrontend.html">OverpassFrontend</a></li><li><a href="OverpassNode.html">OverpassNode</a></li><li><a href="OverpassObject.html">OverpassObject</a></li><li><a href="OverpassRelation.html">OverpassRelation</a></li><li><a href="OverpassWay.html">OverpassWay</a></li><li><a href="Request.html">Request</a></li><li><a href="RequestBBox.html">RequestBBox</a></li><li><a href="RequestGet.html">RequestGet</a></li><li><a href="RequestMulti.html">RequestMulti</a></li></ul><h3>Events</h3><ul><li><a href="OverpassFrontend.html#event:error">error</a></li><li><a href="OverpassFrontend.html#event:load">load</a></li><li><a href="OverpassFrontend.html#event:update">update</a></li><li><a href="Request.html#event:abort">abort</a></li><li><a href="Request.html#event:finish">finish</a></li><li><a href="Request.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="Request.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestBBox.html#event:abort">abort</a></li><li><a href="RequestBBox.html#event:finish">finish</a></li><li><a href="RequestBBox.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestBBox.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestGet.html#event:abort">abort</a></li><li><a href="RequestGet.html#event:finish">finish</a></li><li><a href="RequestGet.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestGet.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestMulti.html#event:abort">abort</a></li><li><a href="RequestMulti.html#event:finish">finish</a></li><li><a href="RequestMulti.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestMulti.html#event:subrequest-finished">subrequest-finished</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Feb 28 2019 20:32:31 GMT+0100 (Central European Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Mar 01 2019 20:31:34 GMT+0100 (GMT+01:00)
 </footer>
 
 <script> prettyPrint(); </script>
