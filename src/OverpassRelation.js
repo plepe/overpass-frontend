@@ -262,7 +262,7 @@ class OverpassRelation extends OverpassObject {
   /**
    * return a leaflet feature for this object.
    * @param {object} [options] options Options will be passed to the leaflet function
-   * @param {[number]} [options.shiftWorld=[0, 0]] Shift western (negative) longitudes by shiftWorld[0], eastern (positive) longitudes by shiftWorld[1] (e.g. by 360, 0 to show objects around lon=180)
+   * @param {number[]} [options.shiftWorld=[0, 0]] Shift western (negative) longitudes by shiftWorld[0], eastern (positive) longitudes by shiftWorld[1] (e.g. by 360, 0 to show objects around lon=180)
    * @return {L.layer}
    */
   leafletFeature (options = {}) {
