@@ -1,3 +1,9 @@
+# Version 2.4 - release 2019-03-01
+Support for queries stretching longitude 180, resp. returning shifted geometries (to show an object shifted by 360 degrees).
+
+# Version 2.3 - release 2019-01-31
+Improved Filters.
+
 # Version 2.2 - release 2018-12-04
 All OverpassObjects (Node, Way, Relation) have new functions `exportGeoJSON()`, `exportOSMXML()` and `exportOSMJSON()` which export the object in the specified format. Check the documentation for further details.
 
