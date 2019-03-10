@@ -2,7 +2,9 @@
 A JavaScript (NodeJS/Browser) library to easily access data from OpenStreetMap via Overpass API. The objects can directly be used with LeafletJS or exported to GeoJSON. Data will be cached locally, optionally by using LocalStorage (or similar).
 
 # INSTALLATION
-Some `@turf` dependencies depend on martinez-polygon-clipping. There's a bug in package.json: set "src/index.js" for option "main" (file: `node_modules/martinez-polygon-clipping/package.json`).
+```sh
+npm install --save overpass-frontend
+```
 
 # DOCUMENTATION
 Find documentation in [doc](https://rawgit.com/plepe/overpass-frontend/master/doc/OverpassFrontend.html). You can re-generate the documentation with `npm run doc`.
