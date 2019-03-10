@@ -31,3 +31,21 @@ overpassFrontend.BBoxQuery(
   }
 )
 ```
+
+# DEVELOPMENT
+You should install [osm3s](https://wiki.openstreetmap.org/wiki/Overpass_API/Installation) (a local copy of Overpass API) for running the unit tests.
+
+```sh
+git clone https://github.com/plepe/overpass-frontend
+cd overpass-frontend
+npm install
+
+# Initialize database for unit tests (ignore messages because of missing nodes/ways)
+# replace /exec/path by the location where you installed osm3s
+init_osm3s.sh test/data.osm.bz2 test/data/ /exec/path --meta
+
+# Run unit tests
+npm run test
+# Check code style (Standard JS)
+npm run lint
+```
