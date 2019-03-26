@@ -313,38 +313,7 @@ class Filter {
    * @return {string}
    */
   toString (def) {
-    let result = ''
-
-    if (!def) {
-      def = this.def
-    }
-
-    if (def.or) {
-      return '(' + def.or.map(part => this.toString(part)).join(';') + ';)'
-    }
-
-    let parts = def.filter(part => part.type)
-
-    switch (parts.length) {
-      case 0:
-        result = 'nwr'
-        break
-      case 1:
-        result = parts[0].type
-        break
-      default:
-        throw new Error('Filter: only one type query allowed!')
-    }
-
-    let queries = filterJoin(def
-      .filter(part => !part.type)
-      .map(compile))
-
-    if (queries.length > 1) {
-      return '(' + queries.map(q => result + q).join(';') + ';)'
-    } else {
-      return result + queries[0]
-    }
+    return this.toQl({}, def)
   }
 
   /**
@@ -364,9 +333,8 @@ class Filter {
 
     if (def.or) {
       return '(' + def.or.map(part => {
-        let r = this.toQl(options, part)
-        return r.slice(1, -1)
-      }).join('') + ')'
+        return this.toQl(options, part)
+      }).join('') + ');'
     }
 
     let parts = def.filter(part => part.type)
@@ -388,9 +356,11 @@ class Filter {
       .map(compile))
 
     if (queries.length > 1) {
-      return '(' + queries.map(q => types.map(type => type + options.inputSet + q).join(';')).join(';') + ';)'
+      return '(' + queries.map(q => types.map(type => type + options.inputSet + q).join(';')).join(';') + ';);'
+    } else if (types.length === 1) {
+      return types[0] + options.inputSet + queries[0] + ';'
     } else {
-      return '(' + types.map(type => type + options.inputSet + queries[0]).join(';') + ';)'
+      return '(' + types.map(type => type + options.inputSet + queries[0]).join(';') + ';);'
     }
   }
 
