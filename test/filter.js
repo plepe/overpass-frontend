@@ -231,6 +231,11 @@ describe('Filter', function () {
         inputSet: '.result'
       })
       assert.equal(r, 'nwr.result["amenity"];')
+
+      r = f.toQl({
+        outputSet: '.result'
+      })
+      assert.equal(r, 'nwr["amenity"]->.result;')
     })
 
     it ('nwr[amenity=restaurant]', function () {
@@ -243,6 +248,11 @@ describe('Filter', function () {
         inputSet: '.result'
       })
       assert.equal(r, 'nwr.result["amenity"="restaurant"];')
+
+      r = f.toQl({
+        outputSet: '.result'
+      })
+      assert.equal(r, 'nwr["amenity"="restaurant"]->.result;')
     })
 
     it ('nwr[amenity=restaurant][shop]', function () {
@@ -255,6 +265,11 @@ describe('Filter', function () {
         inputSet: '.result'
       })
       assert.equal(r, 'nwr.result["amenity"="restaurant"]["shop"];')
+
+      r = f.toQl({
+        outputSet: '.result'
+      })
+      assert.equal(r, 'nwr["amenity"="restaurant"]["shop"]->.result;')
     })
 
     it ('[cuisine^asian]', function () {
@@ -280,6 +295,11 @@ describe('Filter', function () {
         inputSet: '.result'
       })
       assert.equal(r, '(node.result["amenity"="cafe"]["cuisine"="ice_cream"];node.result["amenity"="ice_cream"];nwr.result["shop"="ice_cream"];);')
+
+      var r = f.toQl({
+        outputSet: '.result'
+      })
+      assert.equal(r, '(node["amenity"="cafe"]["cuisine"="ice_cream"];node["amenity"="ice_cream"];nwr["shop"="ice_cream"];)->.result;')
     })
 
     it ('nwr[~wikipedia~"."]', function () {

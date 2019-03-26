@@ -320,6 +320,7 @@ class Filter {
    * Convert query to Overpass QL
    * @param {object} [options] Additional options
    * @param {string} [options.inputSet=''] Specify input set (e.g.'.foo').
+   * @param {string} [options.outputSet=''] Specify output set (e.g.'.foo').
    * @return {string}
    */
   toQl (options = {}, def) {
@@ -331,10 +332,17 @@ class Filter {
       options.inputSet = ''
     }
 
+    if (!options.outputSet) {
+      options.outputSet = ''
+    }
+
     if (def.or) {
       return '(' + def.or.map(part => {
-        return this.toQl(options, part)
-      }).join('') + ');'
+        let subOptions = {
+          inputSet: options.inputSet
+        }
+        return this.toQl(subOptions, part)
+      }).join('') + ')' + (options.outputSet ? '->' + options.outputSet : '') + ';'
     }
 
     let parts = def.filter(part => part.type)
@@ -355,13 +363,16 @@ class Filter {
       .filter(part => !part.type)
       .map(compile))
 
+    let result
     if (queries.length > 1) {
-      return '(' + queries.map(q => types.map(type => type + options.inputSet + q).join(';')).join(';') + ';);'
+      result = '(' + queries.map(q => types.map(type => type + options.inputSet + q).join(';')).join(';') + ';)'
     } else if (types.length === 1) {
-      return types[0] + options.inputSet + queries[0] + ';'
+      result = types[0] + options.inputSet + queries[0]
     } else {
-      return '(' + types.map(type => type + options.inputSet + queries[0]).join(';') + ';);'
+      result = '(' + types.map(type => type + options.inputSet + queries[0]).join(';') + ';)'
     }
+
+    return result + (options.outputSet ? '->' + options.outputSet : '') + ';'
   }
 
   /**
