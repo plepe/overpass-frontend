@@ -374,7 +374,7 @@ class Filter {
 
     switch (parts.length) {
       case 0:
-        types = [ 'node', 'way', 'relation' ]
+        types = [ 'nwr' ]
         break
       case 1:
         types = [ parts[0].type ]
