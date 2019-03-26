@@ -630,4 +630,26 @@ describe('Filter', function () {
 
     check(f, [ 1, 7 ])
   })
+
+  it('and', function () {
+    var f = new Filter({ "and": [
+	[ { "type": "node" } ],
+        [ { "key": "amenity", "op": "=", "value": "cafe" } ],
+        [ { "key": "cuisine", "op": "has", "value": "ice_cream" } ]
+      ] })
+
+    let r
+
+    assert.deepEqual(f.def, { "and": [
+	[ { "type": "node" } ],
+        [ { "key": "amenity", "op": "=", "value": "cafe" } ],
+        [ { "key": "cuisine", "op": "has", "value": "ice_cream" } ]
+      ] })
+
+    assert.equal(f.toQl(), 'node->.x1;nwr.x1["amenity"="cafe"]->.x1;nwr.x1["cuisine"~"^(.*;|)ice_cream(|;.*)$"];')
+    assert.deepEqual(f.toLokijs(), {"$and":[{"type":{"$eq":"node"}},{"tags.amenity":{"$eq":"cafe"}},{"tags.cuisine":{"$regex": "^(.*;|)ice_cream(|;.*)$"}}]})
+
+    check(f, [ 2, 3, 4, 5 ])
+  })
+
 })
