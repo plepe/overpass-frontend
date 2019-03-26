@@ -225,48 +225,48 @@ describe('Filter', function () {
       var f = new Filter([ { op: 'has_key', key: 'amenity' } ])
 
       var r = f.toQl()
-      assert.equal(r, '(node["amenity"];way["amenity"];relation["amenity"];)')
+      assert.equal(r, '(nwr["amenity"];)')
 
       r = f.toQl({
         inputSet: '.result'
       })
-      assert.equal(r, '(node.result["amenity"];way.result["amenity"];relation.result["amenity"];)')
+      assert.equal(r, '(nwr.result["amenity"];)')
     })
 
     it ('nwr[amenity=restaurant]', function () {
       var f = new Filter([ { op: '=', key: 'amenity', value: 'restaurant' } ])
 
       var r = f.toQl()
-      assert.equal(r, '(node["amenity"="restaurant"];way["amenity"="restaurant"];relation["amenity"="restaurant"];)')
+      assert.equal(r, '(nwr["amenity"="restaurant"];)')
 
       r = f.toQl({
         inputSet: '.result'
       })
-      assert.equal(r, '(node.result["amenity"="restaurant"];way.result["amenity"="restaurant"];relation.result["amenity"="restaurant"];)')
+      assert.equal(r, '(nwr.result["amenity"="restaurant"];)')
     })
 
     it ('nwr[amenity=restaurant][shop]', function () {
       var f = new Filter([ { op: '=', key: 'amenity', value: 'restaurant' }, { op: 'has_key', key: 'shop' } ])
 
       var r = f.toQl()
-      assert.equal(r, '(node["amenity"="restaurant"]["shop"];way["amenity"="restaurant"]["shop"];relation["amenity"="restaurant"]["shop"];)')
+      assert.equal(r, '(nwr["amenity"="restaurant"]["shop"];)')
 
       r = f.toQl({
         inputSet: '.result'
       })
-      assert.equal(r, '(node.result["amenity"="restaurant"]["shop"];way.result["amenity"="restaurant"]["shop"];relation.result["amenity"="restaurant"]["shop"];)')
+      assert.equal(r, '(nwr.result["amenity"="restaurant"]["shop"];)')
     })
 
     it ('[cuisine^asian]', function () {
       var f = new Filter([ { op: 'has', key: 'cuisine', value: 'asian' } ])
 
       var r = f.toQl()
-      assert.equal(r, '(node["cuisine"~"^(.*;|)asian(|;.*)$"];way["cuisine"~"^(.*;|)asian(|;.*)$"];relation["cuisine"~"^(.*;|)asian(|;.*)$"];)')
+      assert.equal(r, '(nwr["cuisine"~"^(.*;|)asian(|;.*)$"];)')
 
       r = f.toQl({
         inputSet: '.result'
       })
-      assert.equal(r, '(node.result["cuisine"~"^(.*;|)asian(|;.*)$"];way.result["cuisine"~"^(.*;|)asian(|;.*)$"];relation.result["cuisine"~"^(.*;|)asian(|;.*)$"];)')
+      assert.equal(r, '(nwr.result["cuisine"~"^(.*;|)asian(|;.*)$"];)')
     })
 
     it ('(node[amenity=cafe][cuisine=ice_cream];node[amenity=ice_cream];nwr[shop=ice_cream];)', function () {
@@ -279,21 +279,21 @@ describe('Filter', function () {
       var r = f.toQl({
         inputSet: '.result'
       })
-      assert.equal(r, '(node.result["amenity"="cafe"]["cuisine"="ice_cream"];node.result["amenity"="ice_cream"];node.result["shop"="ice_cream"];way.result["shop"="ice_cream"];relation.result["shop"="ice_cream"];)')
+      assert.equal(r, '(node.result["amenity"="cafe"]["cuisine"="ice_cream"];node.result["amenity"="ice_cream"];nwr.result["shop"="ice_cream"];)')
     })
 
     it ('nwr[~wikipedia~"."]', function () {
       var f = new Filter([ { keyRegexp: true, op: 'has_key', key: 'wikipedia' } ])
 
       var r = f.toQl()
-      assert.equal(r, '(node[~"wikipedia"~"."];way[~"wikipedia"~"."];relation[~"wikipedia"~"."];)')
+      assert.equal(r, '(nwr[~"wikipedia"~"."];)')
     })
 
     it ('nwr[~wikipedia~"foo"]', function () {
       var f = new Filter([ { keyRegexp: true, op: '~', key: 'wikipedia', value: 'foo' } ])
 
       var r = f.toQl()
-      assert.equal(r, '(node[~"wikipedia"~"foo"];way[~"wikipedia"~"foo"];relation[~"wikipedia"~"foo"];)')
+      assert.equal(r, '(nwr[~"wikipedia"~"foo"];)')
     })
   })
 
@@ -463,7 +463,7 @@ describe('Filter', function () {
       let f = new Filter({ or: [ [ { key: 'name', value: '49', op: '~' } ], [ { key: 'ref', value: '49', op: '=' } ] ] })
 
       assert.equal(f.toString(), '(nwr["name"~"49"];nwr["ref"="49"];)')
-      assert.equal(f.toQl(), '(node["name"~"49"];way["name"~"49"];relation["name"~"49"];node["ref"="49"];way["ref"="49"];relation["ref"="49"];)')
+      assert.equal(f.toQl(), '(nwr["name"~"49"];nwr["ref"="49"];)')
       assert.deepEqual(f.toLokijs(), {"$or":[{"tags.name":{"$regex":/49/}},{"tags.ref":{"$eq":"49"}}]})
     })
 
@@ -474,7 +474,7 @@ describe('Filter', function () {
       ])
 
       assert.equal(f.toString(), '(nwr["name"~"49"]["route"="bus"];nwr["ref"="49"]["route"="bus"];)')
-      assert.equal(f.toQl(), '(node["name"~"49"]["route"="bus"];way["name"~"49"]["route"="bus"];relation["name"~"49"]["route"="bus"];node["ref"="49"]["route"="bus"];way["ref"="49"]["route"="bus"];relation["ref"="49"]["route"="bus"];)')
+      assert.equal(f.toQl(), '(nwr["name"~"49"]["route"="bus"];nwr["ref"="49"]["route"="bus"];)')
       assert.deepEqual(f.toLokijs(), {"tags.route":{"$eq":"bus"},"$or":[{"tags.name":{"$regex":/49/}},{"tags.ref":{"$eq":"49"}}]})
     })
 
@@ -486,7 +486,7 @@ describe('Filter', function () {
       ])
 
       assert.equal(f.toString(), '(nwr["name"~"49"]["route"="bus"]["operator"="ÖBB"];nwr["name"~"49"]["route"="bus"]["operator"="WL"];nwr["ref"="49"]["route"="bus"]["operator"="ÖBB"];nwr["ref"="49"]["route"="bus"]["operator"="WL"];)')
-      assert.equal(f.toQl(), '(node["name"~"49"]["route"="bus"]["operator"="ÖBB"];way["name"~"49"]["route"="bus"]["operator"="ÖBB"];relation["name"~"49"]["route"="bus"]["operator"="ÖBB"];node["name"~"49"]["route"="bus"]["operator"="WL"];way["name"~"49"]["route"="bus"]["operator"="WL"];relation["name"~"49"]["route"="bus"]["operator"="WL"];node["ref"="49"]["route"="bus"]["operator"="ÖBB"];way["ref"="49"]["route"="bus"]["operator"="ÖBB"];relation["ref"="49"]["route"="bus"]["operator"="ÖBB"];node["ref"="49"]["route"="bus"]["operator"="WL"];way["ref"="49"]["route"="bus"]["operator"="WL"];relation["ref"="49"]["route"="bus"]["operator"="WL"];)')
+      assert.equal(f.toQl(), '(nwr["name"~"49"]["route"="bus"]["operator"="ÖBB"];nwr["name"~"49"]["route"="bus"]["operator"="WL"];nwr["ref"="49"]["route"="bus"]["operator"="ÖBB"];nwr["ref"="49"]["route"="bus"]["operator"="WL"];)')
       assert.deepEqual(f.toLokijs(), {"tags.route":{"$eq":"bus"},"$and":[{"$or":[{"tags.name":{"$regex":{}}},{"tags.ref":{"$eq":"49"}}]},{"$or":[{"tags.operator":{"$eq":"ÖBB"}},{"tags.operator":{"$eq":"WL"}}]}]})
     })
   })
