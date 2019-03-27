@@ -55,6 +55,11 @@ function test (ob, part) {
     return part.or.some(part => test(ob, part))
   }
 
+  if (part.and) {
+    console.log('here')
+    return part.and.every(part => test(ob, part))
+  }
+
   if (part.keyRegexp) {
     let regex
     if (part.value) {
@@ -282,6 +287,11 @@ function parse (def) {
  * @param {string|object} query
  */
 class Filter {
+  uniqId () {
+    this._uniqId = (this._uniqId || 0) + 1
+    return this._uniqId
+  }
+
   constructor (def) {
     if (typeof def === 'string') {
       [ this.def ] = parse(def)
@@ -305,6 +315,10 @@ class Filter {
       return def.or.some(part => this.match(ob, part))
     }
 
+    if (def.and) {
+      return def.and.every(test.bind(this, ob))
+    }
+
     return def.filter(test.bind(this, ob)).length === def.length
   }
 
@@ -313,44 +327,14 @@ class Filter {
    * @return {string}
    */
   toString (def) {
-    let result = ''
-
-    if (!def) {
-      def = this.def
-    }
-
-    if (def.or) {
-      return '(' + def.or.map(part => this.toString(part)).join(';') + ';)'
-    }
-
-    let parts = def.filter(part => part.type)
-
-    switch (parts.length) {
-      case 0:
-        result = 'nwr'
-        break
-      case 1:
-        result = parts[0].type
-        break
-      default:
-        throw new Error('Filter: only one type query allowed!')
-    }
-
-    let queries = filterJoin(def
-      .filter(part => !part.type)
-      .map(compile))
-
-    if (queries.length > 1) {
-      return '(' + queries.map(q => result + q).join(';') + ';)'
-    } else {
-      return result + queries[0]
-    }
+    return this.toQl({}, def)
   }
 
   /**
    * Convert query to Overpass QL
    * @param {object} [options] Additional options
    * @param {string} [options.inputSet=''] Specify input set (e.g.'.foo').
+   * @param {string} [options.outputSet=''] Specify output set (e.g.'.foo').
    * @return {string}
    */
   toQl (options = {}, def) {
@@ -362,11 +346,27 @@ class Filter {
       options.inputSet = ''
     }
 
+    if (!options.outputSet) {
+      options.outputSet = ''
+    }
+
     if (def.or) {
       return '(' + def.or.map(part => {
-        let r = this.toQl(options, part)
-        return r.slice(1, -1)
-      }).join('') + ')'
+        let subOptions = {
+          inputSet: options.inputSet
+        }
+        return this.toQl(subOptions, part)
+      }).join('') + ')' + (options.outputSet ? '->' + options.outputSet : '') + ';'
+    }
+
+    if (def.and) {
+      let first = def.and[0]
+      let last = def.and[def.and.length - 1]
+      let others = def.and.concat().slice(1, def.and.length - 1)
+      let set = '.x' + this.uniqId()
+      return this.toQl({ inputSet: options.inputSet, outputSet: set }, first) +
+        others.map(part => this.toQl({ inputSet: set, outputSet: set }, part)).join('') +
+        this.toQl({ inputSet: set, outputSet: options.outputSet }, last)
     }
 
     let parts = def.filter(part => part.type)
@@ -374,7 +374,7 @@ class Filter {
 
     switch (parts.length) {
       case 0:
-        types = [ 'node', 'way', 'relation' ]
+        types = [ 'nwr' ]
         break
       case 1:
         types = [ parts[0].type ]
@@ -387,11 +387,16 @@ class Filter {
       .filter(part => !part.type)
       .map(compile))
 
+    let result
     if (queries.length > 1) {
-      return '(' + queries.map(q => types.map(type => type + options.inputSet + q).join(';')).join(';') + ';)'
+      result = '(' + queries.map(q => types.map(type => type + options.inputSet + q).join(';')).join(';') + ';)'
+    } else if (types.length === 1) {
+      result = types[0] + options.inputSet + queries[0]
     } else {
-      return '(' + types.map(type => type + options.inputSet + queries[0]).join(';') + ';)'
+      result = '(' + types.map(type => type + options.inputSet + queries[0]).join(';') + ';)'
     }
+
+    return result + (options.outputSet ? '->' + options.outputSet : '') + ';'
   }
 
   /**
@@ -409,6 +414,27 @@ class Filter {
 
       let r = { $or:
         def.or.map(part => {
+          let r = this.toLokijs(options, part)
+          if (r.needMatch) {
+            needMatch = true
+          }
+          delete r.needMatch
+          return r
+        })
+      }
+
+      if (needMatch) {
+        r.needMatch = true
+      }
+
+      return r
+    }
+
+    if (def.and) {
+      let needMatch = false
+
+      let r = { $and:
+        def.and.map(part => {
           let r = this.toLokijs(options, part)
           if (r.needMatch) {
             needMatch = true

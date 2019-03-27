@@ -222,8 +222,9 @@ class RequestBBox extends Request {
 
     if (this.options.filter) {
       query += this.options.filter.toQl({
-        inputSet: '.result'
-      }) + '->.result;\n'
+        inputSet: '.result',
+        outputSet: '.result'
+      })
     }
 
     if (!('split' in this.options)) {
