@@ -1,3 +1,6 @@
+# Version 2.4.2 - release 2019-03-27
+Support combining filters with 'and'.
+
 # Version 2.4 - release 2019-03-01
 Support for queries stretching longitude 180, resp. returning shifted geometries (to show an object shifted by 360 degrees).
 
