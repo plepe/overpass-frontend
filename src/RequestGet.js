@@ -243,6 +243,7 @@ class RequestGet extends Request {
       requestParts.push({
         properties: this.options.properties,
         receiveObject: this.receiveObject.bind(this),
+        checkObject: this.checkObject.bind(this),
         featureCallback: this._featureCallback.bind(this, this.featureCallback)
       })
     }

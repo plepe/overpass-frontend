@@ -161,6 +161,7 @@ class RequestGetMembers {
     this.part = {
       properties: this.options.memberProperties,
       receiveObject: this.receiveObject.bind(this),
+      checkObject: this.checkObject.bind(this),
       featureCallback: this.options.memberCallback,
       count: 0
     }
@@ -184,6 +185,10 @@ class RequestGetMembers {
 
   receiveObject (ob) {
     this.doneFeatures[ob.id] = ob
+  }
+
+  checkObject (ob) {
+    return true
   }
 
   finishSubRequest (fun, subRequest) {

@@ -125,6 +125,15 @@ class Request {
   }
 
   /**
+   * further checks, if this object really matches the query
+   * @param {OverpassObject} ob - Object which has been received
+   * @returns {boolean} - True, if the object matches.
+   */
+  checkObject (ob) {
+    return true
+  }
+
+  /**
    * SubRequest got finished
    * @event Request#subrequest-finished
    * @param {Request#SubRequest} subRequest - the sub request

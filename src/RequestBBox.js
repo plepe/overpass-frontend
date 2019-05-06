@@ -230,6 +230,7 @@ class RequestBBox extends Request {
         {
           properties: this.options.properties,
           receiveObject: this.receiveObject.bind(this),
+          checkObject: this.checkObject.bind(this),
           featureCallback: this.featureCallback
         }
       ],
