@@ -250,6 +250,16 @@ class RequestBBox extends Request {
   }
 
   /**
+   * further checks, if this object really matches the query
+   * @param {OverpassObject} ob - Object which has been received
+   * @returns {boolean} - True, if the object matches.
+   */
+  checkObject (ob) {
+    // also check the object directly if it intersects the bbox - if possible
+    return !!ob.intersects(this.bounds)
+  }
+
+  /**
    * the current subrequest is finished -> update caches, check whether request is finished
    * @param {Request#SubRequest} subRequest - the current sub request
    */
