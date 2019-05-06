@@ -481,6 +481,11 @@ class OverpassRelation extends OverpassObject {
         }
       }
 
+      // Geometry is not fully known yet, we can't say no (yet)
+      if (!(this.properties & OverpassFrontend.GEOM)) {
+        return 1
+      }
+
       // if there's no relation member we can be sure there's no intersection
       return 0
     } else if (this.members) {
