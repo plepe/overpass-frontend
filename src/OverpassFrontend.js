@@ -19,6 +19,7 @@ var loadOsmFile = require('./loadOsmFile')
 var copyOsm3sMetaFrom = require('./copyOsm3sMeta')
 const timestamp = require('./timestamp')
 const Filter = require('./Filter')
+const isGeoJSON = require('./isGeoJSON')
 
 /**
  * An error occured
@@ -492,7 +493,10 @@ class OverpassFrontend {
    */
   BBoxQuery (query, bounds, options, featureCallback, finalCallback) {
     let request
-    let origBounds = new BoundingBox(bounds)
+    let origBounds = bounds
+    if (!isGeoJSON(bounds)) {
+      origBounds = new BoundingBox(bounds)
+    }
     bounds = new BoundingBox(bounds)
 
     if (bounds.minlon > bounds.maxlon) {
