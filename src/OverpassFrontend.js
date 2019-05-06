@@ -506,14 +506,12 @@ class OverpassFrontend {
           new RequestBBox(this, {
             query: query,
             bounds: bounds1,
-            remainingBounds: bounds1,
             options: options,
             doneFeatures: {}
           }),
           new RequestBBox(this, {
             query: query,
             bounds: bounds2,
-            remainingBounds: bounds2,
             options: options,
             doneFeatures: {}
           })
@@ -523,7 +521,6 @@ class OverpassFrontend {
       request = new RequestBBox(this, {
         query: query,
         bounds: bounds,
-        remainingBounds: bounds,
         options: options,
         doneFeatures: {},
         featureCallback: featureCallback,

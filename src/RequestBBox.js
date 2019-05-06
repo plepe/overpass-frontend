@@ -260,9 +260,9 @@ class RequestBBox extends Request {
       this.loadFinish = true
 
       if (this.options.filter) {
-        this.cacheFilter.add(this.remainingBounds)
+        this.cacheFilter.add(this.bounds)
       } else {
-        this.cache.requested.add(this.remainingBounds)
+        this.cache.requested.add(this.bounds)
       }
     }
   }
