@@ -1,8 +1,13 @@
 /* global L:false */
 
-var OverpassObject = require('./OverpassObject')
-var BoundingBox = require('boundingbox')
-var OverpassFrontend = require('./defines')
+const BoundingBox = require('boundingbox')
+const turf = {
+  pointsWithinPolygon: require('@turf/points-within-polygon').default
+}
+
+const OverpassObject = require('./OverpassObject')
+const OverpassFrontend = require('./defines')
+const isGeoJSON = require('./isGeoJSON')
 
 /**
  * A node
@@ -128,7 +133,12 @@ class OverpassNode extends OverpassObject {
       return 1
     }
 
-    return bbox.intersects(this.bounds) ? 2 : 0
+    if (isGeoJSON(bbox)) {
+      let x = turf.pointsWithinPolygon(this.GeoJSON(), bbox)
+      return x.features.length ? 2 : 0
+    } else {
+      return bbox.intersects(this.bounds) ? 2 : 0
+    }
   }
 }
 

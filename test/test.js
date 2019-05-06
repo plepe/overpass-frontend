@@ -3679,6 +3679,32 @@ describe('Overpass objects structure', function() {
               maxlon: 16.339
             }
           )))
+          assert.equal(2, result.intersects({
+            type: 'Feature',
+            geometry: {
+              type: 'Polygon',
+              coordinates: [[
+                [ 16.338, 48.198 ],
+                [ 16.338, 48.199 ],
+                [ 16.339, 48.199 ],
+                [ 16.339, 48.198 ],
+                [ 16.338, 48.198 ]
+              ]]
+            }
+          }))
+          assert.equal(0, result.intersects({
+            type: 'Feature',
+            geometry: {
+              type: 'Polygon',
+              coordinates: [[
+                [ 16.338, 48.197 ],
+                [ 16.338, 48.198 ],
+                [ 16.339, 48.198 ],
+                [ 16.339, 48.197 ],
+                [ 16.338, 48.197 ]
+              ]]
+            }
+          }))
         },
         function (err) {
           done()

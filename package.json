@@ -23,6 +23,7 @@
     "@turf/bbox-clip": "^6.0.0",
     "@turf/difference": "^6.0.0",
     "@turf/intersect": "^6.0.0",
+    "@turf/points-within-polygon": "^5.1.5",
     "@turf/union": "^6.0.0",
     "async": "*",
     "boundingbox": "^1.0.0",
