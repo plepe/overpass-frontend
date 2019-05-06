@@ -492,6 +492,7 @@ class OverpassFrontend {
    */
   BBoxQuery (query, bounds, options, featureCallback, finalCallback) {
     let request
+    let origBounds = new BoundingBox(bounds)
     bounds = new BoundingBox(bounds)
 
     if (bounds.minlon > bounds.maxlon) {
@@ -508,12 +509,14 @@ class OverpassFrontend {
           new RequestBBox(this, {
             query: query,
             bounds: bounds1,
+            origBounds,
             options: options,
             doneFeatures: {}
           }),
           new RequestBBox(this, {
             query: query,
             bounds: bounds2,
+            origBounds,
             options: options,
             doneFeatures: {}
           })
@@ -523,6 +526,7 @@ class OverpassFrontend {
       request = new RequestBBox(this, {
         query: query,
         bounds: bounds,
+        origBounds,
         options: options,
         doneFeatures: {},
         featureCallback: featureCallback,

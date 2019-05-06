@@ -122,7 +122,7 @@ class RequestBBox extends Request {
       }
 
       // also check the object directly if it intersects the bbox - if possible
-      if (ob.intersects(this.bounds) < 2) {
+      if (ob.intersects(this.origBounds) < 2) {
         continue
       }
 
@@ -256,7 +256,7 @@ class RequestBBox extends Request {
    */
   checkObject (ob) {
     // also check the object directly if it intersects the bbox - if possible
-    return !!ob.intersects(this.bounds)
+    return !!ob.intersects(this.origBounds)
   }
 
   /**
