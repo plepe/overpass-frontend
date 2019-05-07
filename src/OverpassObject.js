@@ -305,7 +305,7 @@ class OverpassObject {
 
   /**
    * Check whether this object intersects (or is within) the specified bounding box. Returns 0 if it does not match; 1 if the exact geometry is not known, but the object's bounding box matches; 2 exact match.
-   * @param {boundingbox:BoundingBox} bbox Bounding box
+   * @param {boundingbox:BoundingBox|GeoJSON} bbox Bounding box
    * @return {number}
    */
   intersects (bbox) {
@@ -313,7 +313,7 @@ class OverpassObject {
       return 0
     }
 
-    if (!bbox.intersects(this.bounds)) {
+    if (!this.bounds.intersects(bbox)) {
       return 0
     }
 
