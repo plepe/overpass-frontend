@@ -426,7 +426,7 @@ class OverpassRelation extends OverpassObject {
     var i
 
     if (this.bounds) {
-      if (!bbox.intersects(this.bounds)) {
+      if (!this.bounds.intersects(bbox)) {
         return 0
       }
       if (this.bounds.within(bbox)) {
@@ -434,71 +434,25 @@ class OverpassRelation extends OverpassObject {
       }
     }
 
-    if (this.geometry) {
-      let geometry = this.geometry
-      let bboxShifted = bbox
-      if (this.bounds && this.bounds.minlon > this.bounds.maxlon) {
-        geometry = geojsonShiftWorld(geometry, [ 360, 0 ])
-        bboxShifted = {
-          minlat: bbox.minlat,
-          maxlat: bbox.maxlat,
-          minlon: bbox.minlon,
-          maxlon: bbox.maxlon + 360
-        }
-      }
+    if (this.members) {
+      let maybeMatch = 0
 
-      for (i = 0; i < geometry.features.length; i++) {
-        var g = geometry.features[i]
-
-        if (g.geometry.type === 'Point') {
-          if (bbox.intersects(g)) {
-            return 2
-          }
-          continue
-        }
-
-        var intersects = turf.bboxClip(g, [ bboxShifted.minlon, bboxShifted.minlat, bboxShifted.maxlon, bboxShifted.maxlat ])
-
-        if (g.geometry.type === 'LineString' || g.geometry.type === 'Polygon') {
-          if (intersects.geometry.coordinates.length) {
-            return 2
-          }
-        }
-        if (g.geometry.type === 'MultiPolygon' || g.geometry.type === 'MultiLineString') {
-          for (var j = 0; j < intersects.geometry.coordinates.length; j++) {
-            if (intersects.geometry.coordinates[j].length) {
-              return 2
-            }
-          }
-        }
-      }
-
-      // if there's a relation member (where Overpass does not return the
-      // geometry) we can't know if the geometry intersects -> return 1
-      for (i = 0; i < this.data.members.length; i++) {
-        if (this.data.members[i].type === 'relation') {
-          return 1
-        }
-      }
-
-      // Geometry is not fully known yet, we can't say no (yet)
-      if (!(this.properties & OverpassFrontend.GEOM)) {
-        return 1
-      }
-
-      // if there's no relation member we can be sure there's no intersection
-      return 0
-    } else if (this.members) {
       for (i in this.members) {
         let memberId = this.members[i].id
         let member = this.overpass.cacheElements[memberId]
 
         if (member) {
-          if (member.intersects(bbox) === 2) {
+          let intersects = member.intersects(bbox)
+          if (intersects === 2) {
             return 2
+          }
+          if (intersects === 1) {
+            maybeMatch = 1
           }
         }
       }
+
+      return maybeMatch
     }
 
     return super.intersects(bbox)

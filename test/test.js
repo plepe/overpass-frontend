@@ -4347,6 +4347,52 @@ describe('Overpass objects structure', function() {
               maxlon: 16.339
             }
           )))
+          assert.equal(1, result.intersects(new BoundingBox({
+              minlat: 48.1984,
+              maxlat: 48.1985,
+              minlon: 16.3384,
+              maxlon: 16.3385
+            }
+          )))
+          assert.equal(1, result.intersects({
+            type: "Feature",
+            geometry: {
+              type: "Polygon",
+              coordinates: [ [
+                [ 16.338, 48.198 ],
+                [ 16.339, 48.198 ],
+                [ 16.339, 48.199 ],
+                [ 16.338, 48.199 ],
+                [ 16.338, 48.198 ]
+              ] ]
+            }
+          }))
+          assert.equal(0, result.intersects({
+            type: "Feature",
+            geometry: {
+              type: "Polygon",
+              coordinates: [ [
+                [ 16.338, 48.197 ],
+                [ 16.339, 48.197 ],
+                [ 16.339, 48.198 ],
+                [ 16.338, 48.198 ],
+                [ 16.338, 48.197 ]
+              ] ]
+            }
+          }))
+          assert.equal(1, result.intersects({
+            type: "Feature",
+            geometry: {
+              type: "Polygon",
+              coordinates: [ [
+                [ 16.3384, 48.1984 ],
+                [ 16.3385, 48.1984 ],
+                [ 16.3385, 48.1985 ],
+                [ 16.3384, 48.1985 ],
+                [ 16.3384, 48.1984 ]
+              ] ]
+            }
+          }))
         },
         function (err) {
           done()
@@ -4371,6 +4417,124 @@ describe('Overpass objects structure', function() {
               maxlon: 16.339
             }
           )))
+          assert.equal(0, result.intersects(new BoundingBox({
+              minlat: 48.1984,
+              maxlat: 48.1985,
+              minlon: 16.3384,
+              maxlon: 16.3385
+            }
+          )))
+          assert.equal(2, result.intersects({
+            type: "Feature",
+            geometry: {
+              type: "Polygon",
+              coordinates: [ [
+                [ 16.338, 48.198 ],
+                [ 16.339, 48.198 ],
+                [ 16.339, 48.199 ],
+                [ 16.338, 48.199 ],
+                [ 16.338, 48.198 ]
+              ] ]
+            }
+          }))
+          assert.equal(0, result.intersects({
+            type: "Feature",
+            geometry: {
+              type: "Polygon",
+              coordinates: [ [
+                [ 16.338, 48.197 ],
+                [ 16.339, 48.197 ],
+                [ 16.339, 48.198 ],
+                [ 16.338, 48.198 ],
+                [ 16.338, 48.197 ]
+              ] ]
+            }
+          }))
+          assert.equal(0, result.intersects({
+            type: "Feature",
+            geometry: {
+              type: "Polygon",
+              coordinates: [ [
+                [ 16.3384, 48.1984 ],
+                [ 16.3385, 48.1984 ],
+                [ 16.3385, 48.1985 ],
+                [ 16.3384, 48.1985 ],
+                [ 16.3384, 48.1984 ]
+              ] ]
+            }
+          }))
+        },
+        function (err) {
+          done()
+        }
+      )
+    })
+
+    it('Multipolygon: method intersects() - full geometry', function (done) {
+      overpassFrontend.get('r167731', { properties: OverpassFrontend.ALL },
+        function (err, result, index) {
+          console.log(JSON.stringify(result.GeoJSON()))
+          assert.equal('foo', 'bar')
+          assert.equal(2, result.intersects(new BoundingBox({
+              minlat: 48.198,
+              maxlat: 48.199,
+              minlon: 16.338,
+              maxlon: 16.339
+            }
+          )))
+          assert.equal(0, result.intersects(new BoundingBox({
+              minlat: 48.197,
+              maxlat: 48.198,
+              minlon: 16.338,
+              maxlon: 16.339
+            }
+          )))
+          assert.equal(0, result.intersects(new BoundingBox({
+              minlat: 48.1984,
+              maxlat: 48.1985,
+              minlon: 16.3384,
+              maxlon: 16.3385
+            }
+          )))
+          assert.equal(2, result.intersects({
+            type: "Feature",
+            geometry: {
+              type: "Polygon",
+              coordinates: [ [
+                [ 16.338, 48.198 ],
+                [ 16.339, 48.198 ],
+                [ 16.339, 48.199 ],
+                [ 16.338, 48.199 ],
+                [ 16.338, 48.198 ]
+              ] ]
+            }
+          }))
+          assert.equal(0, result.intersects({
+            type: "Feature",
+            geometry: {
+              type: "Polygon",
+              coordinates: [ [
+                [ 16.338, 48.197 ],
+                [ 16.339, 48.197 ],
+                [ 16.339, 48.198 ],
+                [ 16.338, 48.198 ],
+                [ 16.338, 48.197 ]
+              ] ]
+            }
+          }))
+          assert.equal(0, result.intersects({
+            type: "Feature",
+            geometry: {
+              type: "Polygon",
+              coordinates: [ [
+                [ 16.3384, 48.1984 ],
+                [ 16.3385, 48.1984 ],
+                [ 16.3385, 48.1985 ],
+                [ 16.3384, 48.1985 ],
+                [ 16.3384, 48.1984 ]
+              ] ]
+            }
+          }))
         },
         function (err) {
           done()
@@ -4395,14 +4559,14 @@ describe('Overpass objects structure', function() {
     it('method intersects()', function (done) {
       overpassFrontend.get('r20313', { properties: OverpassFrontend.BBOX },
         function (err, result, index) {
-          assert.equal(1, result.intersects(new BoundingBox({
+          assert.equal(0, result.intersects(new BoundingBox({
               minlat: 48.198,
               maxlat: 48.199,
               minlon: 16.338,
               maxlon: 16.339
             }
           )))
-          assert.equal(1, result.intersects(new BoundingBox({
+          assert.equal(0, result.intersects(new BoundingBox({
               minlat: 48.197,
               maxlat: 48.198,
               minlon: 16.338,
