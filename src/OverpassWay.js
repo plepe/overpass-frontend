@@ -5,7 +5,7 @@ var BoundingBox = require('boundingbox')
 var OverpassObject = require('./OverpassObject')
 var OverpassFrontend = require('./defines')
 var turf = {
-  bboxClip: require('@turf/bbox-clip').default,
+  intersect: require('@turf/intersect').default,
   lineIntersect: require('@turf/line-intersect').default
 }
 
@@ -305,7 +305,7 @@ class OverpassWay extends OverpassObject {
 
       if (thisGeojson.geometry.type === 'Polygon') {
         intersection = turf.intersect(thisGeojson, bboxGeojson)
-        return intersection.geometry.coordinates.length ? 2 : 0
+        return (intersection && intersection.geometry.coordinates.length) ? 2 : 0
       } else {
         intersection = turf.lineIntersect(thisGeojson, bboxGeojson)
         return intersection.features.length ? 2 : 0

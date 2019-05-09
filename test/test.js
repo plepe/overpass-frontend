@@ -4103,7 +4103,7 @@ describe('Overpass objects structure', function() {
     })
 
     it('Polygon: method intersects() - full geom', function (done) {
-      overpassFrontend.get('w313063304', { properties: OverpassFrontend.BBOX | OverpassFrontend.GEOM },
+      overpassFrontend.get('w313063304', { properties: OverpassFrontend.BBOX | OverpassFrontend.GEOM | OverpassFrontend.MEMBERS },
         function (err, result, index) {
           assert.equal(0, result.intersects(new BoundingBox({
               minlat: 48.20028,
@@ -4124,6 +4124,13 @@ describe('Overpass objects structure', function() {
               maxlat: 48.20096,
               minlon: 16.33709,
               maxlon: 16.33629
+            }
+          )))
+          assert.equal(2, result.intersects(new BoundingBox({
+              minlat: 48.2005,
+              maxlat: 48.2006,
+              minlon: 16.3371,
+              maxlon: 16.3372
             }
           )))
           assert.equal(0, result.intersects({
@@ -4162,6 +4169,19 @@ describe('Overpass objects structure', function() {
                 [ 16.33629, 48.20096 ],
                 [ 16.33709, 48.20096 ],
                 [ 16.33709, 48.20083 ]
+              ] ]
+            }
+          }))
+          assert.equal(2, result.intersects({
+            type: 'Feature',
+            geometry: {
+              type: "Polygon",
+              coordinates: [ [
+                [ 16.3371, 48.2005 ],
+                [ 16.3372, 48.2005 ],
+                [ 16.3372, 48.2006 ],
+                [ 16.3371, 48.2006 ],
+                [ 16.3371, 48.2005 ]
               ] ]
             }
           }))
@@ -4470,68 +4490,178 @@ describe('Overpass objects structure', function() {
       )
     })
 
+    it('Multipolygon: method intersects() - BBOX only', function (done) {
+      overpassFrontend.get('r167731', { properties: OverpassFrontend.BBOX },
+        function (err, result, index) {
+          assert.equal(1, result.intersects(new BoundingBox({
+              minlat: 48.2006,
+              maxlat: 48.2007,
+              minlon: 16.3362,
+              maxlon: 16.3364
+            }
+          )))
+          // inside
+          assert.equal(1, result.intersects(new BoundingBox({
+              minlat: 48.2010,
+              maxlat: 48.2011,
+              minlon: 16.3366,
+              maxlon: 16.3367
+            }
+          )))
+          assert.equal(1, result.intersects(new BoundingBox({
+              minlat: 48.2013,
+              maxlat: 48.2014,
+              minlon: 16.3366,
+              maxlon: 16.3367
+            }
+          )))
+          assert.equal(1, result.intersects(new BoundingBox({
+              minlat: 48.2012,
+              maxlat: 48.2013,
+              minlon: 16.3369,
+              maxlon: 16.33695
+            }
+          )))
+          assert.equal(1, result.intersects({
+            type: "Feature",
+            geometry: {
+              type: "Polygon",
+              coordinates: [ [
+                [ 16.3362, 48.2006 ],
+                [ 16.3364, 48.2006 ],
+                [ 16.3364, 48.2007 ],
+                [ 16.3362, 48.2007 ],
+                [ 16.3362, 48.2006 ]
+              ] ]
+            }
+          }))
+          assert.equal(1, result.intersects({
+            type: "Feature",
+            geometry: {
+              type: "Polygon",
+              coordinates: [ [
+                [ 16.3366, 48.2010 ],
+                [ 16.3367, 48.2010 ],
+                [ 16.3367, 48.2011 ],
+                [ 16.3366, 48.2011 ],
+                [ 16.3366, 48.2010 ]
+              ] ]
+            }
+          }))
+          assert.equal(1, result.intersects({
+            type: "Feature",
+            geometry: {
+              type: "Polygon",
+              coordinates: [ [
+                [ 16.3366, 48.2013 ],
+                [ 16.3367, 48.2013 ],
+                [ 16.3367, 48.2014 ],
+                [ 16.3366, 48.2014 ],
+                [ 16.3366, 48.2013 ]
+              ] ]
+            }
+          }))
+          assert.equal(1, result.intersects({
+            type: "Feature",
+            geometry: {
+              type: "Polygon",
+              coordinates: [ [
+                [ 16.3369, 48.2012 ],
+                [ 16.33695, 48.2012 ],
+                [ 16.33695, 48.2013 ],
+                [ 16.3369, 48.2013 ],
+                [ 16.3369, 48.2012 ]
+              ] ]
+            }
+          }))
+        },
+        function (err) {
+          done()
+        }
+      )
+    })
+
     it('Multipolygon: method intersects() - full geometry', function (done) {
       overpassFrontend.get('r167731', { properties: OverpassFrontend.ALL },
         function (err, result, index) {
-          console.log(JSON.stringify(result.GeoJSON()))
-          assert.equal('foo', 'bar')
+          assert.equal(0, result.intersects(new BoundingBox({
+              minlat: 48.2006,
+              maxlat: 48.2007,
+              minlon: 16.3362,
+              maxlon: 16.3364
+            }
+          )))
+          // inside
+          assert.equal(0, result.intersects(new BoundingBox({
+              minlat: 48.2010,
+              maxlat: 48.2011,
+              minlon: 16.3366,
+              maxlon: 16.3367
+            }
+          )))
           assert.equal(2, result.intersects(new BoundingBox({
-              minlat: 48.198,
-              maxlat: 48.199,
-              minlon: 16.338,
-              maxlon: 16.339
+              minlat: 48.2013,
+              maxlat: 48.2014,
+              minlon: 16.3366,
+              maxlon: 16.3367
             }
           )))
-          assert.equal(0, result.intersects(new BoundingBox({
-              minlat: 48.197,
-              maxlat: 48.198,
-              minlon: 16.338,
-              maxlon: 16.339
+          assert.equal(2, result.intersects(new BoundingBox({
+              minlat: 48.2012,
+              maxlat: 48.2013,
+              minlon: 16.3369,
+              maxlon: 16.33695
             }
           )))
-          assert.equal(0, result.intersects(new BoundingBox({
-              minlat: 48.1984,
-              maxlat: 48.1985,
-              minlon: 16.3384,
-              maxlon: 16.3385
+          assert.equal(0, result.intersects({
+            type: "Feature",
+            geometry: {
+              type: "Polygon",
+              coordinates: [ [
+                [ 16.3362, 48.2006 ],
+                [ 16.3364, 48.2006 ],
+                [ 16.3364, 48.2007 ],
+                [ 16.3362, 48.2007 ],
+                [ 16.3362, 48.2006 ]
+              ] ]
             }
-          )))
+          }))
+          assert.equal(0, result.intersects({
+            type: "Feature",
+            geometry: {
+              type: "Polygon",
+              coordinates: [ [
+                [ 16.3366, 48.2010 ],
+                [ 16.3367, 48.2010 ],
+                [ 16.3367, 48.2011 ],
+                [ 16.3366, 48.2011 ],
+                [ 16.3366, 48.2010 ]
+              ] ]
+            }
+          }))
           assert.equal(2, result.intersects({
             type: "Feature",
             geometry: {
               type: "Polygon",
               coordinates: [ [
-                [ 16.338, 48.198 ],
-                [ 16.339, 48.198 ],
-                [ 16.339, 48.199 ],
-                [ 16.338, 48.199 ],
-                [ 16.338, 48.198 ]
+                [ 16.3366, 48.2013 ],
+                [ 16.3367, 48.2013 ],
+                [ 16.3367, 48.2014 ],
+                [ 16.3366, 48.2014 ],
+                [ 16.3366, 48.2013 ]
               ] ]
             }
           }))
-          assert.equal(0, result.intersects({
+          assert.equal(2, result.intersects({
             type: "Feature",
             geometry: {
               type: "Polygon",
               coordinates: [ [
-                [ 16.338, 48.197 ],
-                [ 16.339, 48.197 ],
-                [ 16.339, 48.198 ],
-                [ 16.338, 48.198 ],
-                [ 16.338, 48.197 ]
-              ] ]
-            }
-          }))
-          assert.equal(0, result.intersects({
-            type: "Feature",
-            geometry: {
-              type: "Polygon",
-              coordinates: [ [
-                [ 16.3384, 48.1984 ],
-                [ 16.3385, 48.1984 ],
-                [ 16.3385, 48.1985 ],
-                [ 16.3384, 48.1985 ],
-                [ 16.3384, 48.1984 ]
+                [ 16.3369, 48.2012 ],
+                [ 16.33695, 48.2012 ],
+                [ 16.33695, 48.2013 ],
+                [ 16.3369, 48.2013 ],
+                [ 16.3369, 48.2012 ]
               ] ]
             }
           }))
@@ -4559,14 +4689,14 @@ describe('Overpass objects structure', function() {
     it('method intersects()', function (done) {
       overpassFrontend.get('r20313', { properties: OverpassFrontend.BBOX },
         function (err, result, index) {
-          assert.equal(0, result.intersects(new BoundingBox({
+          assert.equal(1, result.intersects(new BoundingBox({
               minlat: 48.198,
               maxlat: 48.199,
               minlon: 16.338,
               maxlon: 16.339
             }
           )))
-          assert.equal(0, result.intersects(new BoundingBox({
+          assert.equal(1, result.intersects(new BoundingBox({
               minlat: 48.197,
               maxlat: 48.198,
               minlon: 16.338,

@@ -7,8 +7,12 @@ var OverpassObject = require('./OverpassObject')
 var OverpassFrontend = require('./defines')
 const geojsonShiftWorld = require('./geojsonShiftWorld')
 var turf = {
-  bboxClip: require('@turf/bbox-clip').default
+  intersect: require('@turf/intersect').default,
+  lineIntersect: require('@turf/line-intersect').default,
+  pointsWithinPolygon: require('@turf/points-within-polygon').default
 }
+
+const isGeoJSON = require('./isGeoJSON')
 
 /**
  * A relation
@@ -423,8 +427,6 @@ class OverpassRelation extends OverpassObject {
   }
 
   intersects (bbox) {
-    var i
-
     if (this.bounds) {
       if (!this.bounds.intersects(bbox)) {
         return 0
@@ -434,10 +436,66 @@ class OverpassRelation extends OverpassObject {
       }
     }
 
+    // special handling for multipolygons
+    if (this.geometry) {
+      let bboxGeojson
+      if (isGeoJSON(bbox)) {
+        bboxGeojson = bbox
+      } else {
+        bboxGeojson = bbox.toGeoJSON()
+      }
+
+      for (let i = 0; i < this.geometry.features.length; i++) {
+        var g = this.geometry.features[i]
+        let intersection
+
+        switch (g.geometry.type) {
+          case 'Point':
+            intersection = turf.pointsWithinPolygon(g, bboxGeojson)
+            if (intersection.features.length) {
+              return 2
+            }
+            break
+          case 'LineString':
+          case 'MultiLineString':
+            intersection = turf.lineIntersect(g, bboxGeojson)
+            if (intersection.features.length) {
+              return 2
+            }
+            break
+          case 'Polygon':
+          case 'MultiPolygon':
+            intersection = turf.intersect(g, bboxGeojson)
+            if (intersection && intersection.geometry.coordinates.length) {
+              return 2
+            }
+            break
+          default:
+            console.error('OverpassRelation.intersects(): don\'t know how to handle geometry type ' + g.geometry.type)
+        }
+      }
+
+      // if there's a relation member (where Overpass does not return the
+      // geometry) we can't know if the geometry intersects -> return 1
+      for (let i = 0; i < this.data.members.length; i++) {
+        if (this.data.members[i].type === 'relation') {
+          return 1
+        }
+      }
+
+      // Geometry is not fully known yet, we can't say no (yet)
+      if (!(this.properties & OverpassFrontend.GEOM)) {
+        return 1
+      }
+
+      // if there's no relation member we can be sure there's no intersection
+      return 0
+    }
+
     if (this.members) {
       let maybeMatch = 0
 
-      for (i in this.members) {
+      for (let i in this.members) {
         let memberId = this.members[i].id
         let member = this.overpass.cacheElements[memberId]
 
