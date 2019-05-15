@@ -17,6 +17,7 @@ var RequestMulti = require('./RequestMulti')
 var defines = require('./defines')
 var loadOsmFile = require('./loadOsmFile')
 var copyOsm3sMetaFrom = require('./copyOsm3sMeta')
+const timestamp = require('./timestamp')
 const Filter = require('./Filter')
 
 /**
@@ -97,6 +98,7 @@ class OverpassFrontend {
     this.cacheElements = {}
     this.cacheElementsMemberOf = {}
     this.cacheBBoxQueries = {}
+    this.cacheTimestamp = timestamp()
     this.db.clear()
 
     // Set default properties
@@ -227,7 +229,7 @@ class OverpassFrontend {
 
   _overpassProcess () {
     // currently active - we'll come back later :-)
-    if (this.requestIsActive || !this.ready) {
+    if (!this.ready) {
       return
     }
 
@@ -235,8 +237,9 @@ class OverpassFrontend {
     // e.g. call featureCallback for elements which were received in the
     // meantime
     this.requests.forEach(request => {
-      if (request) {
+      if (request && request.timestampPreprocess < this.cacheTimestamp) {
         request.preprocess()
+        request.timestampPreprocess = this.cacheTimestamp
 
         if (request.mayFinish() || this.localOnly) {
           request.finish()
@@ -244,6 +247,11 @@ class OverpassFrontend {
       }
     })
     this.requests = removeNullEntries(this.requests)
+
+    // currently active - we'll come back later :-)
+    if (this.requestIsActive || !this.ready) {
+      return
+    }
 
     // nothing todo ...
     if (!this.requests.length) {
@@ -452,6 +460,8 @@ class OverpassFrontend {
         this.db.update(ob.dbInsert())
       }
     }
+
+    this.cacheTimestamp = timestamp()
 
     this.pendingNotifies()
 
