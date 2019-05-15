@@ -35,6 +35,7 @@ class Request {
     this.finalCallback = callbacks.final.bind(callbacks)
 
     this.callCount = 0
+    this.timestampPreprocess = 0
   }
 
   /**
