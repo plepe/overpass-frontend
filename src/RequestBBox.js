@@ -58,7 +58,6 @@ class RequestBBox extends Request {
     }
 
     this.loadFinish = false
-    this.lastChecked = 0
 
     if ('members' in this.options) {
       RequestBBoxMembers(this)
@@ -83,7 +82,6 @@ class RequestBBox extends Request {
       this.overpass.cacheBBoxQueries[this.query] = {}
       this.cache = this.overpass.cacheBBoxQueries[this.query]
       this.cache.requested = new KnownArea()
-      this.cache.timestamp = 0
 
       if (filterId) {
         this.cache.filter = {}
@@ -97,13 +95,6 @@ class RequestBBox extends Request {
    * check if there are any map features which can be returned right now
    */
   preprocess () {
-    if (this.lastChecked > this.cache.timestamp) {
-      if (!this.needLoad()) {
-        return
-      }
-    }
-    this.lastChecked = new Date().getTime()
-
     var items = []
     if (this.lokiQuery) {
       items = this.overpass.db.find(this.lokiQuery)
@@ -263,8 +254,6 @@ class RequestBBox extends Request {
    */
   finishSubRequest (subRequest) {
     super.finishSubRequest(subRequest)
-
-    this.cache.timestamp = new Date().getTime()
 
     if (('effortSplit' in this.options && this.options.effortSplit > subRequest.parts[0].count) ||
         (this.options.split > subRequest.parts[0].count)) {
