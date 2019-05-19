@@ -262,3 +262,297 @@ describe('Lon180 (query objects near lon180)', function() {
   })
 
 })
+
+describe('Lon180 with GeoJSON bounds (query objects near lon180)', function() {
+  it('Clear cache', function (done) {
+    overpassFrontend.clearCache()
+    done()
+  })
+
+  it('All lakes (not cached)', function (done) {
+    var finalCalled = 0
+    var expected = [ 'w660439767', 'r3237099', 'w62065034', 'w62065032' ]
+    var found = []
+    var error = ''
+
+    var expectedSubRequestCount = 2
+    var foundSubRequestCount = 0
+
+    function compileListener (subrequest) {
+      foundSubRequestCount++
+    }
+
+    let request = overpassFrontend.BBoxQuery(
+      "nwr[natural=water]",
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "MultiPolygon",
+          "coordinates": [
+            [ [
+              [ 179, 65 ],
+              [ 179, 66 ],
+              [ 180, 66 ],
+              [ 180, 65 ],
+              [ 179, 65 ]
+            ] ],
+            [ [
+              [ -180, 65 ],
+              [ -180, 66 ],
+              [ -179, 66 ],
+              [ -179, 65 ],
+              [ -180, 65 ]
+            ] ]
+          ]
+        }
+      },
+      {
+          properties: OverpassFrontend.MEMBERS | OverpassFrontend.GEOM | OverpassFrontend.TAGS
+      },
+      function (err, result) {
+        found.push(result.id)
+
+        if (expected.indexOf(result.id) === -1) {
+          error += 'Unexpected result ' + result.id + '\n'
+        }
+      },
+      function (err) {
+        assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
+        if (err) {
+          return done(err)
+        }
+
+        if (error) {
+          return done(error)
+        }
+
+        if (found.length !== expected.length) {
+          return done('Wrong count of objects returned:\n' +
+               'Expected: ' + expected.join(', ') + '\n' +
+               'Found: ' + found.join(', '))
+        }
+
+        assert.equal(overpassFrontend.hasStretchLon180, true)
+
+        assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
+
+        request.off('subrequest-compile', compileListener)
+
+        done()
+      }
+    )
+
+    request.on('subrequest-compile', compileListener)
+  })
+
+  it('All lakes (fully cached)', function (done) {
+    var finalCalled = 0
+    var expected = [ 'w660439767', 'r3237099', 'w62065034', 'w62065032' ]
+    var found = []
+    var error = ''
+
+    var expectedSubRequestCount = 0
+    var foundSubRequestCount = 0
+
+    function compileListener (subrequest) {
+      foundSubRequestCount++
+    }
+
+    let request = overpassFrontend.BBoxQuery(
+      "nwr[natural=water]",
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "MultiPolygon",
+          "coordinates": [
+            [ [
+              [ 179, 65 ],
+              [ 179, 66 ],
+              [ 180, 66 ],
+              [ 180, 65 ],
+              [ 179, 65 ]
+            ] ],
+            [ [
+              [ -180, 65 ],
+              [ -180, 66 ],
+              [ -179, 66 ],
+              [ -179, 65 ],
+              [ -180, 65 ]
+            ] ]
+          ]
+        }
+      },
+      {
+          properties: OverpassFrontend.MEMBERS | OverpassFrontend.GEOM | OverpassFrontend.TAGS
+      },
+      function (err, result) {
+        found.push(result.id)
+
+        if (expected.indexOf(result.id) === -1) {
+          error += 'Unexpected result ' + result.id + '\n'
+        }
+      },
+      function (err) {
+        assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
+        if (err) {
+          return done(err)
+        }
+
+        if (error) {
+          return done(error)
+        }
+
+        if (found.length !== expected.length) {
+          return done('Wrong count of objects returned:\n' +
+               'Expected: ' + expected.join(', ') + '\n' +
+               'Found: ' + found.join(', '))
+        }
+
+        assert.equal(overpassFrontend.hasStretchLon180, true)
+
+        assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
+
+        request.off('subrequest-compile', compileListener)
+
+        done()
+      }
+    )
+
+    request.on('subrequest-compile', compileListener)
+  })
+
+  it('Western part (fully cached)', function (done) {
+    var finalCalled = 0
+    var expected = [ 'w660439767', 'r3237099' ]
+    var found = []
+    var error = ''
+
+    var expectedSubRequestCount = 0
+    var foundSubRequestCount = 0
+
+    function compileListener (subrequest) {
+      foundSubRequestCount++
+    }
+
+    let request = overpassFrontend.BBoxQuery(
+      "nwr[natural=water]",
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [ [
+            [ 179, 65 ],
+            [ 179, 66 ],
+            [ 180, 66 ],
+            [ 180, 65 ],
+            [ 179, 65 ]
+          ] ]
+        }
+      },
+      {
+          properties: OverpassFrontend.MEMBERS | OverpassFrontend.GEOM | OverpassFrontend.TAGS
+      },
+      function (err, result) {
+        found.push(result.id)
+
+        if (expected.indexOf(result.id) === -1) {
+          error += 'Unexpected result ' + result.id + '\n'
+        }
+      },
+      function (err) {
+        assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
+        if (err) {
+          return done(err)
+        }
+
+        if (error) {
+          return done(error)
+        }
+
+        if (found.length !== expected.length) {
+          return done('Wrong count of objects returned:\n' +
+               'Expected: ' + expected.join(', ') + '\n' +
+               'Found: ' + found.join(', '))
+        }
+
+        assert.equal(overpassFrontend.hasStretchLon180, true)
+
+        assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
+
+        request.off('subrequest-compile', compileListener)
+
+        done()
+      }
+    )
+
+    request.on('subrequest-compile', compileListener)
+  })
+
+  it('Eastern part (fully cached)', function (done) {
+    var finalCalled = 0
+    var expected = [ 'r3237099', 'w62065034', 'w62065032' ]
+    var found = []
+    var error = ''
+
+    var expectedSubRequestCount = 0
+    var foundSubRequestCount = 0
+
+    function compileListener (subrequest) {
+      foundSubRequestCount++
+    }
+
+    let request = overpassFrontend.BBoxQuery(
+      "nwr[natural=water]",
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [ [
+            [ -179, 65 ],
+            [ -179, 66 ],
+            [ -180, 66 ],
+            [ -180, 65 ],
+            [ -179, 65 ]
+          ] ]
+        }
+      },
+      {
+          properties: OverpassFrontend.MEMBERS | OverpassFrontend.GEOM | OverpassFrontend.TAGS
+      },
+      function (err, result) {
+        found.push(result.id)
+
+        if (expected.indexOf(result.id) === -1) {
+          error += 'Unexpected result ' + result.id + '\n'
+        }
+      },
+      function (err) {
+        assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
+        if (err) {
+          return done(err)
+        }
+
+        if (error) {
+          return done(error)
+        }
+
+        if (found.length !== expected.length) {
+          return done('Wrong count of objects returned:\n' +
+               'Expected: ' + expected.join(', ') + '\n' +
+               'Found: ' + found.join(', '))
+        }
+
+        assert.equal(overpassFrontend.hasStretchLon180, true)
+
+        assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
+
+        request.off('subrequest-compile', compileListener)
+
+        done()
+      }
+    )
+
+    request.on('subrequest-compile', compileListener)
+  })
+
+})

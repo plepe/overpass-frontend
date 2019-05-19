@@ -27,7 +27,7 @@
     "@turf/points-within-polygon": "^5.1.5",
     "@turf/union": "^6.0.0",
     "async": "*",
-    "boundingbox": "^1.0.0",
+    "boundingbox": "^1.2.0",
     "browserify-shim": "^3.8.14",
     "bzip2": "^0.1.1",
     "event-emitter": "^0.3.5",
