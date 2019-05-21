@@ -13,6 +13,7 @@ var turf = {
 }
 
 const isGeoJSON = require('./isGeoJSON')
+const isBoundingBox = require('./isBoundingBox')
 
 /**
  * A relation
@@ -431,7 +432,7 @@ class OverpassRelation extends OverpassObject {
       if (!this.bounds.intersects(bbox)) {
         return 0
       }
-      if (this.bounds.within(bbox)) {
+      if (isBoundingBox(bbox) && this.bounds.within(bbox)) {
         return 2
       }
     }
