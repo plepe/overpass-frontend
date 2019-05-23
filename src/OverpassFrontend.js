@@ -44,6 +44,14 @@ const isGeoJSON = require('./isGeoJSON')
  */
 
 /**
+ * When an object got received from Overpass API
+ * @event OverpassFrontend#receive-object
+ * @param {OverpassNode|OverpassWay|OverpassRelation} object The object which got received.
+ * @param {Request} request - Current request
+ * @param {Request#SubRequest} part - Current subrequest
+ */
+
+/**
  * A connection to an Overpass API Server or an OpenStreetMap file
  * @param {string} url The URL of the API, e.g. 'https://overpass-api.de/api/'. If you omit the protocol, it will use the protocol which is in use for the current page (or https: on nodejs): '//overpass-api.de/api/'. If the url ends in .json, .osm or .osm.bz2 it will load this OpenStreetMap file and use the data from there.
  * @param {object} options Options
@@ -432,6 +440,8 @@ class OverpassFrontend {
         }
       }
 
+      this.emit('receive-object', ob, request, part)
+
       part.count++
       if (part.receiveObject) {
         part.receiveObject(ob)
@@ -678,6 +688,7 @@ class OverpassFrontend {
     }
 
     this.cacheElements[id] = ob
+
     return ob
   }
 
