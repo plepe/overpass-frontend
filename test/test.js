@@ -874,6 +874,55 @@ describe('Overpass get', function() {
       request.on('subrequest-compile', compileListener)
     })
 
+    it('should return a list of node features (fully cached - bounds within same bbox)', function(done) {
+      var finalCalled = 0
+      var found = []
+      var expected = [ "n3037893160", "n3037893161", "n3037893162", "n3037893163", "n3037893164", "n3037882438", "n3037882439", "n3037893159" ]
+      var expectedSubRequestCount = 0
+      var foundSubRequestCount = 0
+
+      function compileListener (subrequest) {
+        foundSubRequestCount++
+      }
+
+      var request = overpassFrontend.BBoxQuery(
+        'node[amenity=bench];',
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "Polygon",
+            "coordinates": [ [
+              [ 16.338107585906982, 48.19878974587783 ],
+              [ 16.33879691362381, 48.199175913895694 ],
+              [ 16.338405311107635, 48.1992742432501 ],
+              [ 16.338107585906982, 48.1992742432501 ],
+              [ 16.338107585906982, 48.19878974587783 ]
+            ] ]
+          }
+        },
+        {
+          properties: OverpassFrontend.TAGS
+        },
+        function(err, result, index) {
+          found.push(result.id)
+
+          if(expected.indexOf(result.id) == -1)
+            assert.fail('Object ' + result.id + ' should not be found!')
+        },
+        function(err) {
+          console.log(found)
+          assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
+          assert.equal(expected.length, found.length, 'Wrong count of objects found!')
+          assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
+
+          request.off('subrequest-compile', compileListener)
+          done()
+        }
+      )
+
+      request.on('subrequest-compile', compileListener)
+    })
+
     it('should return a list of node features (fully cached)', function(done) {
       var finalCalled = 0
       var found = []
@@ -915,6 +964,62 @@ describe('Overpass get', function() {
           assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
 
           request.off('subrequest-compile', compileListener)
+          done()
+        }
+      )
+
+      request.on('subrequest-compile', compileListener)
+    })
+
+    it('should return a list of node features (partly cached - should not re-request loaded objects)', function(done) {
+      var finalCalled = 0
+      var found = []
+      var expected = ["n3037893161", "n3037893162", "n3037893163", "n3037893164"]
+      var expectedSubRequestCount = 1
+      var foundSubRequestCount = 0
+
+      function compileListener (subrequest) {
+        foundSubRequestCount++
+      }
+
+      function receiveObject (ob) {
+        assert.equal(true, false, 'Should receive an empty result set!')
+      }
+
+      overpassFrontend.on('receive-object', receiveObject)
+
+      var request = overpassFrontend.BBoxQuery(
+        'node[amenity=bench];',
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "Polygon",
+            "coordinates": [ [
+              [ 16.338107585906982, 48.19878974587783 ],
+              [ 16.33889691362381, 48.199175913895694 ],
+              [ 16.338405311107635, 48.1992742432501 ],
+              [ 16.338107585906982, 48.19878974587783 ]
+            ] ]
+          }
+        },
+        {
+          properties: OverpassFrontend.TAGS
+        },
+        function(err, result, index) {
+          found.push(result.id)
+
+          if(expected.indexOf(result.id) == -1)
+            assert.fail('Object ' + result.id + ' should not be found!')
+        },
+        function(err) {
+          console.log(found)
+          assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
+          console.log(found)
+          assert.equal(expected.length, found.length, 'Wrong count of objects found!')
+          assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
+
+          request.off('subrequest-compile', compileListener)
+          overpassFrontend.off('receive-object', receiveObject)
           done()
         }
       )

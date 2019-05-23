@@ -122,13 +122,22 @@ class RequestBBox extends Request {
       }
 
       // also check the object directly if it intersects the bbox - if possible
-      if (ob.intersects(this.origBounds) < 2) {
-        continue
+      switch (ob.intersects(this.origBounds)) {
+        case 0:
+          // surely not included - we can skip this object (but mark it, so we
+          // don't include it in the database request)
+          this.doneFeatures[id] = ob
+          continue
+        case 1:
+          // not sure - let's query again
+          continue
+        case 2:
+          // object matches bounds -> this could be a result :-)
+          break
       }
 
       if ((this.options.properties & ob.properties) === this.options.properties) {
         this.doneFeatures[id] = ob
-
         this.featureCallback(null, ob)
       }
     }
