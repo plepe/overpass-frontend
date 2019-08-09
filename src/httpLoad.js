@@ -22,7 +22,7 @@ function httpLoad (url, getParam, postParam, callback) {
         callback(err, data)
       } else {
         try {
-          err = JSON.parse(req.responseText)
+          err = new Error(JSON.parse(req.responseText))
         } catch (err) {
           if (req.responseText.search('OSM3S Response') !== -1) {
             var lines = req.responseText.split(/\n/)
@@ -40,9 +40,15 @@ function httpLoad (url, getParam, postParam, callback) {
               e = 'Got error ' + req.status
             }
 
-            callback(e, null)
+            let error = new Error(e)
+            error.status = req.status
+
+            callback(error, null)
           } else {
-            callback(req.responseText, null)
+            let error = new Error(req.responseText)
+            error.status = req.status
+
+            callback(error, null)
           }
         }
       }
