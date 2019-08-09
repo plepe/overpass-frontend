@@ -51,6 +51,7 @@ const Filter = require('./Filter')
  * @param {number} [options.effortWay=4] The effort for request a way.
  * @param {number} [options.effortRelation=64] The effort for request a relation.
  * @param {number} [options.timeGap=10] A short time gap between two requests to the Overpass API (milliseconds).
+ * @param {number} [options.timeGap429=1000] A longer time after a 429 response from Overpass API (milliseconds).
  * @param {number} [options.loadChunkSize=1000] When loading a file (instead connecting to an Overpass URL) load elements in chunks of n items.
  * @property {boolean} hasStretchLon180=false Are there any map features in the cache which stretch over lon=180/-180?
  */
@@ -63,6 +64,7 @@ class OverpassFrontend {
       effortWay: 4,
       effortRelation: 64,
       timeGap: 10,
+      timeGap429: 1000,
       loadChunkSize: 1000
     }
     for (var k in options) {
@@ -362,7 +364,16 @@ class OverpassFrontend {
 
       if (this.errorCount <= 3) {
         // retry
-        this._overpassProcess()
+        if (err.status === 404) {
+          this.requestIsActive = true
+
+          global.setTimeout(() => {
+            this.requestIsActive = false
+            this._overpassProcess()
+          }, this.options.timeGap429 - this.options.timeGap)
+        } else {
+          this._overpassProcess()
+        }
       } else {
         // abort
         // call finalCallback for the request
