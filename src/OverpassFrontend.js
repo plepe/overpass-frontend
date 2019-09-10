@@ -364,7 +364,7 @@ class OverpassFrontend {
 
       if (this.errorCount <= 3) {
         // retry
-        if (err.status === 404) {
+        if (err.status === 429) {
           this.requestIsActive = true
 
           global.setTimeout(() => {
