@@ -158,7 +158,7 @@ function parse (def) {
         if (m[1] === 'rel') {
           result.push({ type: 'relation' })
         } else if (m[1] === 'nwr') {
-            // nothing
+          // nothing
         } else {
           result.push({ type: m[1] })
         }
@@ -222,7 +222,7 @@ function parse (def) {
 
         op = m[1] === '^' ? 'has'
           : m[1] === '%' ? 'strsearch'
-          : m[1]
+            : m[1]
         mode = 13
         def = def.slice(m[0].length)
       } else {

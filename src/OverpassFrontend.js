@@ -673,19 +673,19 @@ class OverpassFrontend {
 
   regexpEscape (str) {
     return str.replace('\\', '\\\\')
-         .replace('.', '\\.')
-         .replace('|', '\\|')
-         .replace('[', '\\[')
-         .replace(']', '\\]')
-         .replace('(', '\\(')
-         .replace(')', '\\)')
-         .replace('{', '\\{')
-         .replace('}', '\\}')
-         .replace('?', '\\?')
-         .replace('+', '\\+')
-         .replace('*', '\\*')
-         .replace('^', '\\^')
-         .replace('$', '\\$')
+      .replace('.', '\\.')
+      .replace('|', '\\|')
+      .replace('[', '\\[')
+      .replace(']', '\\]')
+      .replace('(', '\\(')
+      .replace(')', '\\)')
+      .replace('{', '\\{')
+      .replace('}', '\\}')
+      .replace('?', '\\?')
+      .replace('+', '\\+')
+      .replace('*', '\\*')
+      .replace('^', '\\^')
+      .replace('$', '\\$')
   }
 }
 
