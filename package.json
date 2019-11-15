@@ -24,7 +24,7 @@
     "@turf/difference": "^6.0.0",
     "@turf/intersect": "^6.0.0",
     "@turf/union": "^6.0.0",
-    "async": "*",
+    "async": "^2.6.2",
     "boundingbox": "^1.0.0",
     "browserify-shim": "^3.8.14",
     "bzip2": "^0.1.1",
