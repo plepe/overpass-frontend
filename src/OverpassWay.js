@@ -69,21 +69,6 @@ class OverpassWay extends OverpassObject {
 
         memberOb.notifyMemberOf(this, null, i)
       }
-
-      if (!this.geometry) {
-        this.geometry = this.members.map(
-          member => {
-            let node = this.overpass.cacheElements[member.id]
-            if (node) {
-              return node.geometry
-            }
-          }
-        )
-
-        if (!this.geometry.length) {
-          delete this.geometry
-        }
-      }
     }
 
     this.checkGeometry()
@@ -92,48 +77,35 @@ class OverpassWay extends OverpassObject {
   notifyMemberUpdate (memberObs) {
     super.notifyMemberUpdate(memberObs)
 
-    if (!this.members) {
-      return
-    }
-
-    memberObs.forEach(memberOb => {
-      this.members.forEach((member, index) => {
-        if (memberOb.id === member.id) {
-          if (memberOb.geometry) {
-            if (!this.geometry) {
-              this.geometry = new Array(this.members.length)
-            }
-
-            this.geometry[index] = memberOb.geometry
-          }
-        }
-
-        if (this.bounds) {
-          this.bounds.extend(memberOb.geometry)
-        } else {
-          this.bounds = new BoundingBox(memberOb.geometry)
-        }
-      })
-    })
-
     this.checkGeometry()
   }
 
   checkGeometry () {
-    if (this.geometry) {
-      let filteredGeometry = this.geometry.filter(geom => geom)
-      if (filteredGeometry.length === this.geometry.length) {
-        this.properties = this.properties | OverpassFrontend.GEOM
 
-        if (!this.bounds) {
-          this.bounds = new BoundingBox(this.geometry[0])
-          this.geometry.slice(1).forEach(geom => this.bounds.extend(geom))
-          this.center = this.bounds.getCenter()
-          this.properties = this.properties | OverpassFrontend.BBOX | OverpassFrontend.CENTER
+    if (this.members && (this.properties & OverpassFrontend.GEOM) === 0) {
+      this.geometry = this.members.map(
+        member => {
+          let node = this.overpass.cacheElements[member.id]
+          if (node) {
+            return node.geometry
+          }
         }
-      } else {
-        this.geometry = filteredGeometry.length ? filteredGeometry : null
+      ).filter(geom => geom)
+
+      if (this.geometry.length === 0) {
+        delete this.geometry
+        return
       }
+    }
+
+    if (this.geometry && (this.properties & OverpassFrontend.BBOX) === 0) {
+      this.bounds = new BoundingBox(this.geometry[0])
+      this.geometry.slice(1).forEach(geom => this.bounds.extend(geom))
+      this.center = this.bounds.getCenter()
+    }
+
+    if ((this.properties & OverpassFrontend.GEOM) === OverpassFrontend.GEOM || (this.members && this.geometry.length === this.members.length)) {
+      this.properties = this.properties | OverpassFrontend.GEOM | OverpassFrontend.BBOX | OverpassFrontend.CENTER
     }
   }
 

@@ -3405,7 +3405,7 @@ describe('notifyMemberUpdate', function () {
       )
     })
 
-    it('Load one of the nodes -> geometry of way should be partly known', (done) => {
+    it('Load one of the nodes -> geometry of way should be partly known (shortened)', (done) => {
       overpassFrontend.get('n252548491',
         {
           properties: OverpassFrontend.GEOM
@@ -3417,7 +3417,8 @@ describe('notifyMemberUpdate', function () {
         },
         (err) => {
           assert.equal(way.properties, OverpassFrontend.TAGS | OverpassFrontend.MEMBERS, 'Way: Only TAGS and MEMBERS should be known')
-          assert.deepEqual(way.geometry[1], { lat: 48.1983261, lon: 16.3382355 }, 'Geometry should be partly known')
+          assert.deepEqual(way.geometry.length, 1, 'Geometry should be partly known')
+          assert.deepEqual(way.geometry[0], { lat: 48.1983261, lon: 16.3382355 }, 'Geometry should be partly known')
           assert.deepEqual(way.bounds, { minlat: 48.1983261, maxlat: 48.1983261, minlon: 16.3382355, maxlon: 16.3382355 }, 'Bounds should not be known')
 
           done(err)
