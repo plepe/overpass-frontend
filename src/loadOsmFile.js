@@ -80,6 +80,7 @@ module.exports = function loadOsmFile (url, callback) {
     req.responseType = 'arraybuffer'
   }
 
+  req.overrideMimeType('text/xml')
   req.open('GET', url)
   req.send()
 }
