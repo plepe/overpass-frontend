@@ -79,7 +79,6 @@ class OverpassWay extends OverpassObject {
             }
           }
         )
-        this.geometry = this.geometry.filter(geom => geom)
 
         if (!this.geometry.length) {
           delete this.geometry
@@ -87,16 +86,7 @@ class OverpassWay extends OverpassObject {
       }
     }
 
-    if (this.geometry && this.geometry.filter(geom => geom).length === this.geometry.length) {
-      this.properties = this.properties | OverpassFrontend.GEOM
-
-      if (!this.bounds) {
-        this.bounds = new BoundingBox(this.geometry[0])
-        this.geometry.slice(1).forEach(geom => this.bounds.extend(geom))
-        this.center = this.bounds.getCenter()
-        this.properties = this.properties | OverpassFrontend.BBOX | OverpassFrontend.CENTER
-      }
-    }
+    this.checkGeometry()
   }
 
   notifyMemberUpdate (memberObs) {
@@ -126,10 +116,24 @@ class OverpassWay extends OverpassObject {
       })
     })
 
-    // all nodes known -> set bbox, geom and center
-    if (this.geometry && this.geometry.filter(geom => geom).length === this.geometry.length) {
-      this.center = this.bounds.getCenter()
-      this.properties = this.properties | OverpassFrontend.BBOX | OverpassFrontend.GEOM | OverpassFrontend.CENTER
+    this.checkGeometry()
+  }
+
+  checkGeometry () {
+    if (this.geometry) {
+      let filteredGeometry = this.geometry.filter(geom => geom)
+      if (filteredGeometry.length === this.geometry.length) {
+        this.properties = this.properties | OverpassFrontend.GEOM
+
+        if (!this.bounds) {
+          this.bounds = new BoundingBox(this.geometry[0])
+          this.geometry.slice(1).forEach(geom => this.bounds.extend(geom))
+          this.center = this.bounds.getCenter()
+          this.properties = this.properties | OverpassFrontend.BBOX | OverpassFrontend.CENTER
+        }
+      } else {
+        this.geometry = filteredGeometry.length ? filteredGeometry : null
+      }
     }
   }
 
