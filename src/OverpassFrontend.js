@@ -124,6 +124,8 @@ class OverpassFrontend {
           chunks.push(result.elements.slice(i, i + this.options.loadChunkSize))
         }
 
+        // collect all objects, so they can be completed later-on
+        let obs = []
         async.eachLimit(
           chunks,
           1,
@@ -135,8 +137,7 @@ class OverpassFrontend {
                   properties: OverpassFrontend.TAGS | OverpassFrontend.META | OverpassFrontend.MEMBERS
                 })
 
-                // Set objects to fully known, as no more data can be loaded from the file
-                ob.properties |= OverpassFrontend.ALL
+                obs.push(ob)
               }
             )
 
@@ -144,6 +145,11 @@ class OverpassFrontend {
           },
           (err) => {
             this.pendingNotifies()
+
+            // Set objects to fully known, as no more data can be loaded from the file
+            obs.forEach(ob => {
+              ob.properties |= OverpassFrontend.ALL
+            })
 
             if (err) {
               console.log('Error loading file', err)
