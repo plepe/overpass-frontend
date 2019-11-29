@@ -96,16 +96,23 @@ class OverpassWay extends OverpassObject {
         delete this.geometry
         return
       }
+
+      if (this.geometry.length === this.members.length) {
+        this.properties = this.properties | OverpassFrontend.GEOM
+      }
     }
 
     if (this.geometry && (this.properties & OverpassFrontend.BBOX) === 0) {
       this.bounds = new BoundingBox(this.geometry[0])
       this.geometry.slice(1).forEach(geom => this.bounds.extend(geom))
+    }
+
+    if (this.bounds && (this.properties & OverpassFrontend.CENTER) === 0) {
       this.center = this.bounds.getCenter()
     }
 
-    if ((this.properties & OverpassFrontend.GEOM) === OverpassFrontend.GEOM || (this.members && this.geometry.length === this.members.length)) {
-      this.properties = this.properties | OverpassFrontend.GEOM | OverpassFrontend.BBOX | OverpassFrontend.CENTER
+    if ((this.properties & OverpassFrontend.GEOM) === OverpassFrontend.GEOM) {
+      this.properties = this.properties | OverpassFrontend.BBOX | OverpassFrontend.CENTER
     }
   }
 
