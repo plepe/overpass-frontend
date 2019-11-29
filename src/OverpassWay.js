@@ -81,7 +81,6 @@ class OverpassWay extends OverpassObject {
   }
 
   checkGeometry () {
-
     if (this.members && (this.properties & OverpassFrontend.GEOM) === 0) {
       this.geometry = this.members.map(
         member => {
