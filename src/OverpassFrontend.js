@@ -34,6 +34,7 @@ const Filter = require('./Filter')
  * @param {string} osm3sMeta.generator Data generator
  * @param {string} osm3sMeta.timestamp_osm_base RFC8601 timestamp of OpenStreetMap data
  * @param {string} osm3sMeta.copyright Copyright statement
+ * @param {BoundingBox} [osm3sMeta.bounds] Bounding Box (only when loading from file)
  */
 
 /**
@@ -149,6 +150,11 @@ class OverpassFrontend {
             // Set objects to fully known, as no more data can be loaded from the file
             obs.forEach(ob => {
               ob.properties |= OverpassFrontend.ALL
+              if (osm3sMeta.bounds) {
+                osm3sMeta.bounds.extend(ob.bounds)
+              } else {
+                osm3sMeta.bounds = new BoundingBox(ob.bounds)
+              }
             })
 
             if (err) {

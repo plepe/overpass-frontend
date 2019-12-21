@@ -13,7 +13,16 @@ describe('load file', function() {
     this.timeout(20000)
     overpassFrontend = new OverpassFrontend('test/data.osm.bz2')
     overpassFrontend.once('load', (osm3sMeta) => {
-      assert.deepEqual(osm3sMeta, { version: 0.6, generator: 'JOSM' })
+      assert.deepEqual(osm3sMeta, {
+        version: 0.6,
+        generator: 'JOSM',
+        bounds: {
+          maxlat: 65.86605,
+          maxlon: 180,
+          minlat: 48.1817041,
+          minlon: -180
+        }
+      })
       done()
     })
   })
