@@ -212,10 +212,12 @@ class OverpassRelation extends OverpassObject {
             this.bounds = new BoundingBox(ob.bounds)
           }
         }
+        if (this.bounds) {
+          this.center = this.bounds.getCenter()
+        }
       })
 
       if (this.bounds && allKnown) {
-        this.center = this.bounds.getCenter()
         this.properties = this.properties | OverpassFrontend.BBOX | OverpassFrontend.CENTER
       }
     }
