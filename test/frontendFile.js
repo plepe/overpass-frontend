@@ -18,9 +18,9 @@ describe('load file', function() {
         generator: 'JOSM',
         bounds: {
           maxlat: 65.86605,
-          maxlon: 180,
+          maxlon: -179.95772720000002,
           minlat: 48.1817041,
-          minlon: -180
+          minlon: 16.2551849
         }
       })
       done()
