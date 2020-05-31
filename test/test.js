@@ -819,6 +819,87 @@ describe('Overpass get', function() {
         done()
       })
     })
+    it('key regexp matches (not cached)', function(done) {
+      OverpassFrontend.clearCache()
+      var finalCalled = 0
+      var found = []
+      var expected = [ 'n3037893162', 'n3037893163', 'n3037893164' ]
+      var expectedSubRequestCount = 1
+      var foundSubRequestCount = 0
+
+      function compileListener (subrequest) {
+        foundSubRequestCount++
+      }
+
+      var request = overpassFrontend.BBoxQuery(
+        'node[~"."~bench];',
+        {
+          minlon: 16.3384616,
+          minlat: 48.1990347,
+          maxlon: 16.3386118,
+          maxlat: 48.1991437
+        },
+        {
+          properties: OverpassFrontend.TAGS
+        },
+        function(err, result, index) {
+          found.push(result.id)
+
+          if(expected.indexOf(result.id) == -1)
+            assert.fail('Object ' + result.id + ' should not be found!')
+        },
+        function(err) {
+          assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
+          assert.equal(expected.length, found.length, 'Wrong count of objects found!')
+          assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
+
+          request.off('subrequest-compile', compileListener)
+          done()
+        }
+      )
+
+      request.on('subrequest-compile', compileListener)
+    })
+    it('key regexp matches (fully cached)', function(done) {
+      var finalCalled = 0
+      var found = []
+      var expected = [ 'n3037893162', 'n3037893163', 'n3037893164' ]
+      var expectedSubRequestCount = 1
+      var foundSubRequestCount = 0
+
+      function compileListener (subrequest) {
+        foundSubRequestCount++
+      }
+
+      var request = overpassFrontend.BBoxQuery(
+        'node[~"."~bench];',
+        {
+          minlon: 16.3384616,
+          minlat: 48.1990347,
+          maxlon: 16.3386118,
+          maxlat: 48.1991437
+        },
+        {
+          properties: OverpassFrontend.TAGS
+        },
+        function(err, result, index) {
+          found.push(result.id)
+
+          if(expected.indexOf(result.id) == -1)
+            assert.fail('Object ' + result.id + ' should not be found!')
+        },
+        function(err) {
+          assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
+          assert.equal(expected.length, found.length, 'Wrong count of objects found!')
+          assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
+
+          request.off('subrequest-compile', compileListener)
+          done()
+        }
+      )
+
+      request.on('subrequest-compile', compileListener)
+    })
   })
   describe('removeFromCache()', function() {
     // TODO: Missing!
