@@ -423,6 +423,11 @@ class Filter {
         })
       }
 
+      // if the $or has elements that are always true, remove whole $or
+      if (r['$or'].filter(p => Object.keys(p).length === 0).length > 0) {
+        delete r['$or']
+      }
+
       if (needMatch) {
         r.needMatch = true
       }

@@ -382,6 +382,20 @@ describe('Filter', function () {
       assert.deepEqual(r, { needMatch: true })
     })
 
+    it ('(nwr[~wikipedia~"."];)', function () {
+      var f = new Filter('(nwr[~wikipedia~"."];)')
+
+      var r = f.toLokijs()
+      assert.deepEqual(r, { needMatch: true })
+    })
+
+    it ('(nwr[~wikipedia~"."];node[foo];)', function () {
+      var f = new Filter('(nwr[~wikipedia~"."];node[foo];)')
+
+      var r = f.toLokijs()
+      assert.deepEqual(r, { needMatch: true })
+    })
+
     it ('node[amenity][~wikipedia~"."]', function () {
       var f = new Filter([ { type: 'node' }, { key: 'amenity', 'op': 'has_key' }, { keyRegexp: true, op: 'has_key', key: 'wikipedia' } ])
 
@@ -410,7 +424,7 @@ describe('Filter', function () {
       ]})
 
       var r = f.toLokijs()
-      assert.deepEqual(r, {"$or":[{},{"type":{$eq:"node"},"tags.amenity":{"$exists":true}}],"needMatch":true})
+      assert.deepEqual(r, {"needMatch":true})
     })
 
     it ("way[railway=rail][railway!~'^(platform|abandoned|disused|station|proposed|subway_entrance)$'][usage~'^(main|branch)$'];", function () {
