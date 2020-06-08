@@ -261,4 +261,28 @@ describe('Lon180 (query objects near lon180)', function() {
     request.on('subrequest-compile', compileListener)
   })
 
+  it('Bounding boxes of lon180-stretching relations', function (done) {
+    overpassFrontend.clearCache()
+
+    let request = overpassFrontend.get(
+      'r3237099',
+      {
+          properties: OverpassFrontend.BOUNDS
+      },
+      function (err, result) {
+        assert.deepEqual(
+          {
+            minlon: 179.9918953,
+            minlat: 65.8635488,
+            maxlon: -179.9872242,
+            maxlat: 65.86605
+          },
+          result.bounds
+        )
+      },
+      function (err) {
+        done(err)
+      }
+    )
+  })
 })
