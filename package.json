@@ -76,7 +76,7 @@
     "Overpass"
   ],
   "author": "Stephan Bösch-Plepelits <skunk@xover.mud.at>",
-  "license": "GPL-3.0",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/plepe/overpass-frontend/issues"
   },
