@@ -56,7 +56,6 @@ function test (ob, part) {
   }
 
   if (part.and) {
-    console.log('here')
     return part.and.every(part => test(ob, part))
   }
 
@@ -270,6 +269,20 @@ function parse (def) {
   return [ result, def ]
 }
 
+function check (def) {
+  if (typeof def === 'string') {
+    return parse(def)[0]
+  }
+  if (def.and) {
+    def.and = def.and.map(p => check(p))
+  }
+  if (def.or) {
+    def.or = def.or.map(p => check(p))
+  }
+
+  return def
+}
+
 /**
  * A Filter into OSM data. A simplified version of <a href='https://wiki.openstreetmap.org/wiki/Overpass_API/Overpass_QL'>Overpass QL</a>.
  *
@@ -293,12 +306,7 @@ class Filter {
   }
 
   constructor (def) {
-    if (typeof def === 'string') {
-      [ this.def ] = parse(def)
-      return
-    }
-
-    this.def = def
+    this.def = check(def)
   }
 
   /**
