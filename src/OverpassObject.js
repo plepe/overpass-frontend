@@ -1,7 +1,7 @@
 const ee = require('event-emitter')
-var BoundingBox = require('boundingbox')
-var OverpassFrontend = require('./defines')
-var turf = {
+const BoundingBox = require('boundingbox')
+const OverpassFrontend = require('./defines')
+const turf = {
   difference: require('@turf/difference'),
   intersect: require('@turf/intersect').default
 }
@@ -52,7 +52,7 @@ class OverpassObject {
 
     this.osm3sMeta = options.osm3sMeta
 
-    for (var k in data) {
+    for (const k in data) {
       this.data[k] = data[k]
     }
 
@@ -143,8 +143,8 @@ class OverpassObject {
   }
 
   GeoJSONProperties () {
-    var ret = {}
-    var k
+    const ret = {}
+    let k
 
     ret['@id'] = this.type + '/' + this.osm_id
 
@@ -225,7 +225,7 @@ class OverpassObject {
   }
 
   _exportOSMXML (options, parentNode, callback) {
-    let result = parentNode.ownerDocument.createElement(this.type)
+    const result = parentNode.ownerDocument.createElement(this.type)
     result.setAttribute('id', this.osm_id)
 
     if (this.meta) {
@@ -237,8 +237,8 @@ class OverpassObject {
     }
 
     if (this.tags) {
-      for (var k in this.tags) {
-        let tag = parentNode.ownerDocument.createElement('tag')
+      for (const k in this.tags) {
+        const tag = parentNode.ownerDocument.createElement('tag')
         tag.setAttribute('k', k)
         tag.setAttribute('v', this.tags[k])
 
@@ -284,7 +284,7 @@ class OverpassObject {
   }
 
   _exportOSMJSON (conf, elements, callback) {
-    let result = elements[this.id]
+    const result = elements[this.id]
     result.type = this.type
     result.id = this.osm_id
 
@@ -318,7 +318,7 @@ class OverpassObject {
     }
 
     if (this.boundsPossibleMatch) {
-      var remaining = turf.intersect(bbox.toGeoJSON(), this.boundsPossibleMatch)
+      const remaining = turf.intersect(bbox.toGeoJSON(), this.boundsPossibleMatch)
 
       if (!remaining || remaining.geometry.type !== 'Polygon') {
         // geometry.type != Polygon: bbox matches border of this.boundsPossibleMatch

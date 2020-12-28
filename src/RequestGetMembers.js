@@ -35,7 +35,7 @@ class RequestGetMembers {
   }
 
   willInclude (fun, context) {
-    let result = fun.call(this.master, context)
+    const result = fun.call(this.master, context)
 
     if (this.loadFinish) {
       return false
@@ -47,7 +47,7 @@ class RequestGetMembers {
 
     if (!('extMembersList' in context)) {
       context.extMembersList = this.relations
-      context.extMembersRequests = [ this ]
+      context.extMembersRequests = [this]
       context.extMembersPriority = this.master.priority
       return true
     } else if (this.master.priority <= context.extMembersPriority) {
@@ -84,7 +84,7 @@ class RequestGetMembers {
 
     each(this.todo, (value, id) => {
       if (id in this.overpass.cacheElements) {
-        var ob = this.overpass.cacheElements[id]
+        const ob = this.overpass.cacheElements[id]
 
         if (this.bounds && !ob.intersects(this.bounds)) {
           return
@@ -97,12 +97,10 @@ class RequestGetMembers {
         }
       }
     })
-
-    return
   }
 
   _compileQuery (fun, context) {
-    var subRequest = fun.call(this.master, context)
+    const subRequest = fun.call(this.master, context)
 
     if (keys(this.relations).length === 0) {
       return subRequest
@@ -129,16 +127,16 @@ class RequestGetMembers {
        '  relation(r.result)' + BBoxString + ';\n' +
        ')->.resultMembers;\n'
 
-    var queryRemoveDoneFeatures = ''
-    var countRemoveDoneFeatures = 0
-    var listedDoneFeatures = {}
+    let queryRemoveDoneFeatures = ''
+    let countRemoveDoneFeatures = 0
+    const listedDoneFeatures = {}
     context.extMembersRequests.forEach(request => {
-      for (var id in request.doneFeatures) {
+      for (const id in request.doneFeatures) {
         if (id in listedDoneFeatures) {
           continue
         }
 
-        var ob = request.doneFeatures[id]
+        const ob = request.doneFeatures[id]
 
         if (countRemoveDoneFeatures % 1000 === 999) {
           query += '(' + queryRemoveDoneFeatures + ')->.doneMembers;\n'
@@ -195,7 +193,7 @@ class RequestGetMembers {
   }
 
   needLoad (fun) {
-    var result = fun.call(this.master)
+    const result = fun.call(this.master)
 
     if (result === true) {
       return true
@@ -205,7 +203,7 @@ class RequestGetMembers {
   }
 
   mayFinish (fun) {
-    var result = fun.call(this.master)
+    const result = fun.call(this.master)
 
     if (result === false) {
       return false

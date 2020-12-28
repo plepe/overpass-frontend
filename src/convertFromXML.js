@@ -1,27 +1,27 @@
 module.exports = function convertFromXML (xml) {
-  let result = {
+  const result = {
     version: parseFloat(xml.getAttribute('version')),
     generator: xml.getAttribute('generator'),
     osm3s: {},
     elements: []
   }
 
-  let notes = xml.getElementsByTagName('note')
+  const notes = xml.getElementsByTagName('note')
   if (notes.length) {
     result.osm3s.copyright = notes[0].textContent
   }
 
-  let metas = xml.getElementsByTagName('meta')
+  const metas = xml.getElementsByTagName('meta')
   if (metas.length) {
-    result.osm3s['timestamp_osm_base'] = metas[0].getAttribute('osm_base')
+    result.osm3s.timestamp_osm_base = metas[0].getAttribute('osm_base')
     if (metas[0].hasAttribute('areas')) {
-      result.osm3s['timestamp_areas_base'] = metas[0].getAttribute('areas')
+      result.osm3s.timestamp_areas_base = metas[0].getAttribute('areas')
     }
   }
 
   let current = xml.firstChild
   while (current) {
-    let element = {}
+    const element = {}
 
     if (current.nodeName === 'node' || current.nodeName === 'way' || current.nodeName === 'relation') {
       element.type = current.nodeName

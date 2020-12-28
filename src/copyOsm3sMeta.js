@@ -1,14 +1,14 @@
 module.exports = function copyOsm3sMetaFrom (results) {
-  let osm3sMeta = {}
+  const osm3sMeta = {}
 
-  for (let k in results) {
+  for (const k in results) {
     if (k !== 'elements' && k !== 'osm3s') {
       osm3sMeta[k] = results[k]
     }
   }
 
   if (results.osm3s) {
-    for (let k in results.osm3s) {
+    for (const k in results.osm3s) {
       osm3sMeta[k] = results.osm3s[k]
     }
   }

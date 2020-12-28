@@ -1,10 +1,10 @@
 /* global L:false */
 
 const async = require('async')
-var BoundingBox = require('boundingbox')
-var OverpassObject = require('./OverpassObject')
-var OverpassFrontend = require('./defines')
-var turf = {
+const BoundingBox = require('boundingbox')
+const OverpassObject = require('./OverpassObject')
+const OverpassFrontend = require('./defines')
+const turf = {
   bboxClip: require('@turf/bbox-clip').default
 }
 
@@ -44,7 +44,7 @@ class OverpassWay extends OverpassObject {
     if (typeof this.data.nodes !== 'undefined') {
       this.members = []
 
-      for (var i = 0; i < this.data.nodes.length; i++) {
+      for (let i = 0; i < this.data.nodes.length; i++) {
         this.members.push({
           id: 'n' + this.data.nodes[i],
           ref: this.data.nodes[i],
@@ -52,7 +52,7 @@ class OverpassWay extends OverpassObject {
         })
 
         let obProperties = OverpassFrontend.ID_ONLY
-        let ob = {
+        const ob = {
           id: this.data.nodes[i],
           type: 'node'
         }
@@ -63,7 +63,7 @@ class OverpassWay extends OverpassObject {
           ob.lon = data.geometry[i].lon
         }
 
-        let memberOb = this.overpass.createOrUpdateOSMObject(ob, {
+        const memberOb = this.overpass.createOrUpdateOSMObject(ob, {
           properties: obProperties
         })
 
@@ -84,10 +84,8 @@ class OverpassWay extends OverpassObject {
     if (this.members && (this.properties & OverpassFrontend.GEOM) === 0) {
       this.geometry = this.members.map(
         member => {
-          let node = this.overpass.cacheElements[member.id]
-          if (node) {
-            return node.geometry
-          }
+          const node = this.overpass.cacheElements[member.id]
+          return node ? node.geometry : null
         }
       ).filter(geom => geom)
 
@@ -125,8 +123,8 @@ class OverpassWay extends OverpassObject {
     }
 
     this._memberIds = []
-    for (var i = 0; i < this.nodes.length; i++) {
-      var member = this.nodes[i]
+    for (let i = 0; i < this.nodes.length; i++) {
+      const member = this.nodes[i]
 
       this._memberIds.push('n' + member)
     }
@@ -140,22 +138,22 @@ class OverpassWay extends OverpassObject {
   }
 
   GeoJSON () {
-    var result = {
+    const result = {
       type: 'Feature',
       id: this.type + '/' + this.osm_id,
       properties: this.GeoJSONProperties()
     }
 
     if (this.geometry) {
-      let coordinates = this.geometry
+      const coordinates = this.geometry
         .filter(point => point) // discard non-loaded points
-        .map(point => [ point.lon, point.lat ])
-      let isClosed = this.members && this.members[0].id === this.members[this.members.length - 1].id
+        .map(point => [point.lon, point.lat])
+      const isClosed = this.members && this.members[0].id === this.members[this.members.length - 1].id
 
       if (isClosed) {
         result.geometry = {
           type: 'Polygon',
-          coordinates: [ coordinates ]
+          coordinates: [coordinates]
         }
       } else {
         result.geometry = {
@@ -182,9 +180,9 @@ class OverpassWay extends OverpassObject {
         if (this.members) {
           async.each(this.members,
             (member, done) => {
-              let memberOb = this.overpass.cacheElements[member.id]
+              const memberOb = this.overpass.cacheElements[member.id]
 
-              let nd = parentNode.ownerDocument.createElement('nd')
+              const nd = parentNode.ownerDocument.createElement('nd')
               nd.setAttribute('ref', memberOb.osm_id)
               result.appendChild(nd)
 
@@ -217,7 +215,7 @@ class OverpassWay extends OverpassObject {
 
           async.each(this.members,
             (member, done) => {
-              let memberOb = this.overpass.cacheElements[member.id]
+              const memberOb = this.overpass.cacheElements[member.id]
 
               result.nodes.push(memberOb.osm_id)
 
@@ -246,10 +244,10 @@ class OverpassWay extends OverpassObject {
     }
 
     if (!('shiftWorld' in options)) {
-      options.shiftWorld = [ 0, 0 ]
+      options.shiftWorld = [0, 0]
     }
 
-    let geom = this.geometry.map(g => {
+    const geom = this.geometry.map(g => {
       return { lat: g.lat, lon: g.lon + options.shiftWorld[g.lon < 0 ? 0 : 1] }
     })
 
@@ -272,7 +270,7 @@ class OverpassWay extends OverpassObject {
     }
 
     if (this.geometry) {
-      var intersects = turf.bboxClip(this.GeoJSON(), [ bbox.minlon, bbox.minlat, bbox.maxlon, bbox.maxlat ])
+      const intersects = turf.bboxClip(this.GeoJSON(), [bbox.minlon, bbox.minlat, bbox.maxlon, bbox.maxlat])
 
       return intersects.geometry.coordinates.length ? 2 : 0
     }

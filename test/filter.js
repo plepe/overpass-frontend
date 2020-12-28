@@ -525,9 +525,8 @@ describe('Filter', function () {
     })
   })
 
-  it('case-senstive regexp', function () {
+  it('case-sensitive regexp', function () {
     var f = new Filter('node["name"~"test"]')
-    let r
 
     assert.deepEqual(f.def, [{"type":"node"},{"key":"name","op":"~","value":"test"}])
     assert.equal(f.toString(), 'node["name"~"test"];')
@@ -537,9 +536,8 @@ describe('Filter', function () {
     check(f, [ 3, 5 ])
   })
 
-  it('case-senstive !regexp', function () {
+  it('case-sensitive !regexp', function () {
     var f = new Filter('node["name"!~"test"]')
-    let r
 
     assert.deepEqual(f.def, [{"type":"node"},{"key":"name","op":"!~","value":"test"}])
     assert.equal(f.toString(), 'node["name"!~"test"];')
@@ -551,7 +549,6 @@ describe('Filter', function () {
 
   it('case-insenstive regexp', function () {
     var f = new Filter('node["name"~"test",i]')
-    let r
 
     assert.deepEqual(f.def, [{"type":"node"},{"key":"name","op":"~i","value":"test"}])
     assert.equal(f.toString(), 'node["name"~"test",i];')
@@ -563,7 +560,6 @@ describe('Filter', function () {
 
   it('case-insenstive !regexp', function () {
     var f = new Filter('node["name"!~"test",i]')
-    let r
 
     assert.deepEqual(f.def, [{"type":"node"},{"key":"name","op":"!~i","value":"test"}])
     assert.equal(f.toString(), 'node["name"!~"test",i];')
@@ -575,7 +571,6 @@ describe('Filter', function () {
 
   it('!=', function () {
     var f = new Filter('node["name"!="test"]')
-    let r
 
     assert.deepEqual(f.def, [{"type":"node"},{"key":"name","op":"!=","value":"test"}])
     assert.equal(f.toString(), 'node["name"!="test"];')
@@ -587,7 +582,6 @@ describe('Filter', function () {
 
   it('key regexp', function () {
     var f = new Filter('node[~"na"~"."]')
-    let r
 
     assert.deepEqual(f.def, [{"type":"node"},{"key":"na","keyRegexp":true,"op":"~","value":"."}])
     assert.equal(f.toString(), 'node[~"na"~"."];')
@@ -599,7 +593,6 @@ describe('Filter', function () {
 
   it('strsearch', function () {
     var f = new Filter('node["name"%"test"]')
-    let r
 
     assert.deepEqual(f.def, [{"type":"node"},{"key":"name","op":"strsearch","value":"test"}])
     assert.equal(f.toString(), 'node["name"~"t[eèeéêëė][sß]t",i];')
@@ -611,7 +604,6 @@ describe('Filter', function () {
 
   it('has', function () {
     var f = new Filter('node["cuisine"^"ice_cream"]')
-    let r
 
     assert.deepEqual(f.def, [{"type":"node"},{"key":"cuisine","op":"has","value":"ice_cream"}])
     assert.equal(f.toString(), 'node["cuisine"~"^(.*;|)ice_cream(|;.*)$"];')
@@ -623,7 +615,6 @@ describe('Filter', function () {
 
   it('has_key', function () {
     var f = new Filter('node["cuisine"]')
-    let r
 
     assert.deepEqual(f.def, [{"type":"node"},{"key":"cuisine","op":"has_key"}])
     assert.equal(f.toString(), 'node["cuisine"];')
@@ -635,7 +626,6 @@ describe('Filter', function () {
 
   it('not_exists', function () {
     var f = new Filter('node[!"cuisine"]')
-    let r
 
     assert.deepEqual(f.def, [{"type":"node"},{"key":"cuisine","op":"not_exists"}])
     assert.equal(f.toString(), 'node[!"cuisine"];')
@@ -651,8 +641,6 @@ describe('Filter', function () {
         [ { "key": "amenity", "op": "=", "value": "cafe" } ],
         [ { "key": "cuisine", "op": "has", "value": "ice_cream" } ]
       ] })
-
-    let r
 
     assert.deepEqual(f.def, { "and": [
 	[ { "type": "node" } ],
@@ -673,8 +661,6 @@ describe('Filter', function () {
         "nwr[amenity=cafe]",
       ]
     })
-
-    let r
 
     assert.deepEqual(f.def, { "and": [
 	[ { "type": "node" } ],

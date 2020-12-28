@@ -14,7 +14,7 @@ function compile (part) {
     return { or: part.or.map(compile) }
   }
 
-  let keyRegexp = (part.keyRegexp ? '~' : '')
+  const keyRegexp = (part.keyRegexp ? '~' : '')
 
   switch (part.op) {
     case 'has_key':
@@ -65,7 +65,7 @@ function test (ob, part) {
       regex = new RegExp(part.value, part.op.match(/i$/) ? 'i' : '')
     }
 
-    for (let k in ob.tags) {
+    for (const k in ob.tags) {
       if (k.match(part.key)) {
         if (regex) {
           if (ob.tags[k].match(regex)) {
@@ -108,11 +108,11 @@ function test (ob, part) {
 
 function parseString (str) {
   let result = ''
-  let chr = str[0]
+  const chr = str[0]
   str = str.slice(1)
 
   while (str.length) {
-    let m = str.match('^[^\\\\' + chr + ']+')
+    const m = str.match('^[^\\\\' + chr + ']+')
     if (m) {
       result += m[0]
       str = str.slice(m[0].length)
@@ -121,7 +121,7 @@ function parseString (str) {
       str = str.slice(2)
     } else if (str[0] === chr) {
       str = str.slice(1)
-      return [ result, str ]
+      return [result, str]
     } else {
       throw new Error("Can't parse string from query: " + str)
     }
@@ -129,7 +129,7 @@ function parseString (str) {
 }
 
 function parse (def) {
-  let result = []
+  const result = []
 
   let mode = 0
   let key
@@ -143,16 +143,16 @@ function parse (def) {
       m = def.match(/^\s*(node|way|relation|rel|nwr|\()/)
       if (m && m[1] === '(') {
         def = def.slice(m[0].length)
-        let parts = []
+        const parts = []
 
         do {
           let part
 
-          [ part, def ] = parse(def)
+          [part, def] = parse(def)
           parts.push(part)
         } while (!def.match(/^\s*\)/))
 
-        return [ { or: parts }, def ]
+        return [{ or: parts }, def]
       } else if (m) {
         if (m[1] === 'rel') {
           result.push({ type: 'relation' })
@@ -167,15 +167,15 @@ function parse (def) {
         throw new Error("Can't parse query, expected type of object (e.g. 'node'): " + def)
       }
     } else if (mode === 10) {
-      let m = def.match(/^\s*(\[|;)/)
+      const m = def.match(/^\s*(\[|;)/)
       if (m && m[1] === '[') {
         def = def.slice(m[0].length)
         mode = 11
       } else if (m && m[1] === ';') {
         def = def.slice(m[0].length)
-        return [ result, def ]
+        return [result, def]
       } else if (!m && def.match(/^\s*$/)) {
-        return [ result, '' ]
+        return [result, '']
       } else {
         throw new Error("Can't parse query, expected '[' or ';': " + def)
       }
@@ -190,7 +190,7 @@ function parse (def) {
       }
       if (m && (m[4] === '"' || m[4] === "'")) {
         def = def.slice(m[1].length + (m[2] || '').length)
-        let x = parseString(def)
+        const x = parseString(def)
         key = x[0]
         def = x[1]
         mode = 12
@@ -204,7 +204,7 @@ function parse (def) {
     } else if (mode === 12) {
       m = def.match(/^\s*(=|!=|~|!~|\^|]|%)/)
       if (m && m[1] === ']') {
-        let entry = { key, op: 'has_key' }
+        const entry = { key, op: 'has_key' }
         if (keyRegexp) {
           entry.keyRegexp = true
         }
@@ -219,9 +219,7 @@ function parse (def) {
           throw new Error("Can't parse query, expected ']': " + def)
         }
 
-        op = m[1] === '^' ? 'has'
-          : m[1] === '%' ? 'strsearch'
-            : m[1]
+        op = m[1] === '^' ? 'has' : m[1] === '%' ? 'strsearch' : m[1]
         mode = 13
         def = def.slice(m[0].length)
       } else {
@@ -231,7 +229,7 @@ function parse (def) {
       m = def.match(/^(\s*)([a-zA-Z0-9_]+|"|')/)
       if (m && (m[2] === '"' || m[2] === "'")) {
         def = def.slice(m[1].length)
-        let x = parseString(def)
+        const x = parseString(def)
         value = x[0]
         def = x[1]
         mode = 14
@@ -253,7 +251,7 @@ function parse (def) {
           }
         }
 
-        let entry = { key, op, value }
+        const entry = { key, op, value }
         if (keyRegexp) {
           entry.keyRegexp = true
         }
@@ -266,7 +264,7 @@ function parse (def) {
     }
   }
 
-  return [ result, def ]
+  return [result, def]
 }
 
 function check (def) {
@@ -360,7 +358,7 @@ class Filter {
 
     if (def.or) {
       return '(' + def.or.map(part => {
-        let subOptions = {
+        const subOptions = {
           inputSet: options.inputSet
         }
         return this.toQl(subOptions, part)
@@ -368,30 +366,30 @@ class Filter {
     }
 
     if (def.and) {
-      let first = def.and[0]
-      let last = def.and[def.and.length - 1]
-      let others = def.and.concat().slice(1, def.and.length - 1)
-      let set = '.x' + this.uniqId()
+      const first = def.and[0]
+      const last = def.and[def.and.length - 1]
+      const others = def.and.concat().slice(1, def.and.length - 1)
+      const set = '.x' + this.uniqId()
       return this.toQl({ inputSet: options.inputSet, outputSet: set }, first) +
         others.map(part => this.toQl({ inputSet: set, outputSet: set }, part)).join('') +
         this.toQl({ inputSet: set, outputSet: options.outputSet }, last)
     }
 
-    let parts = def.filter(part => part.type)
+    const parts = def.filter(part => part.type)
     let types
 
     switch (parts.length) {
       case 0:
-        types = [ 'nwr' ]
+        types = ['nwr']
         break
       case 1:
-        types = [ parts[0].type ]
+        types = [parts[0].type]
         break
       default:
         throw new Error('Filter: only one type query allowed!')
     }
 
-    let queries = filterJoin(def
+    const queries = filterJoin(def
       .filter(part => !part.type)
       .map(compile))
 
@@ -420,9 +418,10 @@ class Filter {
     if (def.or) {
       let needMatch = false
 
-      let r = { $or:
+      const r = {
+        $or:
         def.or.map(part => {
-          let r = this.toLokijs(options, part)
+          const r = this.toLokijs(options, part)
           if (r.needMatch) {
             needMatch = true
           }
@@ -432,8 +431,8 @@ class Filter {
       }
 
       // if the $or has elements that are always true, remove whole $or
-      if (r['$or'].filter(p => Object.keys(p).length === 0).length > 0) {
-        delete r['$or']
+      if (r.$or.filter(p => Object.keys(p).length === 0).length > 0) {
+        delete r.$or
       }
 
       if (needMatch) {
@@ -446,9 +445,10 @@ class Filter {
     if (def.and) {
       let needMatch = false
 
-      let r = { $and:
+      const r = {
+        $and:
         def.and.map(part => {
-          let r = this.toLokijs(options, part)
+          const r = this.toLokijs(options, part)
           if (r.needMatch) {
             needMatch = true
           }
@@ -464,11 +464,11 @@ class Filter {
       return r
     }
 
-    let query = {}
+    const query = {}
     let orQueries = []
 
     if (!Array.isArray(def)) {
-      def = [ def ]
+      def = [def]
     }
 
     def.forEach(filter => {
@@ -506,7 +506,7 @@ class Filter {
         v = { $eq: filter.type }
       } else if (filter.or) {
         orQueries.push(filter.or.map(p => {
-          let r = this.toLokijs(options, p)
+          const r = this.toLokijs(options, p)
           if (r.needMatch) {
             query.needMatch = true
             delete r.needMatch
@@ -522,7 +522,7 @@ class Filter {
           query.needMatch = true
         } else if (k in query) {
           if (!('$and' in query[k])) {
-            query[k] = { $and: [ query[k] ] }
+            query[k] = { $and: [query[k]] }
           }
           query[k].$and.push(v)
         } else {

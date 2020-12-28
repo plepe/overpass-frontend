@@ -20,24 +20,24 @@ function geojsonShiftWorld (geojson, shift) {
     case 'Point':
       return {
         type: 'Point',
-        coordinates: [ geojson.coordinates[0] + shift[geojson.coordinates[0] < 0 ? 0 : 1], geojson.coordinates[1] ]
+        coordinates: [geojson.coordinates[0] + shift[geojson.coordinates[0] < 0 ? 0 : 1], geojson.coordinates[1]]
       }
     case 'Polygon':
     case 'MultiLineString':
       return {
         type: geojson.type,
-        coordinates: geojson.coordinates.map(ring => ring.map(poi => [ poi[0] + shift[poi[0] < 0 ? 0 : 1], poi[1] ]))
+        coordinates: geojson.coordinates.map(ring => ring.map(poi => [poi[0] + shift[poi[0] < 0 ? 0 : 1], poi[1]]))
       }
     case 'MultiPolygon':
       return {
         type: 'MultiPolygon',
-        coordinates: geojson.coordinates.map(poly => poly.map(ring => ring.map(poi => [ poi[0] + shift[poi[0] < 0 ? 0 : 1], poi[1] ])))
+        coordinates: geojson.coordinates.map(poly => poly.map(ring => ring.map(poi => [poi[0] + shift[poi[0] < 0 ? 0 : 1], poi[1]])))
       }
     case 'LineString':
     case 'MultiPoint':
       return {
         type: geojson.type,
-        coordinates: geojson.coordinates.map(poi => [ poi[0] + shift[poi[0] < 0 ? 0 : 1], poi[1] ])
+        coordinates: geojson.coordinates.map(poi => [poi[0] + shift[poi[0] < 0 ? 0 : 1], poi[1]])
       }
     default:
       console.log(geojson)

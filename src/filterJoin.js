@@ -1,14 +1,14 @@
 module.exports = function filterJoin (def) {
-  let result = [ '' ]
+  let result = ['']
 
   if (!Array.isArray(def)) {
-    def = [ def ]
+    def = [def]
   }
 
   def.forEach(
     d => {
       if (d.or) {
-        let sub = d.or.map(e => filterJoin(e))
+        const sub = d.or.map(e => filterJoin(e))
 
         let newResult = []
         result.forEach(r => { newResult = newResult.concat(sub.map(s => r + s)) })

@@ -47,14 +47,14 @@ class RequestBBox extends Request {
       delete this.lokiQuery.needMatch
 
       if (this.options.filter) {
-        let filterLokiQuery = this.options.filter.toLokijs()
+        const filterLokiQuery = this.options.filter.toLokijs()
         this.lokiQueryFilterNeedMatch = !!filterLokiQuery.needMatch
         delete filterLokiQuery.needMatch
 
-        this.lokiQuery = { $and: [ this.lokiQuery, filterLokiQuery ] }
+        this.lokiQuery = { $and: [this.lokiQuery, filterLokiQuery] }
       }
 
-      this.lokiQuery = { $and: [ this.lokiQuery, boundsToLokiQuery(this.bounds, this.overpass) ] }
+      this.lokiQuery = { $and: [this.lokiQuery, boundsToLokiQuery(this.bounds, this.overpass)] }
     }
 
     this.loadFinish = false
@@ -95,18 +95,18 @@ class RequestBBox extends Request {
    * check if there are any map features which can be returned right now
    */
   preprocess () {
-    var items = []
+    let items = []
     if (this.lokiQuery) {
       items = this.overpass.db.find(this.lokiQuery)
     }
 
-    for (var i = 0; i < items.length; i++) {
-      var id = items[i].id
+    for (let i = 0; i < items.length; i++) {
+      const id = items[i].id
 
       if (!(id in this.overpass.cacheElements)) {
         continue
       }
-      var ob = this.overpass.cacheElements[id]
+      const ob = this.overpass.cacheElements[id]
 
       if (id in this.doneFeatures) {
         continue
@@ -149,8 +149,8 @@ class RequestBBox extends Request {
     }
     context.bbox = this.bounds
 
-    for (let i in context.requests) {
-      let request = context.requests[i]
+    for (const i in context.requests) {
+      const request = context.requests[i]
       if (request instanceof RequestBBox && request.query === this.query) {
         return false
       }
@@ -186,16 +186,16 @@ class RequestBBox extends Request {
       }
     }
 
-    let effortAvailable = Math.max(context.maxEffort, this.options.minEffort)
+    const effortAvailable = Math.max(context.maxEffort, this.options.minEffort)
 
     // if the context already has a bbox and it differs from this, we can't add
     // ours
-    var query = '(' + this.query + ')->.result;\n'
+    let query = '(' + this.query + ')->.result;\n'
 
-    var queryRemoveDoneFeatures = ''
-    var countRemoveDoneFeatures = 0
-    for (var id in this.doneFeatures) {
-      var ob = this.doneFeatures[id]
+    let queryRemoveDoneFeatures = ''
+    let countRemoveDoneFeatures = 0
+    for (const id in this.doneFeatures) {
+      const ob = this.doneFeatures[id]
 
       if (countRemoveDoneFeatures % 1000 === 999) {
         query += '(' + queryRemoveDoneFeatures + ')->.done;\n'
@@ -223,7 +223,7 @@ class RequestBBox extends Request {
     }
     query += '.result out ' + overpassOutOptions(this.options) + ';'
 
-    var subRequest = {
+    const subRequest = {
       query,
       request: this,
       parts: [

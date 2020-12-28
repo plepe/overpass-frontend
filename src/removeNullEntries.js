@@ -1,5 +1,5 @@
 function removeNullEntries (arr) {
-  var p
+  let p
 
   while ((p = arr.indexOf(null)) !== -1) {
     arr.splice(p, 1)

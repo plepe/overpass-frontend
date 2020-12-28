@@ -35,13 +35,13 @@ class RequestBBoxMembers {
     this.todo = {}
     this.loadFinish = true
 
-    var callbacks = new SortedCallbacks(this.options, this.options.memberCallback, this.finalCallback)
+    const callbacks = new SortedCallbacks(this.options, this.options.memberCallback, this.finalCallback)
     this.options.memberCallback = callbacks.next.bind(callbacks)
     this.finalCallback = callbacks.final.bind(callbacks)
   }
 
   willInclude (fun, context) {
-    let result = fun.call(this.master, context)
+    const result = fun.call(this.master, context)
 
     if (!this.loadFinish) {
       return true
@@ -75,7 +75,7 @@ class RequestBBoxMembers {
 
     each(this.todo, (value, id) => {
       if (id in this.overpass.cacheElements) {
-        var ob = this.overpass.cacheElements[id]
+        const ob = this.overpass.cacheElements[id]
 
         if (this.bounds && !ob.intersects(this.bounds)) {
           return
@@ -88,12 +88,10 @@ class RequestBBoxMembers {
         }
       }
     })
-
-    return
   }
 
   _compileQuery (fun, context) {
-    var subRequest = fun.call(this.master, context)
+    const subRequest = fun.call(this.master, context)
 
     if (keys(this.relations).length === 0) {
       return subRequest
@@ -120,10 +118,10 @@ class RequestBBoxMembers {
        '  relation(r.result)' + BBoxString + ';\n' +
        ')->.resultMembers;\n'
 
-    var queryRemoveDoneFeatures = ''
-    var countRemoveDoneFeatures = 0
-    for (var id in this.doneFeatures) {
-      var ob = this.doneFeatures[id]
+    let queryRemoveDoneFeatures = ''
+    let countRemoveDoneFeatures = 0
+    for (const id in this.doneFeatures) {
+      const ob = this.doneFeatures[id]
 
       if (countRemoveDoneFeatures % 1000 === 999) {
         query += '(' + queryRemoveDoneFeatures + ')->.doneMembers;\n'
@@ -178,7 +176,7 @@ class RequestBBoxMembers {
   }
 
   needLoad (fun) {
-    var result = fun.call(this.master)
+    const result = fun.call(this.master)
 
     if (result === true) {
       return true
@@ -188,7 +186,7 @@ class RequestBBoxMembers {
   }
 
   mayFinish (fun) {
-    var result = fun.call(this.master)
+    const result = fun.call(this.master)
 
     if (result === false) {
       return false

@@ -1,8 +1,8 @@
 /* global L:false */
 
-var OverpassObject = require('./OverpassObject')
-var BoundingBox = require('boundingbox')
-var OverpassFrontend = require('./defines')
+const OverpassObject = require('./OverpassObject')
+const BoundingBox = require('boundingbox')
+const OverpassFrontend = require('./defines')
 
 /**
  * A node
@@ -24,7 +24,7 @@ var OverpassFrontend = require('./defines')
  */
 class OverpassNode extends OverpassObject {
   GeoJSON () {
-    let result = {
+    const result = {
       type: 'Feature',
       id: this.type + '/' + this.osm_id,
       properties: this.GeoJSONProperties()
@@ -33,7 +33,7 @@ class OverpassNode extends OverpassObject {
     if (this.geometry) {
       result.geometry = {
         type: 'Point',
-        coordinates: [ this.geometry.lon, this.geometry.lat ]
+        coordinates: [this.geometry.lon, this.geometry.lat]
       }
     }
 
@@ -107,10 +107,10 @@ class OverpassNode extends OverpassObject {
     }
 
     if (!('shiftWorld' in options)) {
-      options.shiftWorld = [ 0, 0 ]
+      options.shiftWorld = [0, 0]
     }
 
-    let geom = { lat: this.geometry.lat, lon: this.geometry.lon + options.shiftWorld[this.geometry.lon < 0 ? 0 : 1] }
+    const geom = { lat: this.geometry.lat, lon: this.geometry.lon + options.shiftWorld[this.geometry.lon < 0 ? 0 : 1] }
 
     switch ('nodeFeature' in options ? options.nodeFeature : null) {
       case 'Marker':

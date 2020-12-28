@@ -20,7 +20,7 @@ class Request {
   constructor (overpass, data) {
     this.overpass = overpass
 
-    for (var k in data) {
+    for (const k in data) {
       this[k] = data[k]
     }
 
@@ -30,7 +30,7 @@ class Request {
 
     this.priority = 'priority' in this.options ? this.options.priority : 0
 
-    var callbacks = new SortedCallbacks(this.options, this.featureCallback, this.finalCallback)
+    const callbacks = new SortedCallbacks(this.options, this.featureCallback, this.finalCallback)
     this.featureCallback = callbacks.next.bind(callbacks)
     this.finalCallback = callbacks.final.bind(callbacks)
 
@@ -107,7 +107,7 @@ class Request {
    * @return {Request#SubRequest} - the compiled query
    */
   compileQuery (context) {
-    let subRequest = this._compileQuery(context)
+    const subRequest = this._compileQuery(context)
     this.emit('subrequest-compile', subRequest)
 
     this.callCount++

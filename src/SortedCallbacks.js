@@ -1,6 +1,6 @@
-var async = require('async')
-var weightSort = require('weight-sort')
-var OverpassFrontend = require('./defines')
+const async = require('async')
+const weightSort = require('weight-sort')
+const OverpassFrontend = require('./defines')
 
 class SortedCallbacks {
   constructor (options, featureCallback, finalCallback) {
@@ -48,8 +48,8 @@ class SortedCallbacks {
 
   final (err) {
     if (this.options.sort === 'BBoxDiagonalLength') {
-      for (var i = 0; i < this.list.length; i++) {
-        var feature = this.list[i].feature
+      for (let i = 0; i < this.list.length; i++) {
+        const feature = this.list[i].feature
 
         if (feature && feature.bounds) {
           this.list[i].weight = feature.bounds.diagonalLength()
@@ -65,7 +65,7 @@ class SortedCallbacks {
 
     async.setImmediate(function () {
       if (this.options.sort !== null) {
-        for (var i = this.lastIndex + 1; i < this.list.length; i++) {
+        for (let i = this.lastIndex + 1; i < this.list.length; i++) {
           // if a request got aborted, the entry in list is missing
           if (this.list[i]) {
             this.featureCallback(this.list[i].err, this.list[i].feature, i)

@@ -1,7 +1,7 @@
-var defines = require('./defines')
+const defines = require('./defines')
 
 function overpassOutOptions (options, optionsOverride) {
-  var outOptions = ''
+  let outOptions = ''
 
   if ('split' in options && options.split > 0) {
     outOptions += options.split + ' '

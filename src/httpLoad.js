@@ -5,11 +5,11 @@ if (typeof XMLHttpRequest === 'undefined') {
 }
 
 function httpLoad (url, getParam, postParam, callback) {
-  var req = new global.XMLHttpRequest()
+  const req = new global.XMLHttpRequest()
 
   req.onreadystatechange = function () {
-    var data = null
-    var err = null
+    let data = null
+    let err = null
 
     if (req.readyState === 4) {
       if (req.status === 200) {
@@ -25,12 +25,12 @@ function httpLoad (url, getParam, postParam, callback) {
           err = new Error(JSON.parse(req.responseText))
         } catch (err) {
           if (req.responseText.search('OSM3S Response') !== -1) {
-            var lines = req.responseText.split(/\n/)
-            var e = ''
+            const lines = req.responseText.split(/\n/)
+            let e = ''
 
-            for (var i = 0; i < lines.length; i++) {
-              var m
-              if ((m = lines[i].match(/<p><strong style="color:#FF0000">Error<\/strong>: (.*)<\/p>/))) {
+            for (let i = 0; i < lines.length; i++) {
+              const m = lines[i].match(/<p><strong style="color:#FF0000">Error<\/strong>: (.*)<\/p>/)
+              if (m) {
                 e += m[1] + '\n'
               }
             }
@@ -40,12 +40,12 @@ function httpLoad (url, getParam, postParam, callback) {
               e = 'Got error ' + req.status
             }
 
-            let error = new Error(e)
+            const error = new Error(e)
             error.status = req.status
 
             callback(error, null)
           } else {
-            let error = new Error(req.responseText)
+            const error = new Error(req.responseText)
             error.status = req.status
 
             callback(error, null)
@@ -55,8 +55,8 @@ function httpLoad (url, getParam, postParam, callback) {
     }
   }
 
-  var reqType = 'GET'
-  var postData = null
+  let reqType = 'GET'
+  let postData = null
   if (postParam) {
     reqType = 'POST'
     postData = postParam

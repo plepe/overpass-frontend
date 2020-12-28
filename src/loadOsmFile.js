@@ -37,7 +37,7 @@ module.exports = function loadOsmFile (url, callback) {
     return
   }
 
-  let req = new window.XMLHttpRequest()
+  const req = new window.XMLHttpRequest()
 
   req.onreadystatechange = function () {
     if (req.readyState === 4) {

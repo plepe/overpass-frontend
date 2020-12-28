@@ -18,7 +18,7 @@ class RequestGet extends Request {
     this.type = 'get'
 
     if (typeof this.ids === 'string') {
-      this.ids = [ this.ids ]
+      this.ids = [this.ids]
     } else {
       this.ids = this.ids.concat()
     }
@@ -27,7 +27,7 @@ class RequestGet extends Request {
       this.options.properties = defines.DEFAULT
     }
 
-    for (var i = 0; i < this.ids.length; i++) {
+    for (let i = 0; i < this.ids.length; i++) {
       if (this.ids[i] in this.overpass.cacheElements && this.overpass.cacheElements[this.ids[i]] === false) {
         delete this.overpass.cacheElements[this.ids[i]]
       }
@@ -51,7 +51,7 @@ class RequestGet extends Request {
       return null
     }
 
-    var type = id.substr(0, 1)
+    const type = id.substr(0, 1)
     switch (type) {
       case 'n':
         return this.overpass.options.effortNode
@@ -67,14 +67,14 @@ class RequestGet extends Request {
    * @return {Request#minMaxEffortResult} - minimum and maximum effort
    */
   minMaxEffort () {
-    var todo = this.ids.filter(x => x)
+    const todo = this.ids.filter(x => x)
 
     if (todo.length === 0) {
       return { minEffort: 0, maxEffort: 0 }
     }
 
-    let minEffort = Math.min.apply(this, todo.map(id => this._effortForId(id)))
-    let maxEffort = todo.map(id => this._effortForId(id)).reduce((a, b) => a + b)
+    const minEffort = Math.min.apply(this, todo.map(id => this._effortForId(id)))
+    const maxEffort = todo.map(id => this._effortForId(id)).reduce((a, b) => a + b)
 
     return { minEffort, maxEffort }
   }
@@ -85,16 +85,16 @@ class RequestGet extends Request {
   preprocess () {
     this.allFound = true
 
-    for (var i = 0; i < this.ids.length; i++) {
-      var id = this.ids[i]
+    for (let i = 0; i < this.ids.length; i++) {
+      const id = this.ids[i]
 
       if (id === null) {
         continue
       }
 
       if (id in this.overpass.cacheElements) {
-        var ob = this.overpass.cacheElements[id]
-        var ready = true
+        const ob = this.overpass.cacheElements[id]
+        let ready = true
 
         // Feature does not exists!
         if (ob.missingObject) {
@@ -141,20 +141,21 @@ class RequestGet extends Request {
    * @return {Request#SubRequest} - the compiled query
    */
   _compileQuery (context) {
-    var query = ''
-    var nodeQuery = ''
-    var wayQuery = ''
-    var relationQuery = ''
-    var BBoxQuery = ''
-    var effort = 0
+    let query = ''
+    let nodeQuery = ''
+    let wayQuery = ''
+    let relationQuery = ''
+    let BBoxQuery = ''
+    let effort = 0
+    let outOptions
 
     if (this.options.bbox) {
       BBoxQuery = '(' + this.options.bbox.toLatLonString() + ')'
     }
 
-    for (var i = 0; i < this.ids.length; i++) {
-      var id = this.ids[i]
-      var outOptions = overpassOutOptions(this.options)
+    for (let i = 0; i < this.ids.length; i++) {
+      const id = this.ids[i]
+      outOptions = overpassOutOptions(this.options)
 
       if (effort > context.maxEffort) {
         break
@@ -218,7 +219,7 @@ class RequestGet extends Request {
       }
     }
 
-    var requestParts = []
+    const requestParts = []
     if (BBoxQuery && (nodeQuery !== '' || wayQuery !== '' || relationQuery !== '')) {
       // additional separator to separate objects outside bbox from inside bbox
       query += 'out count;\n'
@@ -247,7 +248,7 @@ class RequestGet extends Request {
       })
     }
 
-    var subRequest = {
+    const subRequest = {
       query,
       effort: effort,
       request: this,
@@ -258,8 +259,8 @@ class RequestGet extends Request {
   }
 
   _featureCallback (fun, err, ob) {
-    var indexes = []
-    var p
+    const indexes = []
+    let p
 
     while ((p = this.ids.indexOf(ob.id)) !== -1) {
       this.ids[p] = null

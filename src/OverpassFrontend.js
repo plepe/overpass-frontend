@@ -1,22 +1,22 @@
 const ee = require('event-emitter')
-var async = require('async')
-var weightSort = require('weight-sort')
-var BoundingBox = require('boundingbox')
+const async = require('async')
+const weightSort = require('weight-sort')
+const BoundingBox = require('boundingbox')
 const LokiJS = require('lokijs')
 
-var httpLoad = require('./httpLoad')
-var removeNullEntries = require('./removeNullEntries')
+const httpLoad = require('./httpLoad')
+const removeNullEntries = require('./removeNullEntries')
 
-var OverpassObject = require('./OverpassObject')
-var OverpassNode = require('./OverpassNode')
-var OverpassWay = require('./OverpassWay')
-var OverpassRelation = require('./OverpassRelation')
-var RequestGet = require('./RequestGet')
-var RequestBBox = require('./RequestBBox')
-var RequestMulti = require('./RequestMulti')
-var defines = require('./defines')
-var loadOsmFile = require('./loadOsmFile')
-var copyOsm3sMetaFrom = require('./copyOsm3sMeta')
+const OverpassObject = require('./OverpassObject')
+const OverpassNode = require('./OverpassNode')
+const OverpassWay = require('./OverpassWay')
+const OverpassRelation = require('./OverpassRelation')
+const RequestGet = require('./RequestGet')
+const RequestBBox = require('./RequestBBox')
+const RequestMulti = require('./RequestMulti')
+const defines = require('./defines')
+const loadOsmFile = require('./loadOsmFile')
+const copyOsm3sMetaFrom = require('./copyOsm3sMeta')
 const timestamp = require('./timestamp')
 const Filter = require('./Filter')
 
@@ -68,12 +68,12 @@ class OverpassFrontend {
       timeGap429: 1000,
       loadChunkSize: 1000
     }
-    for (var k in options) {
+    for (const k in options) {
       this.options[k] = options[k]
     }
 
-    let db = new LokiJS()
-    this.db = db.addCollection('osm', { unique: [ 'id' ] })
+    const db = new LokiJS()
+    this.db = db.addCollection('osm', { unique: ['id'] })
 
     this.clearCache()
 
@@ -120,20 +120,20 @@ class OverpassFrontend {
 
         osm3sMeta = copyOsm3sMetaFrom(result)
 
-        let chunks = []
-        for (var i = 0; i < result.elements.length; i += this.options.loadChunkSize) {
+        const chunks = []
+        for (let i = 0; i < result.elements.length; i += this.options.loadChunkSize) {
           chunks.push(result.elements.slice(i, i + this.options.loadChunkSize))
         }
 
         // collect all objects, so they can be completed later-on
-        let obs = []
+        const obs = []
         async.eachLimit(
           chunks,
           1,
           (chunk, done) => {
             chunk.forEach(
               (element) => {
-                let ob = this.createOrUpdateOSMObject(element, {
+                const ob = this.createOrUpdateOSMObject(element, {
                   osm3sMeta,
                   properties: OverpassFrontend.TAGS | OverpassFrontend.META | OverpassFrontend.MEMBERS
                 })
@@ -183,7 +183,7 @@ class OverpassFrontend {
    * @return {RequestGet}
    */
   get (ids, options, featureCallback, finalCallback) {
-    var request = new RequestGet(this, {
+    const request = new RequestGet(this, {
       ids: ids,
       options: options,
       featureCallback: featureCallback,
@@ -217,7 +217,7 @@ class OverpassFrontend {
       return false
     }
 
-    let ob = this.cacheElements[id]
+    const ob = this.cacheElements[id]
 
     if (ob.missingObject) {
       return null
@@ -276,10 +276,10 @@ class OverpassFrontend {
     this.requests = weightSort(this.requests, 'priority')
 
     this.requestIsActive = true
-    var request
-    var j
+    let request
+    let j
 
-    var context = {
+    const context = {
       bbox: null,
       todo: {},
       requests: [],
@@ -299,7 +299,7 @@ class OverpassFrontend {
       }
 
       if (request.willInclude(context)) {
-        let { minEffort, maxEffort } = request.minMaxEffort()
+        const { minEffort, maxEffort } = request.minMaxEffort()
 
         if (context.minEffort > 0 && context.minEffort + minEffort > this.options.effortPerRequest) {
           continue
@@ -316,13 +316,13 @@ class OverpassFrontend {
       }
     }
 
-    var effortAvailable = this.options.effortPerRequest
+    let effortAvailable = this.options.effortPerRequest
 
     for (j = 0; j < context.requests.length; j++) {
       request = context.requests[j]
-      let remainingRequestsAtPriority = context.requests.slice(j).filter(r => r.priority === request.priority)
+      const remainingRequestsAtPriority = context.requests.slice(j).filter(r => r.priority === request.priority)
       context.maxEffort = Math.ceil(effortAvailable / remainingRequestsAtPriority.length)
-      var subRequest = request.compileQuery(context)
+      const subRequest = request.compileQuery(context)
 
       if (subRequest.parts.length === 0) {
         console.log('subRequest has no parts! Why was willInclude true?', subRequest)
@@ -347,7 +347,7 @@ class OverpassFrontend {
       return this._next()
     }
 
-    var query = '[out:json]'
+    let query = '[out:json]'
     if (context.bbox) {
       query += '[bbox:' + context.bbox.toLatLonString() + ']'
     }
@@ -399,20 +399,20 @@ class OverpassFrontend {
       this.errorCount = 0
     }
 
-    let osm3sMeta = copyOsm3sMetaFrom(results)
+    const osm3sMeta = copyOsm3sMetaFrom(results)
     this.emit('load', osm3sMeta)
 
-    var subRequestsIndex = 0
-    var partIndex = 0
-    var subRequest = context.subRequests[0]
-    var request = subRequest.request
-    var part = subRequest.parts[0]
+    let subRequestsIndex = 0
+    let partIndex = 0
+    let subRequest = context.subRequests[0]
+    let request = subRequest.request
+    let part = subRequest.parts[0]
     if (!('count' in part)) {
       part.count = 0
     }
 
-    for (var i = 0; i < results.elements.length; i++) {
-      var el = results.elements[i]
+    for (let i = 0; i < results.elements.length; i++) {
+      const el = results.elements[i]
 
       if (isSeparator(el)) {
         partIndex++
@@ -440,14 +440,14 @@ class OverpassFrontend {
       }
 
       part.osm3sMeta = osm3sMeta
-      var ob = this.createOrUpdateOSMObject(el, part)
+      const ob = this.createOrUpdateOSMObject(el, part)
       delete context.todo[ob.id]
 
-      var members = this.cacheElements[ob.id].memberIds()
+      const members = this.cacheElements[ob.id].memberIds()
       if (members) {
-        for (var j = 0; j < members.length; j++) {
+        for (let j = 0; j < members.length; j++) {
           if (!(members[j] in this.cacheElementsMemberOf)) {
-            this.cacheElementsMemberOf[members[j]] = [ this.cacheElements[ob.id] ]
+            this.cacheElementsMemberOf[members[j]] = [this.cacheElements[ob.id]]
           } else {
             this.cacheElementsMemberOf[members[j]].push(this.cacheElements[ob.id])
           }
@@ -467,9 +467,9 @@ class OverpassFrontend {
       console.log('too many parts!!!!')
     }
 
-    for (var id in context.todo) {
+    for (const id in context.todo) {
       if (!(id in this.cacheElements)) {
-        let ob = new OverpassObject()
+        const ob = new OverpassObject()
         ob.id = id
         ob.type = { n: 'node', w: 'way', r: 'relation' }[id.substr(0, 1)]
         ob.osm_id = id.substr(1)
@@ -478,7 +478,7 @@ class OverpassFrontend {
         this.cacheElements[id] = ob
         this.db.insert(ob.dbInsert())
       } else {
-        let ob = this.cacheElements[id]
+        const ob = this.cacheElements[id]
         ob.missingObject = true
         this.db.update(ob.dbInsert())
       }
@@ -516,9 +516,9 @@ class OverpassFrontend {
     bounds = new BoundingBox(bounds)
 
     if (bounds.minlon > bounds.maxlon) {
-      let bounds1 = new BoundingBox(bounds)
+      const bounds1 = new BoundingBox(bounds)
       bounds1.maxlon = 180
-      let bounds2 = new BoundingBox(bounds)
+      const bounds2 = new BoundingBox(bounds)
       bounds2.minlon = -180
 
       request = new RequestMulti(this,
@@ -559,13 +559,13 @@ class OverpassFrontend {
   }
 
   clearBBoxQuery (query) {
-    let filterId = new Filter(query).toString()
+    const filterId = new Filter(query).toString()
 
     delete this.cacheBBoxQueries[filterId]
   }
 
   _abortRequest (request) {
-    var p = this.requests.indexOf(request)
+    const p = this.requests.indexOf(request)
 
     if (p === -1) {
       return
@@ -585,7 +585,7 @@ class OverpassFrontend {
   }
 
   abortAllRequests () {
-    for (var j = 0; j < this.requests.length; j++) {
+    for (let j = 0; j < this.requests.length; j++) {
       if (this.requests[j] === null) {
         continue
       }
@@ -598,23 +598,23 @@ class OverpassFrontend {
 
   removeFromCache (ids) {
     if (typeof ids === 'string') {
-      ids = [ ids ]
+      ids = [ids]
     }
 
-    for (var i = 0; i < ids.length; i++) {
+    for (let i = 0; i < ids.length; i++) {
       if (ids[i] in this.cacheElements) {
-        let ob = this.cacheElements[ids[i]]
+        const ob = this.cacheElements[ids[i]]
 
         // remove all memberOf references
         if (ob.members) {
           ob.members.forEach(member => {
-            let memberOb = this.cacheElements[member.id]
+            const memberOb = this.cacheElements[member.id]
             memberOb.memberOf = memberOb.memberOf
               .filter(memberOf => memberOf.id !== ob.id)
           })
         }
 
-        let lokiOb = this.cacheElements[ids[i]].dbData
+        const lokiOb = this.cacheElements[ids[i]].dbData
         delete this.cacheElements[ids[i]]
         this.db.remove(lokiOb)
       }
@@ -622,11 +622,11 @@ class OverpassFrontend {
   }
 
   notifyMemberUpdates () {
-    let todo = this.pendingNotifyMemberUpdate
+    const todo = this.pendingNotifyMemberUpdate
     this.pendingNotifyMemberUpdate = {}
 
-    for (var k in todo) {
-      let ob = this.cacheElements[k]
+    for (const k in todo) {
+      const ob = this.cacheElements[k]
       ob.notifyMemberUpdate(todo[k])
 
       this.pendingUpdateEmit[ob.id] = ob
@@ -636,7 +636,7 @@ class OverpassFrontend {
   pendingNotifies () {
     this.notifyMemberUpdates()
 
-    let todo = Object.values(this.pendingUpdateEmit)
+    const todo = Object.values(this.pendingUpdateEmit)
     this.pendingUpdateEmit = {}
 
     todo.forEach(ob => {
@@ -646,8 +646,8 @@ class OverpassFrontend {
   }
 
   createOrUpdateOSMObject (el, options) {
-    var id = el.type.substr(0, 1) + el.id
-    var ob = null
+    const id = el.type.substr(0, 1) + el.id
+    let ob = null
     let create = true
 
     if (id in this.cacheElements && !this.cacheElements[id]) {
@@ -679,7 +679,7 @@ class OverpassFrontend {
       if (entry.id in this.pendingNotifyMemberUpdate) {
         this.pendingNotifyMemberUpdate[entry.id].push(ob)
       } else {
-        this.pendingNotifyMemberUpdate[entry.id] = [ ob ]
+        this.pendingNotifyMemberUpdate[entry.id] = [ob]
       }
     })
     this.pendingUpdateEmit[ob.id] = ob
@@ -712,7 +712,7 @@ class OverpassFrontend {
   }
 }
 
-for (var k in defines) {
+for (const k in defines) {
   OverpassFrontend[k] = defines[k]
 }
 
