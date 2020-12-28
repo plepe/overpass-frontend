@@ -340,6 +340,7 @@ class OverpassRelation extends OverpassObject {
           geometries: this.memberFeatures
             .map(member => member.GeoJSON().geometry) // .geometry may be undefined
             .filter(member => member)
+            .filter(member => member.type !== 'GeometryCollection' || member.geometries.length)
         }
       }
     }
