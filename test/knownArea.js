@@ -41,7 +41,7 @@ describe('KnownArea', function() {
       
       assert.deepEqual(
         area.toGeoJSON(),
-        {"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[15.5,48],[16,48],[17,48],[17,49],[16,49],[15.5,49],[15.5,48]]]}}
+        {"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[15.5,48],[17,48],[17,49],[15.5,49],[15.5,48]]]}}
       )
     })
 
@@ -56,7 +56,7 @@ describe('KnownArea', function() {
       
       assert.deepEqual(
         area.toGeoJSON(),
-        {"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[15.5,48],[16,48],[17,48],[17,49],[16,49],[15.5,49],[15.5,48]]]}}
+        {"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[15.5,48],[17,48],[17,49],[15.5,49],[15.5,48]]]}}
       )
     })
 
