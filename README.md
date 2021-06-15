@@ -9,7 +9,38 @@ npm install --save overpass-frontend
 # DOCUMENTATION
 Find documentation in [doc](https://rawgit.com/plepe/overpass-frontend/master/doc/OverpassFrontend.html). You can re-generate the documentation with `npm run doc`.
 
-# EXAMPLE
+# EXAMPLES
+## By ID
+You can execute this example as: `node example-by-id.js`
+
+```js
+const OverpassFrontend = require('overpass-frontend')
+
+// you may specify an OSM file as url, e.g. 'test/data.osm.bz2'
+const overpassFrontend = new OverpassFrontend('//overpass-api.de/api/interpreter')
+
+// request restaurants in the specified bounding box
+overpassFrontend.get(
+  ['n27365030', 'w5013364'],
+  {
+    properties: OverpassFrontend.TAGS
+  },
+  function (err, result) {
+    if (result) {
+      console.log('* ' + result.tags.name + ' (' + result.id + ')')
+    } else {
+      console.log('* empty result')
+    }
+  },
+  function (err) {
+    if (err) { console.log(err) }
+  }
+)
+```
+
+## BBOX Query
+You can execute this example as: `node example-bbox.js`
+
 ```js
 const OverpassFrontend = require('overpass-frontend')
 
