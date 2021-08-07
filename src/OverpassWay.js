@@ -57,7 +57,7 @@ class OverpassWay extends OverpassObject {
           type: 'node'
         }
 
-        if (data.geometry) {
+        if (data.geometry && data.geometry[i]) {
           obProperties = obProperties | OverpassFrontend.GEOM
           ob.lat = data.geometry[i].lat
           ob.lon = data.geometry[i].lon
@@ -247,11 +247,14 @@ class OverpassWay extends OverpassObject {
       options.shiftWorld = [0, 0]
     }
 
-    const geom = this.geometry.map(g => {
-      return { lat: g.lat, lon: g.lon + options.shiftWorld[g.lon < 0 ? 0 : 1] }
-    })
+    const geom = this.geometry
+      .filter(g => g)
+      .map(g => {
+        return { lat: g.lat, lon: g.lon + options.shiftWorld[g.lon < 0 ? 0 : 1] }
+      })
 
-    if (this.geometry[this.geometry.length - 1].lat === this.geometry[0].lat &&
+    if (this.geometry[this.geometry.length - 1] && this.geometry[0] &&
+       this.geometry[this.geometry.length - 1].lat === this.geometry[0].lat &&
        this.geometry[this.geometry.length - 1].lon === this.geometry[0].lon) {
       return L.polygon(geom, options)
     }
