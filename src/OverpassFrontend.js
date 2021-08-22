@@ -52,7 +52,8 @@ const Filter = require('./Filter')
  * @param {number} [options.effortWay=4] The effort for request a way.
  * @param {number} [options.effortRelation=64] The effort for request a relation.
  * @param {number} [options.timeGap=10] A short time gap between two requests to the Overpass API (milliseconds).
- * @param {number} [options.timeGap429=1000] A longer time after a 429 response from Overpass API (milliseconds).
+ * @param {number} [options.timeGap429=500] A longer time gap after a 429 response from Overpass API (milliseconds).
+ * @param {number} [options.timeGap429Exp=3] If we keep getting 429 responses, increase the time exponentially with the specified factor (e.g. 2: 500ms, 1000ms, 2000ms, ...; 3: 500ms, 1500ms, 4500ms, ...)
  * @param {number} [options.loadChunkSize=1000] When loading a file (instead connecting to an Overpass URL) load elements in chunks of n items.
  * @property {boolean} hasStretchLon180=false Are there any map features in the cache which stretch over lon=180/-180?
  */
@@ -65,7 +66,8 @@ class OverpassFrontend {
       effortWay: 4,
       effortRelation: 64,
       timeGap: 10,
-      timeGap429: 1000,
+      timeGap429: 500,
+      timeGap429Exp: 3,
       loadChunkSize: 1000
     }
     for (const k in options) {
@@ -378,11 +380,13 @@ class OverpassFrontend {
         // retry
         if (err.status === 429) {
           this.requestIsActive = true
+          const timeGap = this.options.timeGap429Exp ** (this.errorCount - 1) * this.options.timeGap429
+          console.error('Overpass API returned ' + this.errorCount + '. 429 error, waiting ' + timeGap + 'ms')
 
           global.setTimeout(() => {
             this.requestIsActive = false
             this._overpassProcess()
-          }, this.options.timeGap429 - this.options.timeGap)
+          }, timeGap - this.options.timeGap)
         } else {
           this._overpassProcess()
         }
