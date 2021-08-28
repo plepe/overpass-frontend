@@ -24,6 +24,25 @@ const Filter = require('./Filter')
  * An error occured
  * @event OverpassFrontend#error
  * @param {Error} error
+ * @param {OverpassFrontend#Context} [context] - context of the request
+ */
+
+/**
+ * A request to Overpass API is started
+ * @event OverpassFrontend#start
+ * @param {OverpassFrontend#Context} context - context of the request
+ */
+
+/**
+ * A request to Overpass API was rejected, but will be retried after delay ms.
+ * @event OverpassFrontend#reject
+ * @param {OverpassFrontend#Context} context - context of the request
+ */
+
+/**
+ * A request to Overpass API was aborted as the errorCount exceeded
+ * @event OverpassFrontend#abort
+ * @param {OverpassFrontend#Context} context - context of the request
  */
 
 /**
@@ -35,6 +54,7 @@ const Filter = require('./Filter')
  * @param {string} osm3sMeta.timestamp_osm_base RFC8601 timestamp of OpenStreetMap data
  * @param {string} osm3sMeta.copyright Copyright statement
  * @param {BoundingBox} [osm3sMeta.bounds] Bounding Box (only when loading from file)
+ * @param {OverpassFrontend#Context} [context] - context of the request
  */
 
 /**
@@ -241,6 +261,9 @@ class OverpassFrontend {
    * @property {BoundingBox} bbox - when there are any BBox requests, add this global bbox
    * @property {int} maxEffort - how many queries can we still add to this context
    * @property {object} todo - list of items which should be loaded via get requests to avoid duplicates
+   * @property {int} [status] - result status (e.g. 200 for success, 429 for reject, ...)
+   * @property {int} [errorCount] - the nth error in a row
+   * @property {int} [delay] - after a 429 error, the next request will be delayed for n ms
    */
 
   _overpassProcess () {
@@ -363,6 +386,8 @@ class OverpassFrontend {
         query,
         this._handleResult.bind(this, context)
       )
+
+      this.emit('start', context)
     }.bind(this), this.options.timeGap)
   }
 
@@ -376,21 +401,31 @@ class OverpassFrontend {
     if (err !== null) {
       this.errorCount++
 
+      context.status = err.status
+      context.errorCount = this.errorCount
+
       if (this.errorCount <= 3) {
         // retry
         if (err.status === 429) {
           this.requestIsActive = true
           const timeGap = this.options.timeGap429Exp ** (this.errorCount - 1) * this.options.timeGap429
-          console.error('Overpass API returned ' + this.errorCount + '. 429 error, waiting ' + timeGap + 'ms')
+
+          context.delay = timeGap
+          this.emit('reject', context)
 
           global.setTimeout(() => {
             this.requestIsActive = false
             this._overpassProcess()
           }, timeGap - this.options.timeGap)
         } else {
+          this.emit('error', null, context)
+
           this._overpassProcess()
         }
       } else {
+        this.emit('error', null, context)
+        this.emit('abort', context)
+
         // abort
         // call finalCallback for the request
         context.subRequests.forEach(function (subRequest) {
@@ -399,12 +434,15 @@ class OverpassFrontend {
       }
 
       return
-    } else {
-      this.errorCount = 0
     }
 
+    this.errorCount = 0
+
+    context.status = 200
+    context.errorCount = 0
+
     const osm3sMeta = copyOsm3sMetaFrom(results)
-    this.emit('load', osm3sMeta)
+    this.emit('load', osm3sMeta, context)
 
     let subRequestsIndex = 0
     let partIndex = 0
