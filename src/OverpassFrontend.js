@@ -24,6 +24,30 @@ const Filter = require('./Filter')
  * An error occured
  * @event OverpassFrontend#error
  * @param {Error} error
+ * @param {OverpassFrontend#Context} [context] - context of the request
+ */
+
+/**
+ * A request to Overpass API is started
+ * @event OverpassFrontend#start
+ * @param {object} reserved
+ * @param {OverpassFrontend#Context} context - context of the request
+ */
+
+/**
+ * A request to Overpass API was rejected
+ * @event OverpassFrontend#reject
+ * @param {OverpassFrontend#QueryStatus} queryStatus
+ * @param {OverpassFrontend#Context} context - context of the request
+ */
+
+/**
+ * Status of a query to Overpass API
+ * @typedef {Object} OverpassFrontend#QueryStatus
+ * @property {int} [status] - result status (e.g. 429 for reject, ...)
+ * @property {int} [errorCount] - the nth error in a row
+ * @property {boolean} [retry] - true, if the request will be retried (after a 429 error)
+ * @property {int} [retryTimeout] - if the query will be retried, the next request will be delayed for n ms
  */
 
 /**
@@ -35,6 +59,7 @@ const Filter = require('./Filter')
  * @param {string} osm3sMeta.timestamp_osm_base RFC8601 timestamp of OpenStreetMap data
  * @param {string} osm3sMeta.copyright Copyright statement
  * @param {BoundingBox} [osm3sMeta.bounds] Bounding Box (only when loading from file)
+ * @param {OverpassFrontend#Context} [context] - context of the request
  */
 
 /**
@@ -363,6 +388,8 @@ class OverpassFrontend {
         query,
         this._handleResult.bind(this, context)
       )
+
+      this.emit('start', {}, context)
     }.bind(this), this.options.timeGap)
   }
 
@@ -373,24 +400,42 @@ class OverpassFrontend {
       err = results.remark
     }
 
+    const status = {}
+
     if (err !== null) {
       this.errorCount++
+
+      status.status = err.status
+      status.errorCount = this.errorCount
 
       if (this.errorCount <= 3) {
         // retry
         if (err.status === 429) {
           this.requestIsActive = true
           const timeGap = this.options.timeGap429Exp ** (this.errorCount - 1) * this.options.timeGap429
-          console.error('Overpass API returned ' + this.errorCount + '. 429 error, waiting ' + timeGap + 'ms')
+
+          status.retry = true
+          status.retryTimeout = timeGap
+          this.emit('reject', status, context)
 
           global.setTimeout(() => {
             this.requestIsActive = false
             this._overpassProcess()
           }, timeGap - this.options.timeGap)
         } else {
+          this.emit('error', err, context)
+
           this._overpassProcess()
         }
       } else {
+        if (err.status === 429) {
+          status.retry = false
+
+          this.emit('reject', status, context)
+        }
+
+        this.emit('error', status, context)
+
         // abort
         // call finalCallback for the request
         context.subRequests.forEach(function (subRequest) {
@@ -399,12 +444,12 @@ class OverpassFrontend {
       }
 
       return
-    } else {
-      this.errorCount = 0
     }
 
+    this.errorCount = 0
+
     const osm3sMeta = copyOsm3sMetaFrom(results)
-    this.emit('load', osm3sMeta)
+    this.emit('load', osm3sMeta, context)
 
     let subRequestsIndex = 0
     let partIndex = 0
