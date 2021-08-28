@@ -84,4 +84,18 @@
     <tag k="source:maxspeed" v="AT:urban"/>
     <tag k="surface" v="asphalt"/>
   </way>
+  <node id="7574526582" lat="48.2083724" lon="16.3386017" version="1" timestamp="2020-05-31T07:32:41Z" changeset="86000250" uid="5140186" user="m3h4"/>
+  <node id="7574526583" lat="48.2083887" lon="16.3386135" version="1" timestamp="2020-05-31T07:32:41Z" changeset="86000250" uid="5140186" user="m3h4"/>
+  <node id="7574526584" lat="48.2083755" lon="16.3386587" version="1" timestamp="2020-05-31T07:32:41Z" changeset="86000250" uid="5140186" user="m3h4"/>
+  <node id="7574533785" lat="48.2083592" lon="16.3386486" version="1" timestamp="2020-05-31T07:32:41Z" changeset="86000250" uid="5140186" user="m3h4"/>
+  <way id="810158846" version="2" timestamp="2021-06-16T18:18:48Z" changeset="106484339" uid="6752061" user="wonderb0lt">
+    <nd ref="7574526582"/>
+    <nd ref="7574526583"/>
+    <nd ref="7574526584"/>
+    <nd ref="7574533785"/>
+    <nd ref="7574526582"/>
+    <tag k="amenity" v="fast_food"/>
+    <tag k="building" v="yes"/>
+    <tag k="name" v="Hot Dogs"/>
+  </way>
 </osm>

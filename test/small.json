@@ -228,6 +228,71 @@
         "source:maxspeed": "AT:urban",
         "surface": "asphalt"
       }
+    },
+    {
+      "type": "node",
+      "id": 7574526582,
+      "lat": 48.2083724,
+      "lon": 16.3386017,
+      "timestamp": "2020-05-31T07:32:41Z",
+      "version": 1,
+      "changeset": 86000250,
+      "user": "m3h4",
+      "uid": 5140186
+    },
+    {
+      "type": "node",
+      "id": 7574526583,
+      "lat": 48.2083887,
+      "lon": 16.3386135,
+      "timestamp": "2020-05-31T07:32:41Z",
+      "version": 1,
+      "changeset": 86000250,
+      "user": "m3h4",
+      "uid": 5140186
+    },
+    {
+      "type": "node",
+      "id": 7574526584,
+      "lat": 48.2083755,
+      "lon": 16.3386587,
+      "timestamp": "2020-05-31T07:32:41Z",
+      "version": 1,
+      "changeset": 86000250,
+      "user": "m3h4",
+      "uid": 5140186
+    },
+    {
+      "type": "node",
+      "id": 7574533785,
+      "lat": 48.2083592,
+      "lon": 16.3386486,
+      "timestamp": "2020-05-31T07:32:41Z",
+      "version": 1,
+      "changeset": 86000250,
+      "user": "m3h4",
+      "uid": 5140186
+    },
+    {
+      "type": "way",
+      "id": 810158846,
+      "timestamp": "2021-06-16T18:18:48Z",
+      "version": 2,
+      "changeset": 106484339,
+      "user": "wonderb0lt",
+      "uid": 6752061,
+      "nodes": [
+        7574526582,
+        7574526583,
+        7574526584,
+        7574533785,
+        7574526582
+      ],
+      "tags": {
+        "amenity": "fast_food",
+        "building": "yes",
+        "name": "Hot Dogs"
+      }
     }
   ]
 }
