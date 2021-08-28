@@ -191,7 +191,8 @@ describe('Overpass get before load finishes', function() {
           assert.deepEqual(result.members, [
             { type: 'way', ref: 47379824, role: 'from', id: 'w47379824', dir: null },
             { type: 'node', ref: 17312837, role: 'via', id: 'n17312837' },
-            { type: 'way', ref: 324297228, role: 'to', id: 'w324297228', dir: null }
+            { type: 'way', ref: 324297228, role: 'to', id: 'w324297228', dir: null },
+            { type: 'way', ref: 324297229, role: 'incomplete', id: 'w324297229' }
           ])
         } else if (result.id === 'n293269032') {
           assert.deepEqual(result.memberOf, [
@@ -201,7 +202,8 @@ describe('Overpass get before load finishes', function() {
           assert.deepEqual(result.memberOf, [
             { id: 'r276122', sequence: 1, role: 'via' },
             { id: 'w47379824', sequence: 3, role: null },
-            { id: 'w324297228', sequence: 0, role: null }
+            { id: 'w324297228', sequence: 0, role: null },
+            { id: 'w26738383', sequence: 12, role: null }
           ])
         } else if (result.id === 'w324297228') {
           assert.deepEqual(result.memberOf, [
@@ -250,7 +252,8 @@ describe('Overpass BBoxQuery with members', function() {
               assert.deepEqual(result.memberOf, [
                 { id: 'r276122', sequence: 1, role: 'via' },
                 { id: 'w47379824', sequence: 3, role: null },
-                { id: 'w324297228', sequence: 0, role: null }
+                { id: 'w324297228', sequence: 0, role: null },
+                { id: 'w26738383', sequence: 12, role: null }
               ])
             } else if (result.id === 'w324297228') {
               assert.deepEqual(result.memberOf, [
@@ -269,7 +272,8 @@ describe('Overpass BBoxQuery with members', function() {
             assert.deepEqual(result.members, [
               { type: 'way', ref: 47379824, role: 'from', id: 'w47379824', dir: null },
               { type: 'node', ref: 17312837, role: 'via', id: 'n17312837' },
-              { type: 'way', ref: 324297228, role: 'to', id: 'w324297228', dir: null }
+              { type: 'way', ref: 324297228, role: 'to', id: 'w324297228', dir: null },
+              { type: 'way', ref: 324297229, role: 'incomplete', id: 'w324297229' }
             ])
           }
         },
@@ -303,7 +307,8 @@ describe('Overpass BBoxQuery with members', function() {
               assert.deepEqual(result.memberOf, [
                 { id: 'r276122', sequence: 1, role: 'via' },
                 { id: 'w47379824', sequence: 3, role: null },
-                { id: 'w324297228', sequence: 0, role: null }
+                { id: 'w324297228', sequence: 0, role: null },
+                { id: 'w26738383', sequence: 12, role: null }
               ])
             } else if (result.id === 'w324297228') {
               assert.deepEqual(result.memberOf, [
@@ -326,7 +331,8 @@ describe('Overpass BBoxQuery with members', function() {
             assert.deepEqual(result.members, [
               { type: 'way', ref: 47379824, role: 'from', id: 'w47379824', dir: null },
               { type: 'node', ref: 17312837, role: 'via', id: 'n17312837' },
-              { type: 'way', ref: 324297228, role: 'to', id: 'w324297228', dir: null }
+              { type: 'way', ref: 324297228, role: 'to', id: 'w324297228', dir: null },
+              { type: 'way', ref: 324297229, role: 'incomplete', id: 'w324297229' }
             ])
           }
         },

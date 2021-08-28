@@ -2,18 +2,18 @@
   "version": 0.6,
   "generator": "Overpass API 0.7.55.4 3079d8ea",
   "osm3s": {
-    "timestamp_osm_base": "2018-09-29T15:06:02Z",
-    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.",
+    "timestamp_osm_base": "2018-09-29T15:06:02Z"
   },
   "elements": [
     {
       "type": "relation",
       "id": 276122,
-      "timestamp": "2015-01-25T19:01:10Z",
-      "version": 5,
       "changeset": 28402799,
+      "timestamp": "2015-01-25T19:01:10Z",
       "user": "Eckhart Wörner",
       "uid": 2675,
+      "version": 5,
       "members": [
         {
           "type": "way",
@@ -29,11 +29,6 @@
           "type": "way",
           "ref": 324297228,
           "role": "to"
-        },
-        {
-          "type": "way",
-          "ref": 324297229,
-          "role": "incomplete"
         }
       ],
       "tags": {
@@ -43,47 +38,58 @@
     },
     {
       "type": "node",
-      "id": 378469,
-      "lat": 48.2061526,
-      "lon": 16.3373996,
-      "timestamp": "2019-05-04T02:12:52Z",
-      "version": 8,
+      "id": 378466,
       "changeset": 69864791,
+      "timestamp": "2019-05-04T02:12:52Z",
       "user": "Laci",
-      "uid": 134881
+      "uid": 134881,
+      "version": 10,
+      "lat": 48.2042243,
+      "lon": 16.337525
+    },
+    {
+      "type": "node",
+      "id": 378469,
+      "changeset": 69864791,
+      "timestamp": "2019-05-04T02:12:52Z",
+      "user": "Laci",
+      "uid": 134881,
+      "version": 8,
+      "lat": 48.2061526,
+      "lon": 16.3373996
     },
     {
       "type": "node",
       "id": 17312863,
-      "lat": 48.2073210,
-      "lon": 16.3381480,
-      "timestamp": "2011-12-10T02:06:51Z",
-      "version": 14,
       "changeset": 10078045,
+      "timestamp": "2011-12-10T02:06:51Z",
       "user": "KaiRo",
-      "uid": 17047
+      "uid": 17047,
+      "version": 14,
+      "lat": 48.207321,
+      "lon": 16.338148
     },
     {
       "type": "node",
       "id": 17312836,
-      "lat": 48.2085805,
-      "lon": 16.3381316,
-      "timestamp": "2015-01-25T19:01:18Z",
-      "version": 14,
       "changeset": 28402799,
+      "timestamp": "2015-01-25T19:01:18Z",
       "user": "Eckhart Wörner",
-      "uid": 2675
+      "uid": 2675,
+      "version": 14,
+      "lat": 48.2085805,
+      "lon": 16.3381316
     },
     {
       "type": "node",
       "id": 17312837,
-      "lat": 48.2084499,
-      "lon": 16.3388375,
-      "timestamp": "2015-01-25T19:01:18Z",
-      "version": 10,
       "changeset": 28402799,
+      "timestamp": "2015-01-25T19:01:18Z",
       "user": "Eckhart Wörner",
       "uid": 2675,
+      "version": 10,
+      "lat": 48.2084499,
+      "lon": 16.3388375,
       "tags": {
         "highway": "traffic_signals"
       }
@@ -91,13 +97,13 @@
     {
       "type": "node",
       "id": 293269032,
-      "lat": 48.2085393,
-      "lon": 16.3382698,
-      "timestamp": "2013-03-24T10:56:39Z",
-      "version": 14,
       "changeset": 15476879,
+      "timestamp": "2013-03-24T10:56:39Z",
       "user": "stefanct",
       "uid": 303158,
+      "version": 14,
+      "lat": 48.2085393,
+      "lon": 16.3382698,
       "tags": {
         "bicycle": "yes",
         "crossing": "traffic_signals",
@@ -108,13 +114,13 @@
     {
       "type": "node",
       "id": 1538937640,
-      "lat": 48.208453,
-      "lon": 16.3389884,
-      "timestamp": "2017-02-16T14:01:24Z",
-      "version": 3,
       "changeset": 46137877,
+      "timestamp": "2017-02-16T14:01:24Z",
       "user": "Weltstaat",
       "uid": 3080626,
+      "version": 3,
+      "lat": 48.208453,
+      "lon": 16.3389884,
       "tags": {
         "crossing": "traffic_signals",
         "highway": "crossing"
@@ -123,13 +129,13 @@
     {
       "type": "node",
       "id": 2076499330,
-      "lat": 48.20846,
-      "lon": 16.3387307,
-      "timestamp": "2013-03-24T10:56:39Z",
-      "version": 2,
       "changeset": 15476879,
+      "timestamp": "2013-03-24T10:56:39Z",
       "user": "stefanct",
       "uid": 303158,
+      "version": 2,
+      "lat": 48.20846,
+      "lon": 16.3387307,
       "tags": {
         "crossing": "traffic_signals",
         "highway": "crossing"
@@ -138,22 +144,22 @@
     {
       "type": "node",
       "id": 3310442552,
-      "lat": 48.2084566,
-      "lon": 16.3391389,
-      "timestamp": "2015-01-25T19:01:09Z",
-      "version": 1,
       "changeset": 28402799,
+      "timestamp": "2015-01-25T19:01:09Z",
       "user": "Eckhart Wörner",
-      "uid": 2675
+      "uid": 2675,
+      "version": 1,
+      "lat": 48.2084566,
+      "lon": 16.3391389
     },
     {
       "type": "way",
       "id": 47379824,
-      "timestamp": "2018-07-01T19:31:07Z",
-      "version": 10,
       "changeset": 60328723,
+      "timestamp": "2018-07-01T19:31:07Z",
       "user": "JM82",
       "uid": 2641694,
+      "version": 10,
       "nodes": [
         17312836,
         293269032,
@@ -172,11 +178,11 @@
     {
       "type": "way",
       "id": 324297228,
-      "timestamp": "2017-12-06T17:30:22Z",
-      "version": 3,
       "changeset": 54407099,
+      "timestamp": "2017-12-06T17:30:22Z",
       "user": "m3h4",
       "uid": 5140186,
+      "version": 3,
       "nodes": [
         17312837,
         1538937640,
@@ -195,11 +201,11 @@
     {
       "type": "way",
       "id": 26738383,
-      "timestamp": "2020-08-26T13:21:34Z",
-      "version": 16,
       "changeset": 89975018,
+      "timestamp": "2020-08-26T13:21:34Z",
       "user": "Hannes237",
       "uid": 11085411,
+      "version": 16,
       "nodes": [
         378466,
         1541460528,

@@ -9,9 +9,12 @@
     <member type="way" ref="47379824" role="from"/>
     <member type="node" ref="17312837" role="via"/>
     <member type="way" ref="324297228" role="to"/>
+    <member type="way" ref="324297229" role="incomplete"/>
     <tag k="restriction" v="only_straight_on"/>
     <tag k="type" v="restriction"/>
   </relation>
+  <node id="378469" lat="48.2061526" lon="16.3373996" version="8" timestamp="2019-05-04T02:12:52Z" changeset="69864791" uid="134881" user="Laci"/>
+  <node id="17312863" lat="48.2073210" lon="16.3381480" version="14" timestamp="2011-12-10T02:06:51Z" changeset="10078045" uid="17047" user="KaiRo"/>
   <node id="17312836" lat="48.2085805" lon="16.3381316" version="14" timestamp="2015-01-25T19:01:18Z" changeset="28402799" uid="2675" user="Eckhart Wörner"/>
   <node id="17312837" lat="48.2084499" lon="16.3388375" version="10" timestamp="2015-01-25T19:01:18Z" changeset="28402799" uid="2675" user="Eckhart Wörner">
     <tag k="highway" v="traffic_signals"/>
@@ -55,5 +58,30 @@
     <tag k="oneway" v="yes"/>
     <tag k="surface" v="asphalt"/>
   </way>
-
+  <way id="26738383" version="16" timestamp="2020-08-26T13:21:34Z" changeset="89975018" uid="11085411" user="Hannes237">
+    <nd ref="378466"/>
+    <nd ref="1541460528"/>
+    <nd ref="1541461243"/>
+    <nd ref="6447009618"/>
+    <nd ref="6447009619"/>
+    <nd ref="33240966"/>
+    <nd ref="378469"/>
+    <nd ref="1538935506"/>
+    <nd ref="17312863"/>
+    <nd ref="3310442551"/>
+    <nd ref="6447009606"/>
+    <nd ref="1538937617"/>
+    <nd ref="17312837"/>
+    <tag k="bicycle" v="use_sidepath"/>
+    <tag k="cycleway:right" v="no"/>
+    <tag k="highway" v="primary"/>
+    <tag k="lanes" v="4"/>
+    <tag k="lit" v="yes"/>
+    <tag k="maxspeed" v="50"/>
+    <tag k="name" v="Lerchenfelder Gürtel"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="ref" v="B221"/>
+    <tag k="source:maxspeed" v="AT:urban"/>
+    <tag k="surface" v="asphalt"/>
+  </way>
 </osm>
