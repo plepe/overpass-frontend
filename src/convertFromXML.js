@@ -50,13 +50,46 @@ module.exports = function convertFromXML (xml) {
 
           element.tags[child.getAttribute('k')] = child.getAttribute('v')
         } else if (child.nodeName === 'member') {
-          element.members.push({
+          const member = {
             type: child.getAttribute('type'),
             ref: parseInt(child.getAttribute('ref')),
             role: child.getAttribute('role')
-          })
+          }
+
+          if (child.hasAttribute('lat')) {
+            member.lat = parseFloat(child.getAttribute('lat'))
+            member.lon = parseFloat(child.getAttribute('lon'))
+          }
+
+          let memberChild = child.firstChild
+          if (member.type === 'way' && memberChild) {
+            member.geometry = []
+            while (memberChild) {
+              if (memberChild.nodeName === 'nd') {
+                member.geometry.push({
+                  lat: parseFloat(memberChild.getAttribute('lat')),
+                  lon: parseFloat(memberChild.getAttribute('lon'))
+                })
+              }
+
+              memberChild = memberChild.nextSibling
+            }
+          }
+
+          element.members.push(member)
         } else if (child.nodeName === 'nd') {
           element.nodes.push(parseInt(child.getAttribute('ref')))
+
+          if (child.hasAttribute('lat')) {
+            if (!element.geometry) {
+              element.geometry = []
+            }
+
+            element.geometry.push({
+              lat: parseFloat(child.getAttribute('lat')),
+              lon: parseFloat(child.getAttribute('lon'))
+            })
+          }
         }
 
         child = child.nextSibling
