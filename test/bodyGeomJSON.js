@@ -138,6 +138,90 @@ describe('Load OSM data from JSON file created with "out body geom" from Overpas
     )
   })
 
+  it('way (referenced object)', (done) => {
+    let count = 0
+
+    overpassFrontend.get(
+      ['w771273963'],
+      {
+        properties: OverpassFrontend.ID_ONLY
+      },
+      (err, result) => {
+        count++
+        const geojson = result.GeoJSON()
+        assert.equal(result.properties, OverpassFrontend.GEOM|OverpassFrontend.BBOX|OverpassFrontend.CENTER)
+        assert.deepEqual(geojson, {
+          "type": "Feature",
+          "id": "way/771273963",
+          "properties": {
+            "@id": "way/771273963"
+          },
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                16.3440996,
+                48.1318708
+              ],
+              [
+                16.3440728,
+                48.131835
+              ],
+              [
+                16.3441291,
+                48.1317974
+              ],
+              [
+                16.3442901,
+                48.1317706
+              ],
+              [
+                16.3445476,
+                48.131767
+              ],
+              [
+                16.3446924,
+                48.1317563
+              ],
+              [
+                16.3447648,
+                48.1317885
+              ],
+              [
+                16.3448158,
+                48.1318189
+              ],
+              [
+                16.344797,
+                48.1318404
+              ],
+              [
+                16.3446951,
+                48.1318386
+              ],
+              [
+                16.34451,
+                48.131835
+              ],
+              [
+                16.3443276,
+                48.1318458
+              ],
+              [
+                16.3440996,
+                48.1318708
+              ]
+            ]
+          }
+        })
+      },
+      (err) => {
+        assert.equal(count, 1, "No object found")
+        done(err)
+      }
+    )
+  })
+
   it('relation', (done) => {
     let count = 0
 

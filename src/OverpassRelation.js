@@ -52,6 +52,15 @@ class OverpassRelation extends OverpassObject {
         const member = data.members[i]
 
         this.members.push(member)
+
+        // fix referenced ways from 'out geom' output
+        if (member.type === 'way' && typeof member.ref === 'string') {
+          const m = member.ref.match(/^_fullGeom([0-9]+)$/)
+          if (m) {
+            member.ref = parseInt(m[1])
+          }
+        }
+
         this.members[i].id = member.type.substr(0, 1) + member.ref
       }
     }
@@ -61,13 +70,18 @@ class OverpassRelation extends OverpassObject {
 
       this.memberFeatures = data.members.map(
         (member, sequence) => {
+          let obProperties = OverpassFrontend.ID_ONLY
           const ob = JSON.parse(JSON.stringify(member))
           ob.id = ob.ref
           delete ob.ref
           delete ob.role
 
+          if (ob.geometry) {
+            obProperties |= OverpassFrontend.GEOM
+          }
+
           const memberOb = this.overpass.createOrUpdateOSMObject(ob, {
-            properties: options.properties & OverpassFrontend.GEOM
+            properties: obProperties
           })
 
           // call notifyMemberOf only once per member
