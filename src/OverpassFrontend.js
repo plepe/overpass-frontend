@@ -1,4 +1,4 @@
-const ee = require('event-emitter')
+const EventEmitter = require('events')
 const async = require('async')
 const weightSort = require('weight-sort')
 const BoundingBox = require('boundingbox')
@@ -77,8 +77,9 @@ const Filter = require('./Filter')
  * @param {number} [options.loadChunkSize=1000] When loading a file (instead connecting to an Overpass URL) load elements in chunks of n items.
  * @property {boolean} hasStretchLon180=false Are there any map features in the cache which stretch over lon=180/-180?
  */
-class OverpassFrontend {
+class OverpassFrontend extends EventEmitter {
   constructor (url, options) {
+    super()
     this.url = url
     this.options = {
       effortPerRequest: 1000,
@@ -761,8 +762,6 @@ for (const k in defines) {
 function isSeparator (el) {
   return ('count' in el || ('type' in el && el.type === 'count'))
 }
-
-ee(OverpassFrontend.prototype)
 
 OverpassFrontend.Filter = Filter
 

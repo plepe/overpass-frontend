@@ -1,4 +1,4 @@
-const ee = require('event-emitter')
+const EventEmitter = require('events')
 const BoundingBox = require('boundingbox')
 const OverpassFrontend = require('./defines')
 const turf = {
@@ -23,8 +23,9 @@ const turf = {
 * @property {BoundingBox} bounds Bounding box of this object.
  * @property {Point} center Centroid of the bounding box.
  */
-class OverpassObject {
+class OverpassObject extends EventEmitter {
   constructor () {
+    super()
     this.data = {}
     this.properties = 0
     this.memberOf = []
@@ -365,7 +366,5 @@ class OverpassObject {
     return this.dbData
   }
 }
-
-ee(OverpassObject.prototype)
 
 module.exports = OverpassObject

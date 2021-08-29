@@ -1,4 +1,4 @@
-const ee = require('event-emitter')
+const EventEmitter = require('events')
 const SortedCallbacks = require('./SortedCallbacks')
 
 /**
@@ -16,8 +16,9 @@ const SortedCallbacks = require('./SortedCallbacks')
  * @param {OverpassFrontend} overpass
  * @param {object} options
  */
-class Request {
+class Request extends EventEmitter {
   constructor (overpass, data) {
+    super()
     this.overpass = overpass
 
     for (const k in data) {
@@ -138,7 +139,5 @@ class Request {
     this.emit('subrequest-finish', subRequest)
   }
 }
-
-ee(Request.prototype)
 
 module.exports = Request

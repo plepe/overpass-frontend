@@ -28,7 +28,6 @@
     "boundingbox": "^1.2.4",
     "browserify-shim": "^3.8.14",
     "bzip2": "^0.1.1",
-    "event-emitter": "^0.3.5",
     "lodash": "^4.17.20",
     "lokijs": "^1.5.12",
     "osmtogeojson": "^3.0.0-beta.4",
