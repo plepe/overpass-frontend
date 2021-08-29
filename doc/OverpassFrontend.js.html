@@ -52,6 +52,30 @@ const Filter = require('./Filter')
  * An error occured
  * @event OverpassFrontend#error
  * @param {Error} error
+ * @param {OverpassFrontend#Context} [context] - context of the request
+ */
+
+/**
+ * A request to Overpass API is started
+ * @event OverpassFrontend#start
+ * @param {object} reserved
+ * @param {OverpassFrontend#Context} context - context of the request
+ */
+
+/**
+ * A request to Overpass API was rejected
+ * @event OverpassFrontend#reject
+ * @param {OverpassFrontend#QueryStatus} queryStatus
+ * @param {OverpassFrontend#Context} context - context of the request
+ */
+
+/**
+ * Status of a query to Overpass API
+ * @typedef {Object} OverpassFrontend#QueryStatus
+ * @property {int} [status] - result status (e.g. 429 for reject, ...)
+ * @property {int} [errorCount] - the nth error in a row
+ * @property {boolean} [retry] - true, if the request will be retried (after a 429 error)
+ * @property {int} [retryTimeout] - if the query will be retried, the next request will be delayed for n ms
  */
 
 /**
@@ -63,6 +87,7 @@ const Filter = require('./Filter')
  * @param {string} osm3sMeta.timestamp_osm_base RFC8601 timestamp of OpenStreetMap data
  * @param {string} osm3sMeta.copyright Copyright statement
  * @param {BoundingBox} [osm3sMeta.bounds] Bounding Box (only when loading from file)
+ * @param {OverpassFrontend#Context} [context] - context of the request
  */
 
 /**
@@ -80,7 +105,8 @@ const Filter = require('./Filter')
  * @param {number} [options.effortWay=4] The effort for request a way.
  * @param {number} [options.effortRelation=64] The effort for request a relation.
  * @param {number} [options.timeGap=10] A short time gap between two requests to the Overpass API (milliseconds).
- * @param {number} [options.timeGap429=1000] A longer time after a 429 response from Overpass API (milliseconds).
+ * @param {number} [options.timeGap429=500] A longer time gap after a 429 response from Overpass API (milliseconds).
+ * @param {number} [options.timeGap429Exp=3] If we keep getting 429 responses, increase the time exponentially with the specified factor (e.g. 2: 500ms, 1000ms, 2000ms, ...; 3: 500ms, 1500ms, 4500ms, ...)
  * @param {number} [options.loadChunkSize=1000] When loading a file (instead connecting to an Overpass URL) load elements in chunks of n items.
  * @property {boolean} hasStretchLon180=false Are there any map features in the cache which stretch over lon=180/-180?
  */
@@ -93,7 +119,8 @@ class OverpassFrontend {
       effortWay: 4,
       effortRelation: 64,
       timeGap: 10,
-      timeGap429: 1000,
+      timeGap429: 500,
+      timeGap429Exp: 3,
       loadChunkSize: 1000
     }
     for (const k in options) {
@@ -389,6 +416,8 @@ class OverpassFrontend {
         query,
         this._handleResult.bind(this, context)
       )
+
+      this.emit('start', {}, context)
     }.bind(this), this.options.timeGap)
   }
 
@@ -399,22 +428,42 @@ class OverpassFrontend {
       err = results.remark
     }
 
+    const status = {}
+
     if (err !== null) {
       this.errorCount++
+
+      status.status = err.status
+      status.errorCount = this.errorCount
 
       if (this.errorCount &lt;= 3) {
         // retry
         if (err.status === 429) {
           this.requestIsActive = true
+          const timeGap = this.options.timeGap429Exp ** (this.errorCount - 1) * this.options.timeGap429
+
+          status.retry = true
+          status.retryTimeout = timeGap
+          this.emit('reject', status, context)
 
           global.setTimeout(() => {
             this.requestIsActive = false
             this._overpassProcess()
-          }, this.options.timeGap429 - this.options.timeGap)
+          }, timeGap - this.options.timeGap)
         } else {
+          this.emit('error', err, context)
+
           this._overpassProcess()
         }
       } else {
+        if (err.status === 429) {
+          status.retry = false
+
+          this.emit('reject', status, context)
+        }
+
+        this.emit('error', status, context)
+
         // abort
         // call finalCallback for the request
         context.subRequests.forEach(function (subRequest) {
@@ -423,12 +472,12 @@ class OverpassFrontend {
       }
 
       return
-    } else {
-      this.errorCount = 0
     }
 
+    this.errorCount = 0
+
     const osm3sMeta = copyOsm3sMetaFrom(results)
-    this.emit('load', osm3sMeta)
+    this.emit('load', osm3sMeta, context)
 
     let subRequestsIndex = 0
     let partIndex = 0
@@ -763,13 +812,13 @@ module.exports = OverpassFrontend
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Filter.html">Filter</a></li><li><a href="KnownArea.html">KnownArea</a></li><li><a href="OverpassFrontend.html">OverpassFrontend</a></li><li><a href="OverpassNode.html">OverpassNode</a></li><li><a href="OverpassObject.html">OverpassObject</a></li><li><a href="OverpassRelation.html">OverpassRelation</a></li><li><a href="OverpassWay.html">OverpassWay</a></li><li><a href="Request.html">Request</a></li><li><a href="RequestBBox.html">RequestBBox</a></li><li><a href="RequestGet.html">RequestGet</a></li><li><a href="RequestMulti.html">RequestMulti</a></li></ul><h3>Events</h3><ul><li><a href="OverpassFrontend.html#event:error">error</a></li><li><a href="OverpassFrontend.html#event:load">load</a></li><li><a href="OverpassFrontend.html#event:update">update</a></li><li><a href="Request.html#event:abort">abort</a></li><li><a href="Request.html#event:finish">finish</a></li><li><a href="Request.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="Request.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestBBox.html#event:abort">abort</a></li><li><a href="RequestBBox.html#event:finish">finish</a></li><li><a href="RequestBBox.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestBBox.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestGet.html#event:abort">abort</a></li><li><a href="RequestGet.html#event:finish">finish</a></li><li><a href="RequestGet.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestGet.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestMulti.html#event:abort">abort</a></li><li><a href="RequestMulti.html#event:finish">finish</a></li><li><a href="RequestMulti.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestMulti.html#event:subrequest-finished">subrequest-finished</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Filter.html">Filter</a></li><li><a href="KnownArea.html">KnownArea</a></li><li><a href="OverpassFrontend.html">OverpassFrontend</a></li><li><a href="OverpassNode.html">OverpassNode</a></li><li><a href="OverpassObject.html">OverpassObject</a></li><li><a href="OverpassRelation.html">OverpassRelation</a></li><li><a href="OverpassWay.html">OverpassWay</a></li><li><a href="Request.html">Request</a></li><li><a href="RequestBBox.html">RequestBBox</a></li><li><a href="RequestGet.html">RequestGet</a></li><li><a href="RequestMulti.html">RequestMulti</a></li></ul><h3>Events</h3><ul><li><a href="OverpassFrontend.html#event:error">error</a></li><li><a href="OverpassFrontend.html#event:load">load</a></li><li><a href="OverpassFrontend.html#event:reject">reject</a></li><li><a href="OverpassFrontend.html#event:start">start</a></li><li><a href="OverpassFrontend.html#event:update">update</a></li><li><a href="Request.html#event:abort">abort</a></li><li><a href="Request.html#event:finish">finish</a></li><li><a href="Request.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="Request.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestBBox.html#event:abort">abort</a></li><li><a href="RequestBBox.html#event:finish">finish</a></li><li><a href="RequestBBox.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestBBox.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestGet.html#event:abort">abort</a></li><li><a href="RequestGet.html#event:finish">finish</a></li><li><a href="RequestGet.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestGet.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestMulti.html#event:abort">abort</a></li><li><a href="RequestMulti.html#event:finish">finish</a></li><li><a href="RequestMulti.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestMulti.html#event:subrequest-finished">subrequest-finished</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Sat Jul 03 2021 10:25:26 GMT+0200 (Central European Summer Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Sun Aug 29 2021 10:08:07 GMT+0200 (Central European Summer Time)
 </footer>
 
 <script> prettyPrint(); </script>
