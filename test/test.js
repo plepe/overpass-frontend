@@ -18,6 +18,13 @@ describe('Overpass get', function() {
   describe('single id', function() {
     it('should return an existing relation', function(done) {
       var finalCalled = 0
+      let startEventCalled = 0
+      let loadEventCalled = 0
+
+      let startListener = (status, context) => startEventCalled++
+      let loadListener = (status, context) => loadEventCalled++
+      overpassFrontend.on('start', startListener)
+      overpassFrontend.on('load', loadListener)
 
       overpassFrontend.get('r910885',
         {
@@ -29,6 +36,12 @@ describe('Overpass get', function() {
         },
         function(err) {
           assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
+
+          assert.equal(startEventCalled, 1, '"start" event was called ' + startEventCalled + ' times!')
+          overpassFrontend.off('start', startListener)
+          assert.equal(loadEventCalled, 1, '"load" event was called ' + loadEventCalled + ' times!')
+          overpassFrontend.off('load', loadListener)
+
           done(err)
         })
     })
