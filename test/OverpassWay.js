@@ -102,16 +102,16 @@ describe('OverpassWay', function () {
 
     it('intersect() -- with BoundingBox', function (done) {
       let result = ob.intersects(new BoundingBox({minlon: 16, minlat: 48, maxlon: 17, maxlat: 49}))
-      assert.equal(result, 0) // WRONG
+      assert.equal(result, 1)
 
       result = ob.intersects(new BoundingBox({minlon: 16, minlat: 48, maxlon: 16.2, maxlat: 49}))
-      assert.equal(result, 0) // WRONG
+      assert.equal(result, 1)
 
       result = ob.intersects(new BoundingBox({ minlon: 16.3385746255517, minlat: 48.198845168318556, maxlon: 16.33860144764185, maxlat: 48.19885924739677 }))
-      assert.equal(result, 0) // WRONG
+      assert.equal(result, 1)
 
       result = ob.intersects(new BoundingBox({ minlon: 16.338586695492268, minlat: 48.19886528128624, maxlon: 16.338611505925655, maxlat: 48.198870644742975 }))
-      assert.equal(result, 0) // WRONG
+      assert.equal(result, 1)
 
       done()
     })

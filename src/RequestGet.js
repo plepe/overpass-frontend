@@ -105,10 +105,13 @@ class RequestGet extends Request {
 
         // for bbox option, if object is (partly) loaded, but outside call
         // featureCallback with 'false'
-        if (this.options.bbox && !ob.intersects(this.options.bbox)) {
-          this.featureCallback(null, false, i)
-          this.ids[i] = null
-          continue
+        if (this.options.bbox) {
+          const intersects = ob.intersects(this.options.bbox)
+          if (intersects === 0 || (!ob.bounds && ob.properties | defines.BBOX)) {
+            this.featureCallback(null, false, i)
+            this.ids[i] = null
+            continue
+          }
         }
 
         // not fully loaded

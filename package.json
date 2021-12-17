@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@turf/bbox-clip": "^6.5.0",
+    "@turf/boolean-intersects": "^6.5.0",
     "@turf/difference": "^6.5.0",
     "@turf/intersect": "^6.5.0",
     "@turf/union": "^6.5.0",

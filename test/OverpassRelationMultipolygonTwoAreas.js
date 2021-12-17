@@ -238,16 +238,16 @@ describe('OverpassRelation (multipolygon with separate areas)', function () {
       assert.equal(result, 0)
 
       result = ob.intersects(new BoundingBox({minlon: 16.359533071517944, minlat: 48.21044680425194, maxlon: 16.359715461730957, maxlat: 48.21058264759624}))
-      assert.equal(result, 0) // WRONG -> 1 (between areas)
+      assert.equal(result, 1) // (between areas)
 
       result = ob.intersects(new BoundingBox({minlon: 16.35964035987854, minlat: 48.20887385507528, maxlon: 16.359769105911255, maxlat: 48.20895965354886}))
-      assert.equal(result, 0) // WRONG -> 1 (outside)
+      assert.equal(result, 1) // (outside)
 
       result = ob.intersects(new BoundingBox({minlon: 16.359533071517944, minlat: 48.21149064385367, maxlon: 16.35987639427185, maxlat: 48.21169797932382}))
-      assert.equal(result, 0) // WRONG -> 1 (inside area 1)
+      assert.equal(result, 1) // (inside area 1)
 
       result = ob.intersects(new BoundingBox({minlon: 16.358073949813843, minlat: 48.209495890752116, maxlon: 16.35839581489563, maxlat: 48.209696084535224}))
-      assert.equal(result, 0) // WRONG -> 1 (intersect border of area 2)
+      assert.equal(result, 1) // (intersect border of area 2)
 
       done()
     })
@@ -262,22 +262,22 @@ describe('OverpassRelation (multipolygon with separate areas)', function () {
 
     it('intersect() -- with BoundingBox', function (done) {
       let result = ob.intersects(new BoundingBox({minlon: 16, minlat: 48, maxlon: 17, maxlat: 49}))
-      assert.equal(result, 0) // WRONG -> 1
+      assert.equal(result, 1)
 
       result = ob.intersects(new BoundingBox({minlon: 16, minlat: 48, maxlon: 16.2, maxlat: 49}))
-      assert.equal(result, 0) // WRONG -> 1
+      assert.equal(result, 1)
 
       result = ob.intersects(new BoundingBox({minlon: 16.359533071517944, minlat: 48.21044680425194, maxlon: 16.359715461730957, maxlat: 48.21058264759624}))
-      assert.equal(result, 0) // WRONG -> 1 (between areas)
+      assert.equal(result, 1) // (between areas)
 
       result = ob.intersects(new BoundingBox({minlon: 16.35964035987854, minlat: 48.20887385507528, maxlon: 16.359769105911255, maxlat: 48.20895965354886}))
-      assert.equal(result, 0) // WRONG -> 1 (outside)
+      assert.equal(result, 1) // (outside)
 
       result = ob.intersects(new BoundingBox({minlon: 16.359533071517944, minlat: 48.21149064385367, maxlon: 16.35987639427185, maxlat: 48.21169797932382}))
-      assert.equal(result, 0) // WRONG -> 1 (inside area 1)
+      assert.equal(result, 1) // (inside area 1)
 
       result = ob.intersects(new BoundingBox({minlon: 16.358073949813843, minlat: 48.209495890752116, maxlon: 16.35839581489563, maxlat: 48.209696084535224}))
-      assert.equal(result, 0) // WRONG -> 1 (intersect border of area 2)
+      assert.equal(result, 1) // (intersect border of area 2)
 
       done()
     })

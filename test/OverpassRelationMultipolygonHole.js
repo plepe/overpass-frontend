@@ -69,7 +69,7 @@ describe('OverpassRelation (multipolygon with hole)', function () {
       assert.equal(result, 0)
 
       result = ob.intersects(new BoundingBox({ minlon: 16.33894443511963, minlat: 48.19965146865885, maxlon: 16.33899539709091, maxlat: 48.19968007331587 }))
-      assert.equal(result, 2) // WRONG -> 0 (inside of the hole)
+      assert.equal(result, 0) // (inside of the hole)
 
       result = ob.intersects(new BoundingBox({ minlon: 16.338808983564373, minlat: 48.19949682445519, maxlon: 16.33886530995369, maxlat: 48.199535262075436 }))
       assert.equal(result, 2) // (inside building area)
@@ -102,19 +102,19 @@ describe('OverpassRelation (multipolygon with hole)', function () {
       assert.equal(result, 0)
 
       result = ob.intersects(new BoundingBox({ minlon: 16.33894443511963, minlat: 48.19965146865885, maxlon: 16.33899539709091, maxlat: 48.19968007331587 }))
-      assert.equal(result, 0) // WRONG -> 1 (inside of the hole)
+      assert.equal(result, 1) // (inside of the hole)
 
       result = ob.intersects(new BoundingBox({ minlon: 16.338808983564373, minlat: 48.19949682445519, maxlon: 16.33886530995369, maxlat: 48.199535262075436 }))
-      assert.equal(result, 0) // WRONG -> 1 (inside building area)
+      assert.equal(result, 1) // (inside building area)
 
       result = ob.intersects(new BoundingBox({ minlon: 16.338711082935333, minlat: 48.1994190552284, maxlon: 16.338735222816467, maxlat: 48.19943872102103}))
-      assert.equal(result, 0) // WRONG -> 1 (outside building area)
+      assert.equal(result, 1) // (outside building area)
 
       result = ob.intersects(new BoundingBox({ minlon: 16.339346766471863, minlat: 48.19963001515559, maxlon: 16.33941650390625, maxlat: 48.199672922153106 }))
-      assert.equal(result, 0) // WRONG -> 1 (intersecting outline)
+      assert.equal(result, 1) // (intersecting outline)
 
       result = ob.intersects(new BoundingBox({ minlon: 16.33936285972595, minlat: 48.19949771835367, maxlon: 16.339470148086548, maxlat: 48.199565654591936 }))
-      assert.equal(result, 0) // WRONG -> 1 (intersecting corner)
+      assert.equal(result, 1) // (intersecting corner)
 
       done()
     })
@@ -130,25 +130,25 @@ describe('OverpassRelation (multipolygon with hole)', function () {
 
     it('intersect() -- with BoundingBox', function (done) {
       let result = ob.intersects(new BoundingBox({minlon: 16, minlat: 48, maxlon: 17, maxlat: 49}))
-      assert.equal(result, 0) // WRONG -> 1
+      assert.equal(result, 1)
 
       result = ob.intersects(new BoundingBox({minlon: 16, minlat: 48, maxlon: 16.2, maxlat: 49}))
-      assert.equal(result, 0) // WRONG -> 1
+      assert.equal(result, 1)
 
       result = ob.intersects(new BoundingBox({ minlon: 16.33894443511963, minlat: 48.19965146865885, maxlon: 16.33899539709091, maxlat: 48.19968007331587 }))
-      assert.equal(result, 0) // WRONG -> 1 (inside of the hole)
+      assert.equal(result, 1) // (inside of the hole)
 
       result = ob.intersects(new BoundingBox({ minlon: 16.338808983564373, minlat: 48.19949682445519, maxlon: 16.33886530995369, maxlat: 48.199535262075436 }))
-      assert.equal(result, 0) // WRONG -> 1 (inside building area)
+      assert.equal(result, 1) // (inside building area)
 
       result = ob.intersects(new BoundingBox({ minlon: 16.338711082935333, minlat: 48.1994190552284, maxlon: 16.338735222816467, maxlat: 48.19943872102103}))
-      assert.equal(result, 0) // WRONG -> 1 (outside building area)
+      assert.equal(result, 1) // (outside building area)
 
       result = ob.intersects(new BoundingBox({ minlon: 16.339346766471863, minlat: 48.19963001515559, maxlon: 16.33941650390625, maxlat: 48.199672922153106 }))
-      assert.equal(result, 0) // WRONG -> 1 (intersecting outline)
+      assert.equal(result, 1) // (intersecting outline)
 
       result = ob.intersects(new BoundingBox({ minlon: 16.33936285972595, minlat: 48.19949771835367, maxlon: 16.339470148086548, maxlat: 48.199565654591936 }))
-      assert.equal(result, 0) // WRONG -> 1 (intersecting corner)
+      assert.equal(result, 1) // (intersecting corner)
 
       done()
     })

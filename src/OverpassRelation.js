@@ -7,7 +7,7 @@ const OverpassObject = require('./OverpassObject')
 const OverpassFrontend = require('./defines')
 const geojsonShiftWorld = require('./geojsonShiftWorld')
 const turf = {
-  bboxClip: require('@turf/bbox-clip').default
+  booleanIntersects: require('@turf/boolean-intersects').default
 }
 
 /**
@@ -435,16 +435,13 @@ class OverpassRelation extends OverpassObject {
   }
 
   intersects (bbox) {
-    let i
+    const result = super.intersects(bbox)
 
-    if (this.bounds) {
-      if (!bbox.intersects(this.bounds)) {
-        return 0
-      }
-      if (this.bounds.within(bbox)) {
-        return 2
-      }
+    if (result === 0 || result === 2) {
+      return result
     }
+
+    let i
 
     if (this.geometry) {
       let geometry = this.geometry
@@ -459,30 +456,14 @@ class OverpassRelation extends OverpassObject {
         }
       }
 
-      for (i = 0; i < geometry.features.length; i++) {
-        const g = geometry.features[i]
-
-        if (g.geometry.type === 'Point') {
-          if (bbox.intersects(g)) {
-            return 2
-          }
-          continue
-        }
-
-        const intersects = turf.bboxClip(g, [bboxShifted.minlon, bboxShifted.minlat, bboxShifted.maxlon, bboxShifted.maxlat])
-
-        if (g.geometry.type === 'LineString' || g.geometry.type === 'Polygon') {
-          if (intersects.geometry.coordinates.length) {
-            return 2
-          }
-        }
-        if (g.geometry.type === 'MultiPolygon' || g.geometry.type === 'MultiLineString') {
-          for (let j = 0; j < intersects.geometry.coordinates.length; j++) {
-            if (intersects.geometry.coordinates[j].length) {
-              return 2
-            }
-          }
-        }
+      if (turf.booleanIntersects(geometry, {type:'Feature', geometry:{type:'Polygon', coordinates: [[
+          [bboxShifted.minlon, bboxShifted.minlat],
+          [bboxShifted.maxlon, bboxShifted.minlat],
+          [bboxShifted.maxlon, bboxShifted.maxlat],
+          [bboxShifted.minlon, bboxShifted.maxlat],
+          [bboxShifted.minlon, bboxShifted.minlat]
+        ]]}})) {
+        return 2
       }
 
       // if there's a relation member (where Overpass does not return the
@@ -493,8 +474,8 @@ class OverpassRelation extends OverpassObject {
         }
       }
 
-      // if there's no relation member we can be sure there's no intersection
-      return 0
+      // if there's no relation member and the geometry is complete we can be sure there's no intersection
+      return this.properties & OverpassFrontend.GEOM ? 0 : 1
     } else if (this.members) {
       for (i in this.members) {
         const memberId = this.members[i].id
@@ -508,7 +489,7 @@ class OverpassRelation extends OverpassObject {
       }
     }
 
-    return super.intersects(bbox)
+    return 1
   }
 }
 

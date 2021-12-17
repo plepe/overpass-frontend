@@ -263,13 +263,10 @@ class OverpassWay extends OverpassObject {
   }
 
   intersects (bbox) {
-    if (this.bounds) {
-      if (!bbox.intersects(this.bounds)) {
-        return 0
-      }
-      if (this.bounds.within(bbox)) {
-        return 2
-      }
+    const result = super.intersects(bbox)
+
+    if (result === 0 || result === 2) {
+      return result
     }
 
     if (this.geometry) {
@@ -278,7 +275,7 @@ class OverpassWay extends OverpassObject {
       return intersects.geometry.coordinates.length ? 2 : 0
     }
 
-    return super.intersects(bbox)
+    return 1
   }
 }
 
