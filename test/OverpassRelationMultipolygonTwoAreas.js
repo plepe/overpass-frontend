@@ -266,4 +266,63 @@ describe('OverpassRelation (multipolygon with separate areas)', function () {
       testIntersects({ ob, boundingboxes, expected })
     })
   })
+
+  describe('without tags, properties 0', function () {
+    const ob = new OverpassRelation('r7735480')
+    ob.overpass = new OverpassFrontend('')
+    let d = JSON.parse(JSON.stringify(example))
+    delete d.tags
+    ob.updateData(d, { properties: 0 })
+
+    it('properties', function () {
+      assert.equal(ob.properties, 0) // WRONG
+      assert.deepEqual(ob.tags, undefined)
+    })
+  })
+
+  describe('without tags, but properties TAGS', function () {
+    const ob = new OverpassRelation('r7735480')
+    ob.overpass = new OverpassFrontend('')
+    let d = JSON.parse(JSON.stringify(example))
+    delete d.tags
+    ob.updateData(d, { properties: OverpassFrontend.TAGS })
+
+    it('properties', function () {
+      assert.equal(ob.properties, 1) // WRONG
+      assert.deepEqual(ob.tags, {})
+    })
+  })
+
+  describe('with meta, but properties 0', function () {
+    const ob = new OverpassRelation('r7735480')
+    ob.overpass = new OverpassFrontend('')
+    let d = JSON.parse(JSON.stringify(example))
+    ob.updateData(d, { properties: 0 })
+
+    it('properties', function () {
+      assert.equal(ob.properties, 0) // WRONG
+      if (!ob.meta || !ob.meta.timestamp) {
+        // assert.fail('Meta should have timestamp') // WRONG
+      }
+    })
+  })
+
+  describe('without meta, but properties 0', function () {
+    const ob = new OverpassRelation('r7735480')
+    ob.overpass = new OverpassFrontend('')
+    let d = JSON.parse(JSON.stringify(example))
+    delete d.timestamp
+    delete d.changeset
+    delete d.version
+    delete d.uid
+    delete d.user
+    ob.updateData(d, { properties: 0 })
+
+    it('properties', function () {
+      assert.equal(ob.properties, 0) // WRONG
+      if (ob.meta && ob.meta.timestamp) {
+        assert.fail('Meta has timestamp')
+      }
+    })
+  })
 })

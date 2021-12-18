@@ -59,6 +59,10 @@ describe('OverpassWay', function () {
     ob.overpass = new OverpassFrontend('')
     ob.updateData(example, { properties: 63 })
 
+    it('properties', function () {
+      assert.equal(ob.properties, 63)
+    })
+
     it('intersect()', function () {
       const expected = {
         'wrap': 2,
@@ -77,6 +81,10 @@ describe('OverpassWay', function () {
     let d = JSON.parse(JSON.stringify(example))
     delete d.geometry
     ob.updateData(d, { properties: 7 })
+
+    it('properties', function () {
+      assert.equal(ob.properties, 7)
+    })
 
     it('intersect()', function () {
       const expected = {
@@ -98,6 +106,10 @@ describe('OverpassWay', function () {
     delete d.bounds
     ob.updateData(d, { properties: 7 })
 
+    it('properties', function () {
+      assert.equal(ob.properties, 7)
+    })
+
     it('intersect()', function () {
       const expected = {
         'wrap': 1,
@@ -107,6 +119,77 @@ describe('OverpassWay', function () {
       }
 
       testIntersects({ ob, boundingboxes, expected })
+    })
+  })
+
+  describe('with tags, properties 0', function () {
+    const ob = new OverpassWay('w299709376')
+    ob.overpass = new OverpassFrontend('')
+    let d = JSON.parse(JSON.stringify(example))
+    ob.updateData(d, { properties: 0 })
+
+    it('properties', function () {
+      assert.equal(ob.properties, 56) // WRONG
+      assert.deepEqual(ob.tags, example.tags)
+    })
+  })
+
+  describe('without tags, properties 0', function () {
+    const ob = new OverpassWay('w299709376')
+    ob.overpass = new OverpassFrontend('')
+    let d = JSON.parse(JSON.stringify(example))
+    delete d.tags
+    ob.updateData(d, { properties: 0 })
+
+    it('properties', function () {
+      assert.equal(ob.properties, 56)
+      assert.deepEqual(ob.tags, undefined)
+    })
+  })
+
+  describe('without tags, but properties TAGS', function () {
+    const ob = new OverpassWay('w299709376')
+    ob.overpass = new OverpassFrontend('')
+    let d = JSON.parse(JSON.stringify(example))
+    delete d.tags
+    ob.updateData(d, { properties: OverpassFrontend.TAGS })
+
+    it('properties', function () {
+      assert.equal(ob.properties, 57)
+      assert.deepEqual(ob.tags, {})
+    })
+  })
+
+  describe('with meta, but properties 0', function () {
+    const ob = new OverpassWay('w299709376')
+    ob.overpass = new OverpassFrontend('')
+    let d = JSON.parse(JSON.stringify(example))
+    ob.updateData(d, { properties: 0 })
+
+    it('properties', function () {
+      assert.equal(ob.properties, 56) // WRONG
+      if (!ob.meta || !ob.meta.timestamp) {
+        assert.fail('Meta should have timestamp')
+      }
+    })
+  })
+
+  describe('without meta, but properties 0', function () {
+    const ob = new OverpassWay('w299709376')
+    ob.overpass = new OverpassFrontend('')
+    let d = JSON.parse(JSON.stringify(example))
+    delete d.timestamp
+    delete d.changeset
+    delete d.version
+    delete d.uid
+    delete d.user
+    ob.updateData(d, { properties: 0 })
+
+    it('properties', function () {
+      assert.equal(ob.properties, 56) // WRONG
+      if (ob.meta && ob.meta.timestamp) {
+        assert.fail('Meta has timestamp')
+      }
     })
   })
 })
