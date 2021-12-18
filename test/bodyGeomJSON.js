@@ -55,7 +55,7 @@ describe('Load OSM data from JSON file created with "out body geom" from Overpas
       (err, result) => {
         count++
         const geojson = result.GeoJSON()
-        assert.equal(result.properties, OverpassFrontend.CENTER|OverpassFrontend.GEOM|OverpassFrontend.BBOX)
+        assert.equal(result.properties, OverpassFrontend.CENTER|OverpassFrontend.GEOM|OverpassFrontend.BBOX|OverpassFrontend.MEMBERS)
         assert.deepEqual(geojson, {
           "type": "Feature",
           "id": "node/4332664312",

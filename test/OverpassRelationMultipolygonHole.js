@@ -9,6 +9,11 @@ const id = 'r2334391'
 const example = {
   "type": "relation",
   "id": 2334391,
+  "timestamp": "2012-08-06T03:08:07Z",
+  "version": 1,
+  "changeset": 12628312,
+  "user": "KaiRo",
+  "uid": 17047,
   "bounds": {
     "minlat": 48.1994112,
     "minlon": 16.3386374,
@@ -71,7 +76,11 @@ describe('OverpassRelation (multipolygon with hole)', function () {
   describe('with geometry', function () {
     const ob = new OverpassRelation(id)
     ob.overpass = new OverpassFrontend('')
-    ob.updateData(example, { properties: 63 })
+    ob.updateData(example, { properties: 0 })
+
+    it('properties', function () {
+      assert.equal(ob.properties, 63)
+    })
 
     it('intersect()', function () {
       const expected = {
@@ -141,7 +150,7 @@ describe('OverpassRelation (multipolygon with hole)', function () {
     ob.updateData(d, { properties: 0 })
 
     it('properties', function () {
-      assert.equal(ob.properties, 0) // WRONG
+      assert.equal(ob.properties, 62)
       assert.deepEqual(ob.tags, undefined)
     })
   })
@@ -154,7 +163,7 @@ describe('OverpassRelation (multipolygon with hole)', function () {
     ob.updateData(d, { properties: OverpassFrontend.TAGS })
 
     it('properties', function () {
-      assert.equal(ob.properties, 1) // WRONG
+      assert.equal(ob.properties, 63)
       assert.deepEqual(ob.tags, {})
     })
   })
@@ -166,9 +175,9 @@ describe('OverpassRelation (multipolygon with hole)', function () {
     ob.updateData(d, { properties: 0 })
 
     it('properties', function () {
-      assert.equal(ob.properties, 0) // WRONG
+      assert.equal(ob.properties, 63)
       if (!ob.meta || !ob.meta.timestamp) {
-        // assert.fail('Meta should have timestamp') // WRONG
+        assert.fail('Meta should have timestamp') // WRONG
       }
     })
   })
@@ -185,7 +194,7 @@ describe('OverpassRelation (multipolygon with hole)', function () {
     ob.updateData(d, { properties: 0 })
 
     it('properties', function () {
-      assert.equal(ob.properties, 0) // WRONG
+      assert.equal(ob.properties, 61)
       if (ob.meta && ob.meta.timestamp) {
         assert.fail('Meta has timestamp')
       }

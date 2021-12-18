@@ -40,49 +40,50 @@ const turf = {
  */
 class OverpassRelation extends OverpassObject {
   updateData (data, options) {
-    let i
-
     super.updateData(data, options)
 
-    if ((options.properties & OverpassFrontend.MEMBERS) &&
-        data.members) {
-      this.members = []
-
-      for (i = 0; i < data.members.length; i++) {
-        const member = data.members[i]
-
-        this.members.push(member)
-
-        // fix referenced ways from 'out geom' output
-        if (member.type === 'way' && typeof member.ref === 'string') {
-          const m = member.ref.match(/^_fullGeom([0-9]+)$/)
-          if (m) {
-            member.ref = parseInt(m[1])
-          }
-        }
-
-        this.members[i].id = member.type.substr(0, 1) + member.ref
-      }
+    if (data.bounds) {
+      this.bounds = new BoundingBox(data.bounds)
+      this.center = this.bounds.getCenter()
+      this.properties |= OverpassFrontend.BBOX | OverpassFrontend.CENTER
     }
 
-    if (options.properties & OverpassFrontend.MEMBERS) {
-      const membersKnown = !!this.memberFeatures
+    if (data.center) {
+      this.center = data.center
+      this.properties |= OverpassFrontend.CENTER
+    }
 
+    if (data.members) {
+      this.members = []
+      this.properties |= OverpassFrontend.MEMBERS
+
+      const membersKnown = !!this.memberFeatures
       this.memberFeatures = data.members.map(
         (member, sequence) => {
-          let obProperties = OverpassFrontend.ID_ONLY
+          this.members.push(member)
+
+          // fix referenced ways from 'out geom' output
+          if (member.type === 'way' && typeof member.ref === 'string') {
+            const m = member.ref.match(/^_fullGeom([0-9]+)$/)
+            if (m) {
+              member.ref = parseInt(m[1])
+            }
+          }
+
+          member.id = member.type.substr(0, 1) + member.ref
+
           const ob = JSON.parse(JSON.stringify(member))
           ob.id = ob.ref
           delete ob.ref
           delete ob.role
+          let memberProperties = OverpassFrontend.ID_ONLY
 
-          if (ob.geometry) {
-            obProperties |= OverpassFrontend.GEOM
+          if ((member.type === 'node' && 'lat' in member) ||
+              (member.type === 'way' && 'geometry' in member)) {
+            memberProperties |= OverpassFrontend.GEOM
           }
 
-          const memberOb = this.overpass.createOrUpdateOSMObject(ob, {
-            properties: obProperties
-          })
+          const memberOb = this.overpass.createOrUpdateOSMObject(ob, { properties: memberProperties })
 
           // call notifyMemberOf only once per member
           if (!membersKnown) {
@@ -92,15 +93,7 @@ class OverpassRelation extends OverpassObject {
           return memberOb
         }
       )
-    }
 
-    if ((options.properties & OverpassFrontend.MEMBERS) &&
-        (options.properties & OverpassFrontend.GEOM) &&
-        data.members) {
-      const elements = [JSON.parse(JSON.stringify(data))]
-      this.geometry = osmtogeojson({ elements })
-    } else if ((options.properties & OverpassFrontend.MEMBERS) &&
-        data.members) {
       this.updateGeometry()
     }
   }
@@ -216,7 +209,7 @@ class OverpassRelation extends OverpassObject {
       }
     )
 
-    if (!this.bounds) {
+    if (!(this.properties & OverpassFrontend.BBOX)) {
       this.members.forEach(member => {
         const ob = this.overpass.cacheElements[member.id]
         if (ob.bounds) {

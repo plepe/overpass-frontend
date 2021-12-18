@@ -70,7 +70,7 @@ describe('OverpassNode', function () {
     ob.updateData(d, { properties: 0 })
 
     it('properties', function () {
-      assert.equal(ob.properties, 56) // WRONG
+      assert.equal(ob.properties, 63)
       assert.deepEqual(ob.tags, example.tags)
     })
   })
@@ -83,7 +83,7 @@ describe('OverpassNode', function () {
     ob.updateData(d, { properties: 0 })
 
     it('properties', function () {
-      assert.equal(ob.properties, 56)
+      assert.equal(ob.properties, 62)
       assert.deepEqual(ob.tags, undefined)
     })
   })
@@ -96,7 +96,7 @@ describe('OverpassNode', function () {
     ob.updateData(d, { properties: OverpassFrontend.TAGS })
 
     it('properties', function () {
-      assert.equal(ob.properties, 57)
+      assert.equal(ob.properties, 63)
       assert.deepEqual(ob.tags, {})
     })
   })
@@ -108,7 +108,7 @@ describe('OverpassNode', function () {
     ob.updateData(d, { properties: 0 })
 
     it('properties', function () {
-      assert.equal(ob.properties, 56) // WRONG
+      assert.equal(ob.properties, 63)
       if (!ob.meta || !ob.meta.timestamp) {
         assert.fail('Meta should have timestamp')
       }
@@ -127,7 +127,7 @@ describe('OverpassNode', function () {
     ob.updateData(d, { properties: 0 })
 
     it('properties', function () {
-      assert.equal(ob.properties, 56) // WRONG
+      assert.equal(ob.properties, 61)
       if (ob.meta && ob.meta.timestamp) {
         assert.fail('Meta has timestamp')
       }

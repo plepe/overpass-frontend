@@ -1117,7 +1117,7 @@ describe('Overpass query by id with bbox option', function() {
     overpassFrontend.get(query.concat([]), { properties: OverpassFrontend.ID_ONLY },
         function(err, result, index) {
           // has GEOM, because for nodes lat/lon is geom, bbox and center
-          assert.equal(OverpassFrontend.GEOM | OverpassFrontend.BBOX | OverpassFrontend.CENTER, result.properties, 'Element ' + result.id + ' which was loaded outside bbox, should only have BBOX data')
+          assert.equal(OverpassFrontend.GEOM | OverpassFrontend.BBOX | OverpassFrontend.CENTER | OverpassFrontend.MEMBERS, result.properties, 'Element ' + result.id + ' which was loaded outside bbox, should only have BBOX data')
         },
         function(err) {
           assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
@@ -1772,7 +1772,7 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
       function (err, result) {
         found.push(result.id)
 
-        assert.equal(result.properties, OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.BBOX)
+        assert.equal(result.properties, OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.BBOX | OverpassFrontend.CENTER)
 
         if (expected.indexOf(result.id) === -1) {
           error += 'Unexpected result ' + result.id + '\n'
@@ -1856,7 +1856,7 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
       function (err, result) {
         found.push(result.id)
 
-        assert.equal(result.properties, OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.BBOX)
+        assert.equal(result.properties, OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.BBOX | OverpassFrontend.CENTER)
 
         if (expected.indexOf(result.id) === -1) {
           error += 'Unexpected result ' + result.id + '\n'
@@ -1938,7 +1938,7 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
       function (err, result) {
         found.push(result.id)
 
-        assert.equal(result.properties, OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.BBOX)
+        assert.equal(result.properties, OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.BBOX | OverpassFrontend.CENTER)
 
         if (expected.indexOf(result.id) === -1) {
           error += 'Unexpected result ' + result.id + '\n'
@@ -2019,7 +2019,7 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
       function (err, result) {
         found.push(result.id)
 
-        assert.equal(result.properties, OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.BBOX)
+        assert.equal(result.properties, OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.BBOX | OverpassFrontend.CENTER)
 
         if (expected.indexOf(result.id) === -1) {
           error += 'Unexpected result ' + result.id + '\n'
@@ -2103,7 +2103,7 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
       function (err, result) {
         found.push(result.id)
 
-        assert.equal(result.properties, OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.BBOX)
+        assert.equal(result.properties, OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.BBOX | OverpassFrontend.CENTER)
 
         if (expected.indexOf(result.id) === -1) {
           error += 'Unexpected result ' + result.id + '\n'
@@ -2186,7 +2186,7 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
       function (err, result) {
         found.push(result.id)
 
-        assert.equal(result.properties, OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.BBOX)
+        assert.equal(result.properties, OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.BBOX | OverpassFrontend.CENTER)
 
         if (expected.indexOf(result.id) === -1) {
           error += 'Unexpected result ' + result.id + '\n'
@@ -2503,7 +2503,7 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
       function (err, result) {
         found.push(result.id)
 
-        assert.equal(result.properties, OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.BBOX)
+        assert.equal(result.properties, OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.BBOX | OverpassFrontend.CENTER)
 
         if (expected.indexOf(result.id) === -1) {
           error += 'Unexpected result ' + result.id + '\n'
@@ -2580,7 +2580,7 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
       function (err, result) {
         found.push(result.id)
 
-        assert.equal(result.properties, OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.BBOX)
+        assert.equal(result.properties, OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.BBOX | OverpassFrontend.CENTER)
 
         if (expected.indexOf(result.id) === -1) {
           error += 'Unexpected result ' + result.id + '\n'
@@ -2668,7 +2668,7 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
       function (err, result) {
         found.push(result.id)
 
-        assert.equal(result.properties, OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.BBOX)
+        assert.equal(result.properties, OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.BBOX | OverpassFrontend.CENTER)
 
         if (expected.indexOf(result.id) === -1) {
           error += 'Unexpected result ' + result.id + '\n'
@@ -2755,7 +2755,7 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
         found.push(result.id)
         foundObjs[result.id] = result
 
-        assert.equal(result.properties, OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.BBOX)
+        assert.equal(result.properties, OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.BBOX | OverpassFrontend.CENTER)
 
         if (expected.indexOf(result.id) === -1) {
           error += 'Unexpected result ' + result.id + '\n'
@@ -2784,7 +2784,7 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
 
         for (var i in foundObjs) {
           let ob = foundObjs[i]
-          assert.equal(ob.properties, OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.BBOX | OverpassFrontend.GEOM, 'After loading all members, relations should have GEOM known')
+          assert.equal(ob.properties, OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.BBOX | OverpassFrontend.GEOM | OverpassFrontend.CENTER, 'After loading all members, relations should have GEOM known')
         }
 
         assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
@@ -3609,7 +3609,7 @@ describe('Events', function () {
           }
 
           assert.equal(result.memberFeatures.length, 63, 'Wrong count of member features')
-          assert.equal(result.memberFeatures[0].properties, OverpassFrontend.GEOM | OverpassFrontend.BBOX | OverpassFrontend.CENTER, 'Member features has more than GEOM properties')
+          assert.equal(result.memberFeatures[0].properties, OverpassFrontend.GEOM | OverpassFrontend.BBOX | OverpassFrontend.CENTER | OverpassFrontend.MEMBERS, 'Member features has more than GEOM properties')
 
           result.on('update', countUpdateCalls)
 
@@ -3623,7 +3623,7 @@ describe('Events', function () {
               }
 
               if (result.type === 'node') {
-                assert.equal(result.properties, OverpassFrontend.GEOM | OverpassFrontend.BBOX | OverpassFrontend.CENTER | OverpassFrontend.TAGS, 'Should know GEOM from relation and TAGS from direct request (node)')
+                assert.equal(result.properties, OverpassFrontend.GEOM | OverpassFrontend.BBOX | OverpassFrontend.CENTER | OverpassFrontend.TAGS | OverpassFrontend.MEMBERS, 'Should know GEOM from relation and TAGS from direct request (node)')
               } else if (result.type === 'way') {
                 assert.equal(result.properties, OverpassFrontend.GEOM | OverpassFrontend.BBOX | OverpassFrontend.CENTER | OverpassFrontend.TAGS, 'Should know GEOM from relation and TAGS from direct request (way)')
               }

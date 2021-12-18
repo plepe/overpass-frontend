@@ -37,6 +37,7 @@ class OverpassWay extends OverpassObject {
 
     if (data.geometry) {
       this.geometry = data.geometry
+      this.properties |= OverpassFrontend.GEOM
     }
 
     super.updateData(data, options)
