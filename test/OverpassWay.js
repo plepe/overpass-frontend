@@ -3,6 +3,7 @@ const BoundingBox = require('boundingbox')
 
 const OverpassWay = require('../src/OverpassWay')
 const OverpassFrontend = require('..')
+const testIntersects = require('../src/testIntersects')
 
 const example = {
   "type": "way",
@@ -45,26 +46,28 @@ const example = {
   }
 }
 
+const boundingboxes = {
+  'wrap': new BoundingBox({minlon: 16, minlat: 48, maxlon: 17, maxlat: 49}),
+  'not wrap': new BoundingBox({minlon: 16, minlat: 48, maxlon: 16.2, maxlat: 49}),
+  'not quite': new BoundingBox({ minlon: 16.3385746255517, minlat: 48.198845168318556, maxlon: 16.33860144764185, maxlat: 48.19885924739677 }),
+  'intersect': new BoundingBox({ minlon: 16.338586695492268, minlat: 48.19886528128624, maxlon: 16.338611505925655, maxlat: 48.198870644742975 })
+}
+
 describe('OverpassWay', function () {
   describe('with geometry', function () {
     const ob = new OverpassWay('w299709376')
     ob.overpass = new OverpassFrontend('')
     ob.updateData(example, { properties: 63 })
 
-    it('intersect() -- with BoundingBox', function (done) {
-      let result = ob.intersects(new BoundingBox({minlon: 16, minlat: 48, maxlon: 17, maxlat: 49}))
-      assert.equal(result, 2)
+    it('intersect()', function () {
+      const expected = {
+        'wrap': 2,
+        'not wrap': 0,
+        'not quite': 0,
+        'intersect': 2
+      }
 
-      result = ob.intersects(new BoundingBox({minlon: 16, minlat: 48, maxlon: 16.2, maxlat: 49}))
-      assert.equal(result, 0)
-
-      result = ob.intersects(new BoundingBox({ minlon: 16.3385746255517, minlat: 48.198845168318556, maxlon: 16.33860144764185, maxlat: 48.19885924739677 }))
-      assert.equal(result, 0)
-
-      result = ob.intersects(new BoundingBox({ minlon: 16.338586695492268, minlat: 48.19886528128624, maxlon: 16.338611505925655, maxlat: 48.198870644742975 }))
-      assert.equal(result, 2)
-
-      done()
+      testIntersects({ ob, boundingboxes, expected })
     })
   })
 
@@ -75,20 +78,15 @@ describe('OverpassWay', function () {
     delete d.geometry
     ob.updateData(d, { properties: 7 })
 
-    it('intersect() -- with BoundingBox', function (done) {
-      let result = ob.intersects(new BoundingBox({minlon: 16, minlat: 48, maxlon: 17, maxlat: 49}))
-      assert.equal(result, 2)
+    it('intersect()', function () {
+      const expected = {
+        'wrap': 2,
+        'not wrap': 0,
+        'not quite': 1,
+        'intersect': 1
+      }
 
-      result = ob.intersects(new BoundingBox({minlon: 16, minlat: 48, maxlon: 16.2, maxlat: 49}))
-      assert.equal(result, 0)
-
-      result = ob.intersects(new BoundingBox({ minlon: 16.3385746255517, minlat: 48.198845168318556, maxlon: 16.33860144764185, maxlat: 48.19885924739677 }))
-      assert.equal(result, 1)
-
-      result = ob.intersects(new BoundingBox({ minlon: 16.338586695492268, minlat: 48.19886528128624, maxlon: 16.338611505925655, maxlat: 48.198870644742975 }))
-      assert.equal(result, 1)
-
-      done()
+      testIntersects({ ob, boundingboxes, expected })
     })
   })
 
@@ -100,20 +98,15 @@ describe('OverpassWay', function () {
     delete d.bounds
     ob.updateData(d, { properties: 7 })
 
-    it('intersect() -- with BoundingBox', function (done) {
-      let result = ob.intersects(new BoundingBox({minlon: 16, minlat: 48, maxlon: 17, maxlat: 49}))
-      assert.equal(result, 1)
+    it('intersect()', function () {
+      const expected = {
+        'wrap': 1,
+        'not wrap': 1,
+        'not quite': 1,
+        'intersect': 1
+      }
 
-      result = ob.intersects(new BoundingBox({minlon: 16, minlat: 48, maxlon: 16.2, maxlat: 49}))
-      assert.equal(result, 1)
-
-      result = ob.intersects(new BoundingBox({ minlon: 16.3385746255517, minlat: 48.198845168318556, maxlon: 16.33860144764185, maxlat: 48.19885924739677 }))
-      assert.equal(result, 1)
-
-      result = ob.intersects(new BoundingBox({ minlon: 16.338586695492268, minlat: 48.19886528128624, maxlon: 16.338611505925655, maxlat: 48.198870644742975 }))
-      assert.equal(result, 1)
-
-      done()
+      testIntersects({ ob, boundingboxes, expected })
     })
   })
 })

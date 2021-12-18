@@ -3,6 +3,7 @@ const BoundingBox = require('boundingbox')
 
 const OverpassRelation = require('../src/OverpassRelation')
 const OverpassFrontend = require('..')
+const testIntersects = require('../src/testIntersects')
 
 const id = 'r2334391'
 const example = {
@@ -55,35 +56,35 @@ const example = {
   }
 }
 
+const boundingboxes = {
+  'wrap': new BoundingBox({minlon: 16, minlat: 48, maxlon: 17, maxlat: 49}),
+  'not wrap': new BoundingBox({minlon: 16, minlat: 48, maxlon: 16.2, maxlat: 49}),
+  'inside of the hole': new BoundingBox({ minlon: 16.33894443511963, minlat: 48.19965146865885, maxlon: 16.33899539709091, maxlat: 48.19968007331587 }),
+  'inside building area': new BoundingBox({ minlon: 16.338808983564373, minlat: 48.19949682445519, maxlon: 16.33886530995369, maxlat: 48.199535262075436 }),
+  'outside building area': new BoundingBox({ minlon: 16.338711082935333, minlat: 48.1994190552284, maxlon: 16.338735222816467, maxlat: 48.19943872102103 }),
+  'intersecting outline': new BoundingBox({ minlon: 16.339346766471863, minlat: 48.19963001515559, maxlon: 16.33941650390625, maxlat: 48.199672922153106 }),
+  'intersecting corner': new BoundingBox({ minlon: 16.33936285972595, minlat: 48.19949771835367, maxlon: 16.339470148086548, maxlat: 48.199565654591936 })
+}
+
+
 describe('OverpassRelation (multipolygon with hole)', function () {
   describe('with geometry', function () {
     const ob = new OverpassRelation(id)
     ob.overpass = new OverpassFrontend('')
     ob.updateData(example, { properties: 63 })
 
-    it('intersect() -- with BoundingBox', function (done) {
-      let result = ob.intersects(new BoundingBox({minlon: 16, minlat: 48, maxlon: 17, maxlat: 49}))
-      assert.equal(result, 2)
+    it('intersect()', function () {
+      const expected = {
+        'wrap': 2,
+        'not wrap': 0,
+        'inside of the hole': 0,
+        'inside building area': 2,
+        'outside building area': 0,
+        'intersecting outline': 2,
+        'intersecting corner': 2
+      }
 
-      result = ob.intersects(new BoundingBox({minlon: 16, minlat: 48, maxlon: 16.2, maxlat: 49}))
-      assert.equal(result, 0)
-
-      result = ob.intersects(new BoundingBox({ minlon: 16.33894443511963, minlat: 48.19965146865885, maxlon: 16.33899539709091, maxlat: 48.19968007331587 }))
-      assert.equal(result, 0) // (inside of the hole)
-
-      result = ob.intersects(new BoundingBox({ minlon: 16.338808983564373, minlat: 48.19949682445519, maxlon: 16.33886530995369, maxlat: 48.199535262075436 }))
-      assert.equal(result, 2) // (inside building area)
-
-      result = ob.intersects(new BoundingBox({ minlon: 16.338711082935333, minlat: 48.1994190552284, maxlon: 16.338735222816467, maxlat: 48.19943872102103 }))
-      assert.equal(result, 0) // (outside building area)
-
-      result = ob.intersects(new BoundingBox({ minlon: 16.339346766471863, minlat: 48.19963001515559, maxlon: 16.33941650390625, maxlat: 48.199672922153106 }))
-      assert.equal(result, 2) // (intersecting outline)
-
-      result = ob.intersects(new BoundingBox({ minlon: 16.33936285972595, minlat: 48.19949771835367, maxlon: 16.339470148086548, maxlat: 48.199565654591936 }))
-      assert.equal(result, 2) // (intersecting corner)
-
-      done()
+      testIntersects({ ob, boundingboxes, expected })
     })
   })
 
@@ -94,29 +95,18 @@ describe('OverpassRelation (multipolygon with hole)', function () {
     d.members.forEach(m => delete m.geometry)
     ob.updateData(d, { properties: 7 })
 
-    it('intersect() -- with BoundingBox', function (done) {
-      let result = ob.intersects(new BoundingBox({minlon: 16, minlat: 48, maxlon: 17, maxlat: 49}))
-      assert.equal(result, 2)
+    it('intersect()', function () {
+      const expected = {
+        'wrap': 2,
+        'not wrap': 0,
+        'inside of the hole': 1,
+        'inside building area': 1,
+        'outside building area': 1,
+        'intersecting outline': 1,
+        'intersecting corner': 1
+      }
 
-      result = ob.intersects(new BoundingBox({minlon: 16, minlat: 48, maxlon: 16.2, maxlat: 49}))
-      assert.equal(result, 0)
-
-      result = ob.intersects(new BoundingBox({ minlon: 16.33894443511963, minlat: 48.19965146865885, maxlon: 16.33899539709091, maxlat: 48.19968007331587 }))
-      assert.equal(result, 1) // (inside of the hole)
-
-      result = ob.intersects(new BoundingBox({ minlon: 16.338808983564373, minlat: 48.19949682445519, maxlon: 16.33886530995369, maxlat: 48.199535262075436 }))
-      assert.equal(result, 1) // (inside building area)
-
-      result = ob.intersects(new BoundingBox({ minlon: 16.338711082935333, minlat: 48.1994190552284, maxlon: 16.338735222816467, maxlat: 48.19943872102103}))
-      assert.equal(result, 1) // (outside building area)
-
-      result = ob.intersects(new BoundingBox({ minlon: 16.339346766471863, minlat: 48.19963001515559, maxlon: 16.33941650390625, maxlat: 48.199672922153106 }))
-      assert.equal(result, 1) // (intersecting outline)
-
-      result = ob.intersects(new BoundingBox({ minlon: 16.33936285972595, minlat: 48.19949771835367, maxlon: 16.339470148086548, maxlat: 48.199565654591936 }))
-      assert.equal(result, 1) // (intersecting corner)
-
-      done()
+      testIntersects({ ob, boundingboxes, expected })
     })
   })
 
@@ -128,29 +118,18 @@ describe('OverpassRelation (multipolygon with hole)', function () {
     delete d.bounds
     ob.updateData(d, { properties: 7 })
 
-    it('intersect() -- with BoundingBox', function (done) {
-      let result = ob.intersects(new BoundingBox({minlon: 16, minlat: 48, maxlon: 17, maxlat: 49}))
-      assert.equal(result, 1)
+    it('intersect()', function () {
+      const expected = {
+        'wrap': 1,
+        'not wrap': 1,
+        'inside of the hole': 1,
+        'inside building area': 1,
+        'outside building area': 1,
+        'intersecting outline': 1,
+        'intersecting corner': 1
+      }
 
-      result = ob.intersects(new BoundingBox({minlon: 16, minlat: 48, maxlon: 16.2, maxlat: 49}))
-      assert.equal(result, 1)
-
-      result = ob.intersects(new BoundingBox({ minlon: 16.33894443511963, minlat: 48.19965146865885, maxlon: 16.33899539709091, maxlat: 48.19968007331587 }))
-      assert.equal(result, 1) // (inside of the hole)
-
-      result = ob.intersects(new BoundingBox({ minlon: 16.338808983564373, minlat: 48.19949682445519, maxlon: 16.33886530995369, maxlat: 48.199535262075436 }))
-      assert.equal(result, 1) // (inside building area)
-
-      result = ob.intersects(new BoundingBox({ minlon: 16.338711082935333, minlat: 48.1994190552284, maxlon: 16.338735222816467, maxlat: 48.19943872102103}))
-      assert.equal(result, 1) // (outside building area)
-
-      result = ob.intersects(new BoundingBox({ minlon: 16.339346766471863, minlat: 48.19963001515559, maxlon: 16.33941650390625, maxlat: 48.199672922153106 }))
-      assert.equal(result, 1) // (intersecting outline)
-
-      result = ob.intersects(new BoundingBox({ minlon: 16.33936285972595, minlat: 48.19949771835367, maxlon: 16.339470148086548, maxlat: 48.199565654591936 }))
-      assert.equal(result, 1) // (intersecting corner)
-
-      done()
+      testIntersects({ ob, boundingboxes, expected })
     })
   })
 })
