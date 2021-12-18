@@ -456,13 +456,19 @@ class OverpassRelation extends OverpassObject {
         }
       }
 
-      if (turf.booleanIntersects(geometry, {type:'Feature', geometry:{type:'Polygon', coordinates: [[
-          [bboxShifted.minlon, bboxShifted.minlat],
-          [bboxShifted.maxlon, bboxShifted.minlat],
-          [bboxShifted.maxlon, bboxShifted.maxlat],
-          [bboxShifted.minlon, bboxShifted.maxlat],
-          [bboxShifted.minlon, bboxShifted.minlat]
-        ]]}})) {
+      if (turf.booleanIntersects(geometry, {
+        type: 'Feature',
+        geometry: {
+          type: 'Polygon',
+          coordinates: [[
+            [bboxShifted.minlon, bboxShifted.minlat],
+            [bboxShifted.maxlon, bboxShifted.minlat],
+            [bboxShifted.maxlon, bboxShifted.maxlat],
+            [bboxShifted.minlon, bboxShifted.maxlat],
+            [bboxShifted.minlon, bboxShifted.minlat]
+          ]]
+        }
+      })) {
         return 2
       }
 
