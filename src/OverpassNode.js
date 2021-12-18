@@ -92,6 +92,8 @@ class OverpassNode extends OverpassObject {
 
       this.properties = this.properties | OverpassFrontend.GEOM | OverpassFrontend.BBOX | OverpassFrontend.CENTER
     }
+
+    this.properties |= OverpassFrontend.MEMBERS // node does not have members, so it always known all of them
   }
 
   /**

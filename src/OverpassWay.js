@@ -43,6 +43,7 @@ class OverpassWay extends OverpassObject {
 
     if (typeof this.data.nodes !== 'undefined') {
       this.members = []
+      this.properties |= OverpassFrontend.MEMBERS
 
       for (let i = 0; i < this.data.nodes.length; i++) {
         this.members.push({

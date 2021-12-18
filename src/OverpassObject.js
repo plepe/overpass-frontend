@@ -96,6 +96,9 @@ class OverpassObject {
       } else {
         this.tags = data.tags
       }
+    } else if (data.tags) {
+      this.tags = data.tags
+      this.properties |= OverpassFrontend.TAGS
     }
     this.errors = []
 
@@ -107,10 +110,7 @@ class OverpassObject {
         user: data.user,
         uid: data.uid
       }
-    }
-
-    if (data.tags) {
-      this.tags = data.tags
+      this.properties |= OverpassFrontend.META
     }
   }
 
