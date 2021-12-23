@@ -201,8 +201,8 @@ describe('OverpassRelation (multipolygon spanning lon180)', function () {
     it('intersect()', function () {
       const expected = {
         'wrap': 2,
-        'outside left': 1, // wrong -> 0
-        'outside right': 1, // wrong -> 0
+        'outside left': 0,
+        'outside right': 0,
         'inside left': 1,
         'inside right': 1,
         'inside span lon180': 1,

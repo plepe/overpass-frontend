@@ -27,7 +27,7 @@
     "@turf/intersect": "^6.5.0",
     "@turf/union": "^6.5.0",
     "async": "^3.2.1",
-    "boundingbox": "^1.2.5",
+    "boundingbox": "^1.4.0",
     "browserify-shim": "^3.8.14",
     "bzip2": "^0.1.1",
     "event-emitter": "^0.3.5",
