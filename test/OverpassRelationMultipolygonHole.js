@@ -68,7 +68,14 @@ const boundingboxes = {
   'inside building area': new BoundingBox({ minlon: 16.338808983564373, minlat: 48.19949682445519, maxlon: 16.33886530995369, maxlat: 48.199535262075436 }),
   'outside building area': new BoundingBox({ minlon: 16.338711082935333, minlat: 48.1994190552284, maxlon: 16.338735222816467, maxlat: 48.19943872102103 }),
   'intersecting outline': new BoundingBox({ minlon: 16.339346766471863, minlat: 48.19963001515559, maxlon: 16.33941650390625, maxlat: 48.199672922153106 }),
-  'intersecting corner': new BoundingBox({ minlon: 16.33936285972595, minlat: 48.19949771835367, maxlon: 16.339470148086548, maxlat: 48.199565654591936 })
+  'intersecting corner': new BoundingBox({ minlon: 16.33936285972595, minlat: 48.19949771835367, maxlon: 16.339470148086548, maxlat: 48.199565654591936 }),
+  'geojson wrap': { type: 'Feature', geometry: { type: 'Polygon', coordinates: [[[16.338268518447876, 48.199209882239465], [16.34013533592224, 48.199463750200756], [16.338810324668884, 48.20027182857521], [16.338268518447876, 48.199209882239465]]] } },
+  'geojson wrap in bbox': { type: 'Feature', geometry: { type: 'Polygon', coordinates: [[[16.338268518447876, 48.199209882239465], [16.33992075920105, 48.19953883766654], [16.338858604431152, 48.20022534653635], [16.338268518447876, 48.199209882239465]]] } },
+  'geojson in area': { type: 'Feature', properties: {}, geometry: { type: 'Polygon', coordinates: [[[16.33881703019142, 48.19955314002849], [16.338888108730316, 48.19948252207751], [16.338957846164703, 48.19955403392598], [16.33881703019142, 48.19955314002849]]] } },
+  'geojson in hole': { type: 'Feature', geometry: { type: 'Polygon', coordinates: [[[16.338908225297928, 48.19967381604851], [16.338951140642166, 48.19965146865885], [16.33899539709091, 48.199688118372805], [16.338908225297928, 48.19967381604851]]] } },
+  'geojson intersect boundary': { type: 'Feature', geometry: { type: 'Polygon', coordinates: [[[16.338689625263214, 48.19962643957085], [16.338666826486588, 48.199537049871026], [16.338737905025482, 48.19955939731058], [16.338689625263214, 48.19962643957085]]] } },
+  'geojson outside in bbox': { type: 'Feature', geometry: { type: 'Polygon', coordinates: [[[16.3385970890522, 48.19949056716544], [16.338657438755035, 48.19937704191883], [16.338736563920975, 48.19944497831711], [16.3385970890522, 48.19949056716544]]] } },
+  'geojson outside': { type: 'Feature', geometry: { type: 'Polygon', coordinates: [[[16.337962746620178, 48.199719404693234], [16.33792787790298, 48.19939045042563], [16.33833020925522, 48.19959247150328], [16.337962746620178, 48.199719404693234]]] } }
 }
 
 
@@ -90,7 +97,14 @@ describe('OverpassRelation (multipolygon with hole)', function () {
         'inside building area': 2,
         'outside building area': 0,
         'intersecting outline': 2,
-        'intersecting corner': 2
+        'intersecting corner': 2,
+        'geojson wrap': 2,
+        'geojson wrap in bbox': 2,
+        'geojson in area': 2,
+        'geojson in hole': 0,
+        'geojson intersect boundary': 2,
+        'geojson outside in bbox': 0,
+        'geojson outside': 0
       }
 
       testIntersects({ ob, boundingboxes, expected })
@@ -112,7 +126,14 @@ describe('OverpassRelation (multipolygon with hole)', function () {
         'inside building area': 1,
         'outside building area': 1,
         'intersecting outline': 1,
-        'intersecting corner': 1
+        'intersecting corner': 1,
+        'geojson wrap': 2,
+        'geojson wrap in bbox': 1,
+        'geojson in area': 1,
+        'geojson in hole': 1,
+        'geojson intersect boundary': 1,
+        'geojson outside in bbox': 1,
+        'geojson outside': 0
       }
 
       testIntersects({ ob, boundingboxes, expected })
@@ -135,7 +156,14 @@ describe('OverpassRelation (multipolygon with hole)', function () {
         'inside building area': 1,
         'outside building area': 1,
         'intersecting outline': 1,
-        'intersecting corner': 1
+        'intersecting corner': 1,
+        'geojson wrap': 1,
+        'geojson wrap in bbox': 1,
+        'geojson in area': 1,
+        'geojson in hole': 1,
+        'geojson intersect boundary': 1,
+        'geojson outside in bbox': 1,
+        'geojson outside': 1
       }
 
       testIntersects({ ob, boundingboxes, expected })

@@ -5,7 +5,7 @@ const BoundingBox = require('boundingbox')
 const OverpassObject = require('./OverpassObject')
 const OverpassFrontend = require('./defines')
 const turf = {
-  bboxClip: require('@turf/bbox-clip').default
+  booleanIntersects: require('@turf/boolean-intersects').default
 }
 
 /**
@@ -272,9 +272,16 @@ class OverpassWay extends OverpassObject {
     }
 
     if (this.geometry) {
-      const intersects = turf.bboxClip(this.GeoJSON(), [bbox.minlon, bbox.minlat, bbox.maxlon, bbox.maxlat])
+      let intersects
+      if (bbox.toGeoJSON) {
+        // bbox is BoudingBox
+        intersects = turf.booleanIntersects(this.GeoJSON(), bbox.toGeoJSON())
+      } else {
+        // bbox is GeoJSON
+        intersects = turf.booleanIntersects(this.GeoJSON(), bbox)
+      }
 
-      return intersects.geometry.coordinates.length ? 2 : 0
+      return intersects ? 2 : 0
     }
 
     return 1

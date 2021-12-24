@@ -24,8 +24,11 @@ const example = {
 }
 
 const boundingboxes = {
-  'matching': new BoundingBox({minlon: 16, minlat: 48, maxlon: 17, maxlat: 49}),
-  'not matching': new BoundingBox({minlon: 16, minlat: 48, maxlon: 16.2, maxlat: 49})
+  'matching': new BoundingBox({ minlon: 16, minlat: 48, maxlon: 17, maxlat: 49 }),
+  'not matching': new BoundingBox({ minlon: 16, minlat: 48, maxlon: 16.2, maxlat: 49 }),
+  'geojson around bbox': { type: 'Feature', geometry: { type: 'Polygon', coordinates: [[[16.338690631091595, 48.19852604150785], [16.33869230747223, 48.19854950678225], [16.338727176189423, 48.19854973026099], [16.338684931397438, 48.198556881580544], [16.338690631091595, 48.19852604150785]]] } },
+  'geojson matching': { type: 'Feature', geometry: { type: 'Polygon', coordinates: [[[16.338693313300606, 48.19852403019814], [16.338731534779072, 48.1985593398464], [16.33868459612131, 48.19855017721849], [16.338693313300606, 48.19852403019814]]] } },
+  'geojson not matching': { type: 'Feature', geometry: { type: 'Polygon', coordinates: [[[16.338693313300606, 48.19852403019814], [16.338724493980408, 48.198543025898005], [16.338731534779072, 48.1985593398464], [16.338693313300606, 48.19852403019814]]] } }
 }
 
 describe('OverpassNode', function () {
@@ -38,7 +41,10 @@ describe('OverpassNode', function () {
     it('intersect()', function () {
       const expected = {
         'matching': 2,
-        'not matching': 0
+        'not matching': 0,
+        'geojson around bbox': 0,
+        'geojson matching': 2,
+        'geojson not matching': 0
       }
 
       testIntersects({ ob, boundingboxes, expected })
@@ -56,7 +62,10 @@ describe('OverpassNode', function () {
     it('intersect()', function () {
       const expected = {
         'matching': 1,
-        'not matching': 1
+        'not matching': 1,
+        'geojson around bbox': 1,
+        'geojson matching': 1,
+        'geojson not matching': 1
       }
 
       testIntersects({ ob, boundingboxes, expected })

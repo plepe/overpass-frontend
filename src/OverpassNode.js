@@ -3,6 +3,9 @@
 const OverpassObject = require('./OverpassObject')
 const BoundingBox = require('boundingbox')
 const OverpassFrontend = require('./defines')
+const turf = {
+  booleanIntersects: require('@turf/boolean-intersects').default
+}
 
 /**
  * A node
@@ -128,6 +131,11 @@ class OverpassNode extends OverpassObject {
   intersects (bbox) {
     if (!this.bounds) {
       return 1
+    }
+
+    if (!bbox.intersects) { // GeoJSON detected
+      const r = turf.booleanIntersects(this.GeoJSON(), bbox)
+      return r ? 2 : 0
     }
 
     return bbox.intersects(this.bounds) ? 2 : 0

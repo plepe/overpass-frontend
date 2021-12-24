@@ -2,6 +2,8 @@ const ee = require('event-emitter')
 const BoundingBox = require('boundingbox')
 const OverpassFrontend = require('./defines')
 const turf = {
+  booleanIntersects: require('@turf/boolean-intersects').default,
+  booleanWithin: require('@turf/boolean-within').default,
   difference: require('@turf/difference'),
   intersect: require('@turf/intersect').default
 }
@@ -310,11 +312,21 @@ class OverpassObject {
    */
   intersects (bbox) {
     if (this.bounds) {
-      if (!bbox.intersects(this.bounds)) {
-        return 0
-      }
-      if (this.bounds.within(bbox)) {
-        return 2
+      if (!bbox.intersects) { // GeoJSON detected
+        const geojson = this.bounds.toGeoJSON()
+        if (!turf.booleanIntersects(geojson, bbox)) {
+          return 0
+        }
+        if (turf.booleanWithin(geojson, bbox)) {
+          return 2
+        }
+      } else {
+        if (!bbox.intersects(this.bounds)) {
+          return 0
+        }
+        if (this.bounds.within(bbox)) {
+          return 2
+        }
       }
     }
 

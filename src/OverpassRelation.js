@@ -438,30 +438,13 @@ class OverpassRelation extends OverpassObject {
 
     if (this.geometry) {
       let geometry = this.geometry
-      let bboxShifted = bbox
+      let bboxShifted = bbox.toGeoJSON ? bbox.toGeoJSON() : bbox
       if (this.bounds && this.bounds.minlon > this.bounds.maxlon) {
         geometry = geojsonShiftWorld(geometry, [360, 0])
-        bboxShifted = {
-          minlat: bbox.minlat,
-          maxlat: bbox.maxlat,
-          minlon: bbox.minlon,
-          maxlon: bbox.maxlon + 360
-        }
+        bboxShifted = geojsonShiftWorld(bboxShifted, [360, 0])
       }
 
-      if (turf.booleanIntersects(geometry, {
-        type: 'Feature',
-        geometry: {
-          type: 'Polygon',
-          coordinates: [[
-            [bboxShifted.minlon, bboxShifted.minlat],
-            [bboxShifted.maxlon, bboxShifted.minlat],
-            [bboxShifted.maxlon, bboxShifted.maxlat],
-            [bboxShifted.minlon, bboxShifted.maxlat],
-            [bboxShifted.minlon, bboxShifted.minlat]
-          ]]
-        }
-      })) {
+      if (turf.booleanIntersects(geometry, bboxShifted)) {
         return 2
       }
 

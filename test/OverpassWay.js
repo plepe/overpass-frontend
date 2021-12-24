@@ -50,7 +50,11 @@ const boundingboxes = {
   'wrap': new BoundingBox({minlon: 16, minlat: 48, maxlon: 17, maxlat: 49}),
   'not wrap': new BoundingBox({minlon: 16, minlat: 48, maxlon: 16.2, maxlat: 49}),
   'not quite': new BoundingBox({ minlon: 16.3385746255517, minlat: 48.198845168318556, maxlon: 16.33860144764185, maxlat: 48.19885924739677 }),
-  'intersect': new BoundingBox({ minlon: 16.338586695492268, minlat: 48.19886528128624, maxlon: 16.338611505925655, maxlat: 48.198870644742975 })
+  'intersect': new BoundingBox({ minlon: 16.338586695492268, minlat: 48.19886528128624, maxlon: 16.338611505925655, maxlat: 48.198870644742975 }),
+  'geojson around bbox': { type: 'Feature', geometry: { type: 'Polygon', coordinates: [[[16.33849985897541, 48.198801813672446], [16.338546127080917, 48.19892427927929], [16.338677555322647, 48.19893277140904], [16.338514611124992, 48.19893724095045], [16.33849985897541, 48.198801813672446]]] } },
+  'geojson not matching in bbox': { type: 'Feature', geometry: { type: 'Polygon', coordinates: [[[16.338579654693604, 48.19885097873226], [16.338585019111633, 48.1987311946858], [16.338617876172066, 48.19880226062775], [16.338579654693604, 48.19885097873226]]] } },
+  'geojson intersects': { type: 'Feature', geometry: { type: 'Polygon', coordinates: [[[16.338623240590096, 48.198745497273215], [16.33866548538208, 48.19875443638835], [16.338664144277573, 48.198770526791634], [16.338623240590096, 48.198745497273215]]] } },
+  'geojson wrap': { type: 'Feature', geometry: { type: 'Polygon', coordinates: [[[16.338362395763397, 48.19887377342582], [16.338678896427155, 48.198447376890584], [16.338674873113632, 48.19900607183903], [16.338362395763397, 48.19887377342582]]] } }
 }
 
 describe('OverpassWay', function () {
@@ -68,7 +72,11 @@ describe('OverpassWay', function () {
         'wrap': 2,
         'not wrap': 0,
         'not quite': 0,
-        'intersect': 2
+        'intersect': 2,
+        'geojson around bbox': 0,
+        'geojson not matching in bbox': 0,
+        'geojson intersects': 2,
+        'geojson wrap': 2
       }
 
       testIntersects({ ob, boundingboxes, expected })
@@ -91,7 +99,11 @@ describe('OverpassWay', function () {
         'wrap': 2,
         'not wrap': 0,
         'not quite': 1,
-        'intersect': 1
+        'intersect': 1,
+        'geojson around bbox': 0,
+        'geojson not matching in bbox': 1,
+        'geojson intersects': 1,
+        'geojson wrap': 2
       }
 
       testIntersects({ ob, boundingboxes, expected })
@@ -115,7 +127,11 @@ describe('OverpassWay', function () {
         'wrap': 1,
         'not wrap': 1,
         'not quite': 1,
-        'intersect': 1
+        'intersect': 1,
+        'geojson around bbox': 1,
+        'geojson not matching in bbox': 1,
+        'geojson intersects': 1,
+        'geojson wrap': 1
       }
 
       testIntersects({ ob, boundingboxes, expected })
@@ -138,7 +154,11 @@ describe('OverpassWay', function () {
         'wrap': 2,
         'not wrap': 0,
         'not quite': 0,
-        'intersect': 2
+        'intersect': 2,
+        'geojson around bbox': 0,
+        'geojson not matching in bbox': 0,
+        'geojson intersects': 2,
+        'geojson wrap': 2
       }
 
       testIntersects({ ob, boundingboxes, expected })
