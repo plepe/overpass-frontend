@@ -91,15 +91,23 @@ const example = {
 }
 
 const boundingboxes = {
-  'wrap': new BoundingBox({minlon: 179, minlat: 65, maxlon: -179, maxlat: 66}),
-  'outside left': new BoundingBox({minlon: 178, minlat: 65, maxlon: 179, maxlat: 66}),
-  'outside right': new BoundingBox({minlon: -179, minlat: 65, maxlon: -178, maxlat: 66}),
-  'inside left': new BoundingBox({minlon: 179.99660968780518, minlat: 65.86440853577867, maxlon: 179.99776840209958, maxlat: 65.86475949285342}),
-  'inside right': new BoundingBox({ minlon: -179.99545097351074, minlat: 65.86440853577867, maxlon: -179.99446392059326, maxlat: 65.86475949285342}),
-  'inside span lon180': new BoundingBox({ minlon: 179.99927043914795, minlat: 65.86440853577867, maxlon: -179.99914169311523, maxlat: 65.86475949285342}),
-  'border left': new BoundingBox({minlon: 179.99660968780518, minlat: 65.86528591946968, maxlon: 179.99776840209958, maxlat: 65.86684758824924}),
-  'border right': new BoundingBox({ minlon: -179.99545097351074, minlat: 65.86528591946968, maxlon: -179.99446392059326, maxlat: 65.86684758824924}),
-  'border span lon180': new BoundingBox({ minlon: 179.99927043914795, minlat: 65.86528591946968, maxlon: -179.99914169311523, maxlat: 65.86684758824924}),
+  'wrap': new BoundingBox({ minlon: 179, minlat: 65, maxlon: -179, maxlat: 66 }),
+  'outside left': new BoundingBox({ minlon: 178, minlat: 65, maxlon: 179, maxlat: 66 }),
+  'outside right': new BoundingBox({ minlon: -179, minlat: 65, maxlon: -178, maxlat: 66 }),
+  'inside left': new BoundingBox({ minlon: 179.99660968780518, minlat: 65.86440853577867, maxlon: 179.99776840209958, maxlat: 65.86475949285342 }),
+  'inside right': new BoundingBox({ minlon: -179.99545097351074, minlat: 65.86440853577867, maxlon: -179.99446392059326, maxlat: 65.86475949285342 }),
+  'inside span lon180': new BoundingBox({ minlon: 179.99927043914795, minlat: 65.86440853577867, maxlon: -179.99914169311523, maxlat: 65.86475949285342 }),
+  'border left': new BoundingBox({ minlon: 179.99660968780518, minlat: 65.86528591946968, maxlon: 179.99776840209958, maxlat: 65.86684758824924 }),
+  'border right': new BoundingBox({ minlon: -179.99545097351074, minlat: 65.86528591946968, maxlon: -179.99446392059326, maxlat: 65.86684758824924 }),
+  'border span lon180': new BoundingBox({ minlon: 179.99927043914795, minlat: 65.86528591946968, maxlon: -179.99914169311523, maxlat: 65.86684758824924 }),
+  'geojson wrap': { type: 'Feature', geometry: { type: 'MultiPolygon', coordinates: [[[[179, 65], [180, 65], [180, 66], [179, 66], [179, 65]]], [[[-180, 65], [-179, 65], [-179, 66], [-180, 66], [-180, 65]]]] } },
+  'geojson inside': { type: 'Feature', geometry: { type: 'MultiPolygon', coordinates: [[[[179.99927043914795, 65.86440853577867], [180, 65.86440853577867], [180, 65.86475949285342], [179.99927043914795, 65.86475949285342], [179.99927043914795, 65.86440853577867]]], [[[-180, 65.86440853577867], [-179.99914169311523, 65.86440853577867], [-179.99914169311523, 65.86475949285342], [-180, 65.86475949285342], [-180, 65.86440853577867]]]] } },
+  'geojson outside left': { type: 'Feature', geometry: { type: 'Polygon', coordinates: [[[179.9979829788208, 65.86564563811554], [179.9987554550171, 65.8656105438354], [179.9986696243286, 65.86586497627945], [179.9979829788208, 65.86564563811554]]] } },
+  'geojson inside left': { type: 'Feature', geometry: { type: 'Polygon', coordinates: [[[179.99512910842896, 65.8643471177973], [179.99699592590332, 65.86417163704091], [179.99648094177243, 65.86472439736187], [179.99512910842896, 65.8643471177973]]] } },
+  'geojson intersect border left': { type: 'Feature', geometry: { type: 'Polygon', coordinates: [[[179.99300479888916, 65.86506657635815], [179.99264001846313, 65.86465420623477], [179.99431371688843, 65.86466298013616], [179.99300479888916, 65.86506657635815]]] } },
+  'geojson outside right': { type: 'Feature', geometry: { type: 'Polygon', coordinates: [[[-179.99176025390625, 65.86563686455], [-179.99042987823486, 65.86618081994308], [-179.9925327301025, 65.86616327317483], [-179.99176025390625, 65.86563686455]]] } },
+  'geojson inside right': { type: 'Feature', geometry: { type: 'Polygon', coordinates: [[[-179.99768257141113, 65.86482968369263], [-179.9966526031494, 65.86433834378796], [-179.99536514282227, 65.86479458829702], [-179.99768257141113, 65.86482968369263]]] } },
+  'geojson intersect border right': { type: 'Feature', geometry: { type: 'Polygon', coordinates: [[[-179.98948574066162, 65.86430324772064], [-179.99115943908689, 65.86310995288424], [-179.9883270263672, 65.86303975734303], [-179.98948574066162, 65.86430324772064]]] } }
 }
 
 
@@ -138,7 +146,15 @@ describe('OverpassRelation (multipolygon spanning lon180)', function () {
         'inside span lon180': 2,
         'border left': 2,
         'border right': 2,
-        'border span lon180': 2
+        'border span lon180': 2,
+        'geojson wrap': 2,
+        'geojson inside': 2,
+        'geojson outside left': 0,
+        'geojson inside left': 2,
+        'geojson intersect border left': 2,
+        'geojson outside right': 0,
+        'geojson inside right': 2,
+        'geojson intersect border right': 2
       }
 
       testIntersects({ ob, boundingboxes, expected })
@@ -208,7 +224,15 @@ describe('OverpassRelation (multipolygon spanning lon180)', function () {
         'inside span lon180': 1,
         'border left': 1,
         'border right': 1,
-        'border span lon180': 1
+        'border span lon180': 1,
+        'geojson wrap': 2,
+        'geojson inside': 1,
+        'geojson outside left': 1,
+        'geojson inside left': 1,
+        'geojson intersect border left': 1,
+        'geojson outside right': 1,
+        'geojson inside right': 1,
+        'geojson intersect border right': 1
       }
 
       testIntersects({ ob, boundingboxes, expected })
@@ -233,7 +257,15 @@ describe('OverpassRelation (multipolygon spanning lon180)', function () {
         'inside span lon180': 1,
         'border left': 1,
         'border right': 1,
-        'border span lon180': 1
+        'border span lon180': 1,
+        'geojson wrap': 1,
+        'geojson inside': 1,
+        'geojson outside left': 1,
+        'geojson inside left': 1,
+        'geojson intersect border left': 1,
+        'geojson outside right': 1,
+        'geojson inside right': 1,
+        'geojson intersect border right': 1
       }
 
       testIntersects({ ob, boundingboxes, expected })

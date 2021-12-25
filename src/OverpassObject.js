@@ -3,10 +3,11 @@ const BoundingBox = require('boundingbox')
 const OverpassFrontend = require('./defines')
 const turf = {
   booleanIntersects: require('@turf/boolean-intersects').default,
-  booleanWithin: require('@turf/boolean-within').default,
   difference: require('@turf/difference'),
   intersect: require('@turf/intersect').default
 }
+
+const booleanWithin = require('./booleanWithin')
 
 /**
  * Base class for representing map features.
@@ -317,7 +318,7 @@ class OverpassObject {
         if (!turf.booleanIntersects(geojson, bbox)) {
           return 0
         }
-        if (turf.booleanWithin(geojson, bbox)) {
+        if (booleanWithin(geojson, bbox)) {
           return 2
         }
       } else {
