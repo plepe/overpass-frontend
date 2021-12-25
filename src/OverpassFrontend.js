@@ -562,13 +562,17 @@ class OverpassFrontend {
    */
   BBoxQuery (query, bounds, options, featureCallback, finalCallback) {
     let request
-    bounds = new BoundingBox(bounds)
+    const bbox = new BoundingBox(bounds)
 
-    if (bounds.minlon > bounds.maxlon) {
-      const bounds1 = new BoundingBox(bounds)
-      bounds1.maxlon = 180
-      const bounds2 = new BoundingBox(bounds)
-      bounds2.minlon = -180
+    if (bounds.type !== 'Feature' && bounds.type !== 'FeatureCollection') {
+      bounds = bbox
+    }
+
+    if (bbox.minlon > bbox.maxlon) {
+      const bbox1 = new BoundingBox(bbox)
+      bbox1.maxlon = 180
+      const bbox2 = new BoundingBox(bbox)
+      bbox2.minlon = -180
 
       request = new RequestMulti(this,
         {
@@ -577,13 +581,15 @@ class OverpassFrontend {
         }, [
           new RequestBBox(this, {
             query: query,
-            bounds: bounds1,
+            bbox: bbox1,
+            bounds: bounds,
             options: options,
             doneFeatures: {}
           }),
           new RequestBBox(this, {
             query: query,
-            bounds: bounds2,
+            bbox: bbox2,
+            bounds: bounds,
             options: options,
             doneFeatures: {}
           })
@@ -592,6 +598,7 @@ class OverpassFrontend {
     } else {
       request = new RequestBBox(this, {
         query: query,
+        bbox: bbox,
         bounds: bounds,
         options: options,
         doneFeatures: {},

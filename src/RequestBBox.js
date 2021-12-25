@@ -54,7 +54,7 @@ class RequestBBox extends Request {
         this.lokiQuery = { $and: [this.lokiQuery, filterLokiQuery] }
       }
 
-      this.lokiQuery = { $and: [this.lokiQuery, boundsToLokiQuery(this.bounds, this.overpass)] }
+      this.lokiQuery = { $and: [this.lokiQuery, boundsToLokiQuery(this.bbox, this.overpass)] }
     }
 
     this.loadFinish = false
@@ -144,10 +144,10 @@ class RequestBBox extends Request {
       return false
     }
 
-    if (context.bbox && context.bbox.toLatLonString() !== this.bounds.toLatLonString()) {
+    if (context.bbox && context.bbox.toLatLonString() !== this.bbox.toLatLonString()) {
       return false
     }
-    context.bbox = this.bounds
+    context.bbox = this.bbox
 
     for (const i in context.requests) {
       const request = context.requests[i]
@@ -177,7 +177,7 @@ class RequestBBox extends Request {
    * @return {Request#SubRequest|false} - the compiled query or false if the bbox does not match
    */
   _compileQuery (context) {
-    if (this.loadFinish || (context.bbox && context.bbox.toLatLonString() !== this.bounds.toLatLonString())) {
+    if (this.loadFinish || (context.bbox && context.bbox.toLatLonString() !== this.bbox.toLatLonString())) {
       return {
         query: '',
         request: this,
@@ -260,9 +260,9 @@ class RequestBBox extends Request {
       this.loadFinish = true
 
       if (this.options.filter) {
-        this.cacheFilter.add(this.bounds)
+        this.cacheFilter.add(this.bbox)
       } else {
-        this.cache.requested.add(this.bounds)
+        this.cache.requested.add(this.bbox)
       }
     }
   }
@@ -277,11 +277,11 @@ class RequestBBox extends Request {
     }
 
     // check if we need to call Overpass API (whole area known?)
-    if (this.options.filter && this.cacheFilter.check(this.bounds)) {
+    if (this.options.filter && this.cacheFilter.check(this.bbox)) {
       return false
     }
 
-    return !this.cache.requested.check(this.bounds)
+    return !this.cache.requested.check(this.bbox)
   }
 
   mayFinish () {
