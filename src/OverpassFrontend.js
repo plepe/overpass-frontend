@@ -507,7 +507,7 @@ class OverpassFrontend {
       if (part.receiveObject) {
         part.receiveObject(ob)
       }
-      if (!request.aborted && !request.finished && part.featureCallback) {
+      if (!request.aborted && !request.finished && part.featureCallback && (!part.checkFeatureCallback || part.checkFeatureCallback(ob, part))) {
         part.featureCallback(err, ob)
       }
     }

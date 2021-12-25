@@ -35,8 +35,7 @@ describe('BBoxQuery with GeoJSON bounds', function () {
     it('should return a list of node features', function(done) {
       var finalCalled = 0
       var found = []
-      // var expected = [ 'n3037882438', 'n3037882439', 'n3037893162', 'n3037893163', 'n3037893164' ]
-      var expected = [ 'n3037882438', 'n3037882439', 'n3037893159', 'n3037893160', 'n3037893161', 'n3037893162', 'n3037893163', 'n3037893164' ] // wrong
+      var expected = [ 'n3037882438', 'n3037882439', 'n3037893162', 'n3037893163', 'n3037893164' ]
 
       var expectedSubRequestCount = 1
       var foundSubRequestCount = 0

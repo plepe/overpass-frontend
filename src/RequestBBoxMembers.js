@@ -140,6 +140,7 @@ class RequestBBoxMembers {
     this.part = {
       properties: this.options.memberProperties,
       receiveObject: this.receiveObject.bind(this),
+      checkFeatureCallback: this.checkFeatureCallback.bind(this),
       featureCallback: this.options.memberCallback,
       count: 0
     }
@@ -165,6 +166,14 @@ class RequestBBoxMembers {
 
   receiveObject (ob) {
     this.doneFeatures[ob.id] = ob
+  }
+
+  checkFeatureCallback (ob) {
+    if (this.bounds && ob.intersects(this.bounds) === 0) {
+      return false
+    }
+
+    return true
   }
 
   finishSubRequest (fun, subRequest) {

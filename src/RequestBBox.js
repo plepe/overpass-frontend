@@ -230,6 +230,7 @@ class RequestBBox extends Request {
         {
           properties: this.options.properties,
           receiveObject: this.receiveObject.bind(this),
+          checkFeatureCallback: this.checkFeatureCallback.bind(this),
           featureCallback: this.featureCallback
         }
       ],
@@ -246,6 +247,14 @@ class RequestBBox extends Request {
    */
   receiveObject (ob) {
     this.doneFeatures[ob.id] = ob
+  }
+
+  checkFeatureCallback (ob) {
+    if (this.bounds && ob.intersects(this.bounds) === 0) {
+      return false
+    }
+
+    return true
   }
 
   /**
