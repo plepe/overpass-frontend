@@ -1,3 +1,13 @@
+# Version 2.6.0 - release 2021-12-25
+* OverpassObject.intersect(): accept geojson polygon/multipolygon as boundary
+* Improve support for multipolygons crossing lon180
+* Decrease npm package size
+
+# Version 2.5.0 - release 2021-08-29
+* When the server fails with 429 error, gradually increase time gaps.
+* Emit more events: 'start', 'load', 'reject', 'error'
+* Improve loading referenced objects from 'out geom'
+
 # Version 2.4.2 - release 2019-03-27
 Support combining filters with 'and'.
 
