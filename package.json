@@ -49,6 +49,7 @@
     "eslint-plugin-promise": "^4.3.1",
     "eslint-plugin-standard": "^5.0.0",
     "jsdoc": "^3.6.7",
+    "jsdoc-to-markdown": "^7.1.0",
     "jsdom": "^17.0.0",
     "leaflet": "^1.7.1",
     "mocha": "^8.4.0",
@@ -69,7 +70,7 @@
     "version": "rm -r doc/ && npm run doc && npm run build && npm run build-test && git add -A doc/ dist/",
     "prepare": "require-self",
     "lint": "eslint --fix src/*.js index.js",
-    "doc": "jsdoc -d doc/ src/*.js"
+    "doc": "jsdoc2md src/*.js > doc/API.md"
   },
   "repository": {
     "type": "git",
