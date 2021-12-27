@@ -15,14 +15,14 @@ if (!conf.generator) {
 
 var overpassFrontend = new OverpassFrontend(conf.url)
 
-describe('Overpass query by id with bbox option', function() {
+describe('Overpass query by id with bounds option', function() {
   it('First call', function(done) {
     var finalCalled = 0
     var query = [ 'w299709373', 'w299709375', 'w4583442', 'w299704585', 'n2832485845', 'n3037893162', 'r20313', 'r3636229', 'r3311614', 'w12345' ]
     var expected = [ 'w299709373', 'n3037893162' ]
-    var index_outside_bbox = [ 1, 2, 3, 4, 5, 6, 7, 8 ]
+    var index_outside_bounds = [ 1, 2, 3, 4, 5, 6, 7, 8 ]
     var index_non_existant = [ 9 ]
-    var bbox = {
+    var bounds = {
             minlon: 16.3384616,
             minlat: 48.1990347,
             maxlon: 16.3386118,
@@ -34,9 +34,9 @@ describe('Overpass query by id with bbox option', function() {
       overpassFrontend.removeFromCache(item)
     })
 
-    overpassFrontend.get(query.concat([]), { properties: OverpassFrontend.ALL, bbox: bbox },
+    overpassFrontend.get(query.concat([]), { properties: OverpassFrontend.ALL, bounds: bounds },
         function(err, result, index) {
-          if (result === false && index_outside_bbox.indexOf(index) == -1)
+          if (result === false && index_outside_bounds.indexOf(index) == -1)
               assert.fail('Index ' + index + ' should return a valid result (' + query[index] + ')')
 
           if (result === null && index_non_existant.indexOf(index) === -1) {
@@ -58,18 +58,18 @@ describe('Overpass query by id with bbox option', function() {
     var finalCalled = 0
     var query = [ 'w299709373', 'w299709375', 'w4583442', 'w299704585', 'n2832485845', 'n3037882439', 'n3037893162', 'w12345' ]
     var expected = [ 'w299709375', 'w299704585' ]
-    var index_outside_bbox = [ 0, 1, 2, 4, 5, 6 ]
+    var index_outside_bounds = [ 0, 1, 2, 4, 5, 6 ]
     var index_non_existant = [ 7 ]
-    var bbox = {
+    var bounds = {
             minlat: 48.1996955,
             minlon: 16.3381572,
             maxlat: 48.1998337,
             maxlon: 16.3382651
           }
 
-    overpassFrontend.get(query.concat([]), { properties: OverpassFrontend.ALL, bbox: bbox },
+    overpassFrontend.get(query.concat([]), { properties: OverpassFrontend.ALL, bounds: bounds },
         function(err, result, index) {
-          if (result === false && index_outside_bbox.indexOf(index) == -1)
+          if (result === false && index_outside_bounds.indexOf(index) == -1)
               assert.fail('Index ' + index + ' should return a valid result (' + query[index] + ')')
 
           if (result === null && index_non_existant.indexOf(index) === -1) {
@@ -93,7 +93,7 @@ describe('Overpass query by id with bbox option', function() {
 
     overpassFrontend.get(query.concat([]), { properties: OverpassFrontend.ID_ONLY },
         function(err, result, index) {
-          // has GEOM, because for nodes lat/lon is geom, bbox and center
+          // has GEOM, because for nodes lat/lon is geom, bounds and center
           assert.equal(OverpassFrontend.GEOM | OverpassFrontend.BBOX | OverpassFrontend.CENTER | OverpassFrontend.MEMBERS, result.properties, 'Element ' + result.id + ' which was loaded outside bbox, should only have BBOX data')
         },
         function(err) {
@@ -121,7 +121,7 @@ describe('Overpass query by id with bbox option', function() {
           overpassFrontend.get(items1,
             {
               properties: OverpassFrontend.ALL,
-              bbox: {
+              bounds: {
                 minlon: 16.3375,
                 minlat: 48.1985,
                 maxlon: 16.3385,
@@ -148,7 +148,7 @@ describe('Overpass query by id with bbox option', function() {
           overpassFrontend.get(items2,
             {
               properties: OverpassFrontend.ALL,
-              bbox: {
+              bounds: {
                 minlon: 16.3375,
                 minlat: 48.1985,
                 maxlon: 16.3385,
@@ -174,7 +174,7 @@ describe('Overpass query by id with bbox option', function() {
           overpassFrontend.get(items3,
             {
               properties: OverpassFrontend.ALL,
-              bbox: {
+              bounds: {
                 minlon: 16.3375,
                 minlat: 48.1985,
                 maxlon: 16.3385,
@@ -217,7 +217,7 @@ describe('Overpass query by id with bbox option', function() {
           overpassFrontend.get(items1,
             {
               properties: OverpassFrontend.ALL,
-              bbox: {
+              bounds: {
                 minlon: 16.3375,
                 minlat: 48.1985,
                 maxlon: 16.3385,
@@ -243,7 +243,7 @@ describe('Overpass query by id with bbox option', function() {
           overpassFrontend.get(items2,
             {
               properties: OverpassFrontend.ALL,
-              bbox: {
+              bounds: {
                 minlon: 16.3375,
                 minlat: 48.1985,
                 maxlon: 16.3385,
@@ -269,7 +269,7 @@ describe('Overpass query by id with bbox option', function() {
           overpassFrontend.get(items3,
             {
               properties: OverpassFrontend.ALL,
-              bbox: {
+              bounds: {
                 minlon: 16.3375,
                 minlat: 48.1985,
                 maxlon: 16.3385,

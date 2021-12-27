@@ -68,8 +68,8 @@ class OverpassObject {
       this.center = this.bounds.getCenter()
     }
 
-    if (options.bbox) {
-      if (!this.bounds || options.bbox.intersects(this.bounds)) {
+    if (options.bounds) {
+      if (!this.bounds || options.bounds.intersects(this.bounds)) {
         this.properties = this.properties | options.properties
       } else {
         this.properties = this.properties | OverpassFrontend.BBOX | OverpassFrontend.CENTER
@@ -79,13 +79,13 @@ class OverpassObject {
     }
 
     // result of a request with bbox limitation, where the object was outside
-    if (options.bboxNoMatch && this.bounds) {
+    if (options.boundsNoMatch && this.bounds) {
       // this.boundsPossibleMatch: record unsucessful bbox requests for an object
       if (typeof this.boundsPossibleMatch === 'undefined') {
         this.boundsPossibleMatch = this.bounds.toGeoJSON()
       }
 
-      this.boundsPossibleMatch = turf.difference(this.boundsPossibleMatch, options.bbox.toGeoJSON())
+      this.boundsPossibleMatch = turf.difference(this.boundsPossibleMatch, options.bounds.toGeoJSON())
     }
 
     // geometry is known -> no need for this.boundsPossibleMatch

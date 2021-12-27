@@ -33,8 +33,12 @@ class RequestGet extends Request {
       }
     }
 
-    if (this.options.bbox) {
-      this.options.bbox = new BoundingBox(this.options.bbox)
+    if (this.options.bounds) {
+      this.options.bounds = new BoundingBox(this.options.bounds)
+    } else if (this.options.bbox) {
+      this.options.bounds = new BoundingBox(this.options.bbox)
+      delete this.options.bbox
+      console.error('OverpassFrontend.get(): option "bbox" is deprecated, use "bounds" instead')
     }
     // option 'split' not available for get requests -> use effort instead
     delete this.options.split
@@ -103,10 +107,10 @@ class RequestGet extends Request {
           continue
         }
 
-        // for bbox option, if object is (partly) loaded, but outside call
+        // for bounds option, if object is (partly) loaded, but outside call
         // featureCallback with 'false'
-        if (this.options.bbox) {
-          const intersects = ob.intersects(this.options.bbox)
+        if (this.options.bounds) {
+          const intersects = ob.intersects(this.options.bounds)
           if (intersects === 0 || (!ob.bounds && ob.properties | defines.BBOX)) {
             this.featureCallback(null, false, i)
             this.ids[i] = null
@@ -152,8 +156,8 @@ class RequestGet extends Request {
     let effort = 0
     let outOptions
 
-    if (this.options.bbox) {
-      BBoxQuery = '(' + this.options.bbox.toLatLonString() + ')'
+    if (this.options.bounds) {
+      BBoxQuery = '(' + this.options.bounds.toLatLonString() + ')'
     }
 
     for (let i = 0; i < this.ids.length; i++) {
@@ -173,11 +177,11 @@ class RequestGet extends Request {
         continue
       }
 
-      if (this.options.bbox) {
-        // check if we already know the bbox of the element; if yes, don't try
+      if (this.options.bounds) {
+        // check if we already know the bounds of the element; if yes, don't try
         // to load object if it does not intersect bounds
         if (id in this.overpass.cacheElements && (this.overpass.cacheElements[id].properties & defines.BBOX)) {
-          if (!this.overpass.cacheElements[id].intersects(this.options.bbox)) {
+          if (!this.overpass.cacheElements[id].intersects(this.options.bounds)) {
             continue
           }
         }
@@ -229,8 +233,8 @@ class RequestGet extends Request {
 
       requestParts.push({
         properties: defines.BBOX,
-        bbox: this.options.bbox,
-        bboxNoMatch: true
+        bounds: this.options.bounds,
+        boundsNoMatch: true
       })
     }
     if (nodeQuery !== '') {
@@ -270,7 +274,7 @@ class RequestGet extends Request {
       indexes.push(p)
     }
 
-    if (this.options.bbox && !ob.intersects(this.options.bbox)) {
+    if (this.options.bounds && !ob.intersects(this.options.bounds)) {
       indexes.forEach(p => fun(null, false, p))
       return
     }
