@@ -1,6 +1,7 @@
 const ee = require('event-emitter')
 const BoundingBox = require('boundingbox')
 const OverpassFrontend = require('./defines')
+const isGeoJSON = require('./isGeoJSON')
 const turf = {
   booleanIntersects: require('@turf/boolean-intersects').default,
   difference: require('@turf/difference'),
@@ -332,7 +333,7 @@ class OverpassObject {
     }
 
     if (this.boundsPossibleMatch) {
-      const remaining = turf.intersect(bbox.toGeoJSON(), this.boundsPossibleMatch)
+      const remaining = turf.intersect(isGeoJSON(bbox) ? bbox : bbox.toGeoJSON(), this.boundsPossibleMatch)
 
       if (!remaining || remaining.geometry.type !== 'Polygon') {
         // geometry.type != Polygon: bbox matches border of this.boundsPossibleMatch
