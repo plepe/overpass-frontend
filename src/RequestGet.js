@@ -3,6 +3,7 @@ const defines = require('./defines')
 const BoundingBox = require('boundingbox')
 const overpassOutOptions = require('./overpassOutOptions')
 const RequestGetMembers = require('./RequestGetMembers')
+const isGeoJSON = require('./isGeoJSON')
 
 /**
  * A get request (request list of map features by id)
@@ -34,6 +35,10 @@ class RequestGet extends Request {
     }
 
     if (this.options.bounds) {
+      if (isGeoJSON(this.options.bounds)) {
+        this.geojsonBounds = this.options.bounds
+      }
+
       this.options.bounds = new BoundingBox(this.options.bounds)
     } else if (this.options.bbox) {
       this.options.bounds = new BoundingBox(this.options.bbox)
@@ -110,7 +115,7 @@ class RequestGet extends Request {
         // for bounds option, if object is (partly) loaded, but outside call
         // featureCallback with 'false'
         if (this.options.bounds) {
-          const intersects = ob.intersects(this.options.bounds)
+          const intersects = this.geojsonBounds ? ob.intersects(this.geojsonBounds) : ob.intersects(this.options.bounds)
           if (intersects === 0 || (!ob.bounds && ob.properties | defines.BBOX)) {
             this.featureCallback(null, false, i)
             this.ids[i] = null
@@ -251,6 +256,7 @@ class RequestGet extends Request {
       requestParts.push({
         properties: this.options.properties,
         receiveObject: this.receiveObject.bind(this),
+        checkFeatureCallback: this.checkFeatureCallback.bind(this),
         featureCallback: this._featureCallback.bind(this, this.featureCallback)
       })
     }
@@ -263,6 +269,14 @@ class RequestGet extends Request {
     }
 
     return subRequest
+  }
+
+  checkFeatureCallback (ob) {
+    if (this.geojsonBounds && ob.intersects(this.geojsonBounds) === 0) {
+      return false
+    }
+
+    return true
   }
 
   _featureCallback (fun, err, ob) {

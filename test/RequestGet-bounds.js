@@ -294,6 +294,62 @@ describe('Overpass query by id with bounds option', function() {
         }
       )
     })
+
+  it('Bounds as GeoJSON polygon (cleared cache)', function(done) {
+    overpassFrontend.clearCache()
+
+    var finalCalled = 0
+    var query = [ 'w299709373', 'w299709375', 'w4583442', 'w299704585', 'n2832485845', 'n3037893162', 'r20313', 'r3636229', 'r3311614', 'w12345' ]
+    var expected = [ 'w299709375', 'w299704585', 'n2832485845' ]
+    var index_outside_bounds = [ 0, 1, 2, 3, 4, 5, 6, 7, 8 ]
+    var index_non_existant = [ 9 ]
+    var bounds = { "type": "Feature", "geometry": { "type": "Polygon", "coordinates": [ [ [ 16.338037848472595, 48.19983024750325 ], [ 16.338399946689606, 48.19952274750457 ], [ 16.338165253400803, 48.19988477492663 ], [ 16.338037848472595, 48.19983024750325 ] ] ] } }
+
+    overpassFrontend.get(query.concat([]), { properties: OverpassFrontend.ALL, bounds: bounds },
+        function(err, result, index) {
+          if (result === false && index_outside_bounds.indexOf(index) == -1)
+              assert.fail('Index ' + index + ' should return a valid result (' + query[index] + ')')
+
+          if (result === null && index_non_existant.indexOf(index) === -1) {
+            assert.fail('Index ' + index + ' should not return a non-existant object (' + query[index] + ')')
+          }
+
+          if (result !== false && result !== null && expected.indexOf(result.id) == -1) {
+            assert.fail('Returning object ' + result.id + ' which should not be returned')
+          }
+        },
+        function(err) {
+          assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
+          done()
+        }
+    )
+  })
+
+  it('Bounds as GeoJSON polygon (fully cached)', function(done) {
+    var finalCalled = 0
+    var query = [ 'w299709373', 'w299709375', 'w4583442', 'w299704585', 'n2832485845', 'n3037893162', 'r20313', 'r3636229', 'r3311614', 'w12345' ]
+    var expected = [ 'w299709375', 'w299704585', 'n2832485845' ]
+    var index_outside_bounds = [ 0, 1, 2, 3, 4, 5, 6, 7, 8 ]
+    var index_non_existant = [ 9 ]
+    var bounds = { "type": "Feature", "geometry": { "type": "Polygon", "coordinates": [ [ [ 16.338037848472595, 48.19983024750325 ], [ 16.338399946689606, 48.19952274750457 ], [ 16.338165253400803, 48.19988477492663 ], [ 16.338037848472595, 48.19983024750325 ] ] ] } }
+
+    overpassFrontend.get(query.concat([]), { properties: OverpassFrontend.ALL, bounds: bounds },
+        function(err, result, index) {
+          if (result === false && index_outside_bounds.indexOf(index) == -1)
+              assert.fail('Index ' + index + ' should return a valid result (' + query[index] + ')')
+
+          if (result === null && index_non_existant.indexOf(index) === -1) {
+            assert.fail('Index ' + index + ' should not return a non-existant object (' + query[index] + ')')
+          }
+
+          if (result !== false && result !== null && expected.indexOf(result.id) == -1) {
+            assert.fail('Returning object ' + result.id + ' which should not be returned')
+          }
+        },
+        function(err) {
+          assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
+          done()
+        }
+    )
+  })
 })
-
-
