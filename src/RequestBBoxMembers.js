@@ -5,6 +5,7 @@ const map = require('lodash/map')
 const keys = require('lodash/keys')
 const BoundingBox = require('boundingbox')
 const SortedCallbacks = require('./SortedCallbacks')
+const isGeoJSON = require('./isGeoJSON')
 
 class RequestBBoxMembers {
   constructor (request) {
@@ -17,7 +18,11 @@ class RequestBBoxMembers {
     this.options.memberProperties |= defines.BBOX
 
     if (this.options.memberBounds) {
-      this.bounds = new BoundingBox(this.options.memberBounds)
+      if (isGeoJSON(this.options.memberBounds)) {
+        this.bounds = this.options.memberBounds
+      } else {
+        this.bounds = new BoundingBox(this.options.memberBounds)
+      }
     }
 
     this.master._compileQuery = this._compileQuery.bind(this, this.master._compileQuery)
@@ -109,7 +114,7 @@ class RequestBBoxMembers {
 
     let BBoxString = ''
     if (this.bounds) {
-      BBoxString = '(' + this.bounds.toLatLonString() + ')'
+      BBoxString = '(' + new BoundingBox(this.bounds).toLatLonString() + ')'
     }
 
     query += '(\n' +

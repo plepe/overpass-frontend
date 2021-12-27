@@ -1086,6 +1086,91 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
     request.on('subrequest-compile', compileListener)
   })
 
+  it('memberBounds GeoJSON', function (done) {
+    overpassFrontend.clearCache()
+    var expected = [ 'r910885', 'r910886', 'r1306732', 'r1306733' ]
+    var expectedMembers = [ 'w228707705', 'w228707687', 'w228707710' ]
+    var found = []
+    var foundMembers = []
+    var error = ''
+    var bbox = {
+	"maxlat": 48.19953,
+	"maxlon": 16.33506,
+	"minlat": 48.19800,
+	"minlon": 16.32581,
+      }
+    var memberBounds = { "type": "Feature", "geometry": { "type": "Polygon", "coordinates": [ [ [ 16.340221166610718, 48.20076525069519 ], [ 16.340070962905884, 48.20283900184463 ], [ 16.336004734039307, 48.2021096230804 ], [ 16.340221166610718, 48.20076525069519 ] ] ] } }
+
+    var expectedSubRequestCount = 2
+    var foundSubRequestCount = 0
+
+    function compileListener (subRequest) {
+      foundSubRequestCount++
+    }
+
+    var request = overpassFrontend.BBoxQuery(
+      "relation[type=route][route=tram]",
+      bbox,
+      {
+        "members": true,
+        "properties": OverpassFrontend.TAGS | OverpassFrontend.MEMBERS,
+        "memberProperties": OverpassFrontend.TAGS | OverpassFrontend.GEOM,
+        "memberBounds": memberBounds,
+        "memberCallback": function (err, result) {
+          foundMembers.push(result.id)
+
+          result.memberOf.forEach(memberOf => {
+            if (found.indexOf(memberOf.id) === -1) {
+              assert.fail('memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.id)
+            }
+          })
+
+          if (expectedMembers.indexOf(result.id) === -1) {
+            error += 'Unexpected member result ' + result.id + '\n'
+          }
+        }
+      },
+      function (err, result) {
+        found.push(result.id)
+
+        assert.equal(result.properties, OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.BBOX | OverpassFrontend.CENTER)
+
+        if (expected.indexOf(result.id) === -1) {
+          error += 'Unexpected result ' + result.id + '\n'
+        }
+      },
+      function (err) {
+        if (err) {
+          return done(err)
+        }
+
+        if (error) {
+          return done(error)
+        }
+
+        if (found.length !== expected.length) {
+          return done('Wrong count of objects returned:\n' +
+               'Expected: ' + expected.join(', ') + '\n' +
+               'Found: ' + found.join(', '))
+        }
+
+        if (foundMembers.length !== expectedMembers.length) {
+          return done('Wrong count of member objects returned:\n' +
+               'Expected: ' + expectedMembers.join(', ') + '\n' +
+               'Found: ' + foundMembers.join(', '))
+        }
+
+        assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
+
+        request.off('subrequest-compile', compileListener)
+
+        done()
+      }
+    )
+
+    request.on('subrequest-compile', compileListener)
+  })
+
   describe('Calculate way directions', function () {
     it('Simple queries - routes with members - calculate directions', function (done) {
       overpassFrontend.clearCache()
