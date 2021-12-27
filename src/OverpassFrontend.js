@@ -19,6 +19,7 @@ const loadOsmFile = require('./loadOsmFile')
 const copyOsm3sMetaFrom = require('./copyOsm3sMeta')
 const timestamp = require('./timestamp')
 const Filter = require('./Filter')
+const isGeoJSON = require('./isGeoJSON')
 
 /**
  * An error occured
@@ -564,7 +565,7 @@ class OverpassFrontend {
     let request
     const bbox = new BoundingBox(bounds)
 
-    if (bounds.type !== 'Feature' && bounds.type !== 'FeatureCollection') {
+    if (!isGeoJSON(bounds)) {
       bounds = bbox
     }
 
