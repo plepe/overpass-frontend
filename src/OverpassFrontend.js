@@ -206,6 +206,7 @@ class OverpassFrontend {
    * @param {number} [options.priority=0] - Priority for loading these objects. The lower the sooner they will be requested.
    * @param {string|boolean} [options.sort=false] - When set to true or "index", the function featureCallback will be called in order of the "ids" array. When set to false or null, the featureCallback will be called as soon as the object is loaded (e.g. immediately, if it is cached). When set to "BBoxDiagonalLength", the objects are ordered by the length of the diagonal of the bounding box.
    * @param {"asc"|"desc"} [options.sortDir="asc"] Sort direction.
+   * @param {BoundingBox|GeoJSON} [options.bounds] - Only return items which intersect these bounds. Boundaries is a BoundingBox, or a Leaflet Bounds object (e.g. from map.getBounds()) or a GeoJSON Polygon/Multipolygon.
    * @param {function} featureCallback Will be called for each object which is passed in parameter 'ids'. Will be passed: 1. err (if an error occured, otherwise null), 2. the object or null, 3. index of the item in parameter ids.
    * @param {function} finalCallback Will be called after the last feature. Will be passed: 1. err (if an error occured, otherwise null).
    * @return {RequestGet}
@@ -545,7 +546,7 @@ class OverpassFrontend {
 
   /**
    * @param {string} query - Query for requesting objects from Overpass API, e.g. "node[amenity=restaurant]" or "(node[amenity];way[highway~'^(primary|secondary)$];)". See <a href='Filter.html'>Filter</a> for details.
-   * @param {BoundingBox} bounds - A Leaflet Bounds object, e.g. from map.getBounds()
+   * @param {BoundingBox|GeoJSON} bounds - Boundaries where to load objects, can be a BoundingBox object, Leaflet Bounds object (e.g. from map.getBounds()) or a GeoJSON Polygon/Multipolygon.
    * @param {object} options
    * @param {number} [options.priority=0] - Priority for loading these objects. The lower the sooner they will be requested.
    * @param {boolean|string} [options.sort=false] - If false, it will be called as soon as the features are availabe (e.g. immediately when cached).
