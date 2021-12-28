@@ -20,6 +20,7 @@ const copyOsm3sMetaFrom = require('./copyOsm3sMeta')
 const timestamp = require('./timestamp')
 const Filter = require('./Filter')
 const isGeoJSON = require('./isGeoJSON')
+const boundsIsFullWorld = require('./boundsIsFullWorld')
 
 /**
  * An error occured
@@ -382,7 +383,7 @@ class OverpassFrontend {
     }
 
     context.queryOptions = '[out:json]'
-    if (context.bbox) {
+    if (context.bbox && !boundsIsFullWorld(context.bbox)) {
       context.queryOptions += '[bbox:' + context.bbox.toLatLonString() + ']'
     }
 

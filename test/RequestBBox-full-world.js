@@ -28,6 +28,10 @@ describe('BBoxQuery with GeoJSON bounds', function () {
       foundSubRequestCount++
     }
 
+    overpassFrontend.once('start', (e, context) => {
+      assert.equal(context.queryOptions, '[out:json]')
+    })
+
     var request = overpassFrontend.BBoxQuery(
       'relation["ref:at:gkz"=91501];',
       null,
@@ -42,7 +46,7 @@ describe('BBoxQuery with GeoJSON bounds', function () {
       },
       function(err) {
         assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
-        assert.equal(expected.length, found.length, 'Wrong count of objects found!')
+        assert.equal(found.length, expected.length, 'Wrong count of objects found!')
         assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
 
         request.off('subrequest-compile', compileListener)
