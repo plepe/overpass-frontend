@@ -1,3 +1,6 @@
+# unreleased
+* Bounds and memberBounds for .get() and .BBoxQuery() accept GeoJSON polygons/multipolygons
+
 # Version 2.6.0 - release 2021-12-25
 * OverpassObject.intersect(): accept geojson polygon/multipolygon as boundary
 * Improve support for multipolygons crossing lon180
