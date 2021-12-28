@@ -5,6 +5,7 @@ const KnownArea = require('./knownArea')
 const RequestBBoxMembers = require('./RequestBBoxMembers')
 const Filter = require('./Filter')
 const boundsToLokiQuery = require('./boundsToLokiQuery')
+const boundsIsFullWorld = require('./boundsIsFullWorld')
 
 /**
  * A BBox request
@@ -54,7 +55,7 @@ class RequestBBox extends Request {
         this.lokiQuery = { $and: [this.lokiQuery, filterLokiQuery] }
       }
 
-      if (this.bounds) {
+      if (!boundsIsFullWorld(this.bounds)) {
         this.lokiQuery = { $and: [this.lokiQuery, boundsToLokiQuery(this.bbox, this.overpass)] }
       }
     }
