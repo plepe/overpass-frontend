@@ -20,6 +20,7 @@ const copyOsm3sMetaFrom = require('./copyOsm3sMeta')
 const timestamp = require('./timestamp')
 const Filter = require('./Filter')
 const isGeoJSON = require('./isGeoJSON')
+const boundsIsFullWorld = require('./boundsIsFullWorld')
 
 /**
  * An error occured
@@ -267,6 +268,7 @@ class OverpassFrontend {
    * Current request context
    * @typedef {Object} OverpassFrontend#Context
    * @property {string} query - The compiled code of all sub requests
+   * @property {string} queryOptions - The compiled queryOptions which will be sent to Overpass API
    * @property {Request[]} requests - List of all requests in the context
    * @property {Request#SubRequest[]} subRequests - List of all subRequests in the context
    * @property {BoundingBox} bbox - when there are any BBox requests, add this global bbox
@@ -380,12 +382,12 @@ class OverpassFrontend {
       return this._next()
     }
 
-    let query = '[out:json]'
-    if (context.bbox) {
-      query += '[bbox:' + context.bbox.toLatLonString() + ']'
+    context.queryOptions = '[out:json]'
+    if (context.bbox && !boundsIsFullWorld(context.bbox)) {
+      context.queryOptions += '[bbox:' + context.bbox.toLatLonString() + ']'
     }
 
-    query += ';\n' + context.query
+    const query = context.queryOptions + ';\n' + context.query
 
     setTimeout(function () {
       httpLoad(

@@ -1,1 +1,1 @@
-module.exports = geom => geom.type === 'Feature' || geom.type === 'FeatureCollection'
+module.exports = geom => geom && (geom.type === 'Feature' || geom.type === 'FeatureCollection')
