@@ -567,7 +567,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line85">line 85</a>
+        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line87">line 87</a>
     </li></ul></dd>
     
 
@@ -693,6 +693,9 @@
             
                 
 <span class="param-type">BoundingBox</span>
+|
+
+<span class="param-type">GeoJSON</span>
 
 
             
@@ -702,7 +705,7 @@
 
             
 
-            <td class="description last">A Leaflet Bounds object, e.g. from map.getBounds()</td>
+            <td class="description last">Boundaries where to load objects, can be a BoundingBox object, Leaflet Bounds object (e.g. from map.getBounds()) or a GeoJSON Polygon/Multipolygon.</td>
         </tr>
 
     
@@ -1025,6 +1028,46 @@
 
         <tr>
             
+                <td class="name"><code>memberBounds</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">BoundingBox</span>
+|
+
+<span class="param-type">GeoJSON</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">Only return members which intersect these bounds. Boundaries is a BoundingBox, or a Leaflet Bounds object (e.g. from map.getBounds()) or a GeoJSON Polygon/Multipolygon.</td>
+        </tr>
+
+    
+
+        <tr>
+            
                 <td class="name"><code>memberSplit</code></td>
             
 
@@ -1230,7 +1273,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line563">line 563</a>
+        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line572">line 572</a>
     </li></ul></dd>
     
 
@@ -1336,7 +1379,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line127">line 127</a>
+        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line129">line 129</a>
     </li></ul></dd>
     
 
@@ -1604,6 +1647,199 @@
         </tr>
 
     
+
+        <tr>
+            
+                <td class="name"><code>bounds</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">BoundingBox</span>
+|
+
+<span class="param-type">GeoJSON</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">Only return items which intersect these bounds. Boundaries is a BoundingBox, or a Leaflet Bounds object (e.g. from map.getBounds()) or a GeoJSON Polygon/Multipolygon.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>members</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    false
+                
+                </td>
+            
+
+            <td class="description last">Query relation members of. Default: false</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>memberCallback</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">For every member, call this callback function. (Requires options.members=true)</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>memberProperties</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">bit_array</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">Which properties should be loaded for the members. Default: OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.BBOX</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>memberBounds</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">BoundingBox</span>
+|
+
+<span class="param-type">GeoJSON</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">Only return members which intersect these bounds. Boundaries is a BoundingBox, or a Leaflet Bounds object (e.g. from map.getBounds()) or a GeoJSON Polygon/Multipolygon.</td>
+        </tr>
+
+    
     </tbody>
 </table>
 
@@ -1694,7 +1930,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line212">line 212</a>
+        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line219">line 219</a>
     </li></ul></dd>
     
 
@@ -1933,7 +2169,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line234">line 234</a>
+        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line241">line 241</a>
     </li></ul></dd>
     
 
@@ -2067,6 +2303,29 @@
             
 
             <td class="description last">The compiled code of all sub requests</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>queryOptions</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The compiled queryOptions which will be sent to Overpass API</td>
         </tr>
 
     
@@ -2220,7 +2479,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line260">line 260</a>
+        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line267">line 267</a>
     </li></ul></dd>
     
 
@@ -2447,7 +2706,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line44">line 44</a>
+        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line46">line 46</a>
     </li></ul></dd>
     
 
@@ -2619,7 +2878,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line23">line 23</a>
+        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line25">line 25</a>
     </li></ul></dd>
     
 
@@ -2984,7 +3243,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line53">line 53</a>
+        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line55">line 55</a>
     </li></ul></dd>
     
 
@@ -3144,7 +3403,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line37">line 37</a>
+        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line39">line 39</a>
     </li></ul></dd>
     
 
@@ -3304,7 +3563,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line30">line 30</a>
+        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line32">line 32</a>
     </li></ul></dd>
     
 
@@ -3447,7 +3706,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line65">line 65</a>
+        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line67">line 67</a>
     </li></ul></dd>
     
 
@@ -3495,7 +3754,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Sat Dec 25 2021 08:53:37 GMT+0100 (Central European Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Thu Dec 30 2021 17:10:11 GMT+0100 (Central European Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>
