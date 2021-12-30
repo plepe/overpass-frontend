@@ -1,4 +1,4 @@
-# unreleased
+# Version 2.7.0 - release 2021-12-30
 * Bounds and memberBounds for .get() and .BBoxQuery() accept GeoJSON polygons/multipolygons
 * .BBoxQuery() now accepts empty bounds (query the whole world)
 
