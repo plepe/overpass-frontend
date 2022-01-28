@@ -115,12 +115,12 @@ class OverpassRelation extends OverpassObject {
           role: member.role
         }
 
-        if (!(member.id in this.overpass.cacheElements)) {
+        const ob = this.overpass.cache.get(member.id)
+
+        if (ob === undefined) {
           allKnown = false
           return data
         }
-
-        const ob = this.overpass.cacheElements[member.id]
 
         if ((ob.properties & OverpassFrontend.GEOM) === 0) {
           allKnown = false
@@ -150,8 +150,8 @@ class OverpassRelation extends OverpassObject {
           return
         }
 
-        const memberOb = this.overpass.cacheElements[member.id]
-        if (!memberOb.members || member.type !== 'way') {
+        const memberOb = this.overpass.cache.get(member.id)
+        if (!memberOb || !memberOb.members || member.type !== 'way') {
           return
         }
 
@@ -160,7 +160,7 @@ class OverpassRelation extends OverpassObject {
         const revMemberOf = memberOb.memberOf.filter(memberOf => memberOf.sequence === index && memberOf.id === this.id)[0]
 
         if (index > 0) {
-          const prevMember = this.overpass.cacheElements[this.members[index - 1].id]
+          const prevMember = this.overpass.cache.get(this.members[index - 1].id)
           if (prevMember.type === 'way' && prevMember.members) {
             if (firstMemberId === prevMember.members[0].id || firstMemberId === prevMember.members[prevMember.members.length - 1].id) {
               member.connectedPrev = 'forward'
@@ -173,7 +173,7 @@ class OverpassRelation extends OverpassObject {
         }
 
         if (index < this.members.length - 1) {
-          const nextMember = this.overpass.cacheElements[this.members[index + 1].id]
+          const nextMember = this.overpass.cache.get(this.members[index + 1].id)
           if (nextMember.type === 'way' && nextMember.members) {
             if (firstMemberId === nextMember.members[0].id || firstMemberId === nextMember.members[nextMember.members.length - 1].id) {
               member.connectedNext = 'backward'
@@ -211,8 +211,8 @@ class OverpassRelation extends OverpassObject {
 
     if (!(this.properties & OverpassFrontend.BBOX)) {
       this.members.forEach(member => {
-        const ob = this.overpass.cacheElements[member.id]
-        if (ob.bounds) {
+        const ob = this.overpass.cache.get(member.id)
+        if (ob && ob.bounds) {
           if (this.bounds) {
             this.bounds.extend(ob.bounds)
           } else {
@@ -369,7 +369,7 @@ class OverpassRelation extends OverpassObject {
         if (this.members) {
           async.each(this.members,
             (member, done) => {
-              const memberOb = this.overpass.cacheElements[member.id]
+              const memberOb = this.overpass.cache.get(member.id)
 
               const nd = parentNode.ownerDocument.createElement('member')
               nd.setAttribute('ref', memberOb.osm_id)
@@ -406,7 +406,7 @@ class OverpassRelation extends OverpassObject {
 
           async.each(this.members,
             (member, done) => {
-              const memberOb = this.overpass.cacheElements[member.id]
+              const memberOb = this.overpass.cache.get(member.id)
 
               result.members.push({
                 ref: memberOb.osm_id,
@@ -461,7 +461,7 @@ class OverpassRelation extends OverpassObject {
     } else if (this.members) {
       for (i in this.members) {
         const memberId = this.members[i].id
-        const member = this.overpass.cacheElements[memberId]
+        const member = this.overpass.cache.get(memberId)
 
         if (member) {
           if (member.intersects(bbox) === 2) {

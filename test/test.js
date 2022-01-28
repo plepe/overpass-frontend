@@ -2050,9 +2050,9 @@ describe('Overpass objects structure', function() {
 	    ]
           )
 
-          assert.equal('w4583442' in overpassFrontend.cacheElements, true, 'should have loaded member feature w4583442')
+          assert.equal(overpassFrontend.cache.has('w4583442'), true, 'should have loaded member feature w4583442')
 
-          let member = overpassFrontend.cacheElements['w4583442']
+          let member = overpassFrontend.cache.get('w4583442')
           assert.equal(member.properties, OverpassFrontend.ID_ONLY, 'member w4583442 should have ID_ONLY info')
         },
         function(err) {
@@ -2151,9 +2151,9 @@ describe('Overpass objects structure', function() {
             }
           )
 
-          assert.equal('w4583442' in overpassFrontend.cacheElements, true, 'should have loaded member feature w4583442')
+          assert.equal(overpassFrontend.cache.has('w4583442'), true, 'should have loaded member feature w4583442')
 
-          let member = overpassFrontend.cacheElements['w4583442']
+          let member = overpassFrontend.cache.get('w4583442')
           assert.equal(member.properties, OverpassFrontend.GEOM | OverpassFrontend.BBOX | OverpassFrontend.CENTER, 'member w4583442 should have GEOM info')
         },
         function(err) {

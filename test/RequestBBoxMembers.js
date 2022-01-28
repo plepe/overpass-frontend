@@ -1573,8 +1573,8 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
         function(err, result, index) {
         },
         function(err) {
-          assert.equal('n1476773069' in overpassFrontend.cacheElements, true, 'Member object should exist in cache')
-          assert.equal('n1022300101' in overpassFrontend.cacheElements, true, 'Member object should exist in cache')
+          assert.equal(overpassFrontend.cache.has('n1476773069'), true, 'Member object should exist in cache')
+          assert.equal(overpassFrontend.cache.has('n1022300101'), true, 'Member object should exist in cache')
 
           done(err)
         })

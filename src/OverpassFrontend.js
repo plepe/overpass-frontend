@@ -21,6 +21,7 @@ const timestamp = require('./timestamp')
 const Filter = require('./Filter')
 const isGeoJSON = require('./isGeoJSON')
 const boundsIsFullWorld = require('./boundsIsFullWorld')
+const Cache = require('./Cache')
 
 /**
  * An error occured
@@ -127,7 +128,7 @@ class OverpassFrontend {
    * clear all caches
    */
   clearCache () {
-    this.cacheElements = {}
+    this.cache = new Cache()
     this.cacheElementsMemberOf = {}
     this.cacheBBoxQueries = {}
     this.cacheTimestamp = timestamp()
@@ -247,11 +248,10 @@ class OverpassFrontend {
       options.properties = defines.DEFAULT
     }
 
-    if (!(id in this.cacheElements)) {
+    const ob = this.cache.get(id, options)
+    if (!ob) {
       return false
     }
-
-    const ob = this.cacheElements[id]
 
     if (ob.missingObject) {
       return null
@@ -500,13 +500,13 @@ class OverpassFrontend {
       const ob = this.createOrUpdateOSMObject(el, part)
       delete context.todo[ob.id]
 
-      const members = this.cacheElements[ob.id].memberIds()
+      const members = this.cache.get(ob.id, part).memberIds()
       if (members) {
         for (let j = 0; j < members.length; j++) {
           if (!(members[j] in this.cacheElementsMemberOf)) {
-            this.cacheElementsMemberOf[members[j]] = [this.cacheElements[ob.id]]
+            this.cacheElementsMemberOf[members[j]] = [this.cache.get(ob.id)]
           } else {
-            this.cacheElementsMemberOf[members[j]].push(this.cacheElements[ob.id])
+            this.cacheElementsMemberOf[members[j]].push(this.cache.get(ob.id))
           }
         }
       }
@@ -525,18 +525,18 @@ class OverpassFrontend {
     }
 
     for (const id in context.todo) {
-      if (!(id in this.cacheElements)) {
+      const ob = this.cache.get(id, context.options)
+      if (ob) {
+        ob.missingObject = true
+        ob.dbInsert(this.db)
+      } else {
         const ob = new OverpassObject()
         ob.id = id
         ob.type = { n: 'node', w: 'way', r: 'relation' }[id.substr(0, 1)]
         ob.osm_id = id.substr(1)
         ob.properties = OverpassFrontend.ALL
         ob.missingObject = true
-        this.cacheElements[id] = ob
-        ob.dbInsert(this.db)
-      } else {
-        const ob = this.cacheElements[id]
-        ob.missingObject = true
+        this.cache.add(id, ob)
         ob.dbInsert(this.db)
       }
     }
@@ -667,20 +667,19 @@ class OverpassFrontend {
     }
 
     for (let i = 0; i < ids.length; i++) {
-      if (ids[i] in this.cacheElements) {
-        const ob = this.cacheElements[ids[i]]
-
+      const ob = this.cache.get(ids[i])
+      if (ob) {
         // remove all memberOf references
         if (ob.members) {
           ob.members.forEach(member => {
-            const memberOb = this.cacheElements[member.id]
+            const memberOb = this.cache.get(member.id)
             memberOb.memberOf = memberOb.memberOf
               .filter(memberOf => memberOf.id !== ob.id)
           })
         }
 
-        const lokiOb = this.cacheElements[ids[i]].dbData
-        delete this.cacheElements[ids[i]]
+        const lokiOb = this.cache.get(ids[i]).dbData
+        this.cache.remove(ids[i])
         this.db.remove(lokiOb)
       }
     }
@@ -691,7 +690,7 @@ class OverpassFrontend {
     this.pendingNotifyMemberUpdate = {}
 
     for (const k in todo) {
-      const ob = this.cacheElements[k]
+      const ob = this.cache.get(k)
       ob.notifyMemberUpdate(todo[k])
 
       this.pendingUpdateEmit[ob.id] = ob
@@ -714,13 +713,8 @@ class OverpassFrontend {
     const id = el.type.substr(0, 1) + el.id
     let ob = null
 
-    if (id in this.cacheElements && !this.cacheElements[id]) {
-      console.log('why can this be null?', id)
-    }
-
-    if (id in this.cacheElements && this.cacheElements[id]) {
-      ob = this.cacheElements[id]
-
+    ob = this.cache.get(id, options)
+    if (ob) {
       // no new information -> return
       if (~ob.properties & options.properties === 0) {
         return ob
@@ -749,8 +743,7 @@ class OverpassFrontend {
 
     ob.dbInsert(this.db)
 
-    this.cacheElements[id] = ob
-    return ob
+    return this.cache.add(id, ob)
   }
 
   regexpEscape (str) {

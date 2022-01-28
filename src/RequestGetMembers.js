@@ -88,9 +88,8 @@ class RequestGetMembers {
     })
 
     each(this.todo, (value, id) => {
-      if (id in this.overpass.cacheElements) {
-        const ob = this.overpass.cacheElements[id]
-
+      const ob = this.overpass.cache.get(id)
+      if (ob !== undefined) {
         if (this.bounds && !ob.intersects(this.bounds)) {
           return
         }

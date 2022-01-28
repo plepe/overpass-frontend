@@ -28,11 +28,12 @@ class RequestGet extends Request {
       this.options.properties = defines.DEFAULT
     }
 
-    for (let i = 0; i < this.ids.length; i++) {
-      if (this.ids[i] in this.overpass.cacheElements && this.overpass.cacheElements[this.ids[i]] === false) {
-        delete this.overpass.cacheElements[this.ids[i]]
+    this.ids.forEach(id => {
+      const ob = this.overpass.cache.get(id)
+      if (ob === false) {
+        this.overpass.cache.remove(id)
       }
-    }
+    })
 
     if (this.options.bounds) {
       if (isGeoJSON(this.options.bounds)) {
@@ -101,8 +102,8 @@ class RequestGet extends Request {
         continue
       }
 
-      if (id in this.overpass.cacheElements) {
-        const ob = this.overpass.cacheElements[id]
+      const ob = this.overpass.cache.get(this.ids[i], this.options)
+      if (ob) {
         let ready = true
 
         // Feature does not exists!
@@ -185,8 +186,9 @@ class RequestGet extends Request {
       if (this.options.bounds) {
         // check if we already know the bounds of the element; if yes, don't try
         // to load object if it does not intersect bounds
-        if (id in this.overpass.cacheElements && (this.overpass.cacheElements[id].properties & defines.BBOX)) {
-          if (!this.overpass.cacheElements[id].intersects(this.options.bounds)) {
+        const ob = this.overpass.cache.get(id)
+        if (ob !== undefined && ob.properties & defines.BBOX) {
+          if (!ob.intersects(this.options.bounds)) {
             continue
           }
         }
