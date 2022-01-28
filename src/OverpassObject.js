@@ -355,9 +355,10 @@ class OverpassObject {
     return null
   }
 
-  dbInsert () {
+  dbInsert (db) {
     if (!this.dbData) {
       this.dbData = {}
+      db.insert(this.dbData)
     }
 
     this.dbData.tags = this.tags
@@ -377,7 +378,7 @@ class OverpassObject {
       }
     }
 
-    return this.dbData
+    db.update(this.dbData)
   }
 }
 

@@ -533,11 +533,11 @@ class OverpassFrontend {
         ob.properties = OverpassFrontend.ALL
         ob.missingObject = true
         this.cacheElements[id] = ob
-        this.db.insert(ob.dbInsert())
+        ob.dbInsert(this.db)
       } else {
         const ob = this.cacheElements[id]
         ob.missingObject = true
-        this.db.update(ob.dbInsert())
+        ob.dbInsert(this.db)
       }
     }
 
@@ -706,14 +706,13 @@ class OverpassFrontend {
 
     todo.forEach(ob => {
       ob.emit('update', ob)
-      this.db.update(ob.dbInsert())
+      ob.dbInsert(this.db)
     })
   }
 
   createOrUpdateOSMObject (el, options) {
     const id = el.type.substr(0, 1) + el.id
     let ob = null
-    let create = true
 
     if (id in this.cacheElements && !this.cacheElements[id]) {
       console.log('why can this be null?', id)
@@ -721,7 +720,6 @@ class OverpassFrontend {
 
     if (id in this.cacheElements && this.cacheElements[id]) {
       ob = this.cacheElements[id]
-      create = false
 
       // no new information -> return
       if (~ob.properties & options.properties === 0) {
@@ -749,11 +747,7 @@ class OverpassFrontend {
     })
     this.pendingUpdateEmit[ob.id] = ob
 
-    if (create) {
-      this.db.insert(ob.dbInsert())
-    } else {
-      this.db.update(ob.dbInsert())
-    }
+    ob.dbInsert(this.db)
 
     this.cacheElements[id] = ob
     return ob
