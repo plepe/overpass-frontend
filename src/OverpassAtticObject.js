@@ -22,7 +22,8 @@ class OverpassAtticObject {
     if (options.date) {
       const matching = this.timestamps.filter(d => d < options.date)
       if (matching.length) {
-        return this.versions[matching[matching.length - 1]]
+        const ob = this.versions[matching[matching.length - 1]]
+        return ob.visible ? ob : undefined
       }
     }
   }

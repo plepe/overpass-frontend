@@ -31,6 +31,7 @@ class OverpassObject {
   constructor () {
     this.data = {}
     this.properties = 0
+    this.visible = true
     this.memberOf = []
   }
 

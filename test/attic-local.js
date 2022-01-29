@@ -22,8 +22,8 @@ describe('Attic data from local file', function () {
     const expected = ['n282549433', 'n973838907']
     const timestamps = ['2007-01-01T00:00:00Z', '2009-01-01T00:00:00Z', '2013-01-01T00:00:00Z', '2018-02-01T00:00:00Z', '2018-04-01T00:00:00Z', '2020-01-01T00:00:00Z']
     const expectedTimestamps = {
-      'n282549433': [null, '2008-07-31T21:04:15Z', '2012-04-29T17:02:49Z', '2012-04-29T17:02:49Z', '2012-04-29T17:02:49Z', '2012-04-29T17:02:49Z'], // TODO: the last four should be 'null', because the item has been deleted
-      'n973838907': [null, null, '2012-04-29T17:02:46Z', '2018-01-21T10:37:59Z' /*null*/, '2018-02-11T22:45:14Z', '2018-06-28T18:41:39Z'], // TODO: the last and the item marked null should be 'null'
+      'n282549433': [null, '2008-07-31T21:04:15Z', null, null, null, null],
+      'n973838907': [null, null, '2012-04-29T17:02:46Z', null, '2018-02-11T22:45:14Z', null],
     }
 
     async.eachOf(timestamps,
