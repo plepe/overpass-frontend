@@ -103,6 +103,11 @@ class OverpassRelation extends OverpassObject {
       return
     }
 
+    const cacheOptions = {}
+    if (this.data.timestamp) {
+      cacheOptions.date = this.data.timestamp
+    }
+
     let allKnown = true
     const elements = [{
       type: 'relation',
@@ -115,7 +120,7 @@ class OverpassRelation extends OverpassObject {
           role: member.role
         }
 
-        const ob = this.overpass.cache.get(member.id)
+        const ob = this.overpass.cache.get(member.id, cacheOptions)
 
         if (ob === undefined) {
           allKnown = false
@@ -150,7 +155,7 @@ class OverpassRelation extends OverpassObject {
           return
         }
 
-        const memberOb = this.overpass.cache.get(member.id)
+        const memberOb = this.overpass.cache.get(member.id, cacheOptions)
         if (!memberOb || !memberOb.members || member.type !== 'way') {
           return
         }
@@ -160,7 +165,7 @@ class OverpassRelation extends OverpassObject {
         const revMemberOf = memberOb.memberOf.filter(memberOf => memberOf.sequence === index && memberOf.id === this.id)[0]
 
         if (index > 0) {
-          const prevMember = this.overpass.cache.get(this.members[index - 1].id)
+          const prevMember = this.overpass.cache.get(this.members[index - 1].id, cacheOptions)
           if (prevMember.type === 'way' && prevMember.members) {
             if (firstMemberId === prevMember.members[0].id || firstMemberId === prevMember.members[prevMember.members.length - 1].id) {
               member.connectedPrev = 'forward'
@@ -173,7 +178,7 @@ class OverpassRelation extends OverpassObject {
         }
 
         if (index < this.members.length - 1) {
-          const nextMember = this.overpass.cache.get(this.members[index + 1].id)
+          const nextMember = this.overpass.cache.get(this.members[index + 1].id, cacheOptions)
           if (nextMember.type === 'way' && nextMember.members) {
             if (firstMemberId === nextMember.members[0].id || firstMemberId === nextMember.members[nextMember.members.length - 1].id) {
               member.connectedNext = 'backward'
@@ -211,7 +216,7 @@ class OverpassRelation extends OverpassObject {
 
     if (!(this.properties & OverpassFrontend.BBOX)) {
       this.members.forEach(member => {
-        const ob = this.overpass.cache.get(member.id)
+        const ob = this.overpass.cache.get(member.id, cacheOptions)
         if (ob && ob.bounds) {
           if (this.bounds) {
             this.bounds.extend(ob.bounds)
@@ -356,6 +361,11 @@ class OverpassRelation extends OverpassObject {
   }
 
   exportOSMXML (options, parentNode, callback) {
+    const cacheOptions = {}
+    if (this.data.timestamp) {
+      cacheOptions.date = this.data.timestamp
+    }
+
     super.exportOSMXML(options, parentNode,
       (err, result) => {
         if (err) {
@@ -369,7 +379,7 @@ class OverpassRelation extends OverpassObject {
         if (this.members) {
           async.each(this.members,
             (member, done) => {
-              const memberOb = this.overpass.cache.get(member.id)
+              const memberOb = this.overpass.cache.get(member.id, cacheOptions)
 
               const nd = parentNode.ownerDocument.createElement('member')
               nd.setAttribute('ref', memberOb.osm_id)
@@ -391,6 +401,11 @@ class OverpassRelation extends OverpassObject {
   }
 
   exportOSMJSON (conf, elements, callback) {
+    const cacheOptions = {}
+    if (this.data.timestamp) {
+      cacheOptions.date = this.data.timestamp
+    }
+
     super.exportOSMJSON(conf, elements,
       (err, result) => {
         if (err) {
@@ -406,7 +421,7 @@ class OverpassRelation extends OverpassObject {
 
           async.each(this.members,
             (member, done) => {
-              const memberOb = this.overpass.cache.get(member.id)
+              const memberOb = this.overpass.cache.get(member.id, cacheOptions)
 
               result.members.push({
                 ref: memberOb.osm_id,
@@ -428,6 +443,11 @@ class OverpassRelation extends OverpassObject {
   }
 
   intersects (bbox) {
+    const cacheOptions = {}
+    if (this.data.timestamp) {
+      cacheOptions.date = this.data.timestamp
+    }
+
     const result = super.intersects(bbox)
 
     if (result === 0 || result === 2) {
@@ -461,7 +481,7 @@ class OverpassRelation extends OverpassObject {
     } else if (this.members) {
       for (i in this.members) {
         const memberId = this.members[i].id
-        const member = this.overpass.cache.get(memberId)
+        const member = this.overpass.cache.get(memberId, cacheOptions)
 
         if (member) {
           if (member.intersects(bbox) === 2) {
