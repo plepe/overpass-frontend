@@ -44,6 +44,17 @@ class OverpassObject {
     return this.memberIds()
   }
 
+  memberObjects () {
+    const cacheOptions = {}
+    if (this.data.timestamp) {
+      cacheOptions.date = this.data.timestamp
+    }
+
+    return this.members.map(member => {
+      return this.overpass.cache.get(member.id, cacheOptions)
+    })
+  }
+
   notifyMemberOf (relation, role, sequence) {
     this.memberOf.push({ id: relation.id, role, sequence })
   }
