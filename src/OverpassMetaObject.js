@@ -1,7 +1,10 @@
 const OverpassObject = require('./OverpassObject')
-const OverpassNode = require('./OverpassNode')
-const OverpassWay = require('./OverpassWay')
-const OverpassRelation = require('./OverpassRelation')
+
+const types = {
+  node: require('./OverpassNode'),
+  way: require('./OverpassWay'),
+  relation: require('./OverpassRelation')
+}
 
 module.exports = class OverpassMetaObject {
   constructor (id, overpass) {
@@ -20,12 +23,8 @@ module.exports = class OverpassMetaObject {
       if (~this.ob.properties & options.properties === 0) {
         return this.ob
       }
-    } else if (el.type === 'relation') {
-      this.ob = new OverpassRelation(this.id)
-    } else if (el.type === 'way') {
-      this.ob = new OverpassWay(this.id)
-    } else if (el.type === 'node') {
-      this.ob = new OverpassNode(this.id)
+    } else if (el.type in types) {
+      this.ob = new types[el.type](this.id)
     } else {
       this.ob = new OverpassObject(this.id)
     }
