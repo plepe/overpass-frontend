@@ -106,7 +106,7 @@ class RequestBBox extends Request {
     for (let i = 0; i < items.length; i++) {
       const id = items[i].id
 
-      const ob = this.overpass.cache.get(id)
+      const ob = this.overpass.cache.get(id, this.options)
       if (ob === undefined) {
         continue
       }

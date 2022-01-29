@@ -29,7 +29,7 @@ class RequestGet extends Request {
     }
 
     this.ids.forEach(id => {
-      const ob = this.overpass.cache.get(id)
+      const ob = this.overpass.cache.get(id, this.options)
       if (ob === false) {
         this.overpass.cache.remove(id)
       }
@@ -186,7 +186,7 @@ class RequestGet extends Request {
       if (this.options.bounds) {
         // check if we already know the bounds of the element; if yes, don't try
         // to load object if it does not intersect bounds
-        const ob = this.overpass.cache.get(id)
+        const ob = this.overpass.cache.get(id, this.options)
         if (ob !== undefined && ob.properties & defines.BBOX) {
           if (!ob.intersects(this.options.bounds)) {
             continue

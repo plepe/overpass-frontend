@@ -8,9 +8,7 @@ const httpLoad = require('./httpLoad')
 const removeNullEntries = require('./removeNullEntries')
 
 const OverpassObject = require('./OverpassObject')
-const OverpassNode = require('./OverpassNode')
-const OverpassWay = require('./OverpassWay')
-const OverpassRelation = require('./OverpassRelation')
+const OverpassMetaObject = require('./OverpassMetaObject')
 const RequestGet = require('./RequestGet')
 const RequestBBox = require('./RequestBBox')
 const RequestMulti = require('./RequestMulti')
@@ -502,9 +500,9 @@ class OverpassFrontend {
       if (members) {
         members.forEach(member => {
           if (!(member in this.cacheElementsMemberOf)) {
-            this.cacheElementsMemberOf[member] = [this.cache.get(ob.id)]
+            this.cacheElementsMemberOf[member] = [this.cache.get(ob.id, part)]
           } else {
-            this.cacheElementsMemberOf[member].push(this.cache.get(ob.id))
+            this.cacheElementsMemberOf[member].push(this.cache.get(ob.id, part))
           }
         })
       }
@@ -528,12 +526,13 @@ class OverpassFrontend {
         ob.missingObject = true
         ob.dbInsert(this.db)
       } else {
-        const ob = new OverpassObject()
-        ob.id = id
-        ob.type = { n: 'node', w: 'way', r: 'relation' }[id.substr(0, 1)]
-        ob.osm_id = id.substr(1)
-        ob.properties = OverpassFrontend.ALL
-        ob.missingObject = true
+        const ob = new OverpassMetaObject(id, this)
+        ob.ob = new OverpassObject()
+        ob.ob.id = id
+        ob.ob.type = { n: 'node', w: 'way', r: 'relation' }[id.substr(0, 1)]
+        ob.ob.osm_id = id.substr(1)
+        ob.ob.properties = OverpassFrontend.ALL
+        ob.ob.missingObject = true
         this.cache.add(id, ob)
         ob.dbInsert(this.db)
       }
@@ -711,37 +710,27 @@ class OverpassFrontend {
     const id = el.type.substr(0, 1) + el.id
     let ob = null
 
-    ob = this.cache.get(id, options)
-    if (ob) {
-      // no new information -> return
-      if (~ob.properties & options.properties === 0) {
-        return ob
-      }
-    } else if (el.type === 'relation') {
-      ob = new OverpassRelation(id)
-    } else if (el.type === 'way') {
-      ob = new OverpassWay(id)
-    } else if (el.type === 'node') {
-      ob = new OverpassNode(id)
-    } else {
-      ob = new OverpassObject(id)
+    ob = this.cache.getMeta(id)
+    if (!ob) {
+      ob = new OverpassMetaObject(id, this)
+      this.cache.add(id, ob)
     }
 
-    ob.overpass = this
-    ob.updateData(el, options)
+    const ovOb = ob.updateData(el, options)
 
-    ob.memberOf.forEach(entry => {
+    ovOb.memberOf.forEach(entry => {
       if (entry.id in this.pendingNotifyMemberUpdate) {
-        this.pendingNotifyMemberUpdate[entry.id].push(ob)
+        this.pendingNotifyMemberUpdate[entry.id].push(ovOb)
       } else {
-        this.pendingNotifyMemberUpdate[entry.id] = [ob]
+        this.pendingNotifyMemberUpdate[entry.id] = [ovOb]
       }
     })
-    this.pendingUpdateEmit[ob.id] = ob
+
+    this.pendingUpdateEmit[ob.id] = ovOb
 
     ob.dbInsert(this.db)
 
-    return this.cache.add(id, ob)
+    return ovOb
   }
 
   regexpEscape (str) {
