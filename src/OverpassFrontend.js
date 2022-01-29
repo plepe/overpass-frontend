@@ -9,6 +9,7 @@ const removeNullEntries = require('./removeNullEntries')
 
 const OverpassObject = require('./OverpassObject')
 const OverpassMetaObject = require('./OverpassMetaObject')
+const OverpassAtticObject = require('./OverpassAtticObject')
 const RequestGet = require('./RequestGet')
 const RequestBBox = require('./RequestBBox')
 const RequestMulti = require('./RequestMulti')
@@ -80,6 +81,7 @@ const Cache = require('./Cache')
  * @param {number} [options.timeGap=10] A short time gap between two requests to the Overpass API (milliseconds).
  * @param {number} [options.timeGap429=500] A longer time gap after a 429 response from Overpass API (milliseconds).
  * @param {number} [options.timeGap429Exp=3] If we keep getting 429 responses, increase the time exponentially with the specified factor (e.g. 2: 500ms, 1000ms, 2000ms, ...; 3: 500ms, 1500ms, 4500ms, ...)
+ * @param {boolean} [options.attic] Support attic data (history of OpenStreetMap)
  * @param {number} [options.loadChunkSize=1000] When loading a file (instead connecting to an Overpass URL) load elements in chunks of n items.
  * @property {boolean} hasStretchLon180=false Are there any map features in the cache which stretch over lon=180/-180?
  */
@@ -101,7 +103,8 @@ class OverpassFrontend {
     }
 
     const db = new LokiJS()
-    this.db = db.addCollection('osm', { unique: ['id'] })
+    // id is not unique when attic data used
+    this.db = db.addCollection('osm', { unique: this.options.attic ? [] : ['id'] })
 
     this.clearCache()
 
@@ -688,9 +691,11 @@ class OverpassFrontend {
 
     for (const k in todo) {
       const ob = this.cache.get(k)
-      ob.notifyMemberUpdate(todo[k])
+      if (ob) {
+        ob.notifyMemberUpdate(todo[k])
 
-      this.pendingUpdateEmit[ob.id] = ob
+        this.pendingUpdateEmit[ob.id] = ob
+      }
     }
   }
 
@@ -712,7 +717,7 @@ class OverpassFrontend {
 
     ob = this.cache.getMeta(id)
     if (!ob) {
-      ob = new OverpassMetaObject(id, this)
+      ob = new (this.options.attic ? OverpassAtticObject : OverpassMetaObject)(id, this)
       this.cache.add(id, ob)
     }
 
