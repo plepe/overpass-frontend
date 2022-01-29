@@ -468,9 +468,7 @@ class OverpassFrontend {
       part.count = 0
     }
 
-    for (let i = 0; i < results.elements.length; i++) {
-      const el = results.elements[i]
-
+    results.elements.forEach((el, i) => {
       if (isSeparator(el)) {
         partIndex++
 
@@ -493,7 +491,7 @@ class OverpassFrontend {
           part = subRequest.parts[partIndex]
         }
 
-        continue
+        return
       }
 
       part.osm3sMeta = osm3sMeta
@@ -502,13 +500,13 @@ class OverpassFrontend {
 
       const members = this.cache.get(ob.id, part).memberIds()
       if (members) {
-        for (let j = 0; j < members.length; j++) {
-          if (!(members[j] in this.cacheElementsMemberOf)) {
-            this.cacheElementsMemberOf[members[j]] = [this.cache.get(ob.id)]
+        members.forEach(member => {
+          if (!(member in this.cacheElementsMemberOf)) {
+            this.cacheElementsMemberOf[member] = [this.cache.get(ob.id)]
           } else {
-            this.cacheElementsMemberOf[members[j]].push(this.cache.get(ob.id))
+            this.cacheElementsMemberOf[member].push(this.cache.get(ob.id))
           }
-        }
+        })
       }
 
       part.count++
@@ -518,7 +516,7 @@ class OverpassFrontend {
       if (!request.aborted && !request.finished && part.featureCallback && (!part.checkFeatureCallback || part.checkFeatureCallback(ob, part))) {
         part.featureCallback(err, ob)
       }
-    }
+    })
 
     if (!(subRequestsIndex === context.subRequests.length - 1 || partIndex === context.subRequests[subRequestsIndex].parts.length - 1)) {
       console.log('too many parts!!!!')
@@ -650,13 +648,13 @@ class OverpassFrontend {
   }
 
   abortAllRequests () {
-    for (let j = 0; j < this.requests.length; j++) {
-      if (this.requests[j] === null) {
-        continue
+    this.requests.forEach(request => {
+      if (!request) {
+        return
       }
 
-      this.requests[j].abort()
-    }
+      request.abort()
+    })
 
     this.requests = []
   }
@@ -666,8 +664,8 @@ class OverpassFrontend {
       ids = [ids]
     }
 
-    for (let i = 0; i < ids.length; i++) {
-      const ob = this.cache.get(ids[i])
+    ids.forEach(id => {
+      const ob = this.cache.get(id)
       if (ob) {
         // remove all memberOf references
         if (ob.members) {
@@ -678,11 +676,11 @@ class OverpassFrontend {
           })
         }
 
-        const lokiOb = this.cache.get(ids[i]).dbData
-        this.cache.remove(ids[i])
+        const lokiOb = this.cache.get(id).dbData
+        this.cache.remove(id)
         this.db.remove(lokiOb)
       }
-    }
+    })
   }
 
   notifyMemberUpdates () {
