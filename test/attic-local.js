@@ -112,4 +112,56 @@ describe('Attic data from local file', function () {
         }, done
       )
   })
+
+  it('Load ways by id at different timestamps', function (done) {
+    const expected = ['w86127691', 'w123386238']
+    const timestamps = ['2009-01-01T00:00:00Z', '2011-01-01T00:00:00Z', '2011-07-25T00:00:00Z', '2013-01-01T00:00:00Z', '2022-01-01T00:00:00Z']
+    const expectedTimestamps = {
+      'w86127691': [null, '2010-11-22T17:27:01Z', '2011-07-23T20:31:37Z', null, null],
+      'w123386238': [null, null, null, '2012-04-29T01:42:23Z', '2021-12-30T19:51:29Z']
+    }
+    const expectedMemberVersions = {
+      'w86127691': [null, '1,1,1,1,1', '1,1,1,1,1,1', null, null], // TODO: index 2 is wrong (node changed at 2011-07-23T20:34:09Z)
+      'w123386238': [null, null, null, '1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1', '2,2,2,2,2,2,2,2,2,1,1,1,1,2,2,2,1,2,2,2,1,1,1,1,1,2,2,2,1,2']
+    }
+
+    async.eachOf(timestamps,
+      (date, i, done) => {
+        const found = []
+
+        overpassFrontend.get(
+          expected,
+          { date },
+          function (err, result) {
+            found.push(result.id)
+
+            console.log('At ' + date + ' found:', result.id, 'with ts', result.meta.timestamp)
+            const memberVersions = result.memberObjects().map(node => node ? node.meta.version : '').join(',')
+
+            assert.equal(result.meta.timestamp, expectedTimestamps[result.id][i], 'Way ' + result.id + ' at date ' + date + ' has wrong timestamp')
+            assert.equal(memberVersions, expectedMemberVersions[result.id][i], 'Way ' + result.id + ' at date ' + date + ' has wrong member versions')
+
+            if (expected.indexOf(result.id) === -1) {
+              error += 'Unexpected result ' + result.id + '\n'
+            }
+          },
+          function (err) {
+            if (err) {
+              return done(err)
+            }
+
+            const _expected = expected.filter(e => expectedTimestamps[e][i])
+
+            if (found.length !== _expected.length) {
+              return done('At date ' + date + ', wrong count of objects returned:\n' +
+               'Expected: ' + _expected.join(', ') + '\n' +
+               'Found: ' + found.join(', '))
+            }
+
+            done()
+          })
+        }, done
+      )
+  })
+
 })
