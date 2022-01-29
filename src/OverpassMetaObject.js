@@ -38,4 +38,12 @@ module.exports = class OverpassMetaObject {
   dbInsert (db) {
     this.ob.dbInsert(db)
   }
+
+  emitUpdate () {
+    this.ob.emit('update', this.ob)
+  }
+
+  notifyMemberUpdate (memberObs) {
+    this.ob.notifyMemberUpdate(memberObs)
+  }
 }

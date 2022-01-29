@@ -690,12 +690,10 @@ class OverpassFrontend {
     this.pendingNotifyMemberUpdate = {}
 
     for (const k in todo) {
-      const ob = this.cache.get(k)
-      if (ob) {
-        ob.notifyMemberUpdate(todo[k])
+      const metaOb = this.cache.getMeta(k)
+      metaOb.notifyMemberUpdate(todo[k])
 
-        this.pendingUpdateEmit[ob.id] = ob
-      }
+      this.pendingUpdateEmit[metaOb.id] = metaOb
     }
   }
 
@@ -705,37 +703,36 @@ class OverpassFrontend {
     const todo = Object.values(this.pendingUpdateEmit)
     this.pendingUpdateEmit = {}
 
-    todo.forEach(ob => {
-      ob.emit('update', ob)
-      ob.dbInsert(this.db)
+    todo.forEach(metaOb => {
+      metaOb.emitUpdate()
+      metaOb.dbInsert(this.db)
     })
   }
 
   createOrUpdateOSMObject (el, options) {
     const id = el.type.substr(0, 1) + el.id
-    let ob = null
 
-    ob = this.cache.getMeta(id)
-    if (!ob) {
-      ob = new (this.options.attic ? OverpassAtticObject : OverpassMetaObject)(id, this)
-      this.cache.add(id, ob)
+    let metaOb = this.cache.getMeta(id)
+    if (!metaOb) {
+      metaOb = new (this.options.attic ? OverpassAtticObject : OverpassMetaObject)(id, this)
+      this.cache.add(id, metaOb)
     }
 
-    const ovOb = ob.updateData(el, options)
+    const ob = metaOb.updateData(el, options)
 
-    ovOb.memberOf.forEach(entry => {
+    ob.memberOf.forEach(entry => {
       if (entry.id in this.pendingNotifyMemberUpdate) {
-        this.pendingNotifyMemberUpdate[entry.id].push(ovOb)
+        this.pendingNotifyMemberUpdate[entry.id].push(ob.id)
       } else {
-        this.pendingNotifyMemberUpdate[entry.id] = [ovOb]
+        this.pendingNotifyMemberUpdate[entry.id] = [ob.id]
       }
     })
 
-    this.pendingUpdateEmit[ob.id] = ovOb
+    this.pendingUpdateEmit[metaOb.id] = metaOb
 
-    ob.dbInsert(this.db)
+    metaOb.dbInsert(this.db)
 
-    return ovOb
+    return ob
   }
 
   regexpEscape (str) {

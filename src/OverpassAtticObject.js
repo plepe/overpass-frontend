@@ -61,6 +61,14 @@ class OverpassAtticObject {
   dbInsert (db) {
     Object.values(this.versions).forEach(ob => ob.dbInsert(db))
   }
+
+  emitUpdate () {
+    Object.values(this.versions).forEach(ob => ob.emit('update', ob))
+  }
+
+  notifyMemberUpdate (memberObs) {
+    Object.values(this.versions).forEach(ob => ob.notifyMemberUpdate(memberObs))
+  }
 }
 
 module.exports = OverpassAtticObject
