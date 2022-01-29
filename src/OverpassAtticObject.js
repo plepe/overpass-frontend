@@ -25,6 +25,10 @@ class OverpassAtticObject {
         const ob = this.versions[matching[matching.length - 1]]
         return ob.visible ? ob : undefined
       }
+    } else {
+      const last = this.timestamps[this.timestamps.length - 1]
+      const ob = this.versions[last]
+      return ob.visible ? ob : undefined
     }
   }
 

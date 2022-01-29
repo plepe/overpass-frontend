@@ -19,11 +19,12 @@ describe('Attic data from local file', function () {
   })
 
   it('Load nodes by id at different timestamps', function (done) {
-    const expected = ['n282549433', 'n973838907']
-    const timestamps = ['2007-01-01T00:00:00Z', '2009-01-01T00:00:00Z', '2013-01-01T00:00:00Z', '2018-02-01T00:00:00Z', '2018-04-01T00:00:00Z', '2020-01-01T00:00:00Z']
+    const expected = ['n282549433', 'n973838907', 'n347352725']
+    const timestamps = ['2007-01-01T00:00:00Z', '2009-01-01T00:00:00Z', '2013-01-01T00:00:00Z', '2018-02-01T00:00:00Z', '2018-04-01T00:00:00Z', '2020-01-01T00:00:00Z', null]
     const expectedTimestamps = {
       'n282549433': [null, '2008-07-31T21:04:15Z', null, null, null, null],
       'n973838907': [null, null, '2012-04-29T17:02:46Z', null, '2018-02-11T22:45:14Z', null],
+      'n347352725': [null, null, '2012-10-19T00:31:11Z', '2016-04-19T14:44:27Z', '2016-04-19T14:44:27Z', '2019-06-16T16:21:20Z', '2021-07-23T17:29:32Z']
     }
 
     async.eachOf(timestamps,
@@ -69,10 +70,11 @@ describe('Attic data from local file', function () {
       minlon: 16.34000,
       maxlon: 16.34100
     }
-    const expected = ['n973838907']
-    const timestamps = ['2009-01-01T00:00:00Z', '2010-11-02T00:00:00Z', '2013-01-01T00:00:00Z', '2018-02-01T00:00:00Z', '2018-04-01T00:00:00Z', '2020-01-01T00:00:00Z']
+    const expected = ['n973838907', 'n347352725']
+    const timestamps = ['2009-01-01T00:00:00Z', '2010-11-02T00:00:00Z', '2013-01-01T00:00:00Z', '2018-02-01T00:00:00Z', '2018-04-01T00:00:00Z', '2020-01-01T00:00:00Z', null]
     const expectedTimestamps = {
       'n973838907': [null, null, '2012-04-29T17:02:46Z', null, '2018-02-11T22:45:14Z', null],
+      'n347352725': [null, null, '2012-10-19T00:31:11Z', '2016-04-19T14:44:27Z', '2016-04-19T14:44:27Z', '2019-06-16T16:21:20Z', '2021-07-23T17:29:32Z']
     }
 
     async.eachOf(timestamps,
@@ -80,7 +82,7 @@ describe('Attic data from local file', function () {
         const found = []
 
         overpassFrontend.BBoxQuery(
-          'node[amenity=parking]', bbox,
+          '(node[amenity=parking];node[shop=supermarket];)', bbox,
           { date },
           function (err, result) {
             found.push(result.id)
