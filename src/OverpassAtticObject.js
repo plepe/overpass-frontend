@@ -11,52 +11,54 @@ class OverpassAtticObject {
     this.id = id
     this.overpass = overpass
     this.versions = {}
+    this.originalData = {}
     this.timestamps = null
 
     this.tmpDate = null
   }
 
-  createTmpObject (date, ob, options) {
-    console.log(ob.id)
-    const el = JSON.parse(JSON.stringify(ob.data))
+  createTmpObject (date, timestamp, options) {
+    const el = JSON.parse(this.originalData[timestamp])
     el.timestamp = date
 
-    this.tmpDate = options.date
+    this.tmpDate = date
     this.tmpOb = new types[el.type](this.id)
     this.tmpOb.overpass = this.overpass
-    this.tmpOb.updateData(el, options)
+    this.tmpOb.updateData(el, {})
 
     return this.tmpOb
   }
 
   get (options) {
+    let timestamp
     if (options.date) {
-      if (this.tmpDate === options.date) {
-        return this.tmpOb
-      }
-
       const matching = this.timestamps.filter(d => d <= options.date)
-      if (matching.length) {
-        const ob = this.versions[matching[matching.length - 1]]
-        if (!ob.visible) {
-          return undefined
-        }
-
-        // check for the highest timestamp of any of the member objects
-        // console.log(ob.meta.timestamp, ob.memberObjects(options).map(o => o.meta.timestamp))
-        const maxMemberTimestamp = ob.memberObjects(options).map(o => o.meta.timestamp).sort().reverse()[0]
-        if (maxMemberTimestamp > ob.meta.timestamp) {
-          // create temporary object
-          return this.createTmpObject(options.date, ob, options)
-        }
-
-        return ob
-      }
+      timestamp = matching[matching.length - 1]
     } else {
-      const last = this.timestamps[this.timestamps.length - 1]
-      const ob = this.versions[last]
-      return ob.visible ? ob : undefined
+      timestamp = this.timestamps[this.timestamps.length - 1]
     }
+
+    const ob = this.versions[timestamp]
+    if (!ob || !ob.visible) {
+      return undefined
+    }
+
+    // check for the highest timestamp of any of the member objects
+    const maxMemberTimestamp = ob.memberObjects(options)
+      .map(o => o.meta.timestamp)
+      .filter(t => t)
+      .sort().reverse()[0]
+
+    if (this.tmpDate === maxMemberTimestamp) {
+      return this.tmpOb
+    }
+
+    if (maxMemberTimestamp > ob.meta.timestamp) {
+      // create temporary object
+      return this.createTmpObject(maxMemberTimestamp, timestamp)
+    }
+
+    return ob
   }
 
   updateData (el, options) {
@@ -76,6 +78,7 @@ class OverpassAtticObject {
 
     ob.overpass = this.overpass
 
+    this.originalData[el.timestamp] = JSON.stringify(el)
     ob.updateData(el, options)
 
     if (!ob.meta) {
