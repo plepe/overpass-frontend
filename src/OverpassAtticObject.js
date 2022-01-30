@@ -12,14 +12,45 @@ class OverpassAtticObject {
     this.overpass = overpass
     this.versions = {}
     this.timestamps = null
+
+    this.tmpDate = null
+  }
+
+  createTmpObject (date, ob, options) {
+    console.log(ob.id)
+    const el = JSON.parse(JSON.stringify(ob.data))
+    el.timestamp = date
+
+    this.tmpDate = options.date
+    this.tmpOb = new types[el.type](this.id)
+    this.tmpOb.overpass = this.overpass
+    this.tmpOb.updateData(el, options)
+
+    return this.tmpOb
   }
 
   get (options) {
     if (options.date) {
+      if (this.tmpDate === options.date) {
+        return this.tmpOb
+      }
+
       const matching = this.timestamps.filter(d => d <= options.date)
       if (matching.length) {
         const ob = this.versions[matching[matching.length - 1]]
-        return ob.visible ? ob : undefined
+        if (!ob.visible) {
+          return undefined
+        }
+
+        // check for the highest timestamp of any of the member objects
+        // console.log(ob.meta.timestamp, ob.memberObjects(options).map(o => o.meta.timestamp))
+        const maxMemberTimestamp = ob.memberObjects(options).map(o => o.meta.timestamp).sort().reverse()[0]
+        if (maxMemberTimestamp > ob.meta.timestamp) {
+          // create temporary object
+          return this.createTmpObject(options.date, ob, options)
+        }
+
+        return ob
       }
     } else {
       const last = this.timestamps[this.timestamps.length - 1]
