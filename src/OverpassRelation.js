@@ -166,7 +166,7 @@ class OverpassRelation extends OverpassObject {
 
         if (index > 0) {
           const prevMember = this.overpass.cache.get(this.members[index - 1].id, cacheOptions)
-          if (prevMember.type === 'way' && prevMember.members) {
+          if (prevMember && prevMember.type === 'way' && prevMember.members) {
             if (firstMemberId === prevMember.members[0].id || firstMemberId === prevMember.members[prevMember.members.length - 1].id) {
               member.connectedPrev = 'forward'
             } else if (lastMemberId === prevMember.members[0].id || lastMemberId === prevMember.members[prevMember.members.length - 1].id) {
