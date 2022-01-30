@@ -15,10 +15,6 @@ class OverpassAtticObject {
   }
 
   get (options) {
-    if (!this.timestamps) {
-      this.timestamps = Object.keys(this.versions).sort()
-    }
-
     if (options.date) {
       const matching = this.timestamps.filter(d => d <= options.date)
       if (matching.length) {
@@ -33,6 +29,7 @@ class OverpassAtticObject {
   }
 
   updateData (el, options) {
+    // TODO: el.timestamp will be undefined for referenced objects - what to do about them?
     let ob
     if (el.timestamp in this.versions) {
       ob = this.versions[el.timestamp]
@@ -47,9 +44,26 @@ class OverpassAtticObject {
     }
 
     ob.overpass = this.overpass
+
     ob.updateData(el, options)
 
+    if (!ob.meta) {
+      ob.meta = {
+        timestamp: el.timestamp,
+        version: el.version
+      }
+    }
+
     this.versions[el.timestamp] = ob
+
+    this.timestamps = Object.keys(this.versions).sort().filter(v => v !== 'undefined')
+    const pos = this.timestamps.indexOf(el.timestamp)
+    if (pos > 0) {
+      this.versions[this.timestamps[pos - 1]].meta.endTimestamp = el.timestamp
+    }
+    if (this.timestamps.length > pos + 1) {
+      ob.meta.endTimestamp = this.versions[this.timestamps[pos + 1]].timestamp
+    }
 
     return ob
   }
