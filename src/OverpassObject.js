@@ -51,9 +51,9 @@ class OverpassObject {
 
     if (!options) {
       options = {}
-    }
-    if (this.data.timestamp && !options.timestamp) {
-      options.date = this.data.timestamp
+      if (this.data.timestamp && !options.date) {
+        options.date = this.data.timestamp
+      }
     }
 
     return this.members.map(member => this.overpass.cache.get(member.id, options))
