@@ -58,6 +58,10 @@ class RequestBBox extends Request {
       if (!boundsIsFullWorld(this.bounds)) {
         this.lokiQuery = { $and: [this.lokiQuery, boundsToLokiQuery(this.bbox, this.overpass)] }
       }
+
+      if (this.options.date) {
+        this.lokiQuery = { $and: [this.lokiQuery, { timestamp: { $lte: this.options.date } }] }
+      }
     }
 
     this.loadFinish = false
