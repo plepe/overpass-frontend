@@ -60,7 +60,16 @@ class RequestBBox extends Request {
       }
 
       if (this.options.date) {
-        this.lokiQuery = { $and: [this.lokiQuery, { timestamp: { $lte: this.options.date } }] }
+        this.lokiQuery = { $and: [this.lokiQuery, { timestamp: { $lte: new Date(this.options.date).toISOString().replace(/\.\d{3}Z/, 'Z') } }] }
+      }
+
+      // if attic date is enabled, we have to check again to filter out false
+      // positives (an older version of an object might have matched)
+      if (this.overpass.options.attic) {
+        this.lokiQueryNeedMatch = true
+        if (this.options.filter) {
+          this.lokiQueryFilterNeedMatch = true
+        }
       }
     }
 

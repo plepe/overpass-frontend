@@ -70,11 +70,12 @@ describe('Attic data from local file', function () {
       minlon: 16.34000,
       maxlon: 16.34100
     }
-    const expected = ['n973838907', 'n347352725']
+    const expected = ['n973838907', 'n347352725', 'n4100076539']
     const timestamps = ['2009-01-01T00:00:00Z', '2010-11-02T00:00:00Z', '2013-01-01T00:00:00Z', '2018-02-01T00:00:00Z', '2018-04-01T00:00:00Z', '2020-01-01T00:00:00Z', null]
     const expectedTimestamps = {
       'n973838907': [null, null, '2012-04-29T17:02:46Z', null, '2018-02-11T22:45:14Z', null],
-      'n347352725': [null, null, '2012-10-19T00:31:11Z', '2016-04-19T14:44:27Z', '2016-04-19T14:44:27Z', '2019-06-16T16:21:20Z', '2021-07-23T17:29:32Z']
+      'n347352725': [null, null, '2012-10-19T00:31:11Z', '2016-04-19T14:44:27Z', '2016-04-19T14:44:27Z', '2019-06-16T16:21:20Z', '2021-07-23T17:29:32Z'],
+      'n4100076539': [null, null, null, '2016-05-03T21:08:53Z', '2016-05-03T21:08:53Z', null, null],
     }
 
     async.eachOf(timestamps,
@@ -82,7 +83,7 @@ describe('Attic data from local file', function () {
         const found = []
 
         overpassFrontend.BBoxQuery(
-          '(node[amenity=parking];node[shop=supermarket];)', bbox,
+          '(node[amenity=parking];node[shop=supermarket];node[amenity=pharmacy];)', bbox,
           { date },
           function (err, result) {
             found.push(result.id)
@@ -173,7 +174,7 @@ describe('Attic data from local file', function () {
     }
     const timestamps = ['2009-01-01T00:00:00Z', '2012-01-01T00:00:00Z', '2013-01-01T00:00:00Z', '2018-02-01T00:00:00Z', '2020-01-01T00:00:00Z', null]
     const expectedTimestamps = {
-      'w86127673': [null, '2011-07-23T20:34:07Z', null, null, null, '2021-04-04T17:48:07Z'], // TODO: last index should be null
+      'w86127673': [null, '2011-07-23T20:34:07Z', null, null, null, null],
       'w86127644': [null, '2011-07-23T20:34:06Z', null, null, null, null],
       'w86124803': [null, '2011-07-23T20:34:01Z', null, null, null, null],
       'w123386238': [null, '2011-07-27T19:47:00Z', '2012-04-29T01:42:37Z', '2012-04-29T01:42:37Z', '2012-04-29T01:42:37Z', '2021-12-30T19:51:29Z'],
@@ -185,7 +186,7 @@ describe('Attic data from local file', function () {
       'w161573360': [null, null, '2012-04-29T17:02:30Z', '2012-04-29T17:02:30Z', '2012-04-29T17:02:30Z', '2021-03-15T18:13:35Z'],
     }
     const expectedMemberVersions = {
-      "w86127673": [ "", "2,2,2,2,1,2", "", "", "", "4,1,1,1,1,1,1,2,4,3,1,4,1,1,4" ], // TODO: last index should be ""
+      "w86127673": [ "", "2,2,2,2,1,2", "", "", "", "" ],
       "w86127644": [ "", "2,2,2,2,2", "", "", "", "" ],
       "w86124803": [ "", "2,1,2,2,1,2,2", "", "", "", "" ],
       "w123386238": [ "", "1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1", "2,2,2,2,2,2,2,2,2,1,1,1,1,2,2,2,2,2,2,1,1,1,1,1,2,2,2,1,2", "2,2,2,2,2,2,2,2,2,1,1,1,1,2,2,2,2,2,2,1,1,1,1,1,2,2,2,1,2", "2,2,2,2,2,2,2,2,2,1,1,1,1,2,2,2,2,2,2,1,1,1,1,1,2,2,2,1,2", "2,2,2,2,2,2,2,2,2,1,1,1,1,2,2,2,1,2,2,2,1,1,1,1,1,2,2,2,1,2" ],
