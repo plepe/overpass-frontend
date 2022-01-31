@@ -103,30 +103,35 @@ class RequestBBox extends Request {
       items = this.overpass.db.find(this.lokiQuery)
     }
 
-    for (let i = 0; i < items.length; i++) {
-      const id = items[i].id
+    // items should be a list of IDs
+    items = items.map(item => item.id)
+    if (this.overpass.options.attic) {
+      // filter out duplicates
+      items = [...new Set(items)]
+    }
 
+    items.forEach(id => {
       const ob = this.overpass.cache.get(id, this.options)
       if (ob === undefined) {
-        continue
+        return
       }
 
       if (id in this.doneFeatures) {
-        continue
+        return
       }
 
       // maybe we need an additional check
       if (this.lokiQueryNeedMatch && !this.filterQuery.match(ob)) {
-        continue
+        return
       }
 
       if (this.lokiQueryFilterNeedMatch && !this.options.filter.match(ob)) {
-        continue
+        return
       }
 
       // also check the object directly if it intersects the bbox - if possible
       if (ob.intersects(this.bounds) < 2) {
-        continue
+        return
       }
 
       if ((this.options.properties & ob.properties) === this.options.properties) {
@@ -134,7 +139,7 @@ class RequestBBox extends Request {
 
         this.featureCallback(null, ob)
       }
-    }
+    })
   }
 
   /**
