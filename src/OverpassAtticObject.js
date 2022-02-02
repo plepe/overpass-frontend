@@ -45,7 +45,7 @@ class OverpassAtticObject {
 
     // check for the highest timestamp of any of the member objects
     const maxMemberTimestamp = ob.memberObjects(options)
-      .map(o => o.meta.timestamp)
+      .map(o => o && o.meta && o.meta.timestamp)
       .filter(t => t)
       .sort().reverse()[0]
 
