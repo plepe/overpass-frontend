@@ -1,12 +1,11 @@
-var assert = require('assert')
-var OverpassFrontend = require('../../src/OverpassFrontend')
+const assert = require('assert')
 
 module.exports = {
   get (overpassFrontend, options, done) {
-    var foundSubRequestCount = 0
-    var found = []
-    var foundMembers = []
-    var isDone = false
+    let foundSubRequestCount = 0
+    const found = []
+    const foundMembers = []
+    let isDone = false
 
     function compileListener (subRequest) {
       foundSubRequestCount++
@@ -14,6 +13,7 @@ module.exports = {
 
     if (options.options.members) {
       options.options.memberCallback = function (err, result) {
+        if (err) { return done(err) }
         foundMembers.push(result.id)
 
         if (options.expectedMembers.indexOf(result.id) === -1) {
@@ -21,24 +21,27 @@ module.exports = {
         }
 
         if (options.expectedMemberMemberOf) {
-          assert.deepEqual(result.memberOf, options.expectedMemberMemberOf[result.id], 'Member.memberOf for ' + result.id +' is wrong!')
+          assert.deepEqual(result.memberOf, options.expectedMemberMemberOf[result.id], 'Member.memberOf for ' + result.id + ' is wrong!')
         }
 
         if ('expectedMemberProperties' in options) {
-          assert.equal(result.properties&options.expectedMemberProperties, options.expectedMemberProperties, 'Member should known about sub members')
+          assert.equal(result.properties & options.expectedMemberProperties, options.expectedMemberProperties, 'Member should known about sub members')
         }
 
         assert.equal(isDone, false, 'Called memberCallback after finalCallback')
       }
     }
 
-    var request = overpassFrontend.get(
+    const request = overpassFrontend.get(
       options.ids,
       options.options,
       function (err, result) {
+        if (err) { return done(err) }
         found.push(result.id)
 
-        assert.equal(OverpassFrontend.DEFAULT, result.properties&OverpassFrontend.DEFAULT)
+        if ('expectedProperties' in options) {
+          assert.equal(result.properties, options.expectedProperties)
+        }
       },
       function (err) {
         isDone = true
@@ -68,10 +71,10 @@ module.exports = {
   },
 
   bbox (overpassFrontend, options, done) {
-    var foundSubRequestCount = 0
-    var found = []
-    var foundMembers = []
-    var isDone = false
+    let foundSubRequestCount = 0
+    const found = []
+    const foundMembers = []
+    let isDone = false
 
     function compileListener (subRequest) {
       foundSubRequestCount++
@@ -79,10 +82,11 @@ module.exports = {
 
     if (options.options.members) {
       options.options.memberCallback = function (err, result) {
+        if (err) { return done(err) }
         foundMembers.push(result.id)
 
         if (options.expectedMemberMemberOf) {
-          assert.deepEqual(result.memberOf, options.expectedMemberMemberOf[result.id], 'Member.memberOf for ' + result.id +' is wrong!')
+          assert.deepEqual(result.memberOf, options.expectedMemberMemberOf[result.id], 'Member.memberOf for ' + result.id + ' is wrong!')
         }
 
         if ('expectedMemberProperties' in options) {
@@ -93,11 +97,12 @@ module.exports = {
       }
     }
 
-    var request = overpassFrontend.BBoxQuery(
+    const request = overpassFrontend.BBoxQuery(
       options.query,
       options.bbox,
       options.options,
       function (err, result) {
+        if (err) { return done(err) }
         found.push(result.id)
 
         if ('expectedProperties' in options) {

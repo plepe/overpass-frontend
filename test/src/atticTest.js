@@ -12,13 +12,14 @@ module.exports = {
           options.ids,
           { date },
           function (err, result) {
+            if (err) { return done(err) }
             found.push(result.id)
 
-            //console.log('At ' + date + ' found:', result.id, 'with ts', result.meta.timestamp)
+            // console.log('At ' + date + ' found:', result.id, 'with ts', result.meta.timestamp)
             assert.equal(result.meta.timestamp, options.expectedTimestamps[result.id][i], 'Node ' + result.id + ' at date ' + date + ' has wrong timestamp')
 
-            if (expected.indexOf(result.id) === -1) {
-              error += 'Unexpected result ' + result.id + '\n'
+            if ('expectedProperties' in options) {
+              assert.equal(result.properties, options.expectedProperties)
             }
           },
           function (err) {
@@ -26,16 +27,14 @@ module.exports = {
               return done(err)
             }
 
-            if (found.length !== expected.length) {
-              return done('At date ' + date + ', wrong count of objects returned:\n' +
-               'Expected: ' + expected.join(', ') + '\n' +
-               'Found: ' + found.join(', '))
+            if (expected) {
+              assert.deepEqual(found.sort(), expected.sort(), 'Wrong list of objects returned')
             }
 
             done()
           })
-        }, callback
-      )
+      }, callback
+    )
   },
 
   bbox (overpassFrontend, options, callback) {
@@ -49,29 +48,22 @@ module.exports = {
           options.bbox,
           { date },
           function (err, result) {
+            if (err) { return done(err) }
             found.push(result.id)
 
-            //console.log('At ' + date + ' found:', result.id, 'with ts', result.meta.timestamp)
+            // console.log('At ' + date + ' found:', result.id, 'with ts', result.meta.timestamp)
             assert.equal(result.meta.timestamp, options.expectedTimestamps[result.id][i], 'Node ' + result.id + ' at date ' + date + ' has wrong timestamp')
-
-            if (expected.indexOf(result.id) === -1) {
-              error += 'Unexpected result ' + result.id + '\n'
-            }
           },
           function (err) {
             if (err) {
               return done(err)
             }
 
-            if (found.length !== expected.length) {
-              return done('At date ' + date + ', wrong count of objects returned:\n' +
-               'Expected: ' + expected.join(', ') + '\n' +
-               'Found: ' + found.join(', '))
-            }
+            assert.deepEqual(found.sort(), expected.sort(), 'Wrong list of objects returned')
 
             done()
           })
-        }, callback
-      )
+      }, callback
+    )
   }
 }
