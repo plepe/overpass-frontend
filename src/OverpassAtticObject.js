@@ -102,6 +102,10 @@ class OverpassAtticObject {
     return ob
   }
 
+  addMissingObject (context) {
+    console.log('missing at', context.date)
+  }
+
   leafletFeature (options) {
     return this.getVersion(options).leafletFeature(options)
   }

@@ -525,7 +525,7 @@ class OverpassFrontend {
     for (const id in context.todo) {
       let ob = this.cache.getMeta(id, context)
       if (!ob) {
-        ob = new OverpassMetaObject(id, this)
+        ob = new (this.options.attic ? OverpassAtticObject : OverpassMetaObject)(id, this)
         this.cache.add(id, ob)
       }
 
