@@ -33,7 +33,31 @@ $env = array();
 $pipes = array();
 $cwd = getcwd();
 
-$process = proc_open('osm3s_query --concise --db-dir=data/', $descriptorspec, $pipes, $cwd, $env);
+$db = array_key_exists('db', $_REQUEST) ? $_REQUEST['db'] : 'data';
+if (!preg_match('/^[a-z0-9_-]+$/i', $db)) {
+  Header("HTTP/1.1 403 Forbidden");
+
+  print <<<EOT
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" lang="en"/>
+  <title>OSM3S Response</title>
+</head>
+<body>
+
+<p>Invalid database</p>
+
+</body>
+</html>
+EOT;
+
+  exit(0);
+}
+
+$process = proc_open('osm3s_query --concise --db-dir=' . escapeshellarg($db), $descriptorspec, $pipes, $cwd, $env);
 
 if (is_resource($process)) {
     // $pipes now looks like this:
