@@ -5,6 +5,7 @@ var BoundingBox = require('boundingbox')
 
 var removeNullEntries = require('../src/removeNullEntries')
 var OverpassFrontend = require('../src/OverpassFrontend')
+var test = require('./src/test')
 
 var conf = JSON.parse(fs.readFileSync('test/conf.json', 'utf8'));
 if (!conf.generator) {
@@ -16,583 +17,171 @@ var overpassFrontend = new OverpassFrontend(conf.url)
 
 describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
   it('Simple queries - routes', function (done) {
-    var expected = [ 'r910885', 'r910886', 'r1306732', 'r1306733' ]
-    var expectedMembers = [ 'n2293993991', 'n2293993859', 'n2293993867' , 'n2293993929', 'w122580925', 'w220270706', 'w220270708', 'w220270709', 'w220270714', 'w232881263', 'w232881441', 'w261111319', 'w220270696', 'w220270713', 'w383292582' ]
-    var found = []
-    var foundMembers = []
-    var error = ''
-    var bbox = {
-	"maxlat": 48.19953,
-	"maxlon": 16.33506,
-	"minlat": 48.19800,
-	"minlon": 16.32581,
-      }
-
-    var expectedSubRequestCount = 2
-    var foundSubRequestCount = 0
-
-    function compileListener (subRequest) {
-      foundSubRequestCount++
+    const bbox = {
+      "maxlat": 48.19953,
+      "maxlon": 16.33506,
+      "minlat": 48.19800,
+      "minlon": 16.32581,
     }
 
-    var request = overpassFrontend.BBoxQuery(
-      "relation[type=route][route=tram]",
+    test.bbox(overpassFrontend, {
+      query: "relation[type=route][route=tram]",
       bbox,
-      {
+      expected: [ 'r910885', 'r910886', 'r1306732', 'r1306733' ],
+      expectedMembers: [ 'n2293993991', 'n2293993859', 'n2293993867' , 'n2293993929', 'w122580925', 'w220270706', 'w220270708', 'w220270709', 'w220270714', 'w232881263', 'w232881441', 'w261111319', 'w220270696', 'w220270713', 'w383292582' ],
+      expectedSubRequestCount: 2,
+      options: {
         "members": true,
         "properties": OverpassFrontend.TAGS | OverpassFrontend.MEMBERS,
         "memberProperties": OverpassFrontend.TAGS | OverpassFrontend.GEOM,
         "memberBounds": bbox,
-        "memberCallback": function (err, result) {
-          foundMembers.push(result.id)
-
-          result.memberOf.forEach(memberOf => {
-            if (found.indexOf(memberOf.id) === -1) {
-              assert.fail('memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.id)
-            }
-          })
-
-          if (expectedMembers.indexOf(result.id) === -1) {
-            error += 'Unexpected member result ' + result.id + '\n'
-          }
-        }
-      },
-      function (err, result) {
-        found.push(result.id)
-
-        assert.equal(result.properties, OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.BBOX | OverpassFrontend.CENTER)
-
-        if (expected.indexOf(result.id) === -1) {
-          error += 'Unexpected result ' + result.id + '\n'
-        }
-      },
-      function (err) {
-        if (err) {
-          return done(err)
-        }
-
-        if (error) {
-          return done(error)
-        }
-
-        if (found.length !== expected.length) {
-          return done('Wrong count of objects returned:\n' +
-               'Expected: ' + expected.join(', ') + '\n' +
-               'Found: ' + found.join(', '))
-        }
-
-        if (foundMembers.length !== expectedMembers.length) {
-          return done('Wrong count of member objects returned:\n' +
-               'Expected: ' + expectedMembers.join(', ') + '\n' +
-               'Found: ' + foundMembers.join(', '))
-        }
-
-        assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
-
-        request.off('subrequest-compile', compileListener)
-
-        done()
       }
-    )
-
-    request.on('subrequest-compile', compileListener)
+    }, done)
   })
 
   it('Simple queries - routes (with empty cache)', function (done) {
     overpassFrontend.clearCache()
-    var expected = [ 'r910885', 'r910886', 'r1306732', 'r1306733' ]
-    var expectedMembers = [ 'n2293993991', 'n2293993859', 'n2293993867' , 'n2293993929', 'w122580925', 'w220270706', 'w220270708', 'w220270709', 'w220270714', 'w232881263', 'w232881441', 'w261111319', 'w220270696', 'w220270713', 'w383292582' ]
-    var found = []
-    var foundMembers = []
-    var error = ''
-    var bbox = {
-	"maxlat": 48.19953,
-	"maxlon": 16.33506,
-	"minlat": 48.19800,
-	"minlon": 16.32581,
-      }
-
-    var expectedSubRequestCount = 2
-    var foundSubRequestCount = 0
-
-    function compileListener (subRequest) {
-      foundSubRequestCount++
+    const bbox = {
+      "maxlat": 48.19953,
+      "maxlon": 16.33506,
+      "minlat": 48.19800,
+      "minlon": 16.32581,
     }
 
-    var request = overpassFrontend.BBoxQuery(
-      "relation[type=route][route=tram]",
+    test.bbox(overpassFrontend, {
+      query: "relation[type=route][route=tram]",
       bbox,
-      {
+      expected: [ 'r910885', 'r910886', 'r1306732', 'r1306733' ],
+      expectedMembers: [ 'n2293993991', 'n2293993859', 'n2293993867' , 'n2293993929', 'w122580925', 'w220270706', 'w220270708', 'w220270709', 'w220270714', 'w232881263', 'w232881441', 'w261111319', 'w220270696', 'w220270713', 'w383292582' ],
+      expectedSubRequestCount: 2,
+      options: {
         "members": true,
         "properties": OverpassFrontend.TAGS | OverpassFrontend.MEMBERS,
         "memberProperties": OverpassFrontend.TAGS | OverpassFrontend.GEOM,
         "memberBounds": bbox,
-        "memberCallback": function (err, result) {
-          foundMembers.push(result.id)
-
-          result.memberOf.forEach(memberOf => {
-            if (found.indexOf(memberOf.id) === -1) {
-              assert.fail('memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.id)
-            }
-          })
-
-          if (expectedMembers.indexOf(result.id) === -1) {
-            error += 'Unexpected member result ' + result.id + '\n'
-          }
-        }
-      },
-      function (err, result) {
-        found.push(result.id)
-
-        assert.equal(result.properties, OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.BBOX | OverpassFrontend.CENTER)
-
-        if (expected.indexOf(result.id) === -1) {
-          error += 'Unexpected result ' + result.id + '\n'
-        }
-      },
-      function (err) {
-        if (err) {
-          return done(err)
-        }
-
-        if (error) {
-          return done(error)
-        }
-
-        if (found.length !== expected.length) {
-          return done('Wrong count of objects returned:\n' +
-               'Expected: ' + expected.join(', ') + '\n' +
-               'Found: ' + found.join(', '))
-        }
-
-        if (foundMembers.length !== expectedMembers.length) {
-          return done('Wrong count of member objects returned:\n' +
-               'Expected: ' + expectedMembers.join(', ') + '\n' +
-               'Found: ' + foundMembers.join(', '))
-        }
-
-        assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
-
-        request.off('subrequest-compile', compileListener)
-
-        done()
-      })
-
-      request.on('subrequest-compile', compileListener)
+      }
+    }, done)
   })
 
   it('Simple queries - routes (fully cached)', function (done) {
-    var expected = [ 'r910885', 'r910886', 'r1306732', 'r1306733' ]
-    var expectedMembers = [ 'n2293993991', 'n2293993859', 'n2293993867' , 'n2293993929', 'w122580925', 'w220270706', 'w220270708', 'w220270709', 'w220270714', 'w232881263', 'w232881441', 'w261111319', 'w220270696', 'w220270713', 'w383292582' ]
-    var found = []
-    var foundMembers = []
-    var error = ''
-    var bbox = {
-	"maxlat": 48.19953,
-	"maxlon": 16.33506,
-	"minlat": 48.19800,
-	"minlon": 16.32581,
-      }
-
-    var expectedSubRequestCount = 0
-    var foundSubRequestCount = 0
-
-    function compileListener (subRequest) {
-      foundSubRequestCount++
+    const bbox = {
+      "maxlat": 48.19953,
+      "maxlon": 16.33506,
+      "minlat": 48.19800,
+      "minlon": 16.32581,
     }
 
-    var request = overpassFrontend.BBoxQuery(
-      "relation[type=route][route=tram]",
+    test.bbox(overpassFrontend, {
+      query: "relation[type=route][route=tram]",
       bbox,
-      {
+      expected: [ 'r910885', 'r910886', 'r1306732', 'r1306733' ],
+      expectedMembers: [ 'n2293993991', 'n2293993859', 'n2293993867' , 'n2293993929', 'w122580925', 'w220270706', 'w220270708', 'w220270709', 'w220270714', 'w232881263', 'w232881441', 'w261111319', 'w220270696', 'w220270713', 'w383292582' ],
+      expectedSubRequestCount: 0,
+      expectedProperties: OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.BBOX | OverpassFrontend.CENTER,
+      options: {
         "members": true,
         "properties": OverpassFrontend.TAGS | OverpassFrontend.MEMBERS,
         "memberProperties": OverpassFrontend.TAGS | OverpassFrontend.GEOM,
         "memberBounds": bbox,
-        "memberCallback": function (err, result) {
-          foundMembers.push(result.id)
-
-          result.memberOf.forEach(memberOf => {
-            if (found.indexOf(memberOf.id) === -1) {
-              assert.fail('memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.id)
-            }
-          })
-
-          if (expectedMembers.indexOf(result.id) === -1) {
-            error += 'Unexpected member result ' + result.id + '\n'
-          }
-        }
-      },
-      function (err, result) {
-        found.push(result.id)
-
-        assert.equal(result.properties, OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.BBOX | OverpassFrontend.CENTER)
-
-        if (expected.indexOf(result.id) === -1) {
-          error += 'Unexpected result ' + result.id + '\n'
-        }
-      },
-      function (err) {
-        if (err) {
-          return done(err)
-        }
-
-        if (error) {
-          return done(error)
-        }
-
-        if (found.length !== expected.length) {
-          return done('Wrong count of objects returned:\n' +
-               'Expected: ' + expected.join(', ') + '\n' +
-               'Found: ' + found.join(', '))
-        }
-
-        if (foundMembers.length !== expectedMembers.length) {
-          return done('Wrong count of member objects returned:\n' +
-               'Expected: ' + expectedMembers.join(', ') + '\n' +
-               'Found: ' + foundMembers.join(', '))
-        }
-
-        request.off('subrequest-compile', compileListener)
-
-        done()
       }
-    )
-
-    request.on('subrequest-compile', compileListener)
+    }, done)
   })
 
   it('Simple queries - routes with different area', function (done) {
-    var expected = [ 'r1306732', 'r1306733' ]
-    var expectedMembers = [ 'w232881441', 'w383292582', 'n2411909898', 'n2411911256' ]
-    var found = []
-    var foundMembers = []
-    var error = ''
-    var bbox = {
-        "maxlat": 48.20400,
-        "maxlon": 16.33106,
-        "minlat": 48.19940,
-        "minlon": 16.32281,
-      }
-
-    var expectedSubRequestCount = 1
-    var foundSubRequestCount = 0
-
-    function compileListener (subRequest) {
-      foundSubRequestCount++
+    const bbox = {
+      "maxlat": 48.20400,
+      "maxlon": 16.33106,
+      "minlat": 48.19940,
+      "minlon": 16.32281,
     }
 
-    var request = overpassFrontend.BBoxQuery(
-      "relation[type=route][route=tram]",
+    test.bbox(overpassFrontend, {
+      query: "relation[type=route][route=tram]",
       bbox,
-      {
+      expected: [ 'r1306732', 'r1306733' ],
+      expectedMembers: [ 'w232881441', 'w383292582', 'n2411909898', 'n2411911256' ],
+      expectedSubRequestCount: 1,
+      expectedProperties: OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.BBOX | OverpassFrontend.CENTER,
+      options: {
         "members": true,
         "properties": OverpassFrontend.TAGS | OverpassFrontend.MEMBERS,
         "memberProperties": OverpassFrontend.TAGS | OverpassFrontend.GEOM,
         "memberBounds": bbox,
-        "memberCallback": function (err, result) {
-          foundMembers.push(result.id)
-
-          result.memberOf.forEach(memberOf => {
-            if (found.indexOf(memberOf.id) === -1) {
-              assert.fail('memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.id)
-            }
-          })
-
-          if (expectedMembers.indexOf(result.id) === -1) {
-            error += 'Unexpected member result ' + result.id + '\n'
-          }
-        }
-      },
-      function (err, result) {
-        found.push(result.id)
-
-        assert.equal(result.properties, OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.BBOX | OverpassFrontend.CENTER)
-
-        if (expected.indexOf(result.id) === -1) {
-          error += 'Unexpected result ' + result.id + '\n'
-        }
-      },
-      function (err) {
-        if (err) {
-          return done(err)
-        }
-
-        if (error) {
-          return done(error)
-        }
-
-        if (found.length !== expected.length) {
-          return done('Wrong count of objects returned:\n' +
-               'Expected: ' + expected.join(', ') + '\n' +
-               'Found: ' + found.join(', '))
-        }
-
-        if (foundMembers.length !== expectedMembers.length) {
-          return done('Wrong count of member objects returned:\n' +
-               'Expected: ' + expectedMembers.join(', ') + '\n' +
-               'Found: ' + foundMembers.join(', '))
-        }
-
-        assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
-
-        request.off('subrequest-compile', compileListener)
-
-        done()
       }
-    )
-
-    request.on('subrequest-compile', compileListener)
+    }, done)
   })
 
   it('Simple queries - routes with different area', function (done) {
-    var expected = [ 'r1306732', 'r1306733' ]
-    var expectedMembers = [ 'w232881441', 'w383292582' ]
-    var found = []
-    var foundMembers = []
-    var error = ''
-    var bbox = {
-        "maxlat": 48.19980,
-        "maxlon": 16.33106,
-        "minlat": 48.19940,
-        "minlon": 16.32281,
-      }
-
-    var expectedSubRequestCount = 1 // 0!
-    var foundSubRequestCount = 0
-
-    function compileListener (subRequest) {
-      console.log(subRequest.query)
-      foundSubRequestCount++
+    const bbox = {
+      "maxlat": 48.19980,
+      "maxlon": 16.33106,
+      "minlat": 48.19940,
+      "minlon": 16.32281,
     }
 
-    var request = overpassFrontend.BBoxQuery(
-      "relation[type=route][route=tram]",
+    test.bbox(overpassFrontend, {
+      query: "relation[type=route][route=tram]",
       bbox,
-      {
+      expected: [ 'r1306732', 'r1306733' ],
+      expectedMembers: [ 'w232881441', 'w383292582' ],
+      expectedSubRequestCount: 1, // 0!
+      expectedProperties: OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.BBOX | OverpassFrontend.CENTER,
+      options: {
         "members": true,
         "properties": OverpassFrontend.TAGS | OverpassFrontend.MEMBERS,
         "memberProperties": OverpassFrontend.TAGS | OverpassFrontend.GEOM,
         "memberBounds": bbox,
-        "memberCallback": function (err, result) {
-          foundMembers.push(result.id)
-
-          result.memberOf.forEach(memberOf => {
-            if (found.indexOf(memberOf.id) === -1) {
-              assert.fail('memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.id)
-            }
-          })
-
-          if (expectedMembers.indexOf(result.id) === -1) {
-            error += 'Unexpected member result ' + result.id + '\n'
-          }
-        }
-      },
-      function (err, result) {
-        found.push(result.id)
-
-        assert.equal(result.properties, OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.BBOX | OverpassFrontend.CENTER)
-
-        if (expected.indexOf(result.id) === -1) {
-          error += 'Unexpected result ' + result.id + '\n'
-        }
-      },
-      function (err) {
-        if (err) {
-          return done(err)
-        }
-
-        if (error) {
-          return done(error)
-        }
-
-        if (found.length !== expected.length) {
-          return done('Wrong count of objects returned:\n' +
-               'Expected: ' + expected.join(', ') + '\n' +
-               'Found: ' + found.join(', '))
-        }
-
-        if (foundMembers.length !== expectedMembers.length) {
-          return done('Wrong count of member objects returned:\n' +
-               'Expected: ' + expectedMembers.join(', ') + '\n' +
-               'Found: ' + foundMembers.join(', '))
-        }
-
-        assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
-
-        request.off('subrequest-compile', compileListener)
-
-        done()
       }
-    )
-
-    request.on('subrequest-compile', compileListener)
+    }, done)
   })
 
   it('Simple queries - routes with different area (and more routes)', function (done) {
-    var expected = [ 'r1306732', 'r1306733', 'r1809913', 'r1990861', 'r1809912', 'r1990860', 'r2005432' ]
-    var expectedMembers = [ 'n287235515', 'n2208875393', 'w210599976', 'w125586446', 'w141233631', 'w210848994', 'w26231340', 'w26231341', 'w88093287', 'w146678761', 'w146678770', 'w235999782', 'w236000375', 'w236000518' ]
-    var found = []
-    var foundMembers = []
-    var error = ''
-    var bbox = {
-        "maxlat": 48.19900,
-        "maxlon": 16.34025,
-        "minlat": 48.19698,
-        "minlon": 16.33791
-      }
-
-    var expectedSubRequestCount = 2
-    var foundSubRequestCount = 0
-
-    function compileListener (subRequest) {
-      foundSubRequestCount++
+    const bbox = {
+      "maxlat": 48.19900,
+      "maxlon": 16.34025,
+      "minlat": 48.19698,
+      "minlon": 16.33791
     }
 
-    var request = overpassFrontend.BBoxQuery(
-      "relation[type=route][route=tram]",
+    test.bbox(overpassFrontend, {
+      query: "relation[type=route][route=tram]",
       bbox,
-      {
+      expected: [ 'r1306732', 'r1306733', 'r1809913', 'r1990861', 'r1809912', 'r1990860', 'r2005432' ],
+      expectedMembers: [ 'n287235515', 'n2208875393', 'w210599976', 'w125586446', 'w141233631', 'w210848994', 'w26231340', 'w26231341', 'w88093287', 'w146678761', 'w146678770', 'w235999782', 'w236000375', 'w236000518' ],
+      expectedSubRequestCount: 2,
+      expectedProperties: OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.BBOX | OverpassFrontend.CENTER,
+      options: {
         "members": true,
         "properties": OverpassFrontend.TAGS | OverpassFrontend.MEMBERS,
         "memberProperties": OverpassFrontend.TAGS | OverpassFrontend.GEOM,
         "memberBounds": bbox,
-        "memberCallback": function (err, result) {
-          foundMembers.push(result.id)
-
-          result.memberOf.forEach(memberOf => {
-            if (found.indexOf(memberOf.id) === -1) {
-              assert.fail('memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.id)
-            }
-          })
-
-          if (expectedMembers.indexOf(result.id) === -1) {
-            error += 'Unexpected member result ' + result.id + '\n'
-          }
-        }
-      },
-      function (err, result) {
-        found.push(result.id)
-
-        assert.equal(result.properties, OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.BBOX | OverpassFrontend.CENTER)
-
-        if (expected.indexOf(result.id) === -1) {
-          error += 'Unexpected result ' + result.id + '\n'
-        }
-      },
-      function (err) {
-        if (err) {
-          return done(err)
-        }
-
-        if (error) {
-          return done(error)
-        }
-
-        if (found.length !== expected.length) {
-          return done('Wrong count of objects returned:\n' +
-               'Expected: ' + expected.join(', ') + '\n' +
-               'Found: ' + found.join(', '))
-        }
-
-        if (foundMembers.length !== expectedMembers.length) {
-          return done('Wrong count of member objects returned:\n' +
-               'Expected: ' + expectedMembers.join(', ') + '\n' +
-               'Found: ' + foundMembers.join(', '))
-        }
-
-        assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
-
-        request.off('subrequest-compile', compileListener)
-
-        done()
       }
-    )
-
-    request.on('subrequest-compile', compileListener)
+    }, done)
   })
 
   it('Simple queries - routes with split', function (done) {
-    overpassFrontend.clearBBoxQuery("relation[type=route][route=tram]")
-    var expected = [ 'r910885', 'r910886', 'r1306732', 'r1306733' ]
-    var expectedMembers = [ 'n2293993991', 'n2293993859', 'n2293993867' , 'n2293993929', 'w122580925', 'w220270706', 'w220270708', 'w220270709', 'w220270714', 'w232881263', 'w232881441', 'w261111319', 'w220270696', 'w220270713', 'w383292582' ]
-    var found = []
-    var foundMembers = []
-    var error = ''
-    var bbox = {
-	"maxlat": 48.19953,
-	"maxlon": 16.33506,
-	"minlat": 48.19800,
-	"minlon": 16.32581,
-      }
-
-    var expectedSubRequestCount = 1
-    var foundSubRequestCount = 0
-
-    function compileListener (subRequest) {
-      foundSubRequestCount++
+    const bbox = {
+      "maxlat": 48.19953,
+      "maxlon": 16.33506,
+      "minlat": 48.19800,
+      "minlon": 16.32581,
     }
 
-    var request = overpassFrontend.BBoxQuery(
-      "relation[type=route][route=tram]",
+    test.bbox(overpassFrontend, {
+      query: "relation[type=route][route=tram]",
       bbox,
-      {
+      expected: [ 'r910885', 'r910886', 'r1306732', 'r1306733' ],
+      expectedMembers: [ 'n2293993991', 'n2293993859', 'n2293993867' , 'n2293993929', 'w122580925', 'w220270706', 'w220270708', 'w220270709', 'w220270714', 'w232881263', 'w232881441', 'w261111319', 'w220270696', 'w220270713', 'w383292582' ],
+      expectedSubRequestCount: 1,
+      expectedProperties: OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.BBOX | OverpassFrontend.CENTER,
+      options: {
         "members": true,
         "properties": OverpassFrontend.TAGS | OverpassFrontend.MEMBERS,
         "memberProperties": OverpassFrontend.TAGS | OverpassFrontend.GEOM,
         "memberBounds": bbox,
         "split": 1,
-        "memberCallback": function (err, result) {
-          foundMembers.push(result.id)
-
-          result.memberOf.forEach(memberOf => {
-            if (found.indexOf(memberOf.id) === -1) {
-              assert.fail('memberCallback for ' + result.id + ' called before featureCallback for ' + memberOf.id)
-            }
-          })
-
-          if (expectedMembers.indexOf(result.id) === -1) {
-            error += 'Unexpected member result ' + result.id + '\n'
-          }
-        }
-      },
-      function (err, result) {
-        found.push(result.id)
-
-        if (expected.indexOf(result.id) === -1) {
-          error += 'Unexpected result ' + result.id + '\n'
-        }
-      },
-      function (err) {
-        if (err) {
-          return done(err)
-        }
-
-        if (error) {
-          return done(error)
-        }
-
-        if (found.length !== expected.length) {
-          return done('Wrong count of objects returned:\n' +
-               'Expected: ' + expected.join(', ') + '\n' +
-               'Found: ' + found.join(', '))
-        }
-
-        if (foundMembers.length !== expectedMembers.length) {
-          return done('Wrong count of member objects returned:\n' +
-               'Expected: ' + expectedMembers.join(', ') + '\n' +
-               'Found: ' + foundMembers.join(', '))
-        }
-
-        assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
-
-        request.off('subrequest-compile', compileListener)
-
-        done()
       }
-    )
-
-    request.on('subrequest-compile', compileListener)
+    }, done)
   })
 
   it('Simple queries - routes with memberSplit', function (done) {
