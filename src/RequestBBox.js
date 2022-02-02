@@ -6,6 +6,7 @@ const RequestBBoxMembers = require('./RequestBBoxMembers')
 const Filter = require('./Filter')
 const boundsToLokiQuery = require('./boundsToLokiQuery')
 const boundsIsFullWorld = require('./boundsIsFullWorld')
+const isodate = require('./isodate')
 
 /**
  * A BBox request
@@ -60,7 +61,7 @@ class RequestBBox extends Request {
       }
 
       if (this.options.date) {
-        this.lokiQuery = { $and: [this.lokiQuery, { timestamp: { $lte: new Date(this.options.date).toISOString().replace(/\.\d{3}Z/, 'Z') } }] }
+        this.lokiQuery = { $and: [this.lokiQuery, { timestamp: { $lte: isodate(this.options.date) } }] }
       }
 
       // if attic date is enabled, we have to check again to filter out false
