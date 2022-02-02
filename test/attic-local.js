@@ -1,6 +1,8 @@
 const assert = require('assert')
 const async = require('async')
 
+const atticTest = require('./src/atticTest')
+
 const OverpassFrontend = require('..')
 
 if (typeof XMLHttpRequest === 'undefined') {
@@ -19,48 +21,19 @@ describe('Attic data from local file', function () {
   })
 
   it('Load nodes by id at different timestamps', function (done) {
-    const expected = ['n282549433', 'n973838907', 'n347352725']
     const timestamps = ['2007-01-01T00:00:00Z', '2008-07-31T21:04:15Z', '2009-01-01T00:00:00Z', '2013-01-01T00:00:00Z', '2018-02-01T00:00:00Z', '2018-04-01T00:00:00Z', '2020-01-01T00:00:00Z', null]
     const expectedTimestamps = {
       'n282549433': [null, '2008-07-31T21:04:15Z', '2008-07-31T21:04:15Z', null, null, null, null],
       'n973838907': [null, null, null, '2012-04-29T17:02:46Z', null, '2018-02-11T22:45:14Z', null],
       'n347352725': [null, null, null, '2012-10-19T00:31:11Z', '2016-04-19T14:44:27Z', '2016-04-19T14:44:27Z', '2019-06-16T16:21:20Z', '2021-07-23T17:29:32Z']
     }
+    const ids = Object.keys(expectedTimestamps)
 
-    async.eachOf(timestamps,
-      (date, i, done) => {
-        const found = []
-
-        overpassFrontend.get(
-          expected,
-          { date },
-          function (err, result) {
-            found.push(result.id)
-
-            console.log('At ' + date + ' found:', result.id, 'with ts', result.meta.timestamp)
-            assert.equal(result.meta.timestamp, expectedTimestamps[result.id][i], 'Node ' + result.id + ' at date ' + date + ' has wrong timestamp')
-
-            if (expected.indexOf(result.id) === -1) {
-              error += 'Unexpected result ' + result.id + '\n'
-            }
-          },
-          function (err) {
-            if (err) {
-              return done(err)
-            }
-
-            const _expected = expected.filter(e => expectedTimestamps[e][i])
-
-            if (found.length !== _expected.length) {
-              return done('At date ' + date + ', wrong count of objects returned:\n' +
-               'Expected: ' + _expected.join(', ') + '\n' +
-               'Found: ' + found.join(', '))
-            }
-
-            done()
-          })
-        }, done
-      )
+    atticTest.get(overpassFrontend, {
+      ids,
+      expectedTimestamps,
+      timestamps
+    }, done)
   })
 
   it('Load nodes by bbox at different timestamps', function (done) {
@@ -78,44 +51,15 @@ describe('Attic data from local file', function () {
       'n4100076539': [null, null, null, '2016-05-03T21:08:53Z', '2016-05-03T21:08:53Z', null, null],
     }
 
-    async.eachOf(timestamps,
-      (date, i, done) => {
-        const found = []
-
-        overpassFrontend.BBoxQuery(
-          '(node[amenity=parking];node[shop=supermarket];node[amenity=pharmacy];)', bbox,
-          { date },
-          function (err, result) {
-            found.push(result.id)
-
-            console.log('At ' + date + ' found:', result.id, 'with ts', result.meta.timestamp)
-            assert.equal(result.meta.timestamp, expectedTimestamps[result.id][i], 'Node ' + result.id + ' at date ' + date + ' has wrong timestamp')
-
-            if (expected.indexOf(result.id) === -1) {
-              error += 'Unexpected result ' + result.id + '\n'
-            }
-          },
-          function (err) {
-            if (err) {
-              return done(err)
-            }
-
-            const _expected = expected.filter(e => expectedTimestamps[e][i])
-
-            if (found.length !== _expected.length) {
-              return done('At date ' + date + ', wrong count of objects returned:\n' +
-               'Expected: ' + _expected.join(', ') + '\n' +
-               'Found: ' + found.join(', '))
-            }
-
-            done()
-          })
-        }, done
-      )
+    atticTest.bbox(overpassFrontend, {
+      query: '(node[amenity=parking];node[shop=supermarket];node[amenity=pharmacy];)',
+      bbox,
+      expectedTimestamps,
+      timestamps
+    }, done)
   })
 
   it('Load ways by id at different timestamps', function (done) {
-    const expected = ['w86127691', 'w123386238']
     const timestamps = ['2009-01-01T00:00:00Z', '2011-01-01T00:00:00Z', '2011-07-25T00:00:00Z', '2013-01-01T00:00:00Z', '2022-01-01T00:00:00Z']
     const expectedTimestamps = {
       'w86127691': [null, '2010-11-22T17:27:01Z', '2011-07-23T20:34:09Z', null, null],
@@ -126,43 +70,13 @@ describe('Attic data from local file', function () {
       'w123386238': [null, null, null, '2,2,2,2,2,2,2,2,2,1,1,1,1,2,2,2,2,2,2,1,1,1,1,1,2,2,2,1,2', '2,2,2,2,2,2,2,2,2,1,1,1,1,2,2,2,1,2,2,2,1,1,1,1,1,2,2,2,1,2']
     }
 
-    async.eachOf(timestamps,
-      (date, i, done) => {
-        const found = []
+    const ids = Object.keys(expectedTimestamps)
 
-        overpassFrontend.get(
-          expected,
-          { date },
-          function (err, result) {
-            found.push(result.id)
-
-            console.log('At ' + date + ' found:', result.id, 'with ts', result.meta.timestamp)
-            const memberVersions = result.memberObjects().map(node => node ? node.meta.version : '').join(',')
-
-            assert.equal(result.meta.timestamp, expectedTimestamps[result.id][i], 'Way ' + result.id + ' at date ' + date + ' has wrong timestamp')
-            assert.equal(memberVersions, expectedMemberVersions[result.id][i], 'Way ' + result.id + ' at date ' + date + ' has wrong member versions')
-
-            if (expected.indexOf(result.id) === -1) {
-              error += 'Unexpected result ' + result.id + '\n'
-            }
-          },
-          function (err) {
-            if (err) {
-              return done(err)
-            }
-
-            const _expected = expected.filter(e => expectedTimestamps[e][i])
-
-            if (found.length !== _expected.length) {
-              return done('At date ' + date + ', wrong count of objects returned:\n' +
-               'Expected: ' + _expected.join(', ') + '\n' +
-               'Found: ' + found.join(', '))
-            }
-
-            done()
-          })
-        }, done
-      )
+    atticTest.get(overpassFrontend, {
+      ids,
+      expectedTimestamps,
+      timestamps
+    }, done)
   })
 
   it('Load ways (buildings) by bbox at different timestamps', function (done) {
@@ -198,42 +112,11 @@ describe('Attic data from local file', function () {
       "w161573360": [ "", "", "1,1,1,1,1,1,1,1,1,1", "1,1,1,1,1,1,1,1,1,1", "1,1,1,1,1,1,1,1,1,1", "1,1,1,1,1,1,1,1,1,1" ]
     }
 
-    async.eachOf(timestamps,
-      (date, i, done) => {
-        const found = []
-        const expected = Object.keys(expectedTimestamps).filter(e => expectedTimestamps[e][i])
-
-        overpassFrontend.BBoxQuery(
-          'way[building]', bbox,
-          { date },
-          function (err, result) {
-            found.push(result.id)
-
-            console.log('At ' + date + ' found:', result.id, 'with ts', result.meta.timestamp)
-
-            if (expected.indexOf(result.id) === -1) {
-              assert.fail('At ' + date + ', unexpected result ' + result.id + ' (ts ' + result.meta.timestamp + ')')
-            }
-            assert.equal(result.meta.timestamp, expectedTimestamps[result.id][i], result.id + ' at date ' + date + ' has wrong timestamp')
-
-            const memberVersions = result.memberObjects().map(node => node ? node.meta.version : '').join(',')
-            assert.equal(memberVersions, expectedMemberVersions[result.id][i], result.id + ' at date ' + date + ' has wrong member versions')
-          },
-          function (err) {
-            if (err) {
-              return done(err)
-            }
-
-
-            if (found.length !== expected.length) {
-              return done('At date ' + date + ', wrong count of objects returned:\n' +
-               'Expected: ' + expected.join(', ') + '\n' +
-               'Found: ' + found.join(', '))
-            }
-
-            done()
-          })
-        }, done
-      )
+    atticTest.bbox(overpassFrontend, {
+      query: 'way[building]',
+      bbox,
+      expectedTimestamps,
+      timestamps
+    }, done)
   })
 })
