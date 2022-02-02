@@ -1,4 +1,5 @@
 const OverpassObject = require('./OverpassObject')
+const OverpassFrontend = require('./defines')
 
 const types = {
   node: require('./OverpassNode'),
@@ -36,11 +37,22 @@ module.exports = class OverpassMetaObject {
   }
 
   dbInsert (db) {
-    this.ob.dbInsert(db)
+    if (!this.ob.missingObject) {
+      this.ob.dbInsert(db)
+    }
   }
 
   emitUpdate () {
     this.ob.emit('update', this.ob)
+  }
+
+  addMissingObject (context) {
+    this.ob = new OverpassObject()
+    this.ob.id = this.id
+    this.ob.type = { n: 'node', w: 'way', r: 'relation' }[this.id.substr(0, 1)]
+    this.ob.osm_id = this.id.substr(1)
+    this.ob.properties = OverpassFrontend.ALL
+    this.ob.missingObject = true
   }
 
   notifyMemberUpdate (memberObs) {

@@ -7,7 +7,6 @@ const LokiJS = require('lokijs')
 const httpLoad = require('./httpLoad')
 const removeNullEntries = require('./removeNullEntries')
 
-const OverpassObject = require('./OverpassObject')
 const OverpassMetaObject = require('./OverpassMetaObject')
 const OverpassAtticObject = require('./OverpassAtticObject')
 const RequestGet = require('./RequestGet')
@@ -524,21 +523,14 @@ class OverpassFrontend {
     }
 
     for (const id in context.todo) {
-      const ob = this.cache.get(id, context.options)
-      if (ob) {
-        ob.missingObject = true
-        ob.dbInsert(this.db)
-      } else {
-        const ob = new OverpassMetaObject(id, this)
-        ob.ob = new OverpassObject()
-        ob.ob.id = id
-        ob.ob.type = { n: 'node', w: 'way', r: 'relation' }[id.substr(0, 1)]
-        ob.ob.osm_id = id.substr(1)
-        ob.ob.properties = OverpassFrontend.ALL
-        ob.ob.missingObject = true
+      let ob = this.cache.getMeta(id, context)
+      if (!ob) {
+        ob = new OverpassMetaObject(id, this)
         this.cache.add(id, ob)
-        ob.dbInsert(this.db)
       }
+
+      ob.addMissingObject(context)
+      ob.dbInsert(this.db)
     }
 
     this.cacheTimestamp = timestamp()
