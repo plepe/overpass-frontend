@@ -24,6 +24,12 @@ class RequestBBox extends Request {
     if (typeof this.options.properties === 'undefined') {
       this.options.properties = defines.DEFAULT
     }
+    if (this.overpass.options.attic) {
+      this.options.properties |= defines.META
+    }
+    if (this.options.date) {
+      this.options.date = isodate(this.options.date)
+    }
     this.options.properties |= defines.BBOX
     this.options.minEffort = this.options.minEffort || 256
 
@@ -170,6 +176,11 @@ class RequestBBox extends Request {
       return false
     }
     context.bbox = this.bbox
+
+    if (context.date !== this.options.date) {
+      return false
+    }
+    context.date = this.options.date
 
     for (const i in context.requests) {
       const request = context.requests[i]

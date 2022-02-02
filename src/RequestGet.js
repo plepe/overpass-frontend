@@ -4,6 +4,7 @@ const BoundingBox = require('boundingbox')
 const overpassOutOptions = require('./overpassOutOptions')
 const RequestGetMembers = require('./RequestGetMembers')
 const isGeoJSON = require('./isGeoJSON')
+const isodate = require('./isodate')
 
 /**
  * A get request (request list of map features by id)
@@ -26,6 +27,12 @@ class RequestGet extends Request {
 
     if (typeof this.options.properties === 'undefined') {
       this.options.properties = defines.DEFAULT
+    }
+    if (this.overpass.options.attic) {
+      this.options.properties |= defines.META
+    }
+    if (this.options.date) {
+      this.options.date = isodate(this.options.date)
     }
 
     this.ids.forEach(id => {
@@ -54,6 +61,19 @@ class RequestGet extends Request {
     if ('members' in this.options) {
       RequestGetMembers(this)
     }
+  }
+
+  willInclude (context) {
+    if (!super.willInclude(context)) {
+      return false
+    }
+
+    if (context.date !== this.options.date) {
+      return false
+    }
+    context.date = this.options.date
+
+    return true
   }
 
   _effortForId (id) {
