@@ -70,6 +70,10 @@ class OverpassObject {
       this.osm_id = data.id
     }
 
+    if ('visible' in data) {
+      this.visible = data.visible
+    }
+
     this.osm3sMeta = options.osm3sMeta
 
     for (const k in data) {

@@ -94,8 +94,6 @@ class OverpassNode extends OverpassObject {
       this.center = this.bounds.getCenter()
 
       this.properties = this.properties | OverpassFrontend.GEOM | OverpassFrontend.BBOX | OverpassFrontend.CENTER
-    } else if (this.properties & OverpassFrontend.GEOM !== 0) {
-      this.visible = false
     }
 
     this.properties |= OverpassFrontend.MEMBERS // node does not have members, so it always known all of them

@@ -31,6 +31,9 @@ module.exports = function convertFromXML (xml) {
       element.user = current.getAttribute('user')
       element.uid = parseInt(current.getAttribute('uid'))
       element.version = parseInt(current.getAttribute('version'))
+      if (current.hasAttribute('visible')) {
+        element.visible = current.getAttribute('visible') === 'true'
+      }
 
       if (element.type === 'node') {
         element.lat = parseFloat(current.getAttribute('lat'))

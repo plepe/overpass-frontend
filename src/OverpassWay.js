@@ -74,10 +74,6 @@ class OverpassWay extends OverpassObject {
     }
 
     this.checkGeometry()
-
-    if (this.properties & OverpassFrontend.MEMBERS !== 0 && this.nodes && this.nodes.length === 0) {
-      this.visible = false
-    }
   }
 
   notifyMemberUpdate (memberObs) {
