@@ -535,7 +535,6 @@ class OverpassFrontend {
       }
 
       ob.addMissingObject(context)
-      ob.dbInsert(this.db)
     }
 
     this.cacheTimestamp = timestamp()
