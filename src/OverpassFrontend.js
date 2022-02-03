@@ -11,6 +11,7 @@ const OverpassMetaObject = require('./OverpassMetaObject')
 const OverpassAtticObject = require('./OverpassAtticObject')
 const RequestGet = require('./RequestGet')
 const RequestBBox = require('./RequestBBox')
+const RequestTimeline = require('./RequestTimeline')
 const RequestMulti = require('./RequestMulti')
 const defines = require('./defines')
 const loadOsmFile = require('./loadOsmFile')
@@ -620,6 +621,23 @@ class OverpassFrontend {
     return request
   }
 
+  /* load the timeline of an object
+   */
+  getTimeline (ids, options, featureCallback, finalCallback) {
+    const request = new RequestTimeline(this, {
+      ids,
+      options,
+      featureCallback,
+      finalCallback
+    })
+
+    this.requests.push(request)
+
+    this._next()
+
+    return request
+  }
+
   clearBBoxQuery (query) {
     const filterId = new Filter(query).toString()
 
@@ -707,12 +725,20 @@ class OverpassFrontend {
   }
 
   createOrUpdateOSMObject (el, options) {
-    const id = el.type.substr(0, 1) + el.id
+    let id = el.type.substr(0, 1) + el.id
+
+    if (el.type === 'timeline') {
+      id = el.tags.reftype.substr(0, 1) + el.tags.ref
+    }
 
     let metaOb = this.cache.getMeta(id)
     if (!metaOb) {
       metaOb = new (this.options.attic ? OverpassAtticObject : OverpassMetaObject)(id, this)
       this.cache.add(id, metaOb)
+    }
+
+    if (el.type === 'timeline') {
+      return metaOb.updateTimeline(el.tags)
     }
 
     const ob = metaOb.updateData(el, options)

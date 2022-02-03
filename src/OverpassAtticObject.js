@@ -107,6 +107,28 @@ class OverpassAtticObject {
     return ob
   }
 
+  updateTimeline (entry) {
+    return this.updateData({
+      id: entry.ref,
+      type: entry.reftype,
+      version: entry.refversion,
+      timestamp: entry.created,
+      endTimestamp: entry.expired
+    }, { properties: 0 })
+  }
+
+  getTimeline () {
+    return this.timestamps.map(ts => {
+      const ob = this.versions[ts]
+
+      return {
+        version: ob.meta.version,
+        timestamp: ob.meta.timestamp,
+        endTimestamp: ob.meta.endTimestamp
+      }
+    })
+  }
+
   addMissingObject (context) {
     this.tmpDate = context.date
     this.tmpOb = new OverpassObject()
