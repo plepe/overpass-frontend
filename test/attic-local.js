@@ -1,3 +1,10 @@
+/* How to create the history.osh.bz2 file:
+Download austria-interal.osh.pbf from Geofabrik, used version: 2022-01-27
+
+osmium extract --overwrite --with-history -b 16.33976,48.20232,16.34088,48.20320 austria-internal.osh.pbf -o tmp1.osh
+osmium tags-filter --overwrite tmp1.osh wr/building nwr/amenity nwr/shop -o tmp2.osh
+osmium getid --overwrite --add-referenced --id-osm-file tmp2.osh --with-history tmp1.osh -o history.osh.bz2
+*/
 const assert = require('assert')
 const async = require('async')
 
@@ -15,7 +22,7 @@ let overpassFrontend
 describe('Attic data from local file', function () {
   it('load', function (done) {
     this.timeout(20000)
-    overpassFrontend = new OverpassFrontend('test/history.osm.bz2', {attic: true})
+    overpassFrontend = new OverpassFrontend('test/history.osh.bz2', {attic: true})
     overpassFrontend.on('load', () => done())
     overpassFrontend.on('error', done)
   })

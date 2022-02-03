@@ -14,8 +14,8 @@ module.exports = function loadOsmFile (url, callback) {
           return callback(err)
         }
 
-        if (url.match(/\.osm(\.bz2)?$/)) {
-          if (url.match(/\.osm\.bz2$/)) {
+        if (url.match(/\.os[hm](\.bz2)?$/)) {
+          if (url.match(/\.os[hm]\.bz2$/)) {
             data = bzip2.simple(bzip2.array(content))
             content = ''
             for (let i = 0; i < data.byteLength; i++) {
@@ -44,7 +44,7 @@ module.exports = function loadOsmFile (url, callback) {
       if (req.status === 200) {
         let data
 
-        if (url.match(/\.osm\.bz2$/)) {
+        if (url.match(/\.os[hm]\.bz2$/)) {
           let content = new Uint8Array(req.response)
           data = bzip2.simple(bzip2.array(content))
           content = ''
@@ -76,7 +76,7 @@ module.exports = function loadOsmFile (url, callback) {
     }
   }
 
-  if (url.match(/\.osm\.bz2$/)) {
+  if (url.match(/\.os[hm]\.bz2$/)) {
     req.responseType = 'arraybuffer'
   }
 
