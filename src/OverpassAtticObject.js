@@ -1,4 +1,5 @@
 const OverpassObject = require('./OverpassObject')
+const OverpassFrontend = require('./defines')
 
 const types = {
   node: require('./OverpassNode'),
@@ -103,7 +104,13 @@ class OverpassAtticObject {
   }
 
   addMissingObject (context) {
-    console.log('missing at', context.date)
+    this.tmpDate = context.date
+    this.tmpOb = new OverpassObject()
+    this.tmpOb.id = this.id
+    this.tmpOb.type = { n: 'node', w: 'way', r: 'relation' }[this.id.substr(0, 1)]
+    this.tmpOb.osm_id = this.id.substr(1)
+    this.tmpOb.properties = OverpassFrontend.ALL
+    this.tmpOb.missingObject = true
   }
 
   leafletFeature (options) {
