@@ -15,7 +15,7 @@ class OverpassAtticObject {
     this.originalData = {}
     this.timestamps = null
 
-    this.tmpDate = null
+    this.tmpDate = undefined
   }
 
   createTmpObject (date, timestamp, options) {
@@ -31,6 +31,10 @@ class OverpassAtticObject {
   }
 
   get (options) {
+    if (this.tmpDate && this.tmpDate === options.date) {
+      return this.tmpOb
+    }
+
     let timestamp
     if (options.date) {
       const matching = this.timestamps.filter(d => d <= options.date)
@@ -50,7 +54,7 @@ class OverpassAtticObject {
       .filter(t => t)
       .sort().reverse()[0]
 
-    if (this.tmpDate === maxMemberTimestamp) {
+    if (maxMemberTimestamp && this.tmpDate === maxMemberTimestamp) {
       return this.tmpOb
     }
 
