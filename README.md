@@ -74,6 +74,7 @@ npm install
 # Initialize database for unit tests (ignore messages because of missing nodes/ways)
 # replace /exec/path by the location where you installed osm3s
 init_osm3s.sh test/data.osm.bz2 test/data/ /exec/path --meta
+init_osm3s.sh test/history.osc.bz2 test/history/ /exec/path --keep-attic
 
 # Run unit tests
 npm run test

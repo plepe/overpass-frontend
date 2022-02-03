@@ -1,4 +1,5 @@
 {
   "generator": "Overpass API",
-  "url": "http://localhost/overpass/api/interpreter"
+  "url": "http://localhost/overpass/api/interpreter",
+  "url-history": "http://localhost/overpass/api-history/interpreter"
 }
