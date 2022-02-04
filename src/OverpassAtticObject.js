@@ -121,7 +121,19 @@ class OverpassAtticObject {
     }, { properties: 0 })
   }
 
+  /**
+   * Return the timeline of an object
+   * @returns {Array|false|null} - if the timeline is known, return the list of versions. If the object does not exist, returns false. If the object might exist and a query to the database server is required, return null.
+   */
   getTimeline () {
+    if (this.tmpOb === false) {
+      return false
+    }
+
+    if (!this.timestamps) {
+      return null
+    }
+
     return this.timestamps.map(ts => {
       const ob = this.versions[ts]
 
