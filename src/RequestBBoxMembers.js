@@ -80,7 +80,7 @@ class RequestBBoxMembers {
 
     each(this.todo, (value, id) => {
       const ob = this.overpass.cache.get(id, this.options)
-      if (ob !== undefined) {
+      if (ob) {
         if (this.bounds && !ob.intersects(this.bounds)) {
           return
         }

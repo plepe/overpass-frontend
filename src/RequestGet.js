@@ -207,7 +207,7 @@ class RequestGet extends Request {
         // check if we already know the bounds of the element; if yes, don't try
         // to load object if it does not intersect bounds
         const ob = this.overpass.cache.get(id, this.options)
-        if (ob !== undefined && ob.properties & defines.BBOX) {
+        if (ob && ob.properties & defines.BBOX) {
           if (!ob.intersects(this.options.bounds)) {
             continue
           }

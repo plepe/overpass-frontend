@@ -132,7 +132,7 @@ class RequestBBox extends Request {
 
     items.forEach(id => {
       const ob = this.overpass.cache.get(id, this.options)
-      if (ob === undefined) {
+      if (!ob) {
         return
       }
 

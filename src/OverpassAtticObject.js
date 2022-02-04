@@ -45,7 +45,7 @@ class OverpassAtticObject {
 
     const ob = this.versions[timestamp]
     if (!ob || !ob.visible) {
-      return undefined
+      return null
     }
 
     // check for the highest timestamp of any of the member objects
