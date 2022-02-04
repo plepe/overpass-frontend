@@ -13,6 +13,7 @@ class OverpassAtticObject {
     this.versions = {}
     this.originalData = {}
     this.timestamps = null
+    this.hasTimeline = false
 
     this.tmpDate = undefined
   }
@@ -37,6 +38,19 @@ class OverpassAtticObject {
   get (options) {
     if (this.tmpDate === null || (this.tmpDate && this.tmpDate === options.date)) {
       return this.tmpOb
+    }
+
+    if (options.date === undefined) {
+      return false
+    }
+
+    if (!this.hasTimeline) {
+      this.overpass.getTimeline(this.id, {},
+        (err, result) => { if (err) { console.error(err) } },
+        (err) => { if (err) { console.error(err) } }
+      )
+
+      return undefined
     }
 
     const timestamp = this.matchingTimestamp(options)
@@ -70,6 +84,10 @@ class OverpassAtticObject {
   }
 
   updateData (el, options) {
+    if (this.overpass.localOnly) {
+      this.hasTimeline = true
+    }
+
     // TODO: el.timestamp will be undefined for referenced objects - what to do about them?
     let ob
     if (el.timestamp in this.versions) {
@@ -111,6 +129,7 @@ class OverpassAtticObject {
   }
 
   updateTimeline (entry) {
+    this.hasTimeline = true
     return this.updateData({
       id: entry.ref,
       type: entry.reftype,
@@ -146,7 +165,14 @@ class OverpassAtticObject {
 
   addMissingObject (context) {
     if (context) {
-      this.tmpDate = context.date
+      if (this.timestamps) {
+        const matching = this.matchingTimestamp(context)
+        if (matching) {
+          this.versions[matching].visible = false
+        }
+      } else {
+        this.tmpDate = context.date
+      }
     } else {
       this.tmpDate = null
     }
