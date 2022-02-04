@@ -20,7 +20,7 @@ class RequestTimeline extends Request {
     }
 
     this.result = []
-    this.loadFinish = false
+    this.forceFinish = false
   }
 
   /**
@@ -116,13 +116,19 @@ class RequestTimeline extends Request {
    * @param {Request#SubRequest} subRequest - the current sub request
    */
   finishSubRequest (subRequest) {
-    this.preprocess()
+    this.forceFinish = true
 
+    super.finishSubRequest(subRequest)
+  }
+
+  finish () {
     this.ids.forEach(id => {
       this.overpass.createOrGetMetaObject(id).addMissingObject()
     })
 
-    super.finishSubRequest(subRequest)
+    this.preprocess()
+
+    super.finish()
   }
 
   /**
@@ -134,7 +140,7 @@ class RequestTimeline extends Request {
   }
 
   mayFinish () {
-    return this.allFound
+    return this.allFound || this.forceFinish
   }
 }
 
