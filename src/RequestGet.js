@@ -52,6 +52,7 @@ class RequestGet extends Request {
     delete this.options.split
 
     this.done = {}
+    this.todoNextCall = []
 
     if ('members' in this.options) {
       RequestGetMembers(this)
@@ -112,21 +113,18 @@ class RequestGet extends Request {
    */
   preprocess () {
     this.allFound = true
+    this.todoNextCall = []
 
-    for (let i = 0; i < this.ids.length; i++) {
-      const id = this.ids[i]
+    this.ids.forEach((id, i) => {
+      if (id === null) { return }
 
-      if (id === null) {
-        continue
-      }
-
-      const ob = this.overpass.cache.get(this.ids[i], this.options)
+      const ob = this.overpass.cache.get(id, this.options)
 
       // Feature does not exist!
       if (ob === false) {
         this.featureCallback(null, null, i)
         this.ids[i] = null
-        continue
+        return
       }
 
       if (ob) {
@@ -139,7 +137,7 @@ class RequestGet extends Request {
           if (intersects === 0 || (!ob.bounds && ob.properties | defines.BBOX)) {
             this.featureCallback(null, false, i)
             this.ids[i] = null
-            continue
+            return
           }
         }
 
@@ -152,19 +150,23 @@ class RequestGet extends Request {
         if (ready) {
           this.featureCallback(null, ob, i)
           this.ids[i] = null
-          continue
+          return
         }
+
+        this.todoNextCall.push(id)
+      } else if (ob !== undefined) {
+        this.todoNextCall.push(id)
       } else {
         // Illegal ID
         if (id !== null && !id.match(/^[nwr][0-9]+$/)) {
           this.featureCallback(null, null, i)
           this.ids[i] = null
-          continue
+          return
         }
       }
 
       this.allFound = false
-    }
+    })
   }
 
   /**
@@ -185,21 +187,20 @@ class RequestGet extends Request {
       BBoxQuery = '(' + this.options.bounds.toLatLonString() + ')'
     }
 
-    for (let i = 0; i < this.ids.length; i++) {
-      const id = this.ids[i]
+    this.todoNextCall.forEach(id => {
       outOptions = overpassOutOptions(this.options)
 
       if (effort > context.maxEffort) {
-        break
+        return
       }
 
       if (id === null) {
-        continue
+        return
       }
 
       // don't load objects multiple times in same context
       if (id in context.todo) {
-        continue
+        return
       }
 
       if (this.options.bounds) {
@@ -208,7 +209,7 @@ class RequestGet extends Request {
         const ob = this.overpass.cache.get(id, this.options)
         if (ob && ob.properties & defines.BBOX) {
           if (!ob.intersects(this.options.bounds)) {
-            continue
+            return
           }
         }
       }
@@ -229,7 +230,7 @@ class RequestGet extends Request {
       }
 
       context.todo[id] = true
-    }
+    })
 
     if (nodeQuery !== '') {
       query += '((' + nodeQuery + ');)->.n;\n'
