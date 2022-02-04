@@ -39,17 +39,16 @@ class OverpassAtticObject {
       return this.tmpOb
     }
 
-    let timestamp
-    if (options.date) {
-      const matching = this.timestamps.filter(d => d <= options.date)
-      timestamp = matching[matching.length - 1]
-    } else {
-      timestamp = this.timestamps[this.timestamps.length - 1]
+    const timestamp = this.matchingTimestamp(options)
+
+    // before 1st version
+    if (timestamp === undefined) {
+      return false
     }
 
     const ob = this.versions[timestamp]
     if (!ob || !ob.visible) {
-      return null
+      return false
     }
 
     // check for the highest timestamp of any of the member objects
@@ -126,7 +125,7 @@ class OverpassAtticObject {
    * @returns {Array|false|null} - if the timeline is known, return the list of versions. If the object does not exist, returns false. If the object might exist and a query to the database server is required, return null.
    */
   getTimeline () {
-    if (this.tmpOb === false) {
+    if (this.tmpOb === false && this.tmpDate === null) {
       return false
     }
 
@@ -169,6 +168,15 @@ class OverpassAtticObject {
 
   notifyMemberUpdate (memberObs) {
     Object.values(this.versions).forEach(ob => ob.notifyMemberUpdate(memberObs))
+  }
+
+  matchingTimestamp (options) {
+    if (options.date) {
+      const matching = this.timestamps.filter(d => d <= options.date)
+      return matching[matching.length - 1]
+    } else {
+      return this.timestamps[this.timestamps.length - 1]
+    }
   }
 }
 
