@@ -177,10 +177,13 @@ class RequestBBox extends Request {
     }
     context.bbox = this.bbox
 
-    if (context.date !== this.options.date) {
-      return false
+    if (context.date === undefined) {
+      context.date = this.options.date
+    } else {
+      if (context.date !== this.options.date) {
+        return false
+      }
     }
-    context.date = this.options.date
 
     for (const i in context.requests) {
       const request = context.requests[i]

@@ -33,6 +33,8 @@ class RequestGet extends Request {
     }
     if (this.options.date) {
       this.options.date = isodate(this.options.date)
+    } else {
+      this.options.date = null
     }
 
     if (this.options.bounds) {
@@ -61,10 +63,13 @@ class RequestGet extends Request {
       return false
     }
 
-    if (context.date !== this.options.date) {
-      return false
+    if (context.date === undefined) {
+      context.date = this.options.date
+    } else {
+      if (context.date !== this.options.date) {
+        return false
+      }
     }
-    context.date = this.options.date
 
     return true
   }

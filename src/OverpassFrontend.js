@@ -315,6 +315,7 @@ class OverpassFrontend {
 
     const context = {
       bbox: null,
+      date: undefined,
       todo: {},
       requests: [],
       subRequests: [],
