@@ -28,7 +28,7 @@ module.exports = {
             }
 
             if (expected) {
-              assert.deepEqual(found.sort(), expected.sort(), 'Wrong list of objects returned')
+              assert.deepEqual(found.sort(), expected.sort(), 'At ' + date + ', wrong list of objects returned')
             }
 
             done()
@@ -59,7 +59,7 @@ module.exports = {
               return done(err)
             }
 
-            assert.deepEqual(found.sort(), expected.sort(), 'Wrong list of objects returned')
+            assert.deepEqual(found.sort(), expected.sort(), 'At ' + date + ', wrong list of objects returned')
 
             done()
           })
