@@ -525,12 +525,7 @@ class OverpassFrontend {
     }
 
     for (const id in context.todo) {
-      let ob = this.cache.getMeta(id, context)
-      if (!ob) {
-        ob = new (this.options.attic ? OverpassAtticObject : OverpassMetaObject)(id, this)
-        this.cache.add(id, ob)
-      }
-
+      const ob = this.createOrGetMetaObject(id)
       ob.addMissingObject(context)
     }
 
@@ -541,6 +536,16 @@ class OverpassFrontend {
     request.finishSubRequest(subRequest)
 
     this._next()
+  }
+
+  createOrGetMetaObject (id, options) {
+    let ob = this.cache.getMeta(id, options)
+    if (!ob) {
+      ob = new (this.options.attic ? OverpassAtticObject : OverpassMetaObject)(id, this)
+      this.cache.add(id, ob)
+    }
+
+    return ob
   }
 
   /**
@@ -727,11 +732,7 @@ class OverpassFrontend {
       id = el.tags.reftype.substr(0, 1) + el.tags.ref
     }
 
-    let metaOb = this.cache.getMeta(id)
-    if (!metaOb) {
-      metaOb = new (this.options.attic ? OverpassAtticObject : OverpassMetaObject)(id, this)
-      this.cache.add(id, metaOb)
-    }
+    const metaOb = this.createOrGetMetaObject(id)
 
     if (el.type === 'timeline') {
       return metaOb.updateTimeline(el.tags)
