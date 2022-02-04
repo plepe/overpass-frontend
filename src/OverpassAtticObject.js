@@ -1,5 +1,4 @@
 const OverpassObject = require('./OverpassObject')
-const OverpassFrontend = require('./defines')
 
 const types = {
   node: require('./OverpassNode'),
@@ -30,8 +29,13 @@ class OverpassAtticObject {
     return this.tmpOb
   }
 
+  /**
+   * Return an object
+   * @param {options} - Options, e.g. date at which to query.
+   * @returns {OverpassObject|false|null|undefined} - if an object is loaded, returns the object. If the object does not exist, returns false. If the object might exist and a query to the database server is required, return null. If the object might already be loaded and the code is waiting for further information, return undefined (no query to the database server will be done at this time).
+   */
   get (options) {
-    if (this.tmpDate && this.tmpDate === options.date) {
+    if (this.tmpDate === null || (this.tmpDate && this.tmpDate === options.date)) {
       return this.tmpOb
     }
 
@@ -130,13 +134,13 @@ class OverpassAtticObject {
   }
 
   addMissingObject (context) {
-    this.tmpDate = context.date
-    this.tmpOb = new OverpassObject()
-    this.tmpOb.id = this.id
-    this.tmpOb.type = { n: 'node', w: 'way', r: 'relation' }[this.id.substr(0, 1)]
-    this.tmpOb.osm_id = this.id.substr(1)
-    this.tmpOb.properties = OverpassFrontend.ALL
-    this.tmpOb.missingObject = true
+    if (context) {
+      this.tmpDate = context.date
+    } else {
+      this.tmpDate = null
+    }
+
+    this.tmpOb = false
   }
 
   leafletFeature (options) {

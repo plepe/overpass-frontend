@@ -239,7 +239,7 @@ class OverpassFrontend {
    * @param {string} id - Id of an OSM map feature
    * @param {object} options
    * @param {int} [options.properties] - Which properties have to be known (default: OverpassFrontend.DEFAULT)
-   * @return {null|false|OverpassObject} - null: does not exist in the database; false: may exist, but has not been loaded yet (or not enough properties known); OverpassObject: sucessful object
+   * @returns {OverpassObject|false|null|undefined} - if an object is loaded, returns the object. If the object does not exist, returns false. If the object might exist and a query to the database server is required, return null. If the object might already be loaded and the code is waiting for further information, return undefined (no query to the database server will be done at this time).
    */
   getCached (id, options) {
     if (typeof options === 'undefined') {
@@ -252,15 +252,11 @@ class OverpassFrontend {
 
     const ob = this.cache.get(id, options)
     if (!ob) {
-      return false
-    }
-
-    if (ob.missingObject) {
-      return null
+      return ob
     }
 
     if ((options.properties & ob.properties) !== options.properties) {
-      return false
+      return null
     }
 
     return ob

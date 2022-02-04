@@ -35,13 +35,6 @@ class RequestGet extends Request {
       this.options.date = isodate(this.options.date)
     }
 
-    this.ids.forEach(id => {
-      const ob = this.overpass.cache.get(id, this.options)
-      if (ob === false) {
-        this.overpass.cache.remove(id)
-      }
-    })
-
     if (this.options.bounds) {
       if (isGeoJSON(this.options.bounds)) {
         this.geojsonBounds = this.options.bounds
@@ -123,15 +116,16 @@ class RequestGet extends Request {
       }
 
       const ob = this.overpass.cache.get(this.ids[i], this.options)
+
+      // Feature does not exist!
+      if (ob === false) {
+        this.featureCallback(null, null, i)
+        this.ids[i] = null
+        continue
+      }
+
       if (ob) {
         let ready = true
-
-        // Feature does not exists!
-        if (ob.missingObject) {
-          this.featureCallback(null, null, i)
-          this.ids[i] = null
-          continue
-        }
 
         // for bounds option, if object is (partly) loaded, but outside call
         // featureCallback with 'false'
@@ -145,7 +139,7 @@ class RequestGet extends Request {
         }
 
         // not fully loaded
-        if ((ob !== false && ob !== null) && (this.options.properties & ob.properties) !== this.options.properties) {
+        if ((this.options.properties & ob.properties) !== this.options.properties) {
           ready = false
         }
 

@@ -971,7 +971,7 @@ describe('Overpass getCached()', function () {
       }
     )
 
-    assert.equal(ob, false, 'Cache clear -> false')
+    assert.equal(ob, null, 'Cache clear -> null')
   })
 
   it('a non-existing feature (after cache clear)', function () {
@@ -981,7 +981,7 @@ describe('Overpass getCached()', function () {
       }
     )
 
-    assert.equal(ob, false, 'Cache clear -> false')
+    assert.equal(ob, null, 'Cache clear -> null')
   })
 
   it('load features via async call', function (done) {
@@ -1014,7 +1014,7 @@ describe('Overpass getCached()', function () {
       }
     )
 
-    assert.equal(ob, null, 'Non existant: null')
+    assert.equal(ob, false, 'Non existant: null')
   })
 
   it('an existing feature - wrong properties (after load)', function () {
@@ -1024,7 +1024,7 @@ describe('Overpass getCached()', function () {
       }
     )
 
-    assert.equal(ob, false, 'not fully loaded')
+    assert.equal(ob, null, 'not fully loaded')
   })
 
   it('a non-existing feature - wrong properties (after load)', function () {
@@ -1034,7 +1034,7 @@ describe('Overpass getCached()', function () {
       }
     )
 
-    assert.equal(ob, null, 'Non existant: null')
+    assert.equal(ob, false, 'Non existant: null')
   })
 })
 

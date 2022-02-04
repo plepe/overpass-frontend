@@ -1187,7 +1187,7 @@ describe('Overpass BBoxQuery - Relation with members in BBOX', function() {
           properties: OverpassFrontend.ALL
         },
         function(err, result, index) {
-          if (result === null) {
+          if (!result) {
             foundNullCount++
           } else {
             assert.equal(expected.indexOf(result.id) === -1, false, 'Object ' + result.id + ' should not be found')

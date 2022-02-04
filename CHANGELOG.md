@@ -1,3 +1,9 @@
+# Version 3 - unreleased
+* The notifiers if an object is not existant/not loaded have changed:
+  * false: does not exist
+  * null: might exist, database server should be queries
+  * undefined: might exist, code is waiting for further information on another channel (no query)
+
 # Version 2.7.0 - release 2021-12-30
 * Bounds and memberBounds for .get() and .BBoxQuery() accept GeoJSON polygons/multipolygons
 * .BBoxQuery() now accepts empty bounds (query the whole world)
