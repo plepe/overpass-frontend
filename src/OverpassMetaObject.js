@@ -19,6 +19,10 @@ module.exports = class OverpassMetaObject {
    * @returns {OverpassObject|false|null|undefined} - if an object is loaded, returns the object. If the object does not exist, returns false. If the object might exist and a query to the database server is required, return null. If the object might already be loaded and the code is waiting for further information, return undefined (no query to the database server will be done at this time).
    */
   get (options) {
+    if (this.ob && !this.ob.visible) {
+      return false
+    }
+
     return this.ob
   }
 
@@ -51,7 +55,11 @@ module.exports = class OverpassMetaObject {
   }
 
   addMissingObject (context) {
-    this.ob = false
+    if (!this.ob) {
+      this.ob = new OverpassObject(this.id)
+    }
+
+    this.ob.visible = false
   }
 
   notifyMemberUpdate (memberObs) {
