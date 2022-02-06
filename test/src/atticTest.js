@@ -11,8 +11,13 @@ module.exports = {
         overpassFrontend.get(
           options.ids,
           { date },
-          function (err, result) {
+          function (err, result, index) {
             if (err) { return done(err) }
+            if (!result) {
+              // console.log('At ' + date + ', query for ' + options.ids[index] + ' returned', result)
+              return
+            }
+
             found.push(result.id)
 
             // console.log('At ' + date + ' found:', result.id, 'with ts', result.meta.timestamp)
