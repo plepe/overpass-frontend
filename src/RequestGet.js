@@ -118,15 +118,16 @@ class RequestGet extends Request {
     this.ids.forEach((id, i) => {
       if (id === null) { return }
 
-      const ob = this.overpass.cache.get(id, this.options)
-
-      // Feature does not exist!
-      if (ob === false) {
+      // Illegal ID
+      if (id !== null && !id.match(/^[nwr][0-9]+$/)) {
         this.featureCallback(null, null, i)
         this.ids[i] = null
         return
       }
 
+      const ob = this.overpass.cache.get(id, this.options)
+
+      // Feature does not exist!
       if (ob) {
         let ready = true
 
@@ -154,15 +155,12 @@ class RequestGet extends Request {
         }
 
         this.todoNextCall.push(id)
+      } else if (ob === false) {
+        this.featureCallback(null, null, i)
+        this.ids[i] = null
+        return
       } else if (ob !== undefined) {
         this.todoNextCall.push(id)
-      } else {
-        // Illegal ID
-        if (id !== null && !id.match(/^[nwr][0-9]+$/)) {
-          this.featureCallback(null, null, i)
-          this.ids[i] = null
-          return
-        }
       }
 
       this.allFound = false
