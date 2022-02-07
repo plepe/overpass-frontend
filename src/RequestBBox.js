@@ -44,7 +44,7 @@ class RequestBBox extends Request {
 
     let filterId = null
     if (this.options.filter) {
-      filterId = this.options.filter.toString()
+      filterId = this.options.filter.toString() + (this.options.date ? '-' + this.options.date : '')
     }
 
     if (!('noCacheQuery' in this.options) || !this.options.noCacheQuery) {
@@ -86,8 +86,9 @@ class RequestBBox extends Request {
       RequestBBoxMembers(this)
     }
 
-    if (this.query in this.overpass.cacheBBoxQueries) {
-      this.cache = this.overpass.cacheBBoxQueries[this.query]
+    const cacheId = this.query + (this.options.date ? '-' + this.options.date : '')
+    if (cacheId in this.overpass.cacheBBoxQueries) {
+      this.cache = this.overpass.cacheBBoxQueries[cacheId]
 
       if (filterId) {
         if (!('filter' in this.cache)) {
@@ -102,8 +103,8 @@ class RequestBBox extends Request {
       }
     } else {
       // otherwise initialize cache
-      this.overpass.cacheBBoxQueries[this.query] = {}
-      this.cache = this.overpass.cacheBBoxQueries[this.query]
+      this.overpass.cacheBBoxQueries[cacheId] = {}
+      this.cache = this.overpass.cacheBBoxQueries[cacheId]
       this.cache.requested = new KnownArea()
 
       if (filterId) {
