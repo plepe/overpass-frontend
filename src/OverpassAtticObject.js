@@ -20,7 +20,7 @@ class OverpassAtticObject {
 
   createTmpObject (date, timestamp, options) {
     const el = JSON.parse(this.originalData[timestamp])
-    el.timestamp = date
+    el.geometryTimestamp = date
 
     this.tmpDate = date
     this.tmpOb = new types[el.type](this.id)
@@ -67,7 +67,7 @@ class OverpassAtticObject {
 
     // check for the highest timestamp of any of the member objects
     const maxMemberTimestamp = ob.memberObjects(options)
-      .map(o => o && o.meta && o.meta.timestamp)
+      .map(o => o && o.meta && o.meta.geometryTimestamp)
       .filter(t => t)
       .sort().reverse()[0]
 
@@ -105,11 +105,14 @@ class OverpassAtticObject {
     ob.overpass = this.overpass
 
     this.originalData[el.timestamp] = JSON.stringify(el)
+
+    el.geometryTimestamp = el.timestamp
     ob.updateData(el, options)
 
     if (!ob.meta) {
       ob.meta = {
         timestamp: el.timestamp,
+        geometryTimestamp: el.timestamp,
         version: el.version
       }
     }

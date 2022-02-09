@@ -51,8 +51,8 @@ class OverpassObject {
 
     if (!options) {
       options = {}
-      if (this.data.timestamp && !options.date) {
-        options.date = this.data.timestamp
+      if (this.meta && this.meta.geometryTimestamp) {
+        options.date = this.meta.geometryTimestamp
       }
     }
 
@@ -133,6 +133,9 @@ class OverpassObject {
         changeset: data.changeset,
         user: data.user,
         uid: data.uid
+      }
+      if (data.geometryTimestamp) {
+        this.meta.geometryTimestamp = data.geometryTimestamp
       }
       this.properties |= OverpassFrontend.META
     }
