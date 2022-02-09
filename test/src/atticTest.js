@@ -20,8 +20,14 @@ module.exports = {
 
             found.push(result.id)
 
-            // console.log('At ' + date + ' found:', result.id, 'with ts', result.meta.timestamp)
-            assert.equal(result.meta.timestamp, options.expectedTimestamps[result.id][i], 'Node ' + result.id + ' at date ' + date + ' has wrong timestamp')
+            const memberVersions = result.memberObjects().map(m => m ? m.meta.version : '').join(',')
+            // console.log('At ' + date + ' found:', result.id, 'with ts', result.meta.timestamp, 'and geo-ts', result.meta.geometryTimestamp, '; memberVersions: ' + memberVersions )
+
+            assert.equal(result.meta.geometryTimestamp, options.expectedTimestamps[result.id][i], result.id + ' at date ' + date + ' has wrong timestamp')
+
+            if (options.expectedMemberVersions) {
+              assert.equal(memberVersions, options.expectedMemberVersions[result.id][i], result.id + ' at date ' + date + ' has wrong member versions')
+            }
 
             if ('expectedProperties' in options) {
               assert.equal(result.properties, options.expectedProperties)
@@ -56,8 +62,22 @@ module.exports = {
             if (err) { return done(err) }
             found.push(result.id)
 
-            // console.log('At ' + date + ' found:', result.id, 'with ts', result.meta.timestamp)
-            assert.equal(result.meta.timestamp, options.expectedTimestamps[result.id][i], 'Node ' + result.id + ' at date ' + date + ' has wrong timestamp')
+            if (!(result.id in options.expectedTimestamps)) {
+              return
+            }
+
+            const memberVersions = result.memberObjects().map(m => m ? m.meta.version : '').join(',')
+            // console.log('At ' + date + ' found:', result.id, 'with ts', result.meta.timestamp, 'and geo-ts', result.meta.geometryTimestamp, '; memberVersions: ' + memberVersions )
+
+            assert.equal(result.meta.geometryTimestamp, options.expectedTimestamps[result.id][i], result.id + ' at date ' + date + ' has wrong timestamp')
+
+            if (options.expectedMemberVersions) {
+              assert.equal(memberVersions, options.expectedMemberVersions[result.id][i], result.id + ' at date ' + date + ' has wrong member versions')
+            }
+
+            if ('expectedProperties' in options) {
+              assert.equal(result.properties, options.expectedProperties)
+            }
           },
           function (err) {
             if (err) {

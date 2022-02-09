@@ -82,6 +82,7 @@ describe('Attic data from local file', function () {
     atticTest.get(overpassFrontend, {
       ids,
       expectedTimestamps,
+      expectedMemberVersions,
       timestamps
     }, done)
   })
@@ -123,6 +124,7 @@ describe('Attic data from local file', function () {
       query: 'way[building]',
       bbox,
       expectedTimestamps,
+      expectedMemberVersions,
       timestamps
     }, done)
   })
