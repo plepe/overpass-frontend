@@ -497,18 +497,25 @@ class OverpassFrontend {
         return
       }
 
-      part.osm3sMeta = osm3sMeta
-      const metaOb = this.createOrUpdateOSMObject(el, part)
+      const options = {
+        date: context.date,
+        properties: part.properties,
+        bounds: part.bounds,
+        boundsNoMatch: part.boundsNoMatch,
+        osm3sMeta
+      }
+
+      const metaOb = this.createOrUpdateOSMObject(el, options)
       delete context.todo[metaOb.id]
 
-      const ob = this.cache.get(metaOb.id, part)
+      const ob = this.cache.get(metaOb.id, options)
       const members = ob ? ob.memberIds() : null
       if (members) {
         members.forEach(member => {
           if (!(member in this.cacheElementsMemberOf)) {
-            this.cacheElementsMemberOf[member] = [this.cache.get(ob.id, part)]
+            this.cacheElementsMemberOf[member] = [this.cache.get(ob.id, options)]
           } else {
-            this.cacheElementsMemberOf[member].push(this.cache.get(ob.id, part))
+            this.cacheElementsMemberOf[member].push(this.cache.get(ob.id, options))
           }
         })
       }
