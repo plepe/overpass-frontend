@@ -497,36 +497,8 @@ class OverpassFrontend {
         return
       }
 
-      const options = {
-        date: context.date,
-        properties: part.properties,
-        bounds: part.bounds,
-        boundsNoMatch: part.boundsNoMatch,
-        osm3sMeta
-      }
-
-      const metaOb = this.createOrUpdateOSMObject(el, options)
-      delete context.todo[metaOb.id]
-
-      const ob = this.cache.get(metaOb.id, options)
-      const members = ob ? ob.memberIds() : null
-      if (members) {
-        members.forEach(member => {
-          if (!(member in this.cacheElementsMemberOf)) {
-            this.cacheElementsMemberOf[member] = [this.cache.get(ob.id, options)]
-          } else {
-            this.cacheElementsMemberOf[member].push(this.cache.get(ob.id, options))
-          }
-        })
-      }
-
       part.count++
-      if (part.receiveObject) {
-        part.receiveObject(ob)
-      }
-      if (!request.aborted && !request.finished && part.featureCallback && (!part.checkFeatureCallback || part.checkFeatureCallback(ob, part))) {
-        part.featureCallback(err, ob)
-      }
+      this.elementNotifyFromRequest(el, context, request, part, osm3sMeta)
     })
 
     if (!(subRequestsIndex === context.subRequests.length - 1 || partIndex === context.subRequests[subRequestsIndex].parts.length - 1)) {
@@ -545,6 +517,39 @@ class OverpassFrontend {
     request.finishSubRequest(subRequest)
 
     this._next()
+  }
+
+  elementNotifyFromRequest (el, context, request, part, osm3sMeta) {
+    const options = {
+      date: context.date,
+      properties: part.properties,
+      bounds: part.bounds,
+      boundsNoMatch: part.boundsNoMatch,
+      osm3sMeta
+    }
+
+    const metaOb = this.createOrUpdateOSMObject(el, options)
+    delete context.todo[metaOb.id]
+
+    const ob = this.cache.get(metaOb.id, options)
+    const members = ob ? ob.memberIds() : null
+    if (members) {
+      members.forEach(member => {
+        if (!(member in this.cacheElementsMemberOf)) {
+          this.cacheElementsMemberOf[member] = [this.cache.get(ob.id, options)]
+        } else {
+          this.cacheElementsMemberOf[member].push(this.cache.get(ob.id, options))
+        }
+      })
+    }
+
+    if (part.receiveObject) {
+      part.receiveObject(ob, el)
+    }
+
+    if (!request.aborted && !request.finished && part.featureCallback && (!part.checkFeatureCallback || part.checkFeatureCallback(ob, part))) {
+      part.featureCallback(null, ob)
+    }
   }
 
   createOrGetMetaObject (id, options) {
