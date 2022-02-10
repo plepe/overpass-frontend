@@ -531,7 +531,9 @@ class OverpassFrontend {
     const metaOb = this.createOrUpdateOSMObject(el, options)
     delete context.todo[metaOb.id]
 
-    const ob = this.cache.get(metaOb.id, options)
+    const ob = this.cache.get(metaOb.id, { date: context.date, properties: 0 })
+    // TODO: ob might be false/null/undefined
+
     const members = ob ? ob.memberIds() : null
     if (members) {
       members.forEach(member => {

@@ -1,3 +1,4 @@
+const OverpassFrontend = require('./defines')
 const OverpassObject = require('./OverpassObject')
 
 const types = {
@@ -65,8 +66,14 @@ class OverpassAtticObject {
       return false
     }
 
+    const memberObjects = ob.memberObjects(options)
+    const undefinedMembers = memberObjects.filter(m => m === undefined)
+    if (undefinedMembers.length && options.properties && (options.properties & OverpassFrontend.GEOM) !== 0) {
+      return undefined
+    }
+
     // check for the highest timestamp of any of the member objects
-    const maxMemberTimestamp = ob.memberObjects(options)
+    const maxMemberTimestamp = memberObjects
       .map(o => o && o.ob && o.ob.meta && o.ob.meta.geometryTimestamp)
       .filter(t => t)
       .sort().reverse()[0]
