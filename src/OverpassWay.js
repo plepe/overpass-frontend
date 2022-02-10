@@ -86,7 +86,7 @@ class OverpassWay extends OverpassObject {
     if (this.members && (this.properties & OverpassFrontend.GEOM) === 0) {
       this.geometry = this.memberObjects().map(
         node => {
-          return node ? node.geometry : null
+          return node.ob ? node.ob.geometry : null
         }
       ).filter(geom => geom)
 

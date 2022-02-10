@@ -20,7 +20,7 @@ module.exports = {
 
             found.push(result.id)
 
-            const memberVersions = result.memberObjects().map(m => m ? m.meta.version : '').join(',')
+            const memberVersions = result.memberObjects().map(m => m.ob ? m.ob.meta.version : '').join(',')
             // console.log('At ' + date + ' found:', result.id, 'with ts', result.meta.timestamp, 'and geo-ts', result.meta.geometryTimestamp, '; memberVersions: ' + memberVersions )
 
             assert.equal(result.meta.geometryTimestamp, options.expectedTimestamps[result.id][i], result.id + ' at date ' + date + ' has wrong timestamp')
@@ -66,7 +66,7 @@ module.exports = {
               return
             }
 
-            const memberVersions = result.memberObjects().map(m => m ? m.meta.version : '').join(',')
+            const memberVersions = result.memberObjects().map(m => m.ob ? m.ob.meta.version : '').join(',')
             // console.log('At ' + date + ' found:', result.id, 'with ts', result.meta.timestamp, 'and geo-ts', result.meta.geometryTimestamp, '; memberVersions: ' + memberVersions )
 
             assert.equal(result.meta.geometryTimestamp, options.expectedTimestamps[result.id][i], result.id + ' at date ' + date + ' has wrong timestamp')

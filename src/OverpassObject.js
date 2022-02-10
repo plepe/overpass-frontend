@@ -44,6 +44,21 @@ class OverpassObject {
     return this.memberIds()
   }
 
+  /**
+   * @typedef {Object} OverpassObject#MemberObjectResult
+   * @property {string} id ID of the member.
+   * @property {number} ref Numeric ID of the member.
+   * @property {string} type 'node', 'way' or 'relation'.
+   * @property {string} [role] Role of the member (not set for way nodes).
+   * @property {OverpassObject|false|null|undefined} ob If the object is loaded, the object. If the object does not exist, false. If the object might exist and a query to the database server is required, return null. If the object might already be loaded and the code is waiting for further information, return undefined.
+   */
+
+  /**
+   * like the property .members, but returns the actual members, if they are
+   * known (depending on the geometryTimestamp, if attic data is enabled)
+   * @param {object} [options] Options, e.g. date
+   * @returns {OverpassObject#MemberObjectResult[]} Nodes of a way resp. members of a relation.
+   */
   memberObjects (options) {
     if (!this.members) {
       return []
@@ -56,7 +71,17 @@ class OverpassObject {
       }
     }
 
-    return this.members.map(member => this.overpass.cache.get(member.id, options))
+    return this.members.map(member => {
+      const result = {
+        ob: this.overpass.cache.get(member.id, options)
+      }
+
+      for (const k in member) {
+        result[k] = member[k]
+      }
+
+      return result
+    })
   }
 
   notifyMemberOf (relation, role, sequence) {
