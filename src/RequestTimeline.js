@@ -40,8 +40,8 @@ class RequestTimeline extends Request {
         return
       }
 
-      const timeline = metaOb.getTimeline()
-      if (timeline || timeline === false) {
+      if (metaOb.hasTimeline) {
+        const timeline = metaOb.getTimeline()
         const result = { id, timeline }
 
         this.featureCallback(null, result, i)
@@ -116,14 +116,25 @@ class RequestTimeline extends Request {
    * @param {Request#SubRequest} subRequest - the current sub request
    */
   finishSubRequest (subRequest) {
+    this.ids.forEach(id => {
+      const metaOb = this.overpass.cache.getMeta(id)
+      if (metaOb) {
+        metaOb.finishTimeline()
+      }
+    })
+
     this.forceFinish = true
 
     super.finishSubRequest(subRequest)
   }
 
   finish () {
+    this.preprocess()
+
     this.ids.forEach(id => {
-      this.overpass.createOrGetMetaObject(id).addMissingObject()
+      if (id) {
+        this.overpass.createOrGetMetaObject(id).addMissingObject()
+      }
     })
 
     this.preprocess()

@@ -188,6 +188,7 @@ class OverpassFrontend {
                   osm3sMeta.bounds = new BoundingBox(ob.bounds)
                 }
               })
+              metaOb.finishTimeline()
             })
 
             if (err) {

@@ -143,7 +143,6 @@ class OverpassAtticObject {
   }
 
   updateTimeline (entry) {
-    this.hasTimeline = true
     return this.updateData({
       id: entry.ref,
       type: entry.reftype,
@@ -151,6 +150,10 @@ class OverpassAtticObject {
       timestamp: entry.created,
       endTimestamp: entry.expired
     }, { properties: 0 })
+  }
+
+  finishTimeline () {
+    this.hasTimeline = true
   }
 
   /**
@@ -188,6 +191,7 @@ class OverpassAtticObject {
         this.tmpDate = context.date
       }
     } else {
+      this.hasTimeline = true
       this.tmpDate = null
     }
 

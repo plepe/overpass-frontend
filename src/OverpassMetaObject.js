@@ -73,4 +73,10 @@ module.exports = class OverpassMetaObject {
   notifyMemberUpdate (memberObs) {
     this.ob.notifyMemberUpdate(memberObs)
   }
+
+  updateTimeline () {
+  }
+
+  finishTimeline () {
+  }
 }
