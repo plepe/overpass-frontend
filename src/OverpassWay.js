@@ -53,21 +53,21 @@ class OverpassWay extends OverpassObject {
           type: 'node'
         })
 
-        let obProperties = OverpassFrontend.ID_ONLY
+        const memberOptions = JSON.parse(JSON.stringify(options))
+
+        memberOptions.properties = OverpassFrontend.ID_ONLY
         const ob = {
           id: this.data.nodes[i],
           type: 'node'
         }
 
         if (data.geometry && data.geometry[i]) {
-          obProperties = obProperties | OverpassFrontend.GEOM
+          memberOptions.properties |= OverpassFrontend.GEOM
           ob.lat = data.geometry[i].lat
           ob.lon = data.geometry[i].lon
         }
 
-        const memberOb = this.overpass.createOrUpdateOSMObject(ob, {
-          properties: obProperties
-        })
+        const memberOb = this.overpass.createOrUpdateOSMObject(ob, memberOptions)
 
         memberOb.notifyMemberOf(this, null, i)
       }

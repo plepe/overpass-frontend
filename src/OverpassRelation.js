@@ -72,18 +72,20 @@ class OverpassRelation extends OverpassObject {
 
           member.id = member.type.substr(0, 1) + member.ref
 
+          const memberOptions = JSON.parse(JSON.stringify(options))
+
           const ob = JSON.parse(JSON.stringify(member))
           ob.id = ob.ref
           delete ob.ref
           delete ob.role
-          let memberProperties = OverpassFrontend.ID_ONLY
+          memberOptions.properties = OverpassFrontend.ID_ONLY
 
           if ((member.type === 'node' && 'lat' in member) ||
               (member.type === 'way' && 'geometry' in member)) {
-            memberProperties |= OverpassFrontend.GEOM
+            memberOptions.properties |= OverpassFrontend.GEOM
           }
 
-          const memberOb = this.overpass.createOrUpdateOSMObject(ob, { properties: memberProperties })
+          const memberOb = this.overpass.createOrUpdateOSMObject(ob, memberOptions)
 
           // call notifyMemberOf only once per member
           if (!membersKnown) {

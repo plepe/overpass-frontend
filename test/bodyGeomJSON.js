@@ -26,7 +26,11 @@ describe('Load OSM data from JSON file created with "out body geom" from Overpas
           "type": "Feature",
           "id": "node/7717702652",
           "properties": {
-            "@id": "node/7717702652"
+            "@id": "node/7717702652",
+            "@osm3s:copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.",
+            "@osm3s:generator": "Overpass API 0.7.56.9 76e5016d",
+            "@osm3s:timestamp_osm_base": "2021-08-28T13:58:14Z",
+            "@osm3s:version": 0.6
           },
           "geometry": {
             "type": "Point",
@@ -60,7 +64,11 @@ describe('Load OSM data from JSON file created with "out body geom" from Overpas
           "type": "Feature",
           "id": "node/4332664312",
           "properties": {
-            "@id": "node/4332664312"
+            "@id": "node/4332664312",
+            "@osm3s:copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.",
+            "@osm3s:generator": "Overpass API 0.7.56.9 76e5016d",
+            "@osm3s:timestamp_osm_base": "2021-08-28T13:58:14Z",
+            "@osm3s:version": 0.6
           },
           "geometry": {
             "type": "Point",
@@ -154,7 +162,11 @@ describe('Load OSM data from JSON file created with "out body geom" from Overpas
           "type": "Feature",
           "id": "way/771273963",
           "properties": {
-            "@id": "way/771273963"
+            "@id": "way/771273963",
+            "@osm3s:copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.",
+            "@osm3s:generator": "Overpass API 0.7.56.9 76e5016d",
+            "@osm3s:timestamp_osm_base": "2021-08-28T13:58:14Z",
+            "@osm3s:version": 0.6
           },
           "geometry": {
             "type": "LineString",
