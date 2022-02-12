@@ -67,9 +67,9 @@ class OverpassWay extends OverpassObject {
           ob.lon = data.geometry[i].lon
         }
 
-        const memberOb = this.overpass.createOrUpdateOSMObject(ob, memberOptions)
+        const memberMetaOb = this.overpass.createOrUpdateOSMObject(ob, memberOptions)
 
-        memberOb.notifyMemberOf(this, null, i)
+        memberMetaOb.notifyMemberOf(this, null, i)
       }
     }
 

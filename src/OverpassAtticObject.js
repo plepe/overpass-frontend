@@ -218,6 +218,9 @@ class OverpassAtticObject {
       return this.timestamps[this.timestamps.length - 1]
     }
   }
+
+  notifyMemberOf (relation, role, sequence) {
+  }
 }
 
 module.exports = OverpassAtticObject

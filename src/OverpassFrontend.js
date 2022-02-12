@@ -164,12 +164,12 @@ class OverpassFrontend {
           (chunk, done) => {
             chunk.forEach(
               (element) => {
-                const ob = this.createOrUpdateOSMObject(element, {
+                const metaOb = this.createOrUpdateOSMObject(element, {
                   osm3sMeta,
                   properties: OverpassFrontend.TAGS | OverpassFrontend.META | OverpassFrontend.MEMBERS
                 })
 
-                obs.push(ob)
+                obs.push(metaOb)
               }
             )
 
@@ -179,13 +179,15 @@ class OverpassFrontend {
             this.pendingNotifies()
 
             // Set objects to fully known, as no more data can be loaded from the file
-            obs.forEach(ob => {
-              ob.properties |= OverpassFrontend.ALL
-              if (osm3sMeta.bounds) {
-                osm3sMeta.bounds.extend(ob.bounds)
-              } else {
-                osm3sMeta.bounds = new BoundingBox(ob.bounds)
-              }
+            obs.forEach(metaOb => {
+              metaOb.getAll().forEach(ob => {
+                ob.properties |= OverpassFrontend.ALL
+                if (osm3sMeta.bounds) {
+                  osm3sMeta.bounds.extend(ob.bounds)
+                } else {
+                  osm3sMeta.bounds = new BoundingBox(ob.bounds)
+                }
+              })
             })
 
             if (err) {
@@ -768,7 +770,7 @@ class OverpassFrontend {
 
     metaOb.dbInsert(this.db)
 
-    return ob
+    return metaOb
   }
 
   regexpEscape (str) {

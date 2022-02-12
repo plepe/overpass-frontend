@@ -1671,7 +1671,8 @@ describe('Events', function () {
           }
 
           assert.equal(result.memberFeatures.length, 63, 'Wrong count of member features')
-          assert.equal(result.memberFeatures[0].properties, OverpassFrontend.GEOM | OverpassFrontend.BBOX | OverpassFrontend.CENTER | OverpassFrontend.MEMBERS, 'Member features has more than GEOM properties')
+          const member0 = result.memberObjects()[0].ob
+          assert.equal(member0.properties, OverpassFrontend.GEOM | OverpassFrontend.BBOX | OverpassFrontend.CENTER | OverpassFrontend.MEMBERS, 'Member features has more than GEOM properties')
 
           result.on('update', countUpdateCalls)
 

@@ -66,6 +66,10 @@ module.exports = class OverpassMetaObject {
     this.ob.visible = false
   }
 
+  notifyMemberOf (relation, role, sequence) {
+    return this.ob.notifyMemberOf(relation, role, sequence)
+  }
+
   notifyMemberUpdate (memberObs) {
     this.ob.notifyMemberUpdate(memberObs)
   }

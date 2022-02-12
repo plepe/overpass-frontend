@@ -85,14 +85,14 @@ class OverpassRelation extends OverpassObject {
             memberOptions.properties |= OverpassFrontend.GEOM
           }
 
-          const memberOb = this.overpass.createOrUpdateOSMObject(ob, memberOptions)
+          const memberMetaOb = this.overpass.createOrUpdateOSMObject(ob, memberOptions)
 
           // call notifyMemberOf only once per member
           if (!membersKnown) {
-            memberOb.notifyMemberOf(this, member.role, sequence)
+            memberMetaOb.notifyMemberOf(this, member.role, sequence)
           }
 
-          return memberOb
+          return memberMetaOb
         }
       )
 
