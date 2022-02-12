@@ -127,9 +127,13 @@ class RequestGet extends Request {
 
       const ob = this.overpass.cache.get(id, this.options)
 
-      // Feature does not exist!
+      // Feature does exist!
       if (ob) {
         let ready = true
+
+        if (ob.id in this.hasUnfinished) {
+          delete this.hasUnfinished[ob.id]
+        }
 
         // for bounds option, if object is (partly) loaded, but outside call
         // featureCallback with 'false'
@@ -323,6 +327,10 @@ class RequestGet extends Request {
   }
 
   mayFinish () {
+    if (Object.keys(this.hasUnfinished).length) {
+      return false
+    }
+
     return this.allFound
   }
 }

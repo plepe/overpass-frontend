@@ -137,6 +137,10 @@ class RequestBBox extends Request {
         return
       }
 
+      if (id in this.hasUnfinished) {
+        delete this.hasUnfinished[id]
+      }
+
       if (id in this.doneFeatures) {
         return
       }
@@ -282,8 +286,12 @@ class RequestBBox extends Request {
    * @param {Request#SubRequest} subRequest - sub request which is being handled right now
    * @param {int} partIndex - Which part of the subRequest is being received
    */
-  receiveObject (ob) {
-    this.doneFeatures[ob.id] = ob
+  receiveObject (ob, metaOb) {
+    super.receiveObject(ob, metaOb)
+
+    if (ob) {
+      this.doneFeatures[ob.id] = ob
+    }
   }
 
   checkFeatureCallback (ob) {
@@ -331,6 +339,10 @@ class RequestBBox extends Request {
   }
 
   mayFinish () {
+    if (Object.keys(this.hasUnfinished).length) {
+      return false
+    }
+
     return !this.needLoad()
   }
 }

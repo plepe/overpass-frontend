@@ -36,6 +36,7 @@ class Request {
 
     this.callCount = 0
     this.timestampPreprocess = 0
+    this.hasUnfinished = {}
   }
 
   /**
@@ -117,11 +118,13 @@ class Request {
 
   /**
    * receive an object from OverpassFronted -> enter to cache, return to caller
-   * @param {OverpassObject} ob - Object which has been received
-   * @param {Request#SubRequest} subRequest - sub request which is being handled right now
-   * @param {int} partIndex - Which part of the subRequest is being received
+   * @param {OverpassObject|undefined} ob - Object which has been received
+   * @param {OverpassMetaObject} ob - Meta Object which has been received
    */
-  receiveObject (ob) {
+  receiveObject (ob, metaOb) {
+    if (ob === undefined) {
+      this.hasUnfinished[metaOb.id] = true
+    }
   }
 
   /**
