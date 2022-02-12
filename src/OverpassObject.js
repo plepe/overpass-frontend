@@ -151,17 +151,17 @@ class OverpassObject {
     }
     this.errors = []
 
-    if (data.timestamp) {
-      this.meta = {
-        timestamp: data.timestamp,
-        version: data.version,
-        changeset: data.changeset,
-        user: data.user,
-        uid: data.uid
+    if (!this.meta) {
+      this.meta = {}
+    }
+
+    ;['timestamp', 'version', 'changeset', 'user', 'uid', 'geometryTimestamp'].forEach(k => {
+      if (data[k]) {
+        this.meta[k] = data[k]
       }
-      if (data.geometryTimestamp) {
-        this.meta.geometryTimestamp = data.geometryTimestamp
-      }
+    })
+
+    if (data.uid) {
       this.properties |= OverpassFrontend.META
     }
   }
