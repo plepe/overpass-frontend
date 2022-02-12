@@ -90,6 +90,10 @@ class OverpassAtticObject {
     return ob
   }
 
+  getAll () {
+    return Object.values(this.versions)
+  }
+
   updateData (el, options) {
     if (this.overpass.localOnly) {
       this.hasTimeline = true

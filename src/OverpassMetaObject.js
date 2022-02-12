@@ -26,6 +26,10 @@ module.exports = class OverpassMetaObject {
     return this.ob
   }
 
+  getAll () {
+    return [this.ob]
+  }
+
   updateData (el, options) {
     if (this.ob) {
       // no new information -> return
