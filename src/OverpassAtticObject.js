@@ -14,7 +14,8 @@ class OverpassAtticObject {
     this.versions = {}
     this.originalData = {}
     this.timestamps = null
-    this.hasTimeline = false
+    this.hasTimeline = this.overpass.localOnly
+    this.objectsAtTime = {}
 
     this.tmpDate = undefined
   }
@@ -95,40 +96,55 @@ class OverpassAtticObject {
   }
 
   updateData (el, options) {
-    if (this.overpass.localOnly) {
-      this.hasTimeline = true
-    }
-
     // TODO: el.timestamp will be undefined for referenced objects - what to do about them?
     let ob
-    if (el.timestamp in this.versions) {
-      ob = this.versions[el.timestamp]
-      // no new information -> return
-      if (~ob.properties & options.properties === 0) {
-        return ob
+    if (el.timestamp) {
+      if (el.timestamp in this.versions) {
+        ob = this.versions[el.timestamp]
+        // no new information -> return
+        if (~ob.properties & options.properties === 0) {
+          return ob
+        }
+      } else if (el.type in types) {
+        ob = new types[el.type](this.id)
+      } else {
+        ob = new OverpassObject(this.id)
       }
-    } else if (el.type in types) {
-      ob = new types[el.type](this.id)
+    } else if (this.hasTimeline && options.date) {
+      const timestamp = this.matchingTimestamp(options)
+      ob = this.versions[timestamp]
+      el.timestamp = timestamp
     } else {
-      ob = new OverpassObject(this.id)
+      if (options.date in this.objectsAtTime) {
+        ob = this.objectsAtTime[options.date]
+      } else {
+        if (el.type in types) {
+          ob = new types[el.type](this.id)
+        } else {
+          ob = new OverpassObject(this.id)
+        }
+
+        this.objectsAtTime[options.date] = ob
+      }
     }
 
     ob.overpass = this.overpass
 
-    this.originalData[el.timestamp] = JSON.stringify(el)
+    if (el.timestamp) {
+      this.originalData[el.timestamp] = JSON.stringify(el)
+      this.versions[el.timestamp] = ob
+    }
 
     el.geometryTimestamp = el.timestamp
     ob.updateData(el, options)
 
-    if (!ob.meta) {
+    if (!ob.meta && el.timestamp) {
       ob.meta = {
         timestamp: el.timestamp,
         geometryTimestamp: el.timestamp,
         version: el.version
       }
     }
-
-    this.versions[el.timestamp] = ob
 
     this.timestamps = Object.keys(this.versions).sort().filter(v => v !== 'undefined')
     const pos = this.timestamps.indexOf(el.timestamp)
@@ -154,6 +170,9 @@ class OverpassAtticObject {
 
   finishTimeline () {
     this.hasTimeline = true
+    Object.keys(this.objectsAtTime).forEach(date => {
+      this.updateData(this.objectsAtTime[date].data, { date })
+    })
   }
 
   /**
