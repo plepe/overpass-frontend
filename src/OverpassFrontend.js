@@ -537,6 +537,14 @@ class OverpassFrontend {
     const ob = this.cache.get(metaOb.id, { date: context.date, properties: 0 })
     // TODO: ob might be false/null/undefined
 
+    if (part.receiveObject) {
+      part.receiveObject(ob, metaOb)
+    }
+
+    if (!ob) {
+      return
+    }
+
     const members = ob ? ob.memberIds() : null
     if (members) {
       members.forEach(member => {
@@ -546,10 +554,6 @@ class OverpassFrontend {
           this.cacheElementsMemberOf[member].push(this.cache.get(ob.id, options))
         }
       })
-    }
-
-    if (part.receiveObject) {
-      part.receiveObject(ob, el)
     }
 
     if (!request.aborted && !request.finished && part.featureCallback && (!part.checkFeatureCallback || part.checkFeatureCallback(ob, part))) {
