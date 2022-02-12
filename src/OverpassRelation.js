@@ -321,16 +321,16 @@ class OverpassRelation extends OverpassObject {
 
     // create an event handler on the 'update' event, so that loading member
     // features will update geometry
-    this.memberFeatures.forEach(
+    this.memberObjects().forEach(
       (member, index) => {
-        if (!(member.properties & OverpassFrontend.GEOM)) {
+        if (!(member.ob.properties & OverpassFrontend.GEOM)) {
           const updFun = member => {
             feature.clearLayers()
             feature.addData(this.geometry)
             feature.setStyle(options)
           }
 
-          member.once('update', updFun)
+          member.ob.once('update', updFun)
         }
       }
     )
@@ -351,8 +351,8 @@ class OverpassRelation extends OverpassObject {
       } else {
         ret.geometry = {
           type: 'GeometryCollection',
-          geometries: this.memberFeatures
-            .map(member => member.GeoJSON().geometry) // .geometry may be undefined
+          geometries: this.memberObjects()
+            .map(member => member.ob.GeoJSON().geometry) // .geometry may be undefined
             .filter(member => member)
             .filter(member => member.type !== 'GeometryCollection' || member.geometries.length)
         }
