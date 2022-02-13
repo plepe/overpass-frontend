@@ -131,7 +131,15 @@ class OverpassAtticObject {
     ob.overpass = this.overpass
 
     if (el.timestamp) {
-      this.originalData[el.timestamp] = JSON.stringify(el)
+      if (el.timestamp in this.originalData) {
+        const d = JSON.parse(this.originalData[el.timestamp])
+        for (const k in el) {
+          d[k] = el[k]
+        }
+        this.originalData[el.timestamp] = JSON.stringify(d)
+      } else {
+        this.originalData[el.timestamp] = JSON.stringify(el)
+      }
       this.versions[el.timestamp] = ob
     }
 
