@@ -10,9 +10,10 @@ module.exports = {
 
         overpassFrontend.get(
           options.ids,
-          { date },
+          { date, properties: 63 },
           function (err, result, index) {
             if (err) { return done(err) }
+
             if (!result) {
               // console.log('At ' + date + ', query for ' + options.ids[index] + ' returned', result)
               return
@@ -57,7 +58,7 @@ module.exports = {
         overpassFrontend.BBoxQuery(
           options.query,
           options.bbox,
-          { date },
+          { date, properties: 63 },
           function (err, result) {
             if (err) { return done(err) }
             found.push(result.id)
