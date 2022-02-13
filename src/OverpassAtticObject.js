@@ -1,4 +1,3 @@
-const OverpassFrontend = require('./defines')
 const OverpassObject = require('./OverpassObject')
 
 const types = {
@@ -68,8 +67,8 @@ class OverpassAtticObject {
     }
 
     const memberObjects = ob.memberObjects(options)
-    const undefinedMembers = memberObjects.filter(m => m === undefined)
-    if (undefinedMembers.length && options.properties && (options.properties & OverpassFrontend.GEOM) !== 0) {
+    const undefinedMembers = memberObjects.filter(m => m.ob === undefined)
+    if (undefinedMembers.length) {
       return undefined
     }
 
