@@ -14,6 +14,7 @@ const OverpassRelation = require('./OverpassRelation')
 const RequestGet = require('./RequestGet')
 const RequestBBox = require('./RequestBBox')
 const RequestMulti = require('./RequestMulti')
+const RequestQuery = require('./RequestQuery')
 const defines = require('./defines')
 const loadOsmFile = require('./loadOsmFile')
 const copyOsm3sMetaFrom = require('./copyOsm3sMeta')
@@ -199,6 +200,25 @@ class OverpassFrontend {
         )
       }
     )
+  }
+
+  /**
+   * @param {string} query - A query in Overpass QL language
+   * @param {object} options Various options, see below
+   * @param {function} finalCallback Will be called after the last feature. Will be passed: 1. err (if an error occured, otherwise null), 2. the result as object.
+   */
+  query (query, options, finalCallback) {
+    const request = new RequestQuery(this, {
+      query,
+      options,
+      finalCallback
+    })
+
+    this.requests.push(request)
+
+    this._next()
+
+    return request
   }
 
   /**
