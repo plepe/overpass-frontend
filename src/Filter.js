@@ -542,4 +542,5 @@ class Filter {
   }
 }
 
+Filter.parse = parse
 module.exports = Filter
