@@ -172,12 +172,12 @@ function parse (def) {
         throw new Error("Can't parse query, expected type of object (e.g. 'node'): " + def)
       }
     } else if (mode === 10) {
-      const m = def.match(/^\s*(\[|;)/)
+      const m = def.match(/^\s*(\[|;|->)/)
       if (m && m[1] === '[') {
         def = def.slice(m[0].length)
         mode = 11
-      } else if (m && m[1] === ';') {
-        def = def.slice(m[0].length - 1)
+      } else if (m && (m[1] === ';' || m[1] === '->')) {
+        def = def.slice(m[0].length - m[1].length)
         return [result, def]
       } else if (!m && def.match(/^\s*$/)) {
         return [result, '']

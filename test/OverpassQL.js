@@ -7,6 +7,7 @@ describe('OverpassQL parser', function () {
     const expected = [
       {
         type: 'query',
+        output: '_',
         query: [
           { type: 'node' },
           { key: 'name', op: '=', value: 'foo' }
@@ -14,6 +15,7 @@ describe('OverpassQL parser', function () {
       },
       {
         type: 'query',
+        output: '_',
         query: [
           { type: 'way' },
           { key: 'foo', op: '=', value: 'bar' }
@@ -21,6 +23,7 @@ describe('OverpassQL parser', function () {
       },
       {
         type: 'out',
+        input: '_',
         parameters: ''
       }
     ]
@@ -33,9 +36,11 @@ describe('OverpassQL parser', function () {
     const expected = [
       {
         type: 'union',
+        output: '_',
         statements: [
           {
             type: 'query',
+            output: '_',
             query: [
               { type: 'node' },
               { key: 'name', op: '=', value: 'foo' }
@@ -43,6 +48,7 @@ describe('OverpassQL parser', function () {
           },
           {
             type: 'query',
+            output: '_',
             query: [
               { type: 'way' },
               { key: 'foo', op: '=', value: 'bar' }
@@ -52,6 +58,37 @@ describe('OverpassQL parser', function () {
       },
       {
         type: 'out',
+        input: '_',
+        parameters: ''
+      }
+    ]
+
+    assert.deepEqual(result, expected)
+  })
+
+  it('script 3', function () {
+    const result = OverpassQL.parse('node[name=foo]->.a;way[foo=bar]->.b;.a out;')
+    console.log(JSON.stringify(result, null, '  '))
+    const expected = [
+      {
+        type: 'query',
+        output: 'a',
+        query: [
+          { type: 'node' },
+          { key: 'name', op: '=', value: 'foo' }
+        ]
+      },
+      {
+        type: 'query',
+        output: 'b',
+        query: [
+          { type: 'way' },
+          { key: 'foo', op: '=', value: 'bar' }
+        ]
+      },
+      {
+        type: 'out',
+        input: 'a',
         parameters: ''
       }
     ]
