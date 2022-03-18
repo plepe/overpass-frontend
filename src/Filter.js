@@ -150,6 +150,11 @@ function parse (def) {
 
           [part, def] = parse(def)
           parts.push(part)
+
+          const m = def.match(/^\s*;/)
+          if (m) {
+            def = def.substr(m[0].length)
+          }
         } while (!def.match(/^\s*\)/))
 
         return [{ or: parts }, def]
@@ -172,7 +177,7 @@ function parse (def) {
         def = def.slice(m[0].length)
         mode = 11
       } else if (m && m[1] === ';') {
-        def = def.slice(m[0].length)
+        def = def.slice(m[0].length - 1)
         return [result, def]
       } else if (!m && def.match(/^\s*$/)) {
         return [result, '']
