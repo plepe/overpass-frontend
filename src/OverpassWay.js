@@ -286,6 +286,33 @@ class OverpassWay extends OverpassObject {
 
     return 1
   }
+
+  qlOutJSON (options) {
+    const result = super.qlOutJSON(options)
+
+    if (this.data.nodes && (options.body || options.meta || options.skel || !options.ids)) {
+      result.nodes = this.data.nodes
+    }
+
+    if (this.bounds && options.bb) {
+      result.bounds = this.bounds
+    }
+
+    if (this.center && options.center) {
+      result.center = this.center
+    }
+
+    if (this.bounds && options.geom) {
+      result.geometry = this.members.map(
+        member => {
+          const node = this.overpass.cacheElements[member.id]
+          return node ? node.geometry : null
+        }
+      )
+    }
+
+    return result
+  }
 }
 
 module.exports = OverpassWay

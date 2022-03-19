@@ -140,6 +140,17 @@ class OverpassNode extends OverpassObject {
 
     return bbox.intersects(this.bounds) ? 2 : 0
   }
+
+  qlOutJSON (options) {
+    const result = super.qlOutJSON(options)
+
+    if (this.geometry && (options.body || options.meta || options.skel || options.geom || options.bb || options.center || !options.ids)) {
+      result.lat = this.geometry.lat
+      result.lon = this.geometry.lon
+    }
+
+    return result
+  }
 }
 
 module.exports = OverpassNode

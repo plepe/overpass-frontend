@@ -473,6 +473,52 @@ class OverpassRelation extends OverpassObject {
 
     return 1
   }
+
+  qlOutJSON (options) {
+    const result = super.qlOutJSON(options)
+
+    if (this.members && (options.body || options.meta || options.skel || options.geom || !options.ids)) {
+      result.members = this.members.map(member => {
+        const result = {
+          ref: member.ref,
+          type: member.type,
+          role: member.role
+        }
+
+        if (options.geom) {
+          const m = this.overpass.cacheElements[member.id]
+
+          if (member.type === 'node') {
+            if (m.geometry) {
+              result.lat = m.geometry.lat
+              result.lon = m.geometry.lon
+            }
+          } else if (member.type === 'way') {
+            if (m.members) {
+              result.geometry = m.members && m.members.map(
+                member => {
+                  const node = this.overpass.cacheElements[member.id]
+                  return node ? node.geometry : null
+                }
+              )
+            }
+          }
+        }
+
+        return result
+      })
+    }
+
+    if (this.bounds && options.bb) {
+      result.bounds = this.bounds
+    }
+
+    if (this.center && options.center) {
+      result.center = this.center
+    }
+
+    return result
+  }
 }
 
 module.exports = OverpassRelation

@@ -379,6 +379,30 @@ class OverpassObject {
 
     return this.dbData
   }
+
+  qlOutJSON (options) {
+    const result = {
+      type: this.type
+    }
+
+    if (!options.noids) {
+      result.id = this.osm_id
+    }
+
+    if (this.tags && Object.keys(this.tags).length && (options.tags || options.body || options.meta || !(options.ids || options.skel))) {
+      result.tags = this.tags
+    }
+
+    if (options.meta) {
+      result.timestamp = this.meta.timestamp
+      result.version = this.meta.version
+      result.changeset = this.meta.changeset
+      result.user = this.meta.user
+      result.uid = this.meta.uid
+    }
+
+    return result
+  }
 }
 
 ee(OverpassObject.prototype)
