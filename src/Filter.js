@@ -140,9 +140,10 @@ function parse (def) {
   let notExists = null
   while (def.length) {
     if (mode === 0) {
-      m = def.match(/^\s*(node|way|relation|rel|nwr|\()/)
-      if (m && m[1] === '(') {
-        def = def.slice(m[0].length)
+      m = def.match(/^\s*(node|way|relation|rel|nwr)(\.([A-Za-z_]\w*))?/)
+      const m1 = def.match(/^\s*(\()/)
+      if (m1 && m1[1] === '(') {
+        def = def.slice(m1[0].length)
         const parts = []
 
         do {
@@ -166,6 +167,10 @@ function parse (def) {
         } else {
           result.push({ type: m[1] })
         }
+        if (m[2]) {
+          result[result.length - 1].input = m[3]
+        }
+
         mode = 10
         def = def.slice(m[0].length)
       } else {
