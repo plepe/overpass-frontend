@@ -56,7 +56,7 @@ function parse (text) {
         text = text.substr(m1[0].length)
         mode = 0
       } else {
-        console.error("Error parsing mode=" + mode + ":", text)
+        console.error('Error parsing mode=' + mode + ':', text)
       }
     }
   }
@@ -72,6 +72,59 @@ class OverpassQL {
     if (typeof script === 'string') {
       this.script = parse(script)[0]
     }
+  }
+
+  execCache () {
+    const environment = {
+      sets: {},
+      result: []
+    }
+
+    this.script.forEach(statement => {
+      switch (statement.type) {
+        case 'query':
+          this.statementQuery(statement, environment)
+          break
+        case 'union':
+          this.statementUnion(statement, environment)
+          break
+        case 'out':
+          this.statementOut(statement, environment)
+          break
+        default:
+          console.error('no such statement', statement)
+      }
+    })
+
+    return { elements: environment.result }
+  }
+
+  statementQuery (statement, environment) {
+    const filter = new Filter(statement.query)
+
+    const lokiQuery = filter.toLokijs()
+    const lokiQueryNeedMatch = !!lokiQuery.needMatch
+
+    let items = this.overpass.db.find(lokiQuery)
+    if (lokiQueryNeedMatch) {
+      items = items.filter(item => filter.match(item))
+    }
+
+    environment.sets[statement.output] = items
+    console.log(items.map(i => i.id))
+  }
+
+  statementUnion (statement, environment) {
+  }
+
+  statementOut (statement, environment) {
+    const items = environment.sets[statement.input]
+
+    items.forEach(lokiItem => {
+      const item = this.overpass.cacheElements[lokiItem.id]
+
+      environment.result.push(item.overpassQlOut(statement.parameters))
+    })
   }
 }
 

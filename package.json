@@ -58,6 +58,7 @@
   },
   "scripts": {
     "test": "mocha --bail",
+    "test1": "mocha --bail test/OverpassQLOut.js",
     "build": "browserify index.js -o dist/overpass-frontend.js",
     "build-test": "browserify -t brfs --debug test/knownArea.js test/loadOsmFile.js test/test.js test/frontendFile.js test/filter.js test/lon180.js test/leaflet.js test/bodyGeomJSON.js test/bodyGeomXML.js test/429.js -o dist/test.js",
     "watch": "watchify -t browserify-shim --debug index.js -o dist/overpass-frontend.js -v",
@@ -66,7 +67,8 @@
     "preversion": "npm run lint && npm run test",
     "version": "rm -r doc/ && npm run doc && npm run build && npm run build-test && git add -A doc/ dist/",
     "prepare": "require-self",
-    "lint": "eslint --fix src/*.js index.js",
+    "lint": "eslint --fix src/*.js test/src/*.js index.js",
+    "lint1": "eslint --fix test/OverpassQL*.js",
     "doc": "jsdoc -d doc/ src/*.js"
   },
   "repository": {

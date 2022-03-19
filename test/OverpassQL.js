@@ -23,23 +23,28 @@ describe('OverpassQL parser', function () {
   })
 
   it('script 1', function () {
-    const query = new OverpassQL('node[name=foo];way[foo=bar];out;')
-    const result = query.script
+    const query = new OverpassQL('node[historic];out;way[amenity=restaurant];out;', overpassFrontend)
+    let result = query.script
     const expected = [
       {
         type: 'query',
         output: '_',
         query: [
           { type: 'node' },
-          { key: 'name', op: '=', value: 'foo' }
+          { key: 'historic', op: 'has_key' }
         ]
+      },
+      {
+        type: 'out',
+        input: '_',
+        parameters: {}
       },
       {
         type: 'query',
         output: '_',
         query: [
           { type: 'way' },
-          { key: 'foo', op: '=', value: 'bar' }
+          { key: 'amenity', op: '=', value: 'restaurant' }
         ]
       },
       {
@@ -50,6 +55,11 @@ describe('OverpassQL parser', function () {
     ]
 
     assert.deepEqual(result, expected)
+
+    result = query.execCache()
+    // expected =
+
+    console.log(JSON.stringify(expected, null, '  '))
   })
 
   it('script 2', function () {
