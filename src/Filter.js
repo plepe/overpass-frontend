@@ -140,7 +140,7 @@ function parse (def) {
   let notExists = null
   while (def.length) {
     if (mode === 0) {
-      m = def.match(/^\s*(node|way|relation|rel|nwr)(\.([A-Za-z_]\w*))?/)
+      m = def.match(/^\s*(node|way|relation|rel|nwr)/)
       const m1 = def.match(/^\s*(\()/)
       if (m1 && m1[1] === '(') {
         def = def.slice(m1[0].length)
@@ -160,6 +160,7 @@ function parse (def) {
 
         return [{ or: parts }, def]
       } else if (m) {
+        const index = result.length
         if (m[1] === 'rel') {
           result.push({ type: 'relation' })
         } else if (m[1] === 'nwr') {
@@ -167,12 +168,21 @@ function parse (def) {
         } else {
           result.push({ type: m[1] })
         }
-        if (m[2]) {
-          result[result.length - 1].input = m[3]
-        }
 
         mode = 10
         def = def.slice(m[0].length)
+
+        let m1 = def.match(/^\.([A-Za-z_]\w*)/)
+        while (m1) {
+          if (!result[index].input) {
+            result[index].input = []
+          }
+
+          result[index].input.push(m1[1])
+
+          def = def.slice(m1[0].length)
+          m1 = def.match(/^\.([A-Za-z_]\w*)/)
+        }
       } else {
         throw new Error("Can't parse query, expected type of object (e.g. 'node'): " + def)
       }

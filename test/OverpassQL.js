@@ -67,14 +67,14 @@ describe('OverpassQL parser', function () {
   })
 
   it('script 3', function () {
-    const result = OverpassQL.parse('node[name=foo]->.a;way.a[foo=bar]->.b;.a out;')
+    const result = OverpassQL.parse('node.a[name=foo]->.a;way.a.bcd[foo=bar]->.b;.a out;')
     console.log(JSON.stringify(result, null, '  '))
     const expected = [
       {
         type: 'query',
         output: 'a',
         query: [
-          { type: 'node' },
+          { type: 'node', input: ['a'] },
           { key: 'name', op: '=', value: 'foo' }
         ]
       },
@@ -82,7 +82,7 @@ describe('OverpassQL parser', function () {
         type: 'query',
         output: 'b',
         query: [
-          { type: 'way', input: 'a' },
+          { type: 'way', input: ['a', 'bcd'] },
           { key: 'foo', op: '=', value: 'bar' }
         ]
       },
