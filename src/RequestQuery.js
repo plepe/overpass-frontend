@@ -1,4 +1,5 @@
 const Request = require('./Request')
+const OverpassQL = require('./OverpassQL')
 const defines = require('./defines')
 
 class RequestQuery extends Request {
@@ -9,6 +10,8 @@ class RequestQuery extends Request {
   constructor (overpass, data) {
     super(overpass, data)
     this.type = 'query'
+
+    this.script = OverpassQL.parse(this.query)
   }
 }
 

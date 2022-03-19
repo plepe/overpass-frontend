@@ -5,7 +5,7 @@ function parse (text) {
   const result = []
 
   while (text.length) {
-    console.log(mode, text)
+    // console.log(mode, text)
     if (mode === 0) {
       const m1 = text.match(/^\s*\(/)
       const m2 = text.match(/^\s*\)/)
@@ -48,8 +48,19 @@ function parse (text) {
   return [result, text]
 }
 
-module.exports = {
-  parse (text) {
-    return parse(text)[0]
+class OverpassQL {
+  constructor (script, overpass) {
+    this.script = script
+    this.overpass = overpass
+
+    if (typeof script === 'string') {
+      this.script = parse(script)[0]
+    }
   }
 }
+
+OverpassQL.parse = function (text) {
+  return parse(text)[0]
+}
+
+module.exports = OverpassQL

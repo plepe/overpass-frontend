@@ -3,7 +3,8 @@ const assert = require('assert')
 const OverpassQL = require('../src/OverpassQL')
 describe('OverpassQL parser', function () {
   it('script 1', function () {
-    const result = OverpassQL.parse('node[name=foo];way[foo=bar];out;')
+    const query = new OverpassQL('node[name=foo];way[foo=bar];out;')
+    const result = query.script
     const expected = [
       {
         type: 'query',
@@ -32,7 +33,8 @@ describe('OverpassQL parser', function () {
   })
 
   it('script 2', function () {
-    const result = OverpassQL.parse('(node[name=foo];way[foo=bar];);out;')
+    const query = new OverpassQL('(node[name=foo];way[foo=bar];);out;')
+    const result = query.script
     const expected = [
       {
         type: 'union',
@@ -67,8 +69,8 @@ describe('OverpassQL parser', function () {
   })
 
   it('script 3', function () {
-    const result = OverpassQL.parse('node.a[name=foo]->.a;way.a.bcd[foo=bar]->.b;.a out;')
-    console.log(JSON.stringify(result, null, '  '))
+    const query = new OverpassQL('node.a[name=foo]->.a;way.a.bcd[foo=bar]->.b;.a out;')
+    const result = query.script
     const expected = [
       {
         type: 'query',
