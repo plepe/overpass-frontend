@@ -9,7 +9,7 @@ function parse (text) {
     if (mode === 0) {
       const m1 = text.match(/^\s*\(/)
       const m2 = text.match(/^\s*\)/)
-      const m3 = text.match(/^\s*(\.([A-Za-z_])\w*\s+)?(out)(.*);/)
+      const m3 = text.match(/^\s*(\.([A-Za-z_])\w*\s+)?(out)([\w\s]*);/)
 
       if (m1) {
       // union statement
@@ -24,8 +24,24 @@ function parse (text) {
         return [result, text]
       } else if (m3) {
       // out statement
+        const statement = {
+          type: m3[3],
+          input: m3[2] || '_',
+          parameters: {}
+        }
+
+        m3[4].split(/\s+/g).forEach(p => {
+          if (p === '') {
+            // nop
+          } else if (p.match(/^\d+$/)) {
+            statement.count = parseInt(p)
+          } else {
+            statement.parameters[p] = true
+          }
+        })
+
         text = text.substr(m3[0].length)
-        result.push({ type: m3[3], input: m3[2] || '_', parameters: m3[4] })
+        result.push(statement)
       } else {
       // query
         const f = Filter.parse(text)

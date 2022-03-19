@@ -25,7 +25,7 @@ describe('OverpassQL parser', function () {
       {
         type: 'out',
         input: '_',
-        parameters: ''
+        parameters: {}
       }
     ]
 
@@ -33,7 +33,7 @@ describe('OverpassQL parser', function () {
   })
 
   it('script 2', function () {
-    const query = new OverpassQL('(node[name=foo];way[foo=bar];);out;')
+    const query = new OverpassQL('(node[name=foo];way[foo=bar];);out ids;out 5 meta;')
     const result = query.script
     const expected = [
       {
@@ -61,7 +61,13 @@ describe('OverpassQL parser', function () {
       {
         type: 'out',
         input: '_',
-        parameters: ''
+        parameters: { ids: true }
+      },
+      {
+        type: 'out',
+        input: '_',
+        count: 5,
+        parameters: { meta: true }
       }
     ]
 
@@ -91,7 +97,7 @@ describe('OverpassQL parser', function () {
       {
         type: 'out',
         input: 'a',
-        parameters: ''
+        parameters: {}
       }
     ]
 
