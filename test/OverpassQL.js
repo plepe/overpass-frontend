@@ -1,13 +1,21 @@
-const fs = require('fs')
-const conf = JSON.parse(fs.readFileSync('test/conf.json', 'utf8'))
 const assert = require('assert')
 
+const loadTestData = require('./src/loadTestData')
+
+const OverpassQL = require('../src/OverpassQL')
 const OverpassFrontend = require('../src/OverpassFrontend')
 
 let overpassFrontend
 
-const OverpassQL = require('../src/OverpassQL')
 describe('OverpassQL parser', function () {
+  it('load local file', function (done) {
+    this.timeout(20000)
+    loadTestData((err, result) => {
+      overpassFrontend = result
+      done(err)
+    })
+  })
+
   it('load local file', function (done) {
     this.timeout(20000)
     overpassFrontend = new OverpassFrontend('test/data.osm.bz2')
