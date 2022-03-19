@@ -1,7 +1,19 @@
+const fs = require('fs')
+const conf = JSON.parse(fs.readFileSync('test/conf.json', 'utf8'))
 const assert = require('assert')
+
+const OverpassFrontend = require('../src/OverpassFrontend')
+
+let overpassFrontend
 
 const OverpassQL = require('../src/OverpassQL')
 describe('OverpassQL parser', function () {
+  it('load local file', function (done) {
+    this.timeout(20000)
+    overpassFrontend = new OverpassFrontend('test/data.osm.bz2')
+    overpassFrontend.once('load', () => done())
+  })
+
   it('script 1', function () {
     const query = new OverpassQL('node[name=foo];way[foo=bar];out;')
     const result = query.script
