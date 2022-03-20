@@ -25,7 +25,7 @@ describe('OverpassQL parser', function () {
   it('script 1', function () {
     const query = new OverpassQL('node[historic];out;way[amenity=restaurant];out;', overpassFrontend)
     let result = query.script
-    const expected = [
+    let expected = [
       {
         type: 'query',
         output: '_',
@@ -57,9 +57,14 @@ describe('OverpassQL parser', function () {
     assert.deepEqual(result, expected)
 
     result = query.execCache()
-    // expected =
+    expected = {"elements":[
+      {"type":"node","id":1853730679,"tags":{"historic":"memorial","name":"Hesser-Denkmal"},"lat":48.1985683,"lon":16.3385779},
+      {"type":"node","id":3534176419,"tags":{"description:en":"(1807-1877) Austrian Benedictine and chaplain, committed to the socially disadvantaged, especially children and young people. Founded a well-known \"Kleinkinderbewahranstalt\", center for necglected children.","historic":"memorial","memorial":"statue","name":"Pater Urban Loritz","source:description:en":"Wikipedia:de","wikipedia":"de:Urban Loritz"},"lat":48.2013774,"lon":16.3386545},
+      {"type":"way","id":369989037,"tags":{"amenity":"restaurant","indoor":"yes","layer":"1","level":"1","name":"Wiener Wald"},"nodes":[3966187466,3965914141,3966187471,3966187468,3966187466]},
+      {"type":"way","id":370577069,"tags":{"amenity":"restaurant","indoor":"yes","layer":"-1","level":"-1","name":"Merkur Restaurant","wheelchair":"yes"},"nodes":[3966420036,3966420031,3966420030,3966420027,3966420028,3742742818,3966420039,3966420036]}
+    ]}
 
-    console.log(JSON.stringify(expected, null, '  '))
+    assert.deepEqual(result, expected)
   })
 
   it('script 2', function () {

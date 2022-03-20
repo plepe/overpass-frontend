@@ -123,7 +123,7 @@ class OverpassQL {
     items.forEach(lokiItem => {
       const item = this.overpass.cacheElements[lokiItem.id]
 
-      environment.result.push(item.overpassQlOut(statement.parameters))
+      environment.result.push(item.qlOutJSON(statement.parameters))
     })
   }
 }
