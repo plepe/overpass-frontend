@@ -659,6 +659,7 @@ class OverpassFrontend {
     }
 
     this.requests = []
+    this.requestIsActive = false
   }
 
   removeFromCache (ids) {
