@@ -478,11 +478,19 @@ describe('Filter', function () {
 
     it ('node[~wikipedia~"."]', function () {
       var f = new Filter('node[~wikipedia]')
+      assert.deepEqual(f.def, [
+        { type: 'node' },
+        { key: 'wikipedia', op: 'has_key', keyRegexp: true }
+      ])
       assert.equal(f.toString(), 'node[~"wikipedia"~"."];')
     })
 
     it ('node[~"wikipedia"~"."]', function () {
       var f = new Filter('node[~"wikipedia"~"."]')
+      assert.deepEqual(f.def, [
+        { type: 'node' },
+        { key: 'wikipedia', op: 'has_key', keyRegexp: true }
+      ])
       assert.equal(f.toString(), 'node[~"wikipedia"~"."];')
     })
 
@@ -583,7 +591,7 @@ describe('Filter', function () {
   it('key regexp', function () {
     var f = new Filter('node[~"na"~"."]')
 
-    assert.deepEqual(f.def, [{"type":"node"},{"key":"na","keyRegexp":true,"op":"~","value":"."}])
+    assert.deepEqual(f.def, [{"type":"node"},{"key":"na","keyRegexp":true,"op":"has_key"}])
     assert.equal(f.toString(), 'node[~"na"~"."];')
     assert.equal(f.toQl(), 'node[~"na"~"."];')
     assert.deepEqual(f.toLokijs(), { type: { '$eq': 'node' }, needMatch: true })

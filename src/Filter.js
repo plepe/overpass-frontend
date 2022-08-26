@@ -251,7 +251,13 @@ function parse (def) {
           }
         }
 
-        const entry = { key, op, value }
+        const entry = { key, op }
+        if (value === '.') {
+          entry.op = 'has_key'
+        } else {
+          entry.value = value
+        }
+
         if (keyRegexp) {
           entry.keyRegexp = true
         }
