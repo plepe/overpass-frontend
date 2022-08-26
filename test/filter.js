@@ -197,6 +197,8 @@ describe('Filter', function () {
       assert.equal(r, true, 'Object should match')
       var r = f.match({ tags: { 'wikipedia:de': 'test' } })
       assert.equal(r, true, 'Object should match')
+      var r = f.match({ tags: { 'Wikipedia:de': 'test' } })
+      assert.equal(r, false, 'Object should not match')
     })
 
     it ('nwr[~wikipedia~"foo"]', function () {
@@ -216,6 +218,52 @@ describe('Filter', function () {
       assert.equal(r, true, 'Object should match')
       var r = f.match({ tags: { 'wikipedia:de': 'foobar' } })
       assert.equal(r, true, 'Object should match')
+      var r = f.match({ tags: { 'Wikipedia:de': 'foobar' } })
+      assert.equal(r, false, 'Object should not match')
+      var r = f.match({ tags: { 'wikipedia:de': 'Foobar' } })
+      assert.equal(r, false, 'Object should not match')
+      var r = f.match({ tags: { 'Wikipedia:de': 'Foobar' } })
+      assert.equal(r, false, 'Object should not match')
+    })
+
+    it ('nwr[~wikipedia~".",i]', function () {
+      var f = new Filter([ { keyRegexp: 'i', op: 'has_key', key: 'wikipedia' } ])
+
+      var r = f.match({ tags: { amenity: 'restaurant' } })
+      assert.equal(r, false, 'Object should not match')
+      var r = f.match({ tags: { wikipedia: 'test' } })
+      assert.equal(r, true, 'Object should match')
+      var r = f.match({ tags: { 'de:wikipedia': 'test' } })
+      assert.equal(r, true, 'Object should match')
+      var r = f.match({ tags: { 'wikipedia:de': 'test' } })
+      assert.equal(r, true, 'Object should match')
+      var r = f.match({ tags: { 'Wikipedia:de': 'test' } })
+      assert.equal(r, true, 'Object should match')
+    })
+
+    it ('nwr[~wikipedia~"foo",i]', function () {
+      var f = new Filter([ { keyRegexp: 'i', op: '~i', key: 'wikipedia', value: 'foo' } ])
+
+      var r = f.match({ tags: { amenity: 'restaurant' } })
+      assert.equal(r, false, 'Object should not match')
+      var r = f.match({ tags: { wikipedia: 'test' } })
+      assert.equal(r, false, 'Object should not match')
+      var r = f.match({ tags: { 'de:wikipedia': 'test' } })
+      assert.equal(r, false, 'Object should not match')
+      var r = f.match({ tags: { 'wikipedia:de': 'test' } })
+      assert.equal(r, false, 'Object should not match')
+      var r = f.match({ tags: { wikipedia: 'foobar' } })
+      assert.equal(r, true, 'Object should match')
+      var r = f.match({ tags: { 'de:wikipedia': 'foobar' } })
+      assert.equal(r, true, 'Object should match')
+      var r = f.match({ tags: { 'wikipedia:de': 'foobar' } })
+      assert.equal(r, true, 'Object should match')
+      var r = f.match({ tags: { 'Wikipedia:de': 'foobar' } })
+      assert.equal(r, true, 'Object1 should match')
+      var r = f.match({ tags: { 'wikipedia:de': 'Foobar' } })
+      assert.equal(r, true, 'Object2 should match')
+      var r = f.match({ tags: { 'Wikipedia:de': 'Foobar' } })
+      assert.equal(r, true, 'Object3 should match')
     })
 
   })
@@ -315,6 +363,20 @@ describe('Filter', function () {
       var r = f.toQl()
       assert.equal(r, 'nwr[~"wikipedia"~"foo"];')
     })
+
+    it ('nwr[~wikipedia~".",i]', function () {
+      var f = new Filter([ { keyRegexp: 'i', op: 'has_key', key: 'wikipedia' } ])
+
+      var r = f.toQl()
+      assert.equal(r, 'nwr[~"wikipedia"~".",i];')
+    })
+
+    it ('nwr[~wikipedia~"foo",i]', function () {
+      var f = new Filter([ { keyRegexp: 'i', op: '~i', key: 'wikipedia', value: 'foo' } ])
+
+      var r = f.toQl()
+      assert.equal(r, 'nwr[~"wikipedia"~"foo",i];')
+    })
   })
 
   describe('toLokijs', function () {
@@ -382,6 +444,13 @@ describe('Filter', function () {
       assert.deepEqual(r, { needMatch: true })
     })
 
+    it ('nwr[~wikipedia~".",i]', function () {
+      var f = new Filter([ { keyRegexp: 'i', op: 'has_key', key: 'wikipedia' } ])
+
+      var r = f.toLokijs()
+      assert.deepEqual(r, { needMatch: true })
+    })
+
     it ('(nwr[~wikipedia~"."];)', function () {
       var f = new Filter('(nwr[~wikipedia~"."];)')
 
@@ -405,6 +474,13 @@ describe('Filter', function () {
 
     it ('nwr[~wikipedia~"foo"]', function () {
       var f = new Filter([ { keyRegexp: true, op: '~', key: 'wikipedia', value: 'foo' } ])
+
+      var r = f.toLokijs()
+      assert.deepEqual(r, { needMatch: true })
+    })
+
+    it ('nwr[~wikipedia~"foo",i]', function () {
+      var f = new Filter([ { keyRegexp: 'i', op: '~i', key: 'wikipedia', value: 'foo' } ])
 
       var r = f.toLokijs()
       assert.deepEqual(r, { needMatch: true })
@@ -497,6 +573,26 @@ describe('Filter', function () {
     it ('node[~"wikipedia"~"foo"]', function () {
       var f = new Filter('node[~"wikipedia"~"foo"]')
       assert.equal(f.toString(), 'node[~"wikipedia"~"foo"];')
+    })
+
+    it ('node[~"wikipedia"~".",i]', function () {
+      var f = new Filter('node[~"wikipedia"~".",i]')
+
+      assert.deepEqual(f.def, [
+        { type: 'node' },
+        { key: 'wikipedia', op: 'has_key', keyRegexp: 'i' }
+      ])
+      assert.equal(f.toString(), 'node[~"wikipedia"~".",i];')
+    })
+
+    it ('node[~"wikipedia"~"foo",i]', function () {
+      var f = new Filter('node[~"wikipedia"~"foo",i]')
+
+      assert.deepEqual(f.def, [
+        { type: 'node' },
+        { key: 'wikipedia', op: '~i', value: 'foo', keyRegexp: 'i' }
+      ])
+      assert.equal(f.toString(), 'node[~"wikipedia"~"foo",i];')
     })
   })
 

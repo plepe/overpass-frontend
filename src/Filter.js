@@ -18,7 +18,9 @@ function compile (part) {
 
   switch (part.op) {
     case 'has_key':
-      if (keyRegexp) {
+      if (part.keyRegexp === 'i') {
+        return '[~' + qlesc(part.key) + '~".",i]'
+      } else if (keyRegexp) {
         return '[~' + qlesc(part.key) + '~"."]'
       } else {
         return '[' + keyRegexp + qlesc(part.key) + ']'
@@ -65,8 +67,10 @@ function test (ob, part) {
       regex = new RegExp(part.value, part.op.match(/i$/) ? 'i' : '')
     }
 
+    const keyRegex = new RegExp(part.key, part.keyRegexp === 'i' ? 'i' : '')
+
     for (const k in ob.tags) {
-      if (k.match(part.key)) {
+      if (k.match(keyRegex)) {
         if (regex) {
           if (ob.tags[k].match(regex)) {
             return true
@@ -259,7 +263,7 @@ function parse (def) {
         }
 
         if (keyRegexp) {
-          entry.keyRegexp = true
+          entry.keyRegexp = op.match(/^!?~i$/) ? 'i' : true
         }
         result.push(entry)
         mode = 10
