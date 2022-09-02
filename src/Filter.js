@@ -1,5 +1,6 @@
 const strsearch2regexp = require('strsearch2regexp')
 const filterJoin = require('./filterJoin')
+const qlFunctions = require('./qlFunctions/index')
 
 function qlesc (str) {
   return '"' + str.replace(/"/g, '\\"') + '"'
@@ -15,6 +16,10 @@ function compile (part) {
   }
 
   const keyRegexp = (part.keyRegexp ? '~' : '')
+
+  if (part.fun) {
+    return qlFunctions[part.fun].compileQL(part.value)
+  }
 
   switch (part.op) {
     case 'has_key':
@@ -81,6 +86,10 @@ function test (ob, part) {
       }
     }
     return false
+  }
+
+  if (part.fun) {
+    return qlFunctions[part.fun].test(part.value, ob)
   }
 
   switch (part.op) {
@@ -171,10 +180,13 @@ function parse (def) {
         throw new Error("Can't parse query, expected type of object (e.g. 'node'): " + def)
       }
     } else if (mode === 10) {
-      const m = def.match(/^\s*(\[|;)/)
+      const m = def.match(/^\s*(\[|\(|;)/)
       if (m && m[1] === '[') {
         def = def.slice(m[0].length)
         mode = 11
+      } else if (m && m[1] === '(') {
+        def = def.slice(m[0].length)
+        mode = 20
       } else if (m && m[1] === ';') {
         def = def.slice(m[0].length)
         return [result, def]
@@ -270,6 +282,22 @@ function parse (def) {
         def = def.slice(m[0].length)
       } else {
         throw new Error("Can't parse query, expected ']': " + def)
+      }
+    } else if (mode === 20) {
+      const m = def.match(/^\s*((\d+)\s*\))/)
+      const m1 = def.match(/^\s*((\w+)\s*:(.*)\))/)
+      if (m) {
+        def = def.slice(m[0].length)
+        result.push({ fun: 'id', value: [parseInt(m[2])] })
+        mode = 10
+      } else if (m1) {
+        def = def.slice(m1[0].length)
+        const fun = m1[2]
+        const str = m1[3]
+        result.push({ fun, value: qlFunctions[fun].parse(str) })
+        mode = 10
+      } else {
+        throw new Error("Can't parse query, expected id or function: " + def)
       }
     }
   }
@@ -487,6 +515,12 @@ class Filter {
         k = 'needMatch'
         v = true
         // can't query for key regexp, skip
+      } else if (filter.fun) {
+        const d = qlFunctions[filter.fun].compileLokiJS(filter.value)
+        ;[k, v] = d
+        if (d[2]) {
+          query.needMatch = true
+        }
       } else if (filter.op === '=') {
         k = 'tags.' + filter.key
         v = { $eq: filter.value }

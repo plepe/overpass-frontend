@@ -4,13 +4,13 @@ const loki = require('lokijs')
 const Filter = require('../src/Filter')
 
 const objects = [
-  { id: 1, type: 'node', tags: { amenity: 'restaurant' } },
-  { id: 2, type: 'node', tags: { name: 'foobar', amenity: 'cafe', cuisine: 'ice_cream' } },
-  { id: 3, type: 'node', tags: { name: 'test', amenity: 'cafe', cuisine: 'ice_cream;dessert' } },
-  { id: 4, type: 'node', tags: { name: 'TESTER', amenity: 'cafe', cuisine: 'bagel;ice_cream' } },
-  { id: 5, type: 'node', tags: { name: 'tester', amenity: 'cafe', cuisine: 'bagel;ice_cream;dessert' } },
-  { id: 6, type: 'node', tags: { name: 'Tester', amenity: 'cafe', cuisine: 'bagel;dessert' } },
-  { id: 7, type: 'node', tags: { name: 'Tëster', amenity: 'cafe' } }
+  { id: 1, osm_id: 1, type: 'node', tags: { amenity: 'restaurant' } },
+  { id: 2, osm_id: 2, type: 'node', tags: { name: 'foobar', amenity: 'cafe', cuisine: 'ice_cream' } },
+  { id: 3, osm_id: 3, type: 'node', tags: { name: 'test', amenity: 'cafe', cuisine: 'ice_cream;dessert' } },
+  { id: 4, osm_id: 4, type: 'node', tags: { name: 'TESTER', amenity: 'cafe', cuisine: 'bagel;ice_cream' } },
+  { id: 5, osm_id: 5, type: 'node', tags: { name: 'tester', amenity: 'cafe', cuisine: 'bagel;ice_cream;dessert' } },
+  { id: 6, osm_id: 6, type: 'node', tags: { name: 'Tester', amenity: 'cafe', cuisine: 'bagel;dessert' } },
+  { id: 7, osm_id: 7, type: 'node', tags: { name: 'Tëster', amenity: 'cafe' } }
 ]
 
 let db = new loki()
@@ -776,5 +776,39 @@ describe('Filter', function () {
 
     check(f, [ 2, 3, 4, 5, 6, 7 ])
   })
+})
 
+describe('Filter by id', function () {
+  it('numeric', function () {
+    var f = new Filter('node(3)')
+
+    assert.deepEqual(f.def, [{"type":"node"},{"fun":"id", "value":[3]}])
+    assert.equal(f.toString(), 'node(id:3);')
+    assert.equal(f.toQl(), 'node(id:3);')
+    assert.deepEqual(f.toLokijs(), { type: { '$eq': 'node' }, "osm_id": { "$eq": 3 } })
+
+    check(f, [ 3 ])
+  })
+
+  it('id:', function () {
+    var f = new Filter('node(id:3)')
+
+    assert.deepEqual(f.def, [{"type":"node"},{"fun":"id", "value":[3]}])
+    assert.equal(f.toString(), 'node(id:3);')
+    assert.equal(f.toQl(), 'node(id:3);')
+    assert.deepEqual(f.toLokijs(), { type: { '$eq': 'node' }, "osm_id": { "$eq": 3 } })
+
+    check(f, [ 3 ])
+  })
+
+  it('id: (multiple)', function () {
+    var f = new Filter('node(id:3,4,5)')
+
+    assert.deepEqual(f.def, [{"type":"node"},{"fun":"id", "value":[3,4,5]}])
+    assert.equal(f.toString(), 'node(id:3,4,5);')
+    assert.equal(f.toQl(), 'node(id:3,4,5);')
+    assert.deepEqual(f.toLokijs(), { type: { '$eq': 'node' }, "osm_id": { "$in": [ 3, 4, 5 ] } })
+
+    check(f, [ 3, 4, 5 ])
+  })
 })

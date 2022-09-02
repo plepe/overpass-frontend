@@ -363,6 +363,7 @@ class OverpassObject {
     this.dbData.tags = this.tags
     this.dbData.osmMeta = this.meta
     this.dbData.id = this.id
+    this.dbData.osm_id = this.osm_id
     this.dbData.type = this.type
 
     if (this.bounds && this.bounds.minlat) {
