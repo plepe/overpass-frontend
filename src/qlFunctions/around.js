@@ -21,7 +21,7 @@ module.exports = {
   },
 
   compileQL (value) {
-    return '(around:' + value.join(',') + ')'
+    return '(around:' + value.distance + ',' + value.geometry.geometry.coordinates[1] + ',' + value.geometry.geometry.coordinates[0] + ')'
   },
 
   compileLokiJS (value) {

@@ -12,6 +12,10 @@ const objects = [
   { id: 6, osm_id: 6, type: 'node', tags: { name: 'Tester', amenity: 'cafe', cuisine: 'bagel;dessert' } },
   { id: 7, osm_id: 7, type: 'node', tags: { name: 'Tëster', amenity: 'cafe' } }
 ]
+objects.forEach(ob => {
+  ob.GeoJSON = () => {return {type: 'Feature', properties: ob.tags, geometry: {type: 'Point', coordinates: [ 0, 0 ]}}}
+  ob.intersects = () => {}
+})
 
 let db = new loki()
 let lokidb = db.addCollection('db')
@@ -822,21 +826,21 @@ describe('Function "around"', function () {
       value: {
         distance: 100,
         geometry: {
+          type: 'Feature',
           geometry: {
+            type: 'Point',
             coordinates: [
               15.4644484,
               47.0791163
-            ],
-            type: 'Point'
-          },
-          type: 'Feature'
+            ]
+          }
         }
       }
-    })
+    }])
     assert.equal(f.toString(), 'node(around:100,47.0791163,15.4644484);')
     assert.equal(f.toQl(), 'node(around:100,47.0791163,15.4644484);')
-    assert.deepEqual(f.toLokijs(), { type: { '$eq': 'node' } })
+    assert.deepEqual(f.toLokijs(), { type: { '$eq': 'node' }, needMatch: true })
 
-    check(f, [ 3 ])
+    check(f, [])
   })
 })
