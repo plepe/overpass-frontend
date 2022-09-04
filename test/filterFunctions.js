@@ -145,6 +145,17 @@ var overpassFrontend
           expectedSubRequestCount: 1 // TODO: 0
         }, done)
       })
+
+      it('Mixed node/way', function (done) {
+        test({
+          mode,
+          query: '(node(48.19045,16.33705,48.19065,16.33735);way(48.19045,16.33705,48.19065,16.33735);)',
+          expected: [ 'n395262','w31275229' ],
+          expectedViaFile: [ 'n395262', 'w31275229', 'w383507544' ],
+          // Overpass Server won't include ways, where no nodes are inside the bounding box. Overpass-Frontend will include theses ways.
+          expectedSubRequestCount: 1 // TODO: 0
+        }, done)
+      })
     })
   })
 })
@@ -162,7 +173,8 @@ function test (options, callback) {
       found.push(ob.id)
     },
     (err) => {
-      assert.deepEqual(found.sort(), options.expected.sort(), 'List of found objects wrong!')
+      const expected = (options.mode === 'via-server' ? options.expectedViaServer : options.expectedViaFile) || options.expected
+      assert.deepEqual(found.sort(), expected.sort(), 'List of found objects wrong!')
       if (options.mode === 'via-server') {
         assert.equal(foundSubRequestCount, options.expectedSubRequestCount, 'Wrong count of sub requests!')
       }
