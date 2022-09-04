@@ -107,6 +107,16 @@ var overpassFrontend
           expectedSubRequestCount: 1 // TODO: 0
         }, done)
       })
+
+      it('combining two', function (done) {
+        test({
+          mode,
+          query: 'node(around:20,48.19058,16.33761)(around:20,48.19058,16.33721)',
+          expected: [ 'n1599448219', 'n1871276160', 'n643386609' ],
+          expectedSubRequestCount: 1
+        }, done)
+      })
+
     })
   })
 })
