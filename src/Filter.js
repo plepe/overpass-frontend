@@ -267,9 +267,13 @@ function parse (def) {
       const r = parseParantheses(def)
       def = r[1]
       const mId = r[0].match(/^\s*(\d+)\s*$/)
+      const mBbox = r[0].match(/^((\s*\d+(.\d+)?\s*,){3}\s*\d+(.\d+)?\s*)$/)
       const m = r[0].match(/^\s*(\w+)\s*:\s*(.*)\s*$/)
       if (mId) {
         result.push({ fun: 'id', value: [parseInt(mId[1])] })
+        mode = 10
+      } else if (mBbox) {
+        result.push({ fun: 'bbox', value: qlFunctions.bbox.parse(mBbox[1]) })
         mode = 10
       } else if (m) {
         const fun = m[1]
@@ -279,7 +283,7 @@ function parse (def) {
         result.push({ fun, value: qlFunctions[fun].parse(m[2]) })
         mode = 10
       } else {
-        throw new Error("Can't parse query, expected id or function: " + def)
+        throw new Error("Can't parse query, expected id, bbox or function: " + def)
       }
     }
   }

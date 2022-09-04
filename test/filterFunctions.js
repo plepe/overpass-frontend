@@ -116,7 +116,35 @@ var overpassFrontend
           expectedSubRequestCount: 1
         }, done)
       })
+    })
 
+    describe('Filter "bbox"', function () {
+      it('simple', function (done) {
+        test({
+          mode,
+          query: 'node(48.1904,16.3370,48.1907,16.3374)',
+          expected: [ 'n1599448219', 'n1871276160', 'n3765072046', 'n395262', 'n643386609' ],
+          expectedSubRequestCount: 1
+        }, done)
+      })
+
+      it('simple (fully cached)', function (done) {
+        test({
+          mode,
+          query: 'node(48.1904,16.3370,48.1907,16.3374)',
+          expected: [ 'n1599448219', 'n1871276160', 'n3765072046', 'n395262', 'n643386609' ],
+          expectedSubRequestCount: 0
+        }, done)
+      })
+
+      it('simple (fully included in cache)', function (done) {
+        test({
+          mode,
+          query: 'node(48.19045,16.33705,48.19065,16.33735)',
+          expected: [ 'n395262' ],
+          expectedSubRequestCount: 1 // TODO: 0
+        }, done)
+      })
     })
   })
 })
