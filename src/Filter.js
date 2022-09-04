@@ -2,6 +2,7 @@ const strsearch2regexp = require('strsearch2regexp')
 const filterJoin = require('./filterJoin')
 const qlFunctions = require('./qlFunctions/index')
 const parseString = require('./parseString')
+const parseParantheses = require('./parseParantheses')
 
 function qlesc (str) {
   return '"' + str.replace(/"/g, '\\"') + '"'
@@ -164,7 +165,7 @@ function parse (def) {
         def = def.slice(m[0].length)
         mode = 11
       } else if (m && m[1] === '(') {
-        def = def.slice(m[0].length)
+        def = def.slice(m[0].length - 1)
         mode = 20
       } else if (m && m[1] === ';') {
         def = def.slice(m[0].length)
@@ -263,17 +264,16 @@ function parse (def) {
         throw new Error("Can't parse query, expected ']': " + def)
       }
     } else if (mode === 20) {
-      const m = def.match(/^\s*((\d+)\s*\))/)
-      const m1 = def.match(/^\s*((\w+)\s*:(.*)\))/)
+      const r = parseParantheses(def)
+      def = r[1]
+      const m = r[0].match(/^\s*(\d+)\s*$/)
+      const m1 = r[0].match(/^\s*(\w+)\s*:\s*(.*)\s*$/)
       if (m) {
-        def = def.slice(m[0].length)
-        result.push({ fun: 'id', value: [parseInt(m[2])] })
+        result.push({ fun: 'id', value: [parseInt(m[1])] })
         mode = 10
       } else if (m1) {
-        def = def.slice(m1[0].length)
-        const fun = m1[2]
-        const str = m1[3]
-        result.push({ fun, value: qlFunctions[fun].parse(str) })
+        const fun = m1[1]
+        result.push({ fun, value: qlFunctions[fun].parse(m1[2]) })
         mode = 10
       } else {
         throw new Error("Can't parse query, expected id or function: " + def)
