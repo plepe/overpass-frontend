@@ -132,13 +132,9 @@ function test (options, callback) {
   const request = overpassFrontend.BBoxQuery(options.query, null, {},
     (err, ob) => {
       found.push(ob.id)
-
-      if (!options.expected.includes(ob.id)) {
-        assert.fail('Object ' + ob.id + ' should not be found!')
-      }
     },
     (err) => {
-      assert.equal(found.length, options.expected.length, 'Wrong count of objects found!')
+      assert.deepEqual(found.sort(), options.expected.sort(), 'List of found objects wrong!')
       if (options.mode === 'via-server') {
         assert.equal(foundSubRequestCount, options.expectedSubRequestCount, 'Wrong count of sub requests!')
       }

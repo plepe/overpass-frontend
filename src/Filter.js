@@ -273,6 +273,9 @@ function parse (def) {
         mode = 10
       } else if (m1) {
         const fun = m1[1]
+        if (!qlFunctions[fun]) {
+          throw new Error('Unsupported filter function: ' + fun)
+        }
         result.push({ fun, value: qlFunctions[fun].parse(m1[2]) })
         mode = 10
       } else {
