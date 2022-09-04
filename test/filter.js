@@ -812,3 +812,31 @@ describe('Filter by id', function () {
     check(f, [ 3, 4, 5 ])
   })
 })
+
+describe('Function "around"', function () {
+  it('distance from coordinates', function () {
+    var f = new Filter('node(around:100.0,47.0791163,15.4644484)')
+
+    assert.deepEqual(f.def, [{"type":"node"},{
+      fun: 'around',
+      value: {
+        distance: 100,
+        geometry: {
+          geometry: {
+            coordinates: [
+              15.4644484,
+              47.0791163
+            ],
+            type: 'Point'
+          },
+          type: 'Feature'
+        }
+      }
+    })
+    assert.equal(f.toString(), 'node(around:100,47.0791163,15.4644484);')
+    assert.equal(f.toQl(), 'node(around:100,47.0791163,15.4644484);')
+    assert.deepEqual(f.toLokijs(), { type: { '$eq': 'node' } })
+
+    check(f, [ 3 ])
+  })
+})
