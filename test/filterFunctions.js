@@ -79,6 +79,35 @@ var overpassFrontend
         }, done)
       })
     })
+
+    describe('Filter "around"', function () {
+      it('simple', function (done) {
+        test({
+          mode,
+          query: 'node(around:20,48.19058,16.33721)',
+          expected: [ 'n395262', 'n643386609', 'n1599448219', 'n1871276160', 'n3765072046' ],
+          expectedSubRequestCount: 1
+        }, done)
+      })
+
+      it('simple (fully cached)', function (done) {
+        test({
+          mode,
+          query: 'node(around:20,48.19058,16.33721)',
+          expected: [ 'n395262', 'n643386609', 'n1599448219', 'n1871276160', 'n3765072046' ],
+          expectedSubRequestCount: 0
+        }, done)
+      })
+
+      it('simple (smaller area, should be cached)', function (done) {
+        test({
+          mode,
+          query: 'node(around:10,48.19058,16.33721)',
+          expected: [ 'n395262' ],
+          expectedSubRequestCount: 1 // TODO: 0
+        }, done)
+      })
+    })
   })
 })
 
