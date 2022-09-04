@@ -266,17 +266,17 @@ function parse (def) {
     } else if (mode === 20) {
       const r = parseParantheses(def)
       def = r[1]
-      const m = r[0].match(/^\s*(\d+)\s*$/)
-      const m1 = r[0].match(/^\s*(\w+)\s*:\s*(.*)\s*$/)
-      if (m) {
-        result.push({ fun: 'id', value: [parseInt(m[1])] })
+      const mId = r[0].match(/^\s*(\d+)\s*$/)
+      const m = r[0].match(/^\s*(\w+)\s*:\s*(.*)\s*$/)
+      if (mId) {
+        result.push({ fun: 'id', value: [parseInt(mId[1])] })
         mode = 10
-      } else if (m1) {
-        const fun = m1[1]
+      } else if (m) {
+        const fun = m[1]
         if (!qlFunctions[fun]) {
           throw new Error('Unsupported filter function: ' + fun)
         }
-        result.push({ fun, value: qlFunctions[fun].parse(m1[2]) })
+        result.push({ fun, value: qlFunctions[fun].parse(m[2]) })
         mode = 10
       } else {
         throw new Error("Can't parse query, expected id or function: " + def)
