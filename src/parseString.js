@@ -18,4 +18,6 @@ module.exports = function parseString (str) {
       throw new Error("Can't parse string from query: " + str)
     }
   }
+
+  throw new Error("Can't parse string, no string end detected!")
 }
