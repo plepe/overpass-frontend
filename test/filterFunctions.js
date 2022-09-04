@@ -33,6 +33,51 @@ var overpassFrontend
           expectedSubRequestCount: 1
         }, done)
       })
+
+      it('numeric (fully cached)', function (done) {
+        test({
+          mode,
+          query: 'node(378440)',
+          expected: [ 'n378440' ],
+          expectedSubRequestCount: 0
+        }, done)
+      })
+
+      it('id: (single)', function (done) {
+        test({
+          mode,
+          query: 'node(id:378440)',
+          expected: [ 'n378440' ],
+          expectedSubRequestCount: 1 // TODO: 0
+        }, done)
+      })
+
+      it('id: (multiple)', function (done) {
+        test({
+          mode,
+          query: 'node(id:378440,647991,393161,1234)',
+          expected: [ 'n378440', 'n647991', 'n393161' ],
+          expectedSubRequestCount: 1
+        }, done)
+      })
+
+      it('id: (known from other query)', function (done) {
+        test({
+          mode,
+          query: 'node(id:647991)',
+          expected: [ 'n647991' ],
+          expectedSubRequestCount: 1 // TODO: 0
+        }, done)
+      })
+
+      it('id: (non-existant, known from other query)', function (done) {
+        test({
+          mode,
+          query: 'node(id:1234)',
+          expected: [],
+          expectedSubRequestCount: 1 // TODO: 0
+        }, done)
+      })
     })
   })
 })
