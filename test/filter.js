@@ -826,14 +826,11 @@ describe('Function "around"', function () {
       value: {
         distance: 100,
         geometry: {
-          type: 'Feature',
-          geometry: {
-            type: 'Point',
-            coordinates: [
-              15.4644484,
-              47.0791163
-            ]
-          }
+          type: 'Point',
+          coordinates: [
+            15.4644484,
+            47.0791163
+          ]
         }
       }
     }])

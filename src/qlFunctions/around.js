@@ -10,7 +10,7 @@ module.exports = {
       throw new Error('around function expects "distance,latitude,longitude"')
     }
 
-    return { distance: parseFloat(s[0]), geometry: { type: 'Feature', geometry: { type: 'Point', coordinates: [ parseFloat(s[2]), parseFloat(s[1]) ] } } }
+    return { distance: parseFloat(s[0]), geometry: { type: 'Point', coordinates: [ parseFloat(s[2]), parseFloat(s[1]) ] } }
   },
 
   test (value, ob) {
@@ -21,7 +21,7 @@ module.exports = {
   },
 
   compileQL (value) {
-    return '(around:' + value.distance + ',' + value.geometry.geometry.coordinates[1] + ',' + value.geometry.geometry.coordinates[0] + ')'
+    return '(around:' + value.distance + ',' + value.geometry.coordinates[1] + ',' + value.geometry.coordinates[0] + ')'
   },
 
   compileLokiJS (value) {
