@@ -20,6 +20,6 @@ module.exports = {
   },
 
   cacheInfo (options, value) {
-    options.bbox = 'FOO'
+    options.ids = value
   }
 }

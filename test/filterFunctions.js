@@ -30,7 +30,12 @@ var overpassFrontend
           mode,
           query: 'node(378440)',
           expected: [ 'n378440' ],
-          expectedSubRequestCount: 1
+          expectedSubRequestCount: 1,
+          expectedCacheInfo: {
+            name: 'node',
+            ids: [378440],
+            bbox: null
+          }
         }, done)
       })
 
@@ -194,6 +199,13 @@ function test (options, callback) {
   )
 
   request.on('subrequest-compile', compileListener)
-  console.log(JSON.stringify(request.filterQuery, null, '  '))
-  console.log(JSON.stringify(request.filterQuery.caches()))
+
+  const cacheInfo = request.filterQuery.caches()
+  if (options.expectedCacheInfo) {
+    assert.deepEqual(cacheInfo, options.expectedCacheInfo, 'Expected cache info')
+  } else {
+    console.log('cache info', JSON.stringify(cacheInfo, null, '  '))
+  }
+//  console.log(JSON.stringify(request.filterQuery, null, '  '))
+//  console.log(JSON.stringify(request.filterQuery.caches()))
 }
