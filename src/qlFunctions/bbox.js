@@ -32,6 +32,13 @@ module.exports = {
   },
 
   cacheInfo (options, value) {
-    options.bbox = 'FOO'
+    const bounds = value.toGeoJSON()
+
+    const newBounds = options.bounds === null ? bounds : turf.intersect(options.bounds, bounds)
+    if (newBounds === null) {
+      options.invalid = true
+    } else {
+      options.bounds = newBounds.geometry
+    }
   }
 }

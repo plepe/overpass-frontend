@@ -1,5 +1,7 @@
 const turf = {
-  distance: require('@turf/distance').default
+  buffer: require('@turf/buffer').default,
+  distance: require('@turf/distance').default,
+  intersect: require('@turf/intersect').default
 }
 
 module.exports = {
@@ -29,6 +31,15 @@ module.exports = {
   },
 
   cacheInfo (options, value) {
-    options.bbox = 'FOO'
+    if (!value.bounds) {
+      value.bounds = turf.buffer(value.geometry, value.distance / 1000, {units: 'kilometers'})
+    }
+
+    const newBounds = options.bounds === null ? value.bounds : turf.intersect(options.bounds, value.bounds)
+    if (newBounds === null) {
+      options.invalid = true
+    } else {
+      options.bounds = newBounds.geometry
+    }
   }
 }

@@ -20,6 +20,6 @@ module.exports = {
   },
 
   cacheInfo (options, value) {
-    options.ids = value
+    options.ids = value.sort()
   }
 }
