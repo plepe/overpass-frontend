@@ -84,6 +84,15 @@ var overpassFrontend
       it('simple', function (done) {
         test({
           mode,
+          query: 'node[name~"foo"](around:20,48.19058,16.33721)',
+          expected: [ 'n395262', 'n643386609', 'n1599448219', 'n1871276160', 'n3765072046' ],
+          expectedSubRequestCount: 1
+        }, done)
+      })
+
+      it('simple', function (done) {
+        test({
+          mode,
           query: 'node(around:20,48.19058,16.33721)',
           expected: [ 'n395262', 'n643386609', 'n1599448219', 'n1871276160', 'n3765072046' ],
           expectedSubRequestCount: 1
@@ -185,4 +194,6 @@ function test (options, callback) {
   )
 
   request.on('subrequest-compile', compileListener)
+  console.log(JSON.stringify(request.filterQuery, null, '  '))
+  console.log(JSON.stringify(request.filterQuery.caches()))
 }

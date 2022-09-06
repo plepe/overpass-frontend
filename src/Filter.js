@@ -570,6 +570,34 @@ class Filter {
 
     return query
   }
+
+  caches () {
+    const result = []
+
+    if (this.def.or) {
+    }
+    else {
+      return this._caches(this.def)
+    }
+  }
+
+  _caches (def) {
+    let options = { name: '', bbox: null }
+
+    def.forEach(part => {
+      if (part.type) {
+        options.name += part.type
+      }
+      else if (part.op) {
+        options.name += compile(part)
+      }
+      else if (part.fun) {
+        return qlFunctions[part.fun].cacheInfo(options, part.value)
+      }
+    })
+
+    return options
+  }
 }
 
 module.exports = Filter

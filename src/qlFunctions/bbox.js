@@ -29,5 +29,9 @@ module.exports = {
 
   compileLokiJS (value) {
     return [ null, null, true ]
+  },
+
+  cacheInfo (options, value) {
+    options.bbox = 'FOO'
   }
 }
