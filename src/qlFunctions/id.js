@@ -17,5 +17,9 @@ module.exports = {
     } else {
       return [ 'osm_id', { $in: value } ]
     }
+  },
+
+  cacheInfo (options, value) {
+    options.ids = value.sort()
   }
 }

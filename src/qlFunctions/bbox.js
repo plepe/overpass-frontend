@@ -1,3 +1,7 @@
+const turf = {
+  intersect: require('@turf/intersect').default
+}
+
 const BoundingBox = require('boundingbox')
 
 module.exports = {
@@ -8,7 +12,6 @@ module.exports = {
       throw new Error('bbox function expects "latitude,longitude,latitude,longitude"')
     }
 
-    console.log(s)
     s = s.map(v => parseFloat(v))
 
     return new BoundingBox({
@@ -29,5 +32,16 @@ module.exports = {
 
   compileLokiJS (value) {
     return [ null, null, true ]
+  },
+
+  cacheInfo (options, value) {
+    const bounds = value.toGeoJSON()
+
+    const newBounds = options.bounds ? turf.intersect(options.bounds, bounds) : bounds
+    if (newBounds === null) {
+      options.invalid = true
+    } else {
+      options.bounds = newBounds.geometry
+    }
   }
 }

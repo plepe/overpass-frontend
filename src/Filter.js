@@ -602,6 +602,38 @@ class Filter {
 
     return query
   }
+
+  caches () {
+    if (this.def.or) {
+      return this.def.or.map(e => this._caches(e))
+    } else if (Array.isArray(this.def) && Array.isArray(this.def[0])) {
+      // script with several statements detected. only compile the last one, as previous statements
+      // can't have an effect on the last statement yet.
+      return [this._caches(this.def[this.def.length - 1])]
+    } else {
+      return [this._caches(this.def)]
+    }
+  }
+
+  _caches (def) {
+    const options = { name: '' }
+
+    def.forEach(part => {
+      if (part.type) {
+        options.name += part.type
+      } else if (part.op) {
+        options.name += compile(part)
+      } else if (part.fun) {
+        return qlFunctions[part.fun].cacheInfo(options, part.value)
+      } else if (part.or) {
+        // TODO
+      } else {
+        throw new Error('caches(): invalid entry')
+      }
+    })
+
+    return options
+  }
 }
 
 module.exports = Filter
