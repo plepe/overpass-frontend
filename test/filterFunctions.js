@@ -357,6 +357,49 @@ var overpassFrontend
           ]
         }, done)
       })
+
+      it('Mixed node/way (nested)', function (done) {
+        test({
+          mode,
+          query: '((node(48.19045,16.33705,48.19065,16.33735););way(48.19045,16.33705,48.19065,16.33735);)',
+          expected: [ 'n395262','w31275229' ],
+          expectedViaFile: [ 'n395262', 'w31275229', 'w383507544' ],
+          // Overpass Server won't include ways, where no nodes are inside the bounding box. Overpass-Frontend will include theses ways.
+          expectedSubRequestCount: 1, // TODO: 0
+          expectedCacheInfo: [
+            {
+              "name": "node",
+              "bounds": {
+                "type": "Polygon",
+                "coordinates": [
+                  [
+                    [ 16.33705, 48.19045 ],
+                    [ 16.33735, 48.19045 ],
+                    [ 16.33735, 48.19065 ],
+                    [ 16.33705, 48.19065 ],
+                    [ 16.33705, 48.19045 ]
+                  ]
+                ]
+              }
+            },
+            {
+              "name": "way",
+              "bounds": {
+                "type": "Polygon",
+                "coordinates": [
+                  [
+                    [ 16.33705, 48.19045 ],
+                    [ 16.33735, 48.19045 ],
+                    [ 16.33735, 48.19065 ],
+                    [ 16.33705, 48.19065 ],
+                    [ 16.33705, 48.19045 ]
+                  ]
+                ]
+              }
+            }
+          ]
+        }, done)
+      })
     })
   })
 })
@@ -386,6 +429,7 @@ function test (options, callback) {
   )
 
   request.on('subrequest-compile', compileListener)
+  console.log(request.filterQuery.toQl())
 
   const cacheInfo = request.filterQuery.caches()
   if (options.expectedCacheInfo) {

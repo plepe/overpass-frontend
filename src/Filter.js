@@ -121,8 +121,9 @@ function test (ob, part) {
   }
 }
 
-function parse (def) {
-  const result = []
+function parse (def, rek=0) {
+  const script = []
+  let result = []
 
   let mode = 0
   let key
@@ -132,20 +133,26 @@ function parse (def) {
   let keyRegexp = false
   let notExists = null
   while (def.length) {
+    console.log('rek' + rek + ', mode' + mode + ', ' + def.length + '|' + def.substr(0, 20))
     if (mode === 0) {
       m = def.match(/^\s*(node|way|relation|rel|nwr|\()/)
       if (m && m[1] === '(') {
         def = def.slice(m[0].length)
-        const parts = []
+        let parts
+        [parts, def] = parse(def, rek + 1)
+//        do {
+//          let part
+//
+//          [part, def] = parse(def, rek + 1)
+//          parts.push(part)
+//        } while (!def.match(/^\s*\)/))
 
-        do {
-          let part
+        m = def.match(/^\s*\);?/)
+        def = def.slice(m[0].length)
 
-          [part, def] = parse(def)
-          parts.push(part)
-        } while (!def.match(/^\s*\)/))
-
-        return [{ or: parts }, def]
+        console.log('rek' + rek + ', mode' + mode + ', ' + def.length + '|' + def.substr(0, 20))
+        script.push({ or: parts })
+        result = []
       } else if (m) {
         if (m[1] === 'rel') {
           result.push({ type: 'relation' })
@@ -169,7 +176,13 @@ function parse (def) {
         mode = 20
       } else if (m && m[1] === ';') {
         def = def.slice(m[0].length)
-        return [result, def]
+        script.push(result)
+        result = []
+        mode = 0
+
+        if (def.match(/^\s*\)/)) {
+          return [script, def]
+        }
       } else if (!m && def.match(/^\s*$/)) {
         return [result, '']
       } else {
@@ -288,12 +301,24 @@ function parse (def) {
     }
   }
 
-  return [result, def]
+  console.log('script', JSON.stringify(result))
+  if (result.length) {
+    script.push(result)
+  }
+
+  return [script, def]
 }
 
 function check (def) {
   if (typeof def === 'string') {
-    return parse(def)[0]
+    const r = parse(def)
+    console.log('CHECK1', JSON.stringify(r[0]))
+//    if (r[0].length === 1) {
+//      r[0] = r[0][0]
+//    }
+    const t = reduceOr(r[0])
+    console.log('CHECK2', JSON.stringify(t))
+    return t
   }
   if (def.and) {
     def.and = def.and.map(p => check(p))
@@ -573,7 +598,10 @@ class Filter {
 
   caches () {
     if (this.def.or) {
-      return this.def.or.map(e => this._caches(e))
+      console.log(this.def)
+      const def = reduceOr(this.def)
+      console.log(def)
+      return def.or.map(e => this._caches(e))
     } else {
       return [this._caches(this.def)]
     }
@@ -597,3 +625,30 @@ class Filter {
 }
 
 module.exports = Filter
+
+function reduceOr (def = null) {
+    if (!Array.isArray(def)) {
+      return def
+    }
+
+    if (def.length === 1 && def[0].or) {
+      def = def[0]
+      def.or = def.or.map(d => _reduceOr(d))
+    }
+
+    return def
+  }
+
+function  _reduceOr (def) {
+    def.forEach((d, i) => {
+        if (d.or) {
+          d.or = _reduceOr(d.or)
+          def = def.concat(d.or)
+          def.splice(i, 1)
+        }
+    })
+
+    return def
+  }
+
+

@@ -457,6 +457,7 @@ describe('Filter', function () {
 
     it ('(nwr[~wikipedia~"."];)', function () {
       var f = new Filter('(nwr[~wikipedia~"."];)')
+      console.log(JSON.stringify(f.def))
 
       var r = f.toLokijs()
       assert.deepEqual(r, { needMatch: true })
@@ -636,7 +637,7 @@ describe('Filter', function () {
   it('case-sensitive regexp', function () {
     var f = new Filter('node["name"~"test"]')
 
-    assert.deepEqual(f.def, [{"type":"node"},{"key":"name","op":"~","value":"test"}])
+    assert.deepEqual(f.def, [[{"type":"node"},{"key":"name","op":"~","value":"test"}]])
     assert.equal(f.toString(), 'node["name"~"test"];')
     assert.equal(f.toQl(), 'node["name"~"test"];')
     assert.deepEqual(f.toLokijs(), { type: { '$eq': 'node' }, 'tags.name': { '$regex': /test/ } })
