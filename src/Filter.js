@@ -133,7 +133,8 @@ function parseString (str) {
 }
 
 function parse (def) {
-  const result = []
+  const script = []
+  let current = []
 
   let mode = 0
   let key
@@ -159,11 +160,11 @@ function parse (def) {
         return [{ or: parts }, def]
       } else if (m) {
         if (m[1] === 'rel') {
-          result.push({ type: 'relation' })
+          current.push({ type: 'relation' })
         } else if (m[1] === 'nwr') {
           // nothing
         } else {
-          result.push({ type: m[1] })
+          current.push({ type: m[1] })
         }
         mode = 10
         def = def.slice(m[0].length)
@@ -177,9 +178,9 @@ function parse (def) {
         mode = 11
       } else if (m && m[1] === ';') {
         def = def.slice(m[0].length)
-        return [result, def]
+        return [current, def]
       } else if (!m && def.match(/^\s*$/)) {
-        return [result, '']
+        return [current, '']
       } else {
         throw new Error("Can't parse query, expected '[' or ';': " + def)
       }
@@ -215,7 +216,7 @@ function parse (def) {
         if (notExists) {
           entry.op = 'not_exists'
         }
-        result.push(entry)
+        current.push(entry)
         def = def.slice(m[0].length)
         mode = 10
       } else if (m) {
@@ -265,7 +266,7 @@ function parse (def) {
         if (keyRegexp) {
           entry.keyRegexp = op.match(/^!?~i$/) ? 'i' : true
         }
-        result.push(entry)
+        current.push(entry)
         mode = 10
         def = def.slice(m[0].length)
       } else {
@@ -274,7 +275,7 @@ function parse (def) {
     }
   }
 
-  return [result, def]
+  return [current, def]
 }
 
 function check (def) {
