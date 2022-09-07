@@ -132,7 +132,7 @@ function parseString (str) {
   }
 }
 
-function parse (def) {
+function parse (def, rek = 0) {
   const script = []
   let current = []
 
@@ -150,7 +150,7 @@ function parse (def) {
         def = def.slice(m[0].length)
 
         let parts
-        [parts, def] = parse(def)
+        [parts, def] = parse(def, rek + 1)
         mode = 1
 
         script.push({ or: parts })
@@ -169,10 +169,10 @@ function parse (def) {
         throw new Error("Can't parse query, expected type of object (e.g. 'node'): " + def)
       }
     } else if (mode === 1) {
-      m = def.match(/^\s*\)/)
+      m = def.match(/^\s*\);?/)
       if (m) {
         def = def.slice(m[0].length)
-        return [script.length === 1 ? script[0] : script, def]
+        return [rek === 0 && script.length === 1 ? script[0] : script, def]
       } else {
         mode = 0
       }
@@ -190,7 +190,7 @@ function parse (def) {
         if (current.length) {
           script.push(current)
         }
-        return [script.length === 1 ? script[0] : script, '']
+        return [rek === 0 && script.length === 1 ? script[0] : script, '']
       } else {
         throw new Error("Can't parse query, expected '[' or ';': " + def)
       }
@@ -289,7 +289,7 @@ function parse (def) {
     script.push(current)
   }
 
-  return [script.length === 1 ? script[0] : script, def]
+  return [rek === 0 && script.length === 1 ? script[0] : script, def]
 }
 
 function check (def) {
@@ -340,6 +340,12 @@ class Filter {
   match (ob, def) {
     if (!def) {
       def = this.def
+    }
+
+    if (Array.isArray(def) && Array.isArray(def[0])) {
+      // script with several statements detected. only use the last one, as previous statements
+      // can't have an effect on the last statement yet.
+      def = def[def.length - 1]
     }
 
     if (def.or) {
