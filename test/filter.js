@@ -596,6 +596,16 @@ describe('Filter', function () {
     })
   })
 
+  describe('script (several statements)', function () {
+    it('node;way[a=b];', function () {
+      let f = new Filter('node;way[a=b];')
+      assert.deepEqual(f.def, [[{"type":"node"}],[{"type":"way"},{"key":"a","op":"=","value":"b"}]])
+      assert.equal(f.toString(), 'node;way["a"="b"];')
+      assert.equal(f.toQl(), 'node;way["a"="b"];')
+      assert.deepEqual(f.toLokijs(), {"type":{"$eq":"way"},"tags.a":{"$eq":"b"}})
+    })
+  })
+
   describe('or', function () {
     it('or1', function () {
       let f = new Filter({ or: [ [ { key: 'name', value: '49', op: '~' } ], [ { key: 'ref', value: '49', op: '=' } ] ] })

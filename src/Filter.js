@@ -148,16 +148,13 @@ function parse (def) {
       m = def.match(/^\s*(node|way|relation|rel|nwr|\()/)
       if (m && m[1] === '(') {
         def = def.slice(m[0].length)
-        const parts = []
 
-        do {
-          let part
+        let parts
+        [parts, def] = parse(def)
+        mode = 1
 
-          [part, def] = parse(def)
-          parts.push(part)
-        } while (!def.match(/^\s*\)/))
-
-        return [{ or: parts }, def]
+        script.push({ or: parts })
+        current = []
       } else if (m) {
         if (m[1] === 'rel') {
           current.push({ type: 'relation' })
@@ -171,6 +168,14 @@ function parse (def) {
       } else {
         throw new Error("Can't parse query, expected type of object (e.g. 'node'): " + def)
       }
+    } else if (mode === 1) {
+      m = def.match(/^\s*\)/)
+      if (m) {
+        def = def.slice(m[0].length)
+        return [script.length === 1 ? script[0] : script, def]
+      } else {
+        mode = 0
+      }
     } else if (mode === 10) {
       const m = def.match(/^\s*(\[|;)/)
       if (m && m[1] === '[') {
@@ -178,9 +183,14 @@ function parse (def) {
         mode = 11
       } else if (m && m[1] === ';') {
         def = def.slice(m[0].length)
-        return [current, def]
+        script.push(current)
+        current = []
+        mode = 1
       } else if (!m && def.match(/^\s*$/)) {
-        return [current, '']
+        if (current.length) {
+          script.push(current)
+        }
+        return [script.length === 1 ? script[0] : script, '']
       } else {
         throw new Error("Can't parse query, expected '[' or ';': " + def)
       }
@@ -275,7 +285,11 @@ function parse (def) {
     }
   }
 
-  return [current, def]
+  if (current.length) {
+    script.push(current)
+  }
+
+  return [script.length === 1 ? script[0] : script, def]
 }
 
 function check (def) {
@@ -367,6 +381,10 @@ class Filter {
       options.outputSet = ''
     }
 
+    if (Array.isArray(def) && Array.isArray(def[0])) {
+      return def.map(d => this.toQl({}, d)).join('')
+    }
+
     if (def.or) {
       return '(' + def.or.map(part => {
         const subOptions = {
@@ -424,6 +442,12 @@ class Filter {
   toLokijs (options = {}, def) {
     if (!def) {
       def = this.def
+    }
+
+    if (Array.isArray(def) && Array.isArray(def[0])) {
+      // script with several statements detected. only compile the last one, as previous statements
+      // can't have an effect on the last statement yet.
+      def = def[def.length - 1]
     }
 
     if (def.or) {
