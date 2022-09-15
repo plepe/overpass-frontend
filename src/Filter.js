@@ -607,15 +607,14 @@ class Filter {
     if (Array.isArray(this.def) && Array.isArray(this.def[0])) {
       // script with several statements detected. only compile the last one, as previous statements
       // can't have an effect on the last statement yet.
-      return [this._caches(this.def[this.def.length - 1])]
+      return this._caches(this.def[this.def.length - 1])
     } else {
-      const result = this._caches(this.def)
-      return Array.isArray(result) ? result : [result]
+      return this._caches(this.def)
     }
   }
 
   _caches (def) {
-    const options = { name: '' }
+    let options = [{ name: '' }]
 
     if (def.or) {
       let result = []
@@ -630,21 +629,54 @@ class Filter {
       return result
     }
 
+    if (!Array.isArray(def)) {
+      def = [def]
+    }
+
     def.forEach(part => {
       if (part.type) {
-        options.name += part.type
+        options = options.map(o => {
+          o.name += part.type
+          return o
+        })
       } else if (part.op) {
-        options.name += compile(part)
+        options = options.map(o => {
+          o.name += compile(part)
+          return o
+        })
       } else if (part.fun) {
-        return qlFunctions[part.fun].cacheInfo(options, part.value)
+        options = options.map(o => {
+          qlFunctions[part.fun].cacheInfo(o, part.value)
+          return o
+        })
       } else if (part.or) {
-        // TODO
+        const result = []
+        part.or.forEach(e => {
+          const r = this._caches(e)
+
+          options.forEach(o => {
+            r.forEach(r1 => {
+              result.push(this._cacheMerge(o, r1))
+            })
+          })
+        })
+
+        options = result
       } else {
         throw new Error('caches(): invalid entry')
       }
     })
 
     return options
+  }
+
+  _cacheMerge (a, b) {
+    const r = {}
+    for (const k in a) {
+      r[k] = a[k]
+    }
+    r.name += b.name
+    return r
   }
 }
 

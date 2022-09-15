@@ -816,7 +816,10 @@ describe('Filter', function () {
       assert.deepEqual(f.toLokijs(), {"tags.route":{"$eq":"bus"},"$or":[{"tags.name":{"$regex":/49/}},{"tags.ref":{"$eq":"49"}}]})
 
       var r = f.caches()
-      // TODO: assert.deepEqual(r, [ { name: '["route"="bus"]' } ])
+      assert.deepEqual(r, [
+        { name: '["name"~"49"]["route"="bus"]' },
+        { name: '["ref"="49"]["route"="bus"]' }
+      ])
     })
 
     it('or3', function () {
@@ -831,7 +834,12 @@ describe('Filter', function () {
       assert.deepEqual(f.toLokijs(), {"tags.route":{"$eq":"bus"},"$and":[{"$or":[{"tags.name":{"$regex":/49/}},{"tags.ref":{"$eq":"49"}}]},{"$or":[{"tags.operator":{"$eq":"ÖBB"}},{"tags.operator":{"$eq":"WL"}}]}]})
 
       var r = f.caches()
-      // TODO: assert.deepEqual(r, [ { name: '["amenity"="restaurant"]' } ])
+      assert.deepEqual(r, [
+        { name: '["name"~"49"]["route"="bus"]["operator"="ÖBB"]' },
+        { name: '["ref"="49"]["route"="bus"]["operator"="ÖBB"]' },
+        { name: '["name"~"49"]["route"="bus"]["operator"="WL"]' },
+        { name: '["ref"="49"]["route"="bus"]["operator"="WL"]' }
+      ])
     })
   })
 
