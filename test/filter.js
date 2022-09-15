@@ -1147,7 +1147,6 @@ describe('Function "around"', function () {
 describe('Function "bbox"', function () {
   it('simple', function () {
     var f = new Filter('node(10.2,40.0,11,45)')
-    console.log(JSON.stringify(f.def))
 
     assert.deepEqual(f.def, [{"type":"node"},{"fun":"bbox","value":{"minlon":40,"minlat":10.2,"maxlon":45,"maxlat":11}}])
     assert.equal(f.toString(), 'node(10.2,40,11,45);')
@@ -1157,7 +1156,6 @@ describe('Function "bbox"', function () {
     check(f, [])
 
     var r = f.caches()
-    console.log(JSON.stringify(r))
     assert.deepEqual(r, [ { name:"node",bounds:{"type":"Polygon","coordinates":[[[40,10.2],[45,10.2],[45,11],[40,11],[40,10.2]]]}}])
   })
 //  it('and', function () {
