@@ -335,9 +335,9 @@ describe('Filter', function () {
       var f = new Filter('(nwr[~wikipedia~"foo"];node[amenity];)')
       assert.deepEqual(f.def, {or:[
         [{"key":"wikipedia","keyRegexp":true,"op":"~","value":"foo"}],
-        [{"type":"node"},{"key":"amenity","op":"has_key","keyRegexp":true}], // TODO: keyRegexp WRONG!!!
+        [{"type":"node"},{"key":"amenity","op":"has_key"}],
       ]})
-      assert.equal(f.toString(), '(nwr[~"wikipedia"~"foo"];node[~"amenity"~"."];);') // TODO: keyRegexp WRONG!!!
+      assert.equal(f.toString(), '(nwr[~"wikipedia"~"foo"];node["amenity"];);')
 
       var r = f.toLokijs()
       assert.deepEqual(r, { needMatch: true })
