@@ -604,19 +604,31 @@ class Filter {
   }
 
   caches () {
-    if (this.def.or) {
-      return this.def.or.map(e => this._caches(e))
-    } else if (Array.isArray(this.def) && Array.isArray(this.def[0])) {
+    if (Array.isArray(this.def) && Array.isArray(this.def[0])) {
       // script with several statements detected. only compile the last one, as previous statements
       // can't have an effect on the last statement yet.
       return [this._caches(this.def[this.def.length - 1])]
     } else {
-      return [this._caches(this.def)]
+      const result = this._caches(this.def)
+      return Array.isArray(result) ? result : [result]
     }
   }
 
   _caches (def) {
     const options = { name: '' }
+
+    if (def.or) {
+      let result = []
+      def.or.forEach(e => {
+        const r = this._caches(e)
+        if (Array.isArray(r)) {
+          result = result.concat(r)
+        } else {
+          result.push(r)
+        }
+      })
+      return result
+    }
 
     def.forEach(part => {
       if (part.type) {

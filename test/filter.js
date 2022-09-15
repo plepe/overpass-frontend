@@ -91,6 +91,60 @@ describe('Filter', function () {
       assert.equal(r, false, 'Object should not match')
     })
 
+    it ('((nwr[amenity];);)', function () {
+      var f = new Filter('((nwr[amenity];);)')
+      assert.deepEqual(f.def, {or:[
+        {or:[
+          [{"key":"amenity","op":"has_key"}],
+        ]}
+      ]})
+      assert.equal(f.toString(), '((nwr["amenity"];););')
+
+      var r = f.toLokijs()
+      assert.deepEqual(r, { $or: [ { $or: [ { 'tags.amenity': { $exists: true } } ] } ] })
+
+      var r = f.caches()
+      assert.deepEqual(r, [ { name: '["amenity"]' } ])
+
+      var r = f.match({ tags: { amenity: 'restaurant' } })
+      assert.equal(r, true, 'Object should match')
+      var r = f.match({ tags: { amenity: 'cafe' } })
+      assert.equal(r, true, 'Object should match')
+      var r = f.match({ tags: { shop: 'supermarket' } })
+      assert.equal(r, false, 'Object should not match')
+    })
+
+    it ('((nwr[a=b];nwr[c=d];);(nwr[amenity];);)', function () {
+      var f = new Filter('((nwr[a=b];nwr[c=d];);(nwr[amenity];);)')
+      assert.deepEqual(f.def, {or:[
+        {or:[
+          [{"key":"a","op":"=","value":"b"}],
+          [{"key":"c","op":"=","value":"d"}],
+        ]},
+        {or:[
+          [{"key":"amenity","op":"has_key"}]
+        ]}
+      ]})
+      assert.equal(f.toString(), '((nwr["a"="b"];nwr["c"="d"];);(nwr["amenity"];););')
+
+      var r = f.toLokijs()
+      assert.deepEqual(r, { $or: [ { $or: [ { 'tags.a': { $eq: 'b' } }, { 'tags.c': { $eq: 'd' } } ] }, { $or: [ { 'tags.amenity': { $exists: true } } ] } ] })
+
+      var r = f.caches()
+      assert.deepEqual(r, [
+        { name: '["a"="b"]' },
+        { name: '["c"="d"]' },
+        { name: '["amenity"]' }
+      ])
+
+      var r = f.match({ tags: { amenity: 'restaurant' } })
+      assert.equal(r, true, 'Object should match')
+      var r = f.match({ tags: { amenity: 'cafe' } })
+      assert.equal(r, true, 'Object should match')
+      var r = f.match({ tags: { shop: 'supermarket' } })
+      assert.equal(r, false, 'Object should not match')
+    })
+
     it ('nwr[shop];nwr[amenity];', function () {
       var f = new Filter('nwr[shop];nwr[amenity];')
       assert.deepEqual(f.def, [
