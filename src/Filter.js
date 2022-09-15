@@ -121,8 +121,9 @@ function test (ob, part) {
   }
 }
 
-function parse (def) {
-  const result = []
+function parse (def, rek = 0) {
+  const script = []
+  let current = []
 
   let mode = 0
   let key
@@ -133,31 +134,37 @@ function parse (def) {
   let notExists = null
   while (def.length) {
     if (mode === 0) {
+      keyRegexp = false
       m = def.match(/^\s*(node|way|relation|rel|nwr|\()/)
       if (m && m[1] === '(') {
         def = def.slice(m[0].length)
-        const parts = []
 
-        do {
-          let part
+        let parts
+        [parts, def] = parse(def, rek + 1)
+        mode = 1
 
-          [part, def] = parse(def)
-          parts.push(part)
-        } while (!def.match(/^\s*\)/))
-
-        return [{ or: parts }, def]
+        script.push({ or: parts })
+        current = []
       } else if (m) {
         if (m[1] === 'rel') {
-          result.push({ type: 'relation' })
+          current.push({ type: 'relation' })
         } else if (m[1] === 'nwr') {
           // nothing
         } else {
-          result.push({ type: m[1] })
+          current.push({ type: m[1] })
         }
         mode = 10
         def = def.slice(m[0].length)
       } else {
         throw new Error("Can't parse query, expected type of object (e.g. 'node'): " + def)
+      }
+    } else if (mode === 1) {
+      m = def.match(/^\s*\);?/)
+      if (m) {
+        def = def.slice(m[0].length)
+        return [rek === 0 && script.length === 1 ? script[0] : script, def]
+      } else {
+        mode = 0
       }
     } else if (mode === 10) {
       const m = def.match(/^\s*(\[|\(|;)/)
@@ -169,9 +176,14 @@ function parse (def) {
         mode = 20
       } else if (m && m[1] === ';') {
         def = def.slice(m[0].length)
-        return [result, def]
+        script.push(current)
+        current = []
+        mode = 1
       } else if (!m && def.match(/^\s*$/)) {
-        return [result, '']
+        if (current.length) {
+          script.push(current)
+        }
+        return [rek === 0 && script.length === 1 ? script[0] : script, '']
       } else {
         throw new Error("Can't parse query, expected '[' or ';': " + def)
       }
@@ -207,7 +219,7 @@ function parse (def) {
         if (notExists) {
           entry.op = 'not_exists'
         }
-        result.push(entry)
+        current.push(entry)
         def = def.slice(m[0].length)
         mode = 10
       } else if (m) {
@@ -257,7 +269,7 @@ function parse (def) {
         if (keyRegexp) {
           entry.keyRegexp = op.match(/^!?~i$/) ? 'i' : true
         }
-        result.push(entry)
+        current.push(entry)
         mode = 10
         def = def.slice(m[0].length)
       } else {
@@ -270,17 +282,17 @@ function parse (def) {
       const mBbox = r[0].match(/^((\s*\d+(.\d+)?\s*,){3}\s*\d+(.\d+)?\s*)$/)
       const m = r[0].match(/^\s*(\w+)\s*:\s*(.*)\s*$/)
       if (mId) {
-        result.push({ fun: 'id', value: [parseInt(mId[1])] })
+        current.push({ fun: 'id', value: [parseInt(mId[1])] })
         mode = 10
       } else if (mBbox) {
-        result.push({ fun: 'bbox', value: qlFunctions.bbox.parse(mBbox[1]) })
+        current.push({ fun: 'bbox', value: qlFunctions.bbox.parse(mBbox[1]) })
         mode = 10
       } else if (m) {
         const fun = m[1]
         if (!qlFunctions[fun]) {
           throw new Error('Unsupported filter function: ' + fun)
         }
-        result.push({ fun, value: qlFunctions[fun].parse(m[2]) })
+        current.push({ fun, value: qlFunctions[fun].parse(m[2]) })
         mode = 10
       } else {
         throw new Error("Can't parse query, expected id, bbox or function: " + def)
@@ -288,7 +300,11 @@ function parse (def) {
     }
   }
 
-  return [result, def]
+  if (current.length) {
+    script.push(current)
+  }
+
+  return [rek === 0 && script.length === 1 ? script[0] : script, def]
 }
 
 function check (def) {
@@ -341,6 +357,12 @@ class Filter {
       def = this.def
     }
 
+    if (Array.isArray(def) && Array.isArray(def[0])) {
+      // script with several statements detected. only use the last one, as previous statements
+      // can't have an effect on the last statement yet.
+      def = def[def.length - 1]
+    }
+
     if (def.or) {
       return def.or.some(part => this.match(ob, part))
     }
@@ -378,6 +400,10 @@ class Filter {
 
     if (!options.outputSet) {
       options.outputSet = ''
+    }
+
+    if (Array.isArray(def) && Array.isArray(def[0])) {
+      return def.map(d => this.toQl({}, d)).join('')
     }
 
     if (def.or) {
@@ -437,6 +463,12 @@ class Filter {
   toLokijs (options = {}, def) {
     if (!def) {
       def = this.def
+    }
+
+    if (Array.isArray(def) && Array.isArray(def[0])) {
+      // script with several statements detected. only compile the last one, as previous statements
+      // can't have an effect on the last statement yet.
+      def = def[def.length - 1]
     }
 
     if (def.or) {
