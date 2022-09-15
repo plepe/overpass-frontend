@@ -145,6 +145,7 @@ function parse (def, rek = 0) {
   let notExists = null
   while (def.length) {
     if (mode === 0) {
+      keyRegexp = false
       m = def.match(/^\s*(node|way|relation|rel|nwr|\()/)
       if (m && m[1] === '(') {
         def = def.slice(m[0].length)
