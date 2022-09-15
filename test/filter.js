@@ -40,28 +40,38 @@ describe('Filter', function () {
   describe ('input exploded', function () {
     it ('nwr["amenity"=\'restaurant\']["sh\\"op"]', function () {
       var f = new Filter('nwr["amenity"=\'restaurant\']["sh\\"op"]')
-      assert.deepEqual(f.def, [{filters:[{"key":"amenity","op":"=","value":"restaurant"},{"key":"sh\"op","op":"has_key"}]}])
+      assert.deepEqual(f.def, [{"key":"amenity","op":"=","value":"restaurant"},{"key":"sh\"op","op":"has_key"}])
       assert.equal(f.toString(), 'nwr["amenity"="restaurant"]["sh\\"op"];')
     })
 
-    it ('nwr[~wikipedia~"."]', function () {
-      var f = new Filter('nwr[~wikipedia~"."]')
-      assert.deepEqual(f.def, [{filters:[{"key":"wikipedia","keyRegexp":true,"op":"has_key"}]}])
-      assert.equal(f.toString(), 'nwr[~"wikipedia"~"."];')
-    })
-
-    it ('nwr[~wikipedia~"foo"]', function () {
-      var f = new Filter('nwr[~wikipedia~"foo"]')
-      assert.deepEqual(f.def, [{filters:[{"key":"wikipedia","keyRegexp":true,"op":"~","value":"foo"}]}])
-      assert.equal(f.toString(), 'nwr[~"wikipedia"~"foo"];')
-    })
   })
 
   describe ('match', function () {
     it ('nwr[amenity]', function () {
       var f = new Filter('nwr[amenity]')
-      assert.deepEqual(f.def, [{filters:[{"key":"amenity","op":"has_key"}]}])
+      assert.deepEqual(f.def, [{"key":"amenity","op":"has_key"}])
       assert.equal(f.toString(), 'nwr["amenity"];')
+
+      var r = f.toLokijs()
+      assert.deepEqual(r, { 'tags.amenity': { $exists: true }})
+
+      var r = f.match({ tags: { amenity: 'restaurant' } })
+      assert.equal(r, true, 'Object should match')
+      var r = f.match({ tags: { amenity: 'cafe' } })
+      assert.equal(r, true, 'Object should match')
+      var r = f.match({ tags: { shop: 'supermarket' } })
+      assert.equal(r, false, 'Object should not match')
+    })
+
+    it ('(nwr[amenity];)', function () {
+      var f = new Filter('(nwr[amenity];)')
+      assert.deepEqual(f.def, {or:[
+        [{"key":"amenity","op":"has_key"}],
+      ]})
+      assert.equal(f.toString(), '(nwr["amenity"];);')
+
+      var r = f.toLokijs()
+      assert.deepEqual(r, { $or: [ { 'tags.amenity': { $exists: true } } ] })
 
       var r = f.match({ tags: { amenity: 'restaurant' } })
       assert.equal(r, true, 'Object should match')
@@ -73,8 +83,11 @@ describe('Filter', function () {
 
     it ('node[amenity=restaurant]', function () {
       var f = new Filter('node[amenity=restaurant]')
-      assert.deepEqual(f.def, [{type:"node",filters:[{"key":"amenity","op":"=","value":"restaurant"}]}])
+      assert.deepEqual(f.def, [{type:"node"},{"key":"amenity","op":"=","value":"restaurant"}])
       assert.equal(f.toString(), 'node["amenity"="restaurant"];')
+
+      var r = f.toLokijs()
+      assert.deepEqual(r, { 'type': { $eq: 'node' }, 'tags.amenity': { $eq: 'restaurant' } })
 
       var r = f.match({ type: 'node', tags: { amenity: 'restaurant' } })
       assert.equal(r, true, 'Object should match')
@@ -86,10 +99,49 @@ describe('Filter', function () {
       assert.equal(r, false, 'Object should not match')
     })
 
+    it ('node[amenity][amenity!=restaurant]', function () {
+      var f = new Filter('node[amenity][amenity!=restaurant]')
+      assert.deepEqual(f.def, [{type:"node"},{"key":"amenity","op":"has_key"},{"key":"amenity","op":"!=","value":"restaurant"}])
+      assert.equal(f.toString(), 'node["amenity"]["amenity"!="restaurant"];')
+
+      var r = f.toLokijs()
+      assert.deepEqual(r, { 'type': { $eq: 'node' }, 'tags.amenity': { $and: [ { $exists: true }, { $ne: 'restaurant' } ] } } )
+
+      var r = f.match({ type: 'node', tags: { amenity: 'restaurant' } })
+      assert.equal(r, false, 'Object should not match')
+      var r = f.match({ type: 'way', tags: { amenity: 'restaurant' } })
+      assert.equal(r, false, 'Object should not match')
+      var r = f.match({ type: 'node', tags: { amenity: 'cafe' } })
+      assert.equal(r, true, 'Object should match')
+      var r = f.match({ type: 'node', tags: { shop: 'supermarket' } })
+      assert.equal(r, false, 'Object should not match')
+    })
+
+    it ('node[amenity][amenity!=cafe][amenity!=restaurant]', function () {
+      var f = new Filter('node[amenity][amenity!=cafe][amenity!=restaurant]')
+      assert.deepEqual(f.def, [{type:"node"},{"key":"amenity","op":"has_key"},{"key":"amenity","op":"!=","value":"cafe"},{"key":"amenity","op":"!=","value":"restaurant"}])
+      assert.equal(f.toString(), 'node["amenity"]["amenity"!="cafe"]["amenity"!="restaurant"];')
+
+      var r = f.toLokijs()
+      assert.deepEqual(r, { 'type': { $eq: 'node' }, 'tags.amenity': { $and: [ { $exists: true }, { $ne: 'cafe' }, { $ne: 'restaurant' } ] } } )
+
+      var r = f.match({ type: 'node', tags: { amenity: 'restaurant' } })
+      assert.equal(r, false, 'Object should not match')
+      var r = f.match({ type: 'way', tags: { amenity: 'restaurant' } })
+      assert.equal(r, false, 'Object should not match')
+      var r = f.match({ type: 'node', tags: { amenity: 'cafe' } })
+      assert.equal(r, false, 'Object should not match')
+      var r = f.match({ type: 'node', tags: { shop: 'supermarket' } })
+      assert.equal(r, false, 'Object should not match')
+    })
+
     it ('nwr[amenity=restaurant][shop]', function () {
       var f = new Filter('nwr[amenity=restaurant][shop]')
-      assert.deepEqual(f.def, [{filters:[{"key":"amenity","op":"=","value":"restaurant"},{"key":"shop","op":"has_key"}]}])
+      assert.deepEqual(f.def, [{"key":"amenity","op":"=","value":"restaurant"},{"key":"shop","op":"has_key"}])
       assert.equal(f.toString(), 'nwr["amenity"="restaurant"]["shop"];')
+
+      var r = f.toLokijs()
+      assert.deepEqual(r, { 'tags.amenity': { $eq: 'restaurant' }, 'tags.shop': { $exists: true } })
 
       var r = f.match({ tags: { amenity: 'restaurant' } })
       assert.equal(r, false, 'Object should not match')
@@ -103,8 +155,11 @@ describe('Filter', function () {
 
     it ('nwr[cuisine^asian]', function () {
       var f = new Filter('nwr[cuisine^asian]')
-      assert.deepEqual(f.def, [{filters:[{"key":"cuisine","op":"has","value":"asian"}]}])
+      assert.deepEqual(f.def, [{"key":"cuisine","op":"has","value":"asian"}])
       assert.equal(f.toString(), 'nwr["cuisine"~"^(.*;|)asian(|;.*)$"];')
+
+      var r = f.toLokijs()
+      assert.deepEqual(r, { 'tags.cuisine': { $regex: '^(.*;|)asian(|;.*)$' } })
 
       var r = f.match({ tags: { amenity: 'restaurant' } })
       assert.equal(r, false, 'Object should not match')
@@ -124,7 +179,7 @@ describe('Filter', function () {
 
     it ('nwr["amenity"=\'restaurant\']["shop"~"super"]', function () {
       var f = new Filter('nwr["amenity"=\'restaurant\']["shop"~"super"]')
-      assert.deepEqual(f.def, [{filters:[{"key":"amenity","op":"=","value":"restaurant"},{"key":"shop","op":"~","value":"super"}]}])
+      assert.deepEqual(f.def, [{"key":"amenity","op":"=","value":"restaurant"},{"key":"shop","op":"~","value":"super"}])
       assert.equal(f.toString(), 'nwr["amenity"="restaurant"]["shop"~"super"];')
 
       var r = f.match({ tags: { amenity: 'restaurant' } })
@@ -141,15 +196,22 @@ describe('Filter', function () {
 
     it ('(node[amenity=cafe][cuisine=ice_cream];node[amenity=ice_cream];node[shop=ice_cream];)', function () {
       var f = new Filter('(node[amenity=cafe][cuisine=ice_cream];node[amenity=ice_cream];node[shop=ice_cream];)')
-      assert.deepEqual(f.def, [
+      assert.deepEqual(f.def,
         {or: [
-          {type:"node",filters:[{"key":"amenity","op":"=","value":"cafe"},{"key":"cuisine","op":"=","value":"ice_cream"}]},
-          {type:"node",filters:[{"key":"amenity","op":"=","value":"ice_cream"}]},
-          {type:"node",filters:[{"key":"shop","op":"=","value":"ice_cream"}]}
+          [{type:"node"},{"key":"amenity","op":"=","value":"cafe"},{"key":"cuisine","op":"=","value":"ice_cream"}],
+          [{type:"node"},{"key":"amenity","op":"=","value":"ice_cream"}],
+          [{type:"node"},{"key":"shop","op":"=","value":"ice_cream"}]
         ]}
-      ])
+      )
 
       assert.equal(f.toString(), '(node["amenity"="cafe"]["cuisine"="ice_cream"];node["amenity"="ice_cream"];node["shop"="ice_cream"];);')
+
+      var r = f.toLokijs()
+      assert.deepEqual(r, { $or: [
+        { 'type': { $eq: 'node' }, 'tags.amenity': { $eq: 'cafe' }, 'tags.cuisine': { $eq: 'ice_cream' } },
+        { 'type': { $eq: 'node' }, 'tags.amenity': { $eq: 'ice_cream' } },
+        { 'type': { $eq: 'node' }, 'tags.shop': { $eq: 'ice_cream' } }
+      ]})
 
       var r = f.match({ type: 'node', tags: { amenity: 'restaurant' } })
       assert.equal(r, false, 'Object should not match')
@@ -170,7 +232,12 @@ describe('Filter', function () {
     })
 
     it ('nwr[~wikipedia~"."]', function () {
-      var f = new Filter([ { keyRegexp: true, op: 'has_key', key: 'wikipedia' } ])
+      var f = new Filter('nwr[~wikipedia~"."]')
+      assert.deepEqual(f.def, [{"key":"wikipedia","keyRegexp":true,"op":"has_key"}])
+      assert.equal(f.toString(), 'nwr[~"wikipedia"~"."];')
+
+      var r = f.toLokijs()
+      assert.deepEqual(r, { needMatch: true })
 
       var r = f.match({ tags: { amenity: 'restaurant' } })
       assert.equal(r, false, 'Object should not match')
@@ -185,7 +252,12 @@ describe('Filter', function () {
     })
 
     it ('nwr[~wikipedia~"foo"]', function () {
-      var f = new Filter([ { keyRegexp: true, op: '~', key: 'wikipedia', value: 'foo' } ])
+      var f = new Filter('nwr[~wikipedia~"foo"]')
+      assert.deepEqual(f.def, [{"key":"wikipedia","keyRegexp":true,"op":"~","value":"foo"}])
+      assert.equal(f.toString(), 'nwr[~"wikipedia"~"foo"];')
+
+      var r = f.toLokijs()
+      assert.deepEqual(r, { needMatch: true })
 
       var r = f.match({ tags: { amenity: 'restaurant' } })
       assert.equal(r, false, 'Object should not match')
@@ -210,7 +282,12 @@ describe('Filter', function () {
     })
 
     it ('nwr[~wikipedia~".",i]', function () {
-      var f = new Filter([ { keyRegexp: 'i', op: 'has_key', key: 'wikipedia' } ])
+      var f = new Filter('nwr[~wikipedia~".",i]')
+      assert.deepEqual(f.def, [{"key":"wikipedia","keyRegexp":"i","op":"has_key"}])
+      assert.equal(f.toString(), 'nwr[~"wikipedia"~".",i];')
+
+      var r = f.toLokijs()
+      assert.deepEqual(r, { needMatch: true })
 
       var r = f.match({ tags: { amenity: 'restaurant' } })
       assert.equal(r, false, 'Object should not match')
@@ -225,7 +302,12 @@ describe('Filter', function () {
     })
 
     it ('nwr[~wikipedia~"foo",i]', function () {
-      var f = new Filter([ { keyRegexp: 'i', op: '~i', key: 'wikipedia', value: 'foo' } ])
+      var f = new Filter('nwr[~wikipedia~"foo",i]')
+      assert.deepEqual(f.def, [{"key":"wikipedia","keyRegexp":"i","op":"~i","value":"foo"}])
+      assert.equal(f.toString(), 'nwr[~"wikipedia"~"foo",i];')
+
+      var r = f.toLokijs()
+      assert.deepEqual(r, { needMatch: true })
 
       var r = f.match({ tags: { amenity: 'restaurant' } })
       assert.equal(r, false, 'Object should not match')
@@ -247,6 +329,39 @@ describe('Filter', function () {
       assert.equal(r, true, 'Object2 should match')
       var r = f.match({ tags: { 'Wikipedia:de': 'Foobar' } })
       assert.equal(r, true, 'Object3 should match')
+    })
+
+    it ('(nwr[~wikipedia~"foo"];node[amenity];)', function () {
+      var f = new Filter('(nwr[~wikipedia~"foo"];node[amenity];)')
+      assert.deepEqual(f.def, {or:[
+        [{"key":"wikipedia","keyRegexp":true,"op":"~","value":"foo"}],
+        [{"type":"node"},{"key":"amenity","op":"has_key","keyRegexp":true}], // TODO: keyRegexp WRONG!!!
+      ]})
+      assert.equal(f.toString(), '(nwr[~"wikipedia"~"foo"];node[~"amenity"~"."];);') // TODO: keyRegexp WRONG!!!
+
+      var r = f.toLokijs()
+      assert.deepEqual(r, { needMatch: true })
+
+      var r = f.match({ tags: { amenity: 'restaurant' } })
+      assert.equal(r, false, 'Object should not match')
+      var r = f.match({ tags: { wikipedia: 'test' } })
+      assert.equal(r, false, 'Object should not match')
+      var r = f.match({ tags: { 'de:wikipedia': 'test' } })
+      assert.equal(r, false, 'Object should not match')
+      var r = f.match({ tags: { 'wikipedia:de': 'test' } })
+      assert.equal(r, false, 'Object should not match')
+      var r = f.match({ tags: { wikipedia: 'foobar' } })
+      assert.equal(r, true, 'Object should match')
+      var r = f.match({ tags: { 'de:wikipedia': 'foobar' } })
+      assert.equal(r, true, 'Object should match')
+      var r = f.match({ tags: { 'wikipedia:de': 'foobar' } })
+      assert.equal(r, true, 'Object should match')
+      var r = f.match({ tags: { 'Wikipedia:de': 'foobar' } })
+      assert.equal(r, false, 'Object should not match')
+      var r = f.match({ tags: { 'wikipedia:de': 'Foobar' } })
+      assert.equal(r, false, 'Object should not match')
+      var r = f.match({ tags: { 'Wikipedia:de': 'Foobar' } })
+      assert.equal(r, false, 'Object should not match')
     })
 
   })
@@ -363,77 +478,6 @@ describe('Filter', function () {
   })
 
   describe('toLokijs', function () {
-    it ('nwr[amenity]', function () {
-      var f = new Filter([ { op: 'has_key', key: 'amenity' } ])
-
-      var r = f.toLokijs()
-      assert.deepEqual(r, { 'tags.amenity': { $exists: true }})
-    })
-
-    it ('nwr[amenity=restaurant]', function () {
-      var f = new Filter([ { op: '=', key: 'amenity', value: 'restaurant' } ])
-
-      var r = f.toLokijs()
-      assert.deepEqual(r, { 'tags.amenity': { $eq: 'restaurant' } })
-    })
-
-    it ('nwr[amenity][amenity!=restaurant]', function () {
-      var f = new Filter([ { op: 'has_key', key: 'amenity' }, { op: '!=', key: 'amenity', value: 'restaurant' } ])
-
-      var r = f.toLokijs()
-      assert.deepEqual(r, { 'tags.amenity': { $and: [ { $exists: true }, { $ne: 'restaurant' } ] } } )
-    })
-
-    it ('nwr[amenity][amenity!=cafe][amenity!=restaurant]', function () {
-      var f = new Filter([ { op: 'has_key', key: 'amenity' }, { op: '!=', key: 'amenity', value: 'cafe' }, { op: '!=', key: 'amenity', value: 'restaurant' } ])
-
-      var r = f.toLokijs()
-      assert.deepEqual(r, { 'tags.amenity': { $and: [ { $exists: true }, { $ne: 'cafe' }, { $ne: 'restaurant' } ] } } )
-    })
-
-    it ('nwr[amenity=restaurant][shop]', function () {
-      var f = new Filter([ { op: '=', key: 'amenity', value: 'restaurant' }, { op: 'has_key', key: 'shop' } ])
-
-      var r = f.toLokijs()
-      assert.deepEqual(r, { 'tags.amenity': { $eq: 'restaurant' }, 'tags.shop': { $exists: true } })
-    })
-
-    it ('[cuisine^asian]', function () {
-      var f = new Filter([ { op: 'has', key: 'cuisine', value: 'asian' } ])
-
-      var r = f.toLokijs()
-      assert.deepEqual(r, { 'tags.cuisine': { $regex: '^(.*;|)asian(|;.*)$' } })
-    })
-
-    it ('(node[amenity=cafe][cuisine=ice_cream];node[amenity=ice_cream];nwr[shop=ice_cream];)', function () {
-      var f = new Filter({ "or": [
-	[ { "type": "node" }, { "key": "amenity", "op": "=", "value": "cafe" }, { "key": "cuisine", "op": "=", "value": "ice_cream" } ],
-	[ { "type": "node" }, { "key": "amenity", "op": "=", "value": "ice_cream" } ],
-	[ { "key": "shop", "op": "=", "value": "ice_cream" } ]
-      ] })
-
-      var r = f.toLokijs()
-      assert.deepEqual(r, { $or: [
-        { 'type': { $eq: 'node' }, 'tags.amenity': { $eq: 'cafe' }, 'tags.cuisine': { $eq: 'ice_cream' } },
-        { 'type': { $eq: 'node' }, 'tags.amenity': { $eq: 'ice_cream' } },
-        { 'tags.shop': { $eq: 'ice_cream' } }
-      ]})
-    })
-
-    it ('nwr[~wikipedia~"."]', function () {
-      var f = new Filter([ { keyRegexp: true, op: 'has_key', key: 'wikipedia' } ])
-
-      var r = f.toLokijs()
-      assert.deepEqual(r, { needMatch: true })
-    })
-
-    it ('nwr[~wikipedia~".",i]', function () {
-      var f = new Filter([ { keyRegexp: 'i', op: 'has_key', key: 'wikipedia' } ])
-
-      var r = f.toLokijs()
-      assert.deepEqual(r, { needMatch: true })
-    })
-
     it ('(nwr[~wikipedia~"."];)', function () {
       var f = new Filter('(nwr[~wikipedia~"."];)')
 
@@ -453,27 +497,6 @@ describe('Filter', function () {
 
       var r = f.toLokijs()
       assert.deepEqual(r, { "type": { $eq: "node" }, "tags.amenity": { "$exists": true }, "needMatch": true })
-    })
-
-    it ('nwr[~wikipedia~"foo"]', function () {
-      var f = new Filter([ { keyRegexp: true, op: '~', key: 'wikipedia', value: 'foo' } ])
-
-      var r = f.toLokijs()
-      assert.deepEqual(r, { needMatch: true })
-    })
-
-    it ('nwr[~wikipedia~"foo",i]', function () {
-      var f = new Filter([ { keyRegexp: 'i', op: '~i', key: 'wikipedia', value: 'foo' } ])
-
-      var r = f.toLokijs()
-      assert.deepEqual(r, { needMatch: true })
-    })
-
-    it ('nwr[~wikipedia~"foo"][~wikipedia~"bar"]', function () {
-      var f = new Filter([ { keyRegexp: true, op: '~', key: 'wikipedia', value: 'foo' }, { keyRegexp: true, op: '~', key: 'wikipedia', value: 'bar' } ])
-
-      var r = f.toLokijs()
-      assert.deepEqual(r, { needMatch: true })
     })
 
     it ('(nwr[~wikipedia~"foo"];node[amenity];)', function () {
@@ -625,7 +648,7 @@ describe('Filter', function () {
   it('case-sensitive regexp', function () {
     var f = new Filter('node["name"~"test"]')
 
-    assert.deepEqual(f.def, [{"type":"node",filters:[{"key":"name","op":"~","value":"test"}]}])
+    assert.deepEqual(f.def, [{"type":"node"},{"key":"name","op":"~","value":"test"}])
     assert.equal(f.toString(), 'node["name"~"test"];')
     assert.equal(f.toQl(), 'node["name"~"test"];')
     assert.deepEqual(f.toLokijs(), { type: { '$eq': 'node' }, 'tags.name': { '$regex': /test/ } })
@@ -636,7 +659,7 @@ describe('Filter', function () {
   it('case-sensitive !regexp', function () {
     var f = new Filter('node["name"!~"test"]')
 
-    assert.deepEqual(f.def, [{"type":"node",filters:[{"key":"name","op":"!~","value":"test"}]}])
+    assert.deepEqual(f.def, [{"type":"node"},{"key":"name","op":"!~","value":"test"}])
     assert.equal(f.toString(), 'node["name"!~"test"];')
     assert.equal(f.toQl(), 'node["name"!~"test"];')
     assert.deepEqual(f.toLokijs(), { type: { '$eq': 'node' }, 'tags.name': { '$not': { '$regex': /test/ } } })
@@ -647,7 +670,7 @@ describe('Filter', function () {
   it('case-insenstive regexp', function () {
     var f = new Filter('node["name"~"test",i]')
 
-    assert.deepEqual(f.def, [{"type":"node",filters:[{"key":"name","op":"~i","value":"test"}]}])
+    assert.deepEqual(f.def, [{"type":"node"},{"key":"name","op":"~i","value":"test"}])
     assert.equal(f.toString(), 'node["name"~"test",i];')
     assert.equal(f.toQl(), 'node["name"~"test",i];')
     assert.deepEqual(f.toLokijs(), { type: { '$eq': 'node' }, 'tags.name': { '$regex': /test/i } })
@@ -658,7 +681,7 @@ describe('Filter', function () {
   it('case-insenstive !regexp', function () {
     var f = new Filter('node["name"!~"test",i]')
 
-    assert.deepEqual(f.def, [{"type":"node",filters:[{"key":"name","op":"!~i","value":"test"}]}])
+    assert.deepEqual(f.def, [{"type":"node"},{"key":"name","op":"!~i","value":"test"}])
     assert.equal(f.toString(), 'node["name"!~"test",i];')
     assert.equal(f.toQl(), 'node["name"!~"test",i];')
     assert.deepEqual(f.toLokijs(), { type: { '$eq': 'node' }, 'tags.name': { '$not': { '$regex': /test/i } } })
@@ -669,7 +692,7 @@ describe('Filter', function () {
   it('!=', function () {
     var f = new Filter('node["name"!="test"]')
 
-    assert.deepEqual(f.def, [{"type":"node",filters:[{"key":"name","op":"!=","value":"test"}]}])
+    assert.deepEqual(f.def, [{"type":"node"},{"key":"name","op":"!=","value":"test"}])
     assert.equal(f.toString(), 'node["name"!="test"];')
     assert.equal(f.toQl(), 'node["name"!="test"];')
     assert.deepEqual(f.toLokijs(), { type: { '$eq': 'node' }, 'tags.name': { '$ne': 'test' } })
@@ -680,7 +703,7 @@ describe('Filter', function () {
   it('key regexp', function () {
     var f = new Filter('node[~"na"~"."]')
 
-    assert.deepEqual(f.def, [{"type":"node",filters:[{"key":"na","keyRegexp":true,"op":"has_key"}]}])
+    assert.deepEqual(f.def, [{"type":"node"},{"key":"na","keyRegexp":true,"op":"has_key"}])
     assert.equal(f.toString(), 'node[~"na"~"."];')
     assert.equal(f.toQl(), 'node[~"na"~"."];')
     assert.deepEqual(f.toLokijs(), { type: { '$eq': 'node' }, needMatch: true })
@@ -691,7 +714,7 @@ describe('Filter', function () {
   it('strsearch', function () {
     var f = new Filter('node["name"%"test"]')
 
-    assert.deepEqual(f.def, [{"type":"node",filters:[{"key":"name","op":"strsearch","value":"test"}]}])
+    assert.deepEqual(f.def, [{"type":"node"},{"key":"name","op":"strsearch","value":"test"}])
     assert.equal(f.toString(), 'node["name"~"t[eèeéêëė][sß]t",i];')
     assert.equal(f.toQl(), 'node["name"~"t[eèeéêëė][sß]t",i];')
     assert.deepEqual(f.toLokijs(), { type: { '$eq': 'node' }, "tags.name": { "$regex": /t[eèeéêëė][sß]t/i } })
@@ -702,7 +725,7 @@ describe('Filter', function () {
   it('has', function () {
     var f = new Filter('node["cuisine"^"ice_cream"]')
 
-    assert.deepEqual(f.def, [{"type":"node",filters:[{"key":"cuisine","op":"has","value":"ice_cream"}]}])
+    assert.deepEqual(f.def, [{"type":"node"},{"key":"cuisine","op":"has","value":"ice_cream"}])
     assert.equal(f.toString(), 'node["cuisine"~"^(.*;|)ice_cream(|;.*)$"];')
     assert.equal(f.toQl(), 'node["cuisine"~"^(.*;|)ice_cream(|;.*)$"];')
     assert.deepEqual(f.toLokijs(), { type: { '$eq': 'node' }, "tags.cuisine": { "$regex": "^(.*;|)ice_cream(|;.*)$" } })
@@ -713,7 +736,7 @@ describe('Filter', function () {
   it('has_key', function () {
     var f = new Filter('node["cuisine"]')
 
-    assert.deepEqual(f.def, [{"type":"node",filters:[{"key":"cuisine","op":"has_key"}]}])
+    assert.deepEqual(f.def, [{"type":"node"},{"key":"cuisine","op":"has_key"}])
     assert.equal(f.toString(), 'node["cuisine"];')
     assert.equal(f.toQl(), 'node["cuisine"];')
     assert.deepEqual(f.toLokijs(), { type: { '$eq': 'node' }, "tags.cuisine": { "$exists": true } })
@@ -724,7 +747,7 @@ describe('Filter', function () {
   it('not_exists', function () {
     var f = new Filter('node[!"cuisine"]')
 
-    assert.deepEqual(f.def, [{"type":"node",filters:[{"key":"cuisine","op":"not_exists"}]}])
+    assert.deepEqual(f.def, [{"type":"node"},{"key":"cuisine","op":"not_exists"}])
     assert.equal(f.toString(), 'node[!"cuisine"];')
     assert.equal(f.toQl(), 'node[!"cuisine"];')
     assert.deepEqual(f.toLokijs(), { type: { '$eq': 'node' }, "tags.cuisine": { "$exists": false } })
