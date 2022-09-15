@@ -1027,6 +1027,93 @@ describe('Filter by id', function () {
     var r = f.caches()
     assert.deepEqual(r, [ { name: 'node', ids: [3, 4, 5] } ])
   })
+
+  it('id: (multiple with or)', function () {
+    var f = new Filter('(node(id:3,4,5);way(id:3,4);)')
+
+    assert.deepEqual(f.def, {or: [
+      [{"type":"node"},{"fun":"id", "value":[3,4,5]}],
+      [{"type":"way"},{"fun":"id", "value":[3,4]}]
+    ]})
+    assert.equal(f.toString(), '(node(id:3,4,5);way(id:3,4););')
+    assert.equal(f.toQl(), '(node(id:3,4,5);way(id:3,4););')
+    assert.deepEqual(f.toLokijs(), { $or: [
+      { type: { '$eq': 'node' }, "osm_id": { "$in": [ 3, 4, 5 ] } },
+      { type: { '$eq': 'way' }, "osm_id": { "$in": [ 3, 4 ] } }
+    ]})
+
+    check(f, [ 3, 4, 5 ])
+
+    var r = f.caches()
+    assert.deepEqual(r, [
+      { name: 'node', ids: [3, 4, 5] },
+      { name: 'way', ids: [3, 4] }
+    ])
+  })
+
+  it('id: (multiple with or)', function () {
+    var f = new Filter([
+      {or: [
+        [{"fun":"id", "value":[3,4,5]}],
+        [{"fun":"id", "value":[3,4]}]
+      ]},
+      {key:"amenity",op:"has_key"}
+    ])
+
+    assert.equal(f.toString(), '(nwr(id:3,4,5)["amenity"];nwr(id:3,4)["amenity"];);')
+    assert.equal(f.toQl(), '(nwr(id:3,4,5)["amenity"];nwr(id:3,4)["amenity"];);')
+    assert.deepEqual(f.toLokijs(), { $or: [
+      { "osm_id": { "$in": [ 3, 4, 5 ] } },
+      { "osm_id": { "$in": [ 3, 4 ] } }
+    ], "tags.amenity": { $exists: true }})
+
+    check(f, [ 3, 4, 5 ])
+
+    var r = f.caches()
+    assert.deepEqual(r, [
+      { name: '["amenity"]', ids: [3, 4, 5] },
+      { name: '["amenity"]', ids: [3, 4] }
+    ])
+  })
+
+  it('id: (multiple in one query)', function () {
+    var f = new Filter('node(id:1,2,4,5)(id:1,3,5)')
+
+    assert.deepEqual(f.def, [{"type":"node"},{"fun":"id", "value":[1,2,4,5]},{"fun":"id", "value":[1,3,5]}])
+
+    assert.equal(f.toString(), 'node(id:1,2,4,5)(id:1,3,5);')
+    assert.equal(f.toQl(), 'node(id:1,2,4,5)(id:1,3,5);')
+    assert.deepEqual(f.toLokijs(), { type: { '$eq': 'node' }, "osm_id": { $and: [ { "$in": [ 1, 2, 4, 5 ] }, { "$in": [ 1, 3, 5 ] } ] } })
+
+    check(f, [ 1, 5 ])
+
+    var r = f.caches()
+    assert.deepEqual(r, [
+      { name: 'node', ids: [1, 5] },
+    ])
+  })
+
+  it('id: (multiple with and)', function () {
+    var f = new Filter([
+      {or: [
+        [{"fun":"id", "value":[1, 2, 4, 5]}],
+      ]},
+      {"fun":"id", "value":[1, 3, 5]}
+    ])
+
+    assert.equal(f.toString(), 'nwr(id:1,2,4,5)(id:1,3,5);')
+    assert.equal(f.toQl(), 'nwr(id:1,2,4,5)(id:1,3,5);')
+    assert.deepEqual(f.toLokijs(), { $or: [
+      { "osm_id": { "$in": [ 1, 2, 4, 5 ] } },
+    ], "osm_id": { $in: [ 1, 3, 5 ] }})
+
+    check(f, [ 1, 5 ])
+
+    var r = f.caches()
+    assert.deepEqual(r, [
+      { name: '', ids: [1, 5] },
+    ])
+  })
 })
 
 describe('Function "around"', function () {

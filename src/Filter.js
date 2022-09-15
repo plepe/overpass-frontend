@@ -676,6 +676,14 @@ class Filter {
       r[k] = a[k]
     }
     r.name += b.name
+
+    if (b.ids) {
+      r.ids = b.ids
+      if (a.ids) {
+        r.ids = b.ids.filter(n => a.ids.includes(n))
+      }
+    }
+
     return r
   }
 }

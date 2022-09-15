@@ -20,6 +20,10 @@ module.exports = {
   },
 
   cacheInfo (options, value) {
+    if (options.ids) {
+      value = options.ids.filter(n => value.includes(n))
+    }
+
     options.ids = value.sort()
   }
 }
