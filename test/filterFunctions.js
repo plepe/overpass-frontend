@@ -32,7 +32,8 @@ var overpassFrontend
           expected: [ 'n378440' ],
           expectedSubRequestCount: 1,
           expectedCacheInfo: [{
-            name: 'node',
+            type: 'node',
+            filters: '',
             ids: [378440]
           }]
         }, done)
@@ -45,7 +46,8 @@ var overpassFrontend
           expected: [ 'n378440' ],
           expectedSubRequestCount: 0,
           expectedCacheInfo: [{
-            name: 'node',
+            type: 'node',
+            filters: '',
             ids: [378440]
           }]
         }, done)
@@ -58,7 +60,8 @@ var overpassFrontend
           expected: [ 'n378440' ],
           expectedSubRequestCount: 1, // TODO: 0
           expectedCacheInfo: [{
-            name: 'node',
+            type: 'node',
+            filters: '',
             ids: [378440]
           }]
         }, done)
@@ -71,7 +74,8 @@ var overpassFrontend
           expected: [ 'n378440', 'n647991', 'n393161' ],
           expectedSubRequestCount: 1,
           expectedCacheInfo: [{
-            name: 'node',
+            type: 'node',
+            filters: '',
             ids: [1234, 378440, 393161, 647991]
           }]
         }, done)
@@ -84,7 +88,8 @@ var overpassFrontend
           expected: [ 'n647991' ],
           expectedSubRequestCount: 1, // TODO: 0
           expectedCacheInfo: [{
-            name: 'node',
+            type: 'node',
+            filters: '',
             ids: [647991]
           }]
         }, done)
@@ -97,7 +102,8 @@ var overpassFrontend
           expected: [],
           expectedSubRequestCount: 1, // TODO: 0
           expectedCacheInfo: [{
-            name: 'node',
+            type: 'node',
+            filters: '',
             ids: [1234]
           }]
         }, done)
@@ -112,7 +118,8 @@ var overpassFrontend
           expected: [ 'n395262', 'n643386609', 'n1599448219', 'n1871276160', 'n3765072046' ],
           expectedSubRequestCount: 1,
           expectedCacheInfo: [{
-            "name": "node",
+            "type": "node",
+            "filters": "",
             "bounds": {
               "type": "Polygon",
               "coordinates": [
@@ -148,7 +155,8 @@ var overpassFrontend
           expected: [ 'n395262', 'n643386609', 'n1599448219', 'n1871276160', 'n3765072046' ],
           expectedSubRequestCount: 0,
           expectedCacheInfo: [{
-            "name": "node",
+            "type": "node",
+            "filters": "",
             "bounds": {
               "type": "Polygon",
               "coordinates": [
@@ -184,7 +192,8 @@ var overpassFrontend
           expected: [ 'n395262' ],
           expectedSubRequestCount: 1, // TODO: 0
           expectedCacheInfo: [{
-            "name": "node",
+            "type": "node",
+            "filters": "",
             "bounds": {
               "type": "Polygon",
               "coordinates": [
@@ -220,7 +229,8 @@ var overpassFrontend
           expected: [ 'n1599448219', 'n1871276160', 'n643386609' ],
           expectedSubRequestCount: 1,
           expectedCacheInfo: [{
-            "name": "node",
+            "type": "node",
+            "filters": "",
             "bounds": {
               "type": "Polygon",
               "coordinates": [
@@ -250,7 +260,8 @@ var overpassFrontend
           expected: [ 'n1599448219', 'n1871276160', 'n3765072046', 'n395262', 'n643386609' ],
           expectedSubRequestCount: 1,
           expectedCacheInfo: [{
-            "name": "node",
+            "type": "node",
+            "filters": "",
             "bounds": {
               "type": "Polygon",
               "coordinates": [
@@ -272,7 +283,8 @@ var overpassFrontend
           expected: [ 'n1599448219', 'n1871276160', 'n3765072046', 'n395262', 'n643386609' ],
           expectedSubRequestCount: 0,
           expectedCacheInfo: [{
-            "name": "node",
+            "type": "node",
+            "filters": "",
             "bounds": {
               "type": "Polygon",
               "coordinates": [
@@ -294,7 +306,8 @@ var overpassFrontend
           expected: [ 'n395262' ],
           expectedSubRequestCount: 1, // TODO: 0
           expectedCacheInfo: [{
-            "name": "node",
+            "type": "node",
+            "filters": "",
             "bounds": {
               "type": "Polygon",
               "coordinates": [
@@ -319,7 +332,8 @@ var overpassFrontend
           expectedSubRequestCount: 1, // TODO: 0
           expectedCacheInfo: [
             {
-              "name": "node",
+              "type": "node",
+              "filters": "",
               "bounds": {
                 "type": "Polygon",
                 "coordinates": [
@@ -334,7 +348,8 @@ var overpassFrontend
               }
             },
             {
-              "name": "way",
+              "type": "way",
+              "filters": "",
               "bounds": {
                 "type": "Polygon",
                 "coordinates": [

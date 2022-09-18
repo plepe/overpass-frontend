@@ -614,7 +614,7 @@ class Filter {
   }
 
   _caches (def) {
-    let options = [{ name: '' }]
+    let options = [{ filters: '' }]
 
     if (def.or) {
       let result = []
@@ -636,12 +636,16 @@ class Filter {
     def.forEach(part => {
       if (part.type) {
         options = options.map(o => {
-          o.name += part.type
+          if (o.type && o.type !== part.type) {
+            o.type = '-'
+          } else {
+            o.type = part.type
+          }
           return o
         })
       } else if (part.op) {
         options = options.map(o => {
-          o.name += compile(part)
+          o.filters += compile(part)
           return o
         })
       } else if (part.fun) {
@@ -675,7 +679,7 @@ class Filter {
     for (const k in a) {
       r[k] = a[k]
     }
-    r.name += b.name
+    r.filters += b.filters
 
     if (b.ids) {
       r.ids = b.ids
