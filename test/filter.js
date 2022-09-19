@@ -59,6 +59,20 @@ describe('Filter', function () {
   })
 
   describe ('match', function () {
+    it('nwr', function () {
+      var f = new Filter('nwr')
+
+      assert.deepEqual(f.def, [])
+      assert.equal(f.toString(), 'nwr;')
+      assert.equal(f.toQl(), 'nwr;')
+      assert.deepEqual(f.toLokijs(), {})
+
+      check(f, [ 1, 2, 3, 4, 5, 6, 7 ])
+
+      var r = f.caches()
+      assert.deepEqual(r, [ { filters:'' } ])
+    })
+
     it ('nwr[amenity]', function () {
       var f = new Filter('nwr[amenity]')
       assert.deepEqual(f.def, [{"key":"amenity","op":"has_key"}])
