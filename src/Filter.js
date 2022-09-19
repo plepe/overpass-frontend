@@ -670,6 +670,20 @@ class Filter {
         })
 
         options = result
+      } else if (part.and) {
+        let result = options
+        part.and.forEach(e => {
+          const current = result
+          result = []
+          const r = this._caches(e)
+          r.forEach(r1 => {
+            current.forEach(c => {
+              result.push(this._cacheMerge(c, r1))
+            })
+          })
+        })
+
+        options = result
       } else {
         throw new Error('caches(): invalid entry')
       }
@@ -684,6 +698,14 @@ class Filter {
       r[k] = a[k]
     }
     r.filters += b.filters
+
+    if (b.type) {
+      if (a.type && a.type !== b.type) {
+        r.type = '-'
+      } else {
+        r.type = b.type
+      }
+    }
 
     if (b.ids) {
       r.ids = b.ids
