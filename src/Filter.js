@@ -310,6 +310,10 @@ function parse (def, rek = 0) {
 function check (def) {
   if (typeof def === 'string') {
     return parse(def)[0]
+  } else if (def === null) {
+    return
+  } else if (typeof def === 'object' && def.constructor.name === 'Filter') {
+    def = def.def
   }
   if (def.and) {
     def.and = def.and.map(p => check(p))
