@@ -50,6 +50,14 @@ describe('Filter', function () {
 
   })
 
+  describe ('nesting filters', function () {
+    it ('new Filter(new Filter("nwr[amenity]"))', function () {
+      var f = new Filter(new Filter("nwr[amenity]"))
+      assert.deepEqual(f.def, [{"key":"amenity","op":"has_key"}])
+      assert.equal(f.toString(), 'nwr["amenity"];')
+    })
+  })
+
   describe ('match', function () {
     it ('nwr[amenity]', function () {
       var f = new Filter('nwr[amenity]')
