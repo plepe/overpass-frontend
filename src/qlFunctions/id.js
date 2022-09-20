@@ -25,5 +25,9 @@ module.exports = {
     }
 
     options.ids = value.sort()
+  },
+
+  isSupersetOf (value, otherValue) {
+    return !otherValue.filter(id => !value.includes(id)).length
   }
 }

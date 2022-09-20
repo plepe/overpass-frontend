@@ -23,6 +23,10 @@ function compile (part) {
     return qlFunctions[part.fun].compileQL(part.value)
   }
 
+  if (part.type) {
+    return part.type
+  }
+
   switch (part.op) {
     case 'has_key':
       if (part.keyRegexp === 'i') {
@@ -47,7 +51,7 @@ function compile (part) {
     case 'strsearch':
       return '[' + keyRegexp + qlesc(part.key) + '~' + qlesc(strsearch2regexp(part.value)) + ',i]'
     default:
-      throw new Error('unknown operator')
+      throw new Error('unknown operator' + JSON.stringify(part))
   }
 }
 
@@ -715,6 +719,36 @@ class Filter {
     }
 
     return r
+  }
+
+  /**
+   * compare this filter with an other filter.
+   * @param Filter other the other filter.
+   * @return boolean true, if the current filter is equal other or a super-set of other.
+   */
+  isSupersetOf (other) {
+    return this._isSupersetOf(this.def, other.def)
+  }
+
+  _isSupersetOf (def, otherDef) {
+    // search for something, where otherPart is not equal or subset
+    return !def.some(part => {
+      return !otherDef.some(otherPart => {
+        if (part.type && otherPart.type) {
+          return part.type === otherPart.type
+        }
+        if (compile(otherPart) === compile(part)) {
+          return true
+        }
+        if (part.op === 'has_key' && otherPart.op && !['!=', '!~', '!~i', 'not_exists'].includes(otherPart.op) && part.key === otherPart.key) {
+          return true
+        }
+        if (part.fun && otherPart.fun === part.fun && qlFunctions[part.fun].isSupersetOf(part.value, otherPart.value)) {
+          return true
+        }
+        return false
+      })
+    })
   }
 }
 
