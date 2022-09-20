@@ -731,6 +731,20 @@ class Filter {
   }
 
   _isSupersetOf (def, otherDef) {
+    if (def.or) {
+      return def.or.some(d => this._isSupersetOf(d, otherDef))
+    }
+    if (def.and) {
+      return def.and.every(d => this._isSupersetOf(d, otherDef))
+    }
+
+    if (otherDef.or) {
+      return otherDef.or.every(d => this._isSupersetOf(def, d))
+    }
+    if (otherDef.and) {
+      return otherDef.and.some(d => this._isSupersetOf(def, d))
+    }
+
     // search for something, where otherPart is not equal or subset
     return !def.some(part => {
       return !otherDef.some(otherPart => {
