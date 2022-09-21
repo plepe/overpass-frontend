@@ -31,43 +31,22 @@ class RequestBBox extends Request {
       this.query += ';'
     }
 
-    if ((typeof this.options.filter !== 'undefined') && !(this.options.filter instanceof Filter)) {
-      this.options.filter = new Filter(this.options.filter)
-    }
-
-    // TODO: remove filterId, combine query and filter by 'and'
-    let filterId = null
-    if (this.options.filter) {
-      filterId = this.options.filter.toString()
-    }
-
     if (!('noCacheQuery' in this.options) || !this.options.noCacheQuery) {
-      this.filterQuery = new Filter(this.query)
+      if (this.options.filter) {
+        this.filterQuery = new Filter({ and: [this.query, this.options.filter] })
+        this.query = this.filterQuery.toString()
+      } else {
+        this.filterQuery = new Filter(this.query)
+      }
 
       this.lokiQuery = this.filterQuery.toLokijs()
       this.lokiQueryNeedMatch = !!this.lokiQuery.needMatch
       delete this.lokiQuery.needMatch
 
-      if (this.options.filter) {
-        const filterLokiQuery = this.options.filter.toLokijs()
-        this.lokiQueryFilterNeedMatch = !!filterLokiQuery.needMatch
-        delete filterLokiQuery.needMatch
-
-        this.lokiQuery = { $and: [this.lokiQuery, filterLokiQuery] }
-      }
-
       if (!boundsIsFullWorld(this.bounds)) {
         this.lokiQuery = { $and: [this.lokiQuery, boundsToLokiQuery(this.bbox, this.overpass)] }
       }
-    }
 
-    this.loadFinish = false
-
-    if ('members' in this.options) {
-      RequestBBoxMembers(this)
-    }
-
-    if (this.filterQuery) {
       this.caches = this.filterQuery.caches()
       this.caches.forEach(cacheInfo => {
         if (!(cacheInfo.id in this.overpass.cacheBBoxQueries)) {
@@ -82,35 +61,11 @@ class RequestBBox extends Request {
       this.caches = []
     }
 
-    // deprecated start
-    if (this.query in this.overpass.cacheBBoxQueries) {
-      this.cache = this.overpass.cacheBBoxQueries[this.query]
+    this.loadFinish = false
 
-      if (filterId) {
-        if (!('filter' in this.cache)) {
-          this.cache.filter = {}
-        }
-
-        if (!(filterId in this.cache.filter)) {
-          this.cache.filter[filterId] = new KnownArea()
-        }
-
-        this.cacheFilter = this.cache.filter[filterId]
-      }
-    } else {
-      // otherwise initialize cache
-      this.overpass.cacheBBoxQueries[this.query] = {}
-      this.cache = this.overpass.cacheBBoxQueries[this.query]
-      this.cache.requested = new KnownArea()
-
-      if (filterId) {
-        this.cache.filter = {}
-        this.cache.filter[filterId] = new KnownArea()
-        this.cacheFilter = this.cache.filter[filterId]
-      }
+    if ('members' in this.options) {
+      RequestBBoxMembers(this)
     }
-
-    // deprecated end
   }
 
   /**
@@ -136,10 +91,6 @@ class RequestBBox extends Request {
 
       // maybe we need an additional check
       if (this.lokiQueryNeedMatch && !this.filterQuery.match(ob)) {
-        continue
-      }
-
-      if (this.lokiQueryFilterNeedMatch && !this.options.filter.match(ob)) {
         continue
       }
 
@@ -212,7 +163,7 @@ class RequestBBox extends Request {
 
     // if the context already has a bbox and it differs from this, we can't add
     // ours
-    let query = '(' + this.query + ')->.result;\n'
+    let query = this.query.substr(0, this.query.length - 1) + '->.result;\n'
 
     let queryRemoveDoneFeatures = ''
     let countRemoveDoneFeatures = 0
@@ -231,13 +182,6 @@ class RequestBBox extends Request {
     if (countRemoveDoneFeatures) {
       query += '(' + queryRemoveDoneFeatures + ')->.done;\n'
       query += '(.result; - .done;)->.result;\n'
-    }
-
-    if (this.options.filter) {
-      query += this.options.filter.toQl({
-        inputSet: '.result',
-        outputSet: '.result'
-      })
     }
 
     if (!('split' in this.options)) {
@@ -290,15 +234,9 @@ class RequestBBox extends Request {
         (this.options.split > subRequest.parts[0].count)) {
       this.loadFinish = true
 
-      if (this.options.filter) {
-        this.cacheFilter.add(this.bbox)
-      } else {
-        this.cache.requested.add(this.bbox)
-
-        this.caches.forEach(cache => {
-          cache.cache.requested.add(this.bbox)
-        })
-      }
+      this.caches.forEach(cache => {
+        cache.cache.requested.add(this.bbox)
+      })
     }
   }
 
@@ -308,11 +246,6 @@ class RequestBBox extends Request {
    */
   needLoad () {
     if (this.loadFinish) {
-      return false
-    }
-
-    // check if we need to call Overpass API (whole area known?) -> deprecated
-    if (this.options.filter && this.cacheFilter.check(this.bbox)) {
       return false
     }
 
