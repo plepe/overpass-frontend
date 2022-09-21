@@ -76,6 +76,118 @@ describe("Filters - test isSupersetOf", function () {
     assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should not be a super set of " + f1.toString())
   })
 
+  it("node[amenity~'^(restaurant|cafe)$'] - node[amenity=restaurant]", function () {
+    const f1 = new Filter("node[amenity~'^(restaurant|cafe)$']")
+    const f2 = new Filter("node[amenity=restaurant]")
+
+    assert.equal(f1.isSupersetOf(f2), true, f1.toString() + " should be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should not be a super set of " + f1.toString())
+  })
+
+  it("node[amenity~'^(restaurant|cafe)$'] - node[amenity=Restaurant]", function () {
+    const f1 = new Filter("node[amenity~'^(restaurant|cafe)$']")
+    const f2 = new Filter("node[amenity=Restaurant]")
+
+    assert.equal(f1.isSupersetOf(f2), false, f1.toString() + " should not be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should not be a super set of " + f1.toString())
+  })
+
+  it("node[amenity~'^(restaurant|cafe)$',i] - node[amenity=Restaurant]", function () {
+    const f1 = new Filter("node[amenity~'^(restaurant|cafe)$',i]")
+    const f2 = new Filter("node[amenity=Restaurant]")
+
+    assert.equal(f1.isSupersetOf(f2), true, f1.toString() + " should be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should not be a super set of " + f1.toString())
+  })
+
+  it("node[amenity~'^(restaurant|cafe)$'] - node[amenity=bar]", function () {
+    const f1 = new Filter("node[amenity~'^(restaurant|cafe)$']")
+    const f2 = new Filter("node[amenity=bar]")
+
+    assert.equal(f1.isSupersetOf(f2), false, f1.toString() + " should not be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should not be a super set of " + f1.toString())
+  })
+
+  it("node[~'^(amenity|tourism)$'~'^(restaurant|cafe)$'] - node[amenity=bar]", function () {
+    const f1 = new Filter("node[~'^(amenity|tourism)$'~'^(restaurant|cafe)$']")
+    const f2 = new Filter("node[amenity=restaurant]")
+
+    assert.equal(f1.isSupersetOf(f2), true, f1.toString() + " should be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should not be a super set of " + f1.toString())
+  })
+
+  it("node[~'^(amenity|tourism)$'~'^(restaurant|cafe)$'] - node[amenity=bar]", function () {
+    const f1 = new Filter("node[~'^(amenity|tourism)$'~'^(restaurant|cafe)$']")
+    const f2 = new Filter("node[amenity=bar]")
+
+    assert.equal(f1.isSupersetOf(f2), false, f1.toString() + " should not be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should not be a super set of " + f1.toString())
+  })
+
+  it("node[~'^(amenity|tourism)$'~'^(restaurant|cafe)$'] - node[historic=restaurant]", function () {
+    const f1 = new Filter("node[~'^(amenity|tourism)$'~'^(restaurant|cafe)$']")
+    const f2 = new Filter("node[historic=restaurant]")
+
+    assert.equal(f1.isSupersetOf(f2), false, f1.toString() + " should not be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should not be a super set of " + f1.toString())
+  })
+
+  it("node[~'^(amenity|tourism)$'~'^(restaurant|cafe)$'] - node[Amenity=restaurant]", function () {
+    const f1 = new Filter("node[~'^(amenity|tourism)$'~'^(restaurant|cafe)$']")
+    const f2 = new Filter("node[Amenity=restaurant]")
+
+    assert.equal(f1.isSupersetOf(f2), false, f1.toString() + " should not be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should not be a super set of " + f1.toString())
+  })
+
+  it("node[~'^(amenity|tourism)$'~'^(restaurant|cafe)$',i] - node[Amenity=restaurant]", function () {
+    const f1 = new Filter("node[~'^(amenity|tourism)$'~'^(restaurant|cafe)$',i]")
+    const f2 = new Filter("node[Amenity=restaurant]")
+
+    assert.equal(f1.isSupersetOf(f2), true, f1.toString() + " should be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should not be a super set of " + f1.toString())
+  })
+
+  it("node[~'^(amenity|tourism)$'~'^(restaurant|cafe)$',i] - node[Amenity=Restaurant]", function () {
+    const f1 = new Filter("node[~'^(amenity|tourism)$'~'^(restaurant|cafe)$',i]")
+    const f2 = new Filter("node[Amenity=Restaurant]")
+
+    assert.equal(f1.isSupersetOf(f2), true, f1.toString() + " should be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should not be a super set of " + f1.toString())
+  })
+
+  it("node[~'^(amenity|tourism)$'~'.'] - node[amenity=restaurant]", function () {
+    const f1 = new Filter("node[~'^(amenity|tourism)$'~'.']")
+    const f2 = new Filter("node[amenity=restaurant]")
+
+    assert.equal(f1.isSupersetOf(f2), true, f1.toString() + " should be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should not be a super set of " + f1.toString())
+  })
+
+  it("node[~'^(amenity|tourism)$'~'.'] - node[Amenity=restaurant]", function () {
+    const f1 = new Filter("node[~'^(amenity|tourism)$'~'.']")
+    const f2 = new Filter("node[Amenity=restaurant]")
+
+    assert.equal(f1.isSupersetOf(f2), false, f1.toString() + " should not be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should not be a super set of " + f1.toString())
+  })
+
+  it("node[~'^(amenity|tourism)$'~'.',i] - node[Amenity=restaurant]", function () {
+    const f1 = new Filter("node[~'^(amenity|tourism)$'~'.',i]")
+    const f2 = new Filter("node[Amenity=restaurant]")
+
+    assert.equal(f1.isSupersetOf(f2), true, f1.toString() + " should be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should not be a super set of " + f1.toString())
+  })
+
+  it("node[~'^(amenity|tourism)$'~'.'] - node[amenity!=restaurant]", function () {
+    const f1 = new Filter("node[~'^(amenity|tourism)$'~'.']")
+    const f2 = new Filter("node[amenity!=restaurant]")
+
+    assert.equal(f1.isSupersetOf(f2), false, f1.toString() + " should not be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should not be a super set of " + f1.toString())
+  })
+
   it("node[amenity] - node[amenity!=restaurant]", function () {
     const f1 = new Filter("node[amenity]")
     const f2 = new Filter("node[amenity!=restaurant]")

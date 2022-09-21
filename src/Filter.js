@@ -764,7 +764,16 @@ class Filter {
         if (compile(otherPart) === compile(part)) {
           return true
         }
+        if (['~', '~i'].includes(part.op) && otherPart.op === '=' && part.key === otherPart.key && otherPart.value.match(RegExp(part.value, part.op === '~i' ? 'i' : ''))) {
+          return true
+        }
+        if (['~', '~i'].includes(part.op) && part.keyRegexp && otherPart.op === '=' && otherPart.key.match(RegExp(part.key, part.keyRegexp === 'i' ? 'i' : '')) && otherPart.value.match(RegExp(part.value, part.op === '~i' ? 'i' : ''))) {
+          return true
+        }
         if (part.op === 'has_key' && otherPart.op && !['!=', '!~', '!~i', 'not_exists'].includes(otherPart.op) && part.key === otherPart.key) {
+          return true
+        }
+        if (part.op === 'has_key' && part.keyRegexp && otherPart.op && !['!=', '!~', '!~i', 'not_exists'].includes(otherPart.op) && otherPart.key.match(RegExp(part.key, part.keyRegexp === 'i' ? 'i' : ''))) {
           return true
         }
         if (part.fun && otherPart.fun === part.fun && qlFunctions[part.fun].isSupersetOf(part.value, otherPart.value)) {
