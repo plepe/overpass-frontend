@@ -612,13 +612,23 @@ class Filter {
   }
 
   caches () {
+    let result
+
     if (Array.isArray(this.def) && Array.isArray(this.def[0])) {
       // script with several statements detected. only compile the last one, as previous statements
       // can't have an effect on the last statement yet.
-      return this._caches(this.def[this.def.length - 1])
+      result = this._caches(this.def[this.def.length - 1])
     } else {
-      return this._caches(this.def)
+      result = this._caches(this.def)
     }
+
+    result.forEach(entry => {
+      entry.id = (entry.type || 'nwr') + entry.filters
+      delete entry.type
+      delete entry.filters
+    })
+
+    return result
   }
 
   _caches (def) {

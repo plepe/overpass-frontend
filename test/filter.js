@@ -70,7 +70,7 @@ describe('Filter', function () {
       check(f, [ 1, 2, 3, 4, 5, 6, 7 ])
 
       var r = f.caches()
-      assert.deepEqual(r, [ { filters:'' } ])
+      assert.deepEqual(r, [ { id: 'nwr' } ])
     })
 
     it ('nwr[amenity]', function () {
@@ -82,7 +82,7 @@ describe('Filter', function () {
       assert.deepEqual(r, { 'tags.amenity': { $exists: true }})
 
       var r = f.caches()
-      assert.deepEqual(r, [ { filters: '["amenity"]' } ])
+      assert.deepEqual(r, [ { id: 'nwr["amenity"]' } ])
 
       var r = f.match({ tags: { amenity: 'restaurant' } })
       assert.equal(r, true, 'Object should match')
@@ -103,7 +103,7 @@ describe('Filter', function () {
       assert.deepEqual(r, { $or: [ { 'tags.amenity': { $exists: true } } ] })
 
       var r = f.caches()
-      assert.deepEqual(r, [ { filters: '["amenity"]' } ])
+      assert.deepEqual(r, [ { id: 'nwr["amenity"]' } ])
 
       var r = f.match({ tags: { amenity: 'restaurant' } })
       assert.equal(r, true, 'Object should match')
@@ -128,7 +128,7 @@ describe('Filter', function () {
       ] })
 
       var r = f.caches()
-      assert.deepEqual(r, [ { type: 'node', filters: '["amenity"]' }, { type: 'way', filters: '["amenity"]' } ])
+      assert.deepEqual(r, [ { id: 'node["amenity"]' }, { id: 'way["amenity"]' } ])
 
       var r = f.match({ type: 'node', tags: { amenity: 'restaurant' } })
       assert.equal(r, true, 'Object should match')
@@ -165,7 +165,7 @@ describe('Filter', function () {
       assert.deepEqual(r, { $or: [ { $or: [ { 'tags.amenity': { $exists: true } } ] } ] })
 
       var r = f.caches()
-      assert.deepEqual(r, [ { filters: '["amenity"]' } ])
+      assert.deepEqual(r, [ { id: 'nwr["amenity"]' } ])
 
       var r = f.match({ tags: { amenity: 'restaurant' } })
       assert.equal(r, true, 'Object should match')
@@ -193,9 +193,9 @@ describe('Filter', function () {
 
       var r = f.caches()
       assert.deepEqual(r, [
-        { filters: '["a"="b"]' },
-        { filters: '["c"="d"]' },
-        { filters: '["amenity"]' }
+        { id: 'nwr["a"="b"]' },
+        { id: 'nwr["c"="d"]' },
+        { id: 'nwr["amenity"]' }
       ])
 
       var r = f.match({ tags: { amenity: 'restaurant' } })
@@ -218,7 +218,7 @@ describe('Filter', function () {
       assert.deepEqual(r, { 'tags.amenity': { $exists: true } })
 
       var r = f.caches()
-      assert.deepEqual(r, [ { filters: '["amenity"]' } ])
+      assert.deepEqual(r, [ { id: 'nwr["amenity"]' } ])
 
       var r = f.match({ tags: { amenity: 'restaurant' } })
       assert.equal(r, true, 'Object should match')
@@ -237,7 +237,7 @@ describe('Filter', function () {
       assert.deepEqual(r, { 'type': { $eq: 'node' }, 'tags.amenity': { $eq: 'restaurant' } })
 
       var r = f.caches()
-      assert.deepEqual(r, [ { type: 'node', filters: '["amenity"="restaurant"]' } ])
+      assert.deepEqual(r, [ { id: 'node["amenity"="restaurant"]' } ])
 
       var r = f.match({ type: 'node', tags: { amenity: 'restaurant' } })
       assert.equal(r, true, 'Object should match')
@@ -258,7 +258,7 @@ describe('Filter', function () {
       assert.deepEqual(r, { 'type': { $eq: 'node' }, 'tags.amenity': { $and: [ { $exists: true }, { $ne: 'restaurant' } ] } } )
 
       var r = f.caches()
-      assert.deepEqual(r, [ { type:'node', filters:'["amenity"]["amenity"!="restaurant"]' } ])
+      assert.deepEqual(r, [ { id: 'node["amenity"]["amenity"!="restaurant"]' } ])
 
       var r = f.match({ type: 'node', tags: { amenity: 'restaurant' } })
       assert.equal(r, false, 'Object should not match')
@@ -279,7 +279,7 @@ describe('Filter', function () {
       assert.deepEqual(r, { 'type': { $eq: 'node' }, 'tags.amenity': { $and: [ { $exists: true }, { $ne: 'cafe' }, { $ne: 'restaurant' } ] } } )
 
       var r = f.caches()
-      assert.deepEqual(r, [ { type:'node', filters:'["amenity"]["amenity"!="cafe"]["amenity"!="restaurant"]' } ])
+      assert.deepEqual(r, [ { id: 'node["amenity"]["amenity"!="cafe"]["amenity"!="restaurant"]' } ])
 
       var r = f.match({ type: 'node', tags: { amenity: 'restaurant' } })
       assert.equal(r, false, 'Object should not match')
@@ -300,7 +300,7 @@ describe('Filter', function () {
       assert.deepEqual(r, { 'tags.amenity': { $eq: 'restaurant' }, 'tags.shop': { $exists: true } })
 
       var r = f.caches()
-      assert.deepEqual(r, [ { filters:'["amenity"="restaurant"]["shop"]' } ])
+      assert.deepEqual(r, [ { id: 'nwr["amenity"="restaurant"]["shop"]' } ])
 
       var r = f.match({ tags: { amenity: 'restaurant' } })
       assert.equal(r, false, 'Object should not match')
@@ -321,7 +321,7 @@ describe('Filter', function () {
       assert.deepEqual(r, { 'tags.cuisine': { $regex: '^(.*;|)asian(|;.*)$' } })
 
       var r = f.caches()
-      assert.deepEqual(r, [ { filters:'["cuisine"~"^(.*;|)asian(|;.*)$"]' } ])
+      assert.deepEqual(r, [ { id: 'nwr["cuisine"~"^(.*;|)asian(|;.*)$"]' } ])
 
       var r = f.match({ tags: { amenity: 'restaurant' } })
       assert.equal(r, false, 'Object should not match')
@@ -377,9 +377,9 @@ describe('Filter', function () {
 
       var r = f.caches()
       assert.deepEqual(r, [
-        { type:'node', filters:'["amenity"="cafe"]["cuisine"="ice_cream"]' },
-        { type:'node', filters:'["amenity"="ice_cream"]' },
-        { type:'node', filters:'["shop"="ice_cream"]' },
+        { id: 'node["amenity"="cafe"]["cuisine"="ice_cream"]' },
+        { id: 'node["amenity"="ice_cream"]' },
+        { id: 'node["shop"="ice_cream"]' },
       ])
 
       var r = f.match({ type: 'node', tags: { amenity: 'restaurant' } })
@@ -409,7 +409,7 @@ describe('Filter', function () {
       assert.deepEqual(r, { needMatch: true })
 
       var r = f.caches()
-      assert.deepEqual(r, [ { filters:'[~"wikipedia"~"."]' } ])
+      assert.deepEqual(r, [ { id: 'nwr[~"wikipedia"~"."]' } ])
 
       var r = f.match({ tags: { amenity: 'restaurant' } })
       assert.equal(r, false, 'Object should not match')
@@ -432,7 +432,7 @@ describe('Filter', function () {
       assert.deepEqual(r, { needMatch: true })
 
       var r = f.caches()
-      assert.deepEqual(r, [ { filters:'[~"wikipedia"~"foo"]' } ])
+      assert.deepEqual(r, [ { id: 'nwr[~"wikipedia"~"foo"]' } ])
 
       var r = f.match({ tags: { amenity: 'restaurant' } })
       assert.equal(r, false, 'Object should not match')
@@ -465,7 +465,7 @@ describe('Filter', function () {
       assert.deepEqual(r, { needMatch: true })
 
       var r = f.caches()
-      assert.deepEqual(r, [ { filters:'[~"wikipedia"~".",i]' } ])
+      assert.deepEqual(r, [ { id: 'nwr[~"wikipedia"~".",i]' } ])
 
       var r = f.match({ tags: { amenity: 'restaurant' } })
       assert.equal(r, false, 'Object should not match')
@@ -488,7 +488,7 @@ describe('Filter', function () {
       assert.deepEqual(r, { needMatch: true })
 
       var r = f.caches()
-      assert.deepEqual(r, [ { filters:'[~"wikipedia"~"foo",i]' } ])
+      assert.deepEqual(r, [ { id: 'nwr[~"wikipedia"~"foo",i]' } ])
 
       var r = f.match({ tags: { amenity: 'restaurant' } })
       assert.equal(r, false, 'Object should not match')
@@ -525,8 +525,8 @@ describe('Filter', function () {
 
       var r = f.caches()
       assert.deepEqual(r, [
-        { filters:'[~"wikipedia"~"foo"]' },
-        { type:'node', filters:'["amenity"]' }
+        { id: 'nwr[~"wikipedia"~"foo"]' },
+        { id: 'node["amenity"]' }
       ])
 
       var r = f.match({ tags: { amenity: 'restaurant' } })
@@ -669,7 +669,7 @@ describe('Filter', function () {
       var f = new Filter('(nwr[~wikipedia~"."];)')
 
       var r = f.caches()
-      assert.deepEqual(r, [ { filters:'[~"wikipedia"~"."]' } ])
+      assert.deepEqual(r, [ { id: 'nwr[~"wikipedia"~"."]' } ])
 
       var r = f.toLokijs()
       assert.deepEqual(r, { needMatch: true })
@@ -680,8 +680,8 @@ describe('Filter', function () {
 
       var r = f.caches()
       assert.deepEqual(r, [
-        { filters:'[~"wikipedia"~"."]' },
-        { type:'node', filters:'["foo"]' }
+        { id: 'nwr[~"wikipedia"~"."]' },
+        { id: 'node["foo"]' }
       ])
 
       var r = f.toLokijs()
@@ -692,7 +692,7 @@ describe('Filter', function () {
       var f = new Filter([ { type: 'node' }, { key: 'amenity', 'op': 'has_key' }, { keyRegexp: true, op: 'has_key', key: 'wikipedia' } ])
 
       var r = f.caches()
-      assert.deepEqual(r, [ { type:'node', filters:'["amenity"][~"wikipedia"~"."]' } ])
+      assert.deepEqual(r, [ { id: 'node["amenity"][~"wikipedia"~"."]' } ])
 
       var r = f.toLokijs()
       assert.deepEqual(r, { "type": { $eq: "node" }, "tags.amenity": { "$exists": true }, "needMatch": true })
@@ -706,8 +706,8 @@ describe('Filter', function () {
 
       var r = f.caches()
       assert.deepEqual(r, [
-        { filters:'[~"wikipedia"~"foo"]' },
-        { type:'node', filters:'["amenity"]' }
+        { id: 'nwr[~"wikipedia"~"foo"]' },
+        { id: 'node["amenity"]' }
       ])
 
       var r = f.toLokijs()
@@ -718,7 +718,7 @@ describe('Filter', function () {
       var f = new Filter("way[railway=rail][railway!~'^(platform|abandoned|disused|station|proposed|subway_entrance)$'][usage~'^(main|branch)$'];")
 
       var r = f.caches()
-      assert.deepEqual(r, [ { type:'way', filters:'["railway"="rail"]["railway"!~"^(platform|abandoned|disused|station|proposed|subway_entrance)$"]["usage"~"^(main|branch)$"]' } ])
+      assert.deepEqual(r, [ { id: 'way["railway"="rail"]["railway"!~"^(platform|abandoned|disused|station|proposed|subway_entrance)$"]["usage"~"^(main|branch)$"]' } ])
 
       var r = f.toLokijs()
       assert.deepEqual(r, {"type":{"$eq":"way"},"tags.railway":{"$and":[{"$eq":"rail"},{"$not":{"$regex":/^(platform|abandoned|disused|station|proposed|subway_entrance)$/}}]},"tags.usage":{"$regex":/^(main|branch)$/}})
@@ -756,7 +756,7 @@ describe('Filter', function () {
       assert.equal(f.toString(), 'nwr["cuisine"~"^(.*;|)asian(|;.*)$"];')
 
       var r = f.caches()
-      assert.deepEqual(r, [ { filters:'["cuisine"~"^(.*;|)asian(|;.*)$"]' } ])
+      assert.deepEqual(r, [ { id: 'nwr["cuisine"~"^(.*;|)asian(|;.*)$"]' } ])
     })
 
     it ('nwr["amenity"=\'restaurant\']["sh\\"op"]', function () {
@@ -764,7 +764,7 @@ describe('Filter', function () {
       assert.equal(f.toString(), 'nwr["amenity"="restaurant"]["sh\\"op"];')
 
       var r = f.caches()
-      assert.deepEqual(r, [ { filters:'["amenity"="restaurant"]["sh\\"op"]' } ])
+      assert.deepEqual(r, [ { id: 'nwr["amenity"="restaurant"]["sh\\"op"]' } ])
     })
 
     it ('(node[amenity=cafe][cuisine=ice_cream];node[amenity=ice_cream];node[shop=ice_cream];)', function () {
@@ -773,9 +773,9 @@ describe('Filter', function () {
 
       var r = f.caches()
       assert.deepEqual(r, [
-        { type:'node', filters:'["amenity"="cafe"]["cuisine"="ice_cream"]' },
-        { type:'node', filters:'["amenity"="ice_cream"]' },
-        { type:'node', filters:'["shop"="ice_cream"]' },
+        { id: 'node["amenity"="cafe"]["cuisine"="ice_cream"]' },
+        { id: 'node["amenity"="ice_cream"]' },
+        { id: 'node["shop"="ice_cream"]' },
       ])
     })
 
@@ -788,7 +788,7 @@ describe('Filter', function () {
       assert.equal(f.toString(), 'node[~"wikipedia"~"."];')
 
       var r = f.caches()
-      assert.deepEqual(r, [ { type:'node', filters:'[~"wikipedia"~"."]' } ])
+      assert.deepEqual(r, [ { id: 'node[~"wikipedia"~"."]' } ])
     })
 
     it ('node[~"wikipedia"~"."]', function () {
@@ -800,7 +800,7 @@ describe('Filter', function () {
       assert.equal(f.toString(), 'node[~"wikipedia"~"."];')
 
       var r = f.caches()
-      assert.deepEqual(r, [ { type:'node', filters:'[~"wikipedia"~"."]' } ])
+      assert.deepEqual(r, [ { id: 'node[~"wikipedia"~"."]' } ])
     })
 
     it ('node[~"wikipedia"~"foo"]', function () {
@@ -808,7 +808,7 @@ describe('Filter', function () {
       assert.equal(f.toString(), 'node[~"wikipedia"~"foo"];')
 
       var r = f.caches()
-      assert.deepEqual(r, [ { type:'node', filters:'[~"wikipedia"~"foo"]' } ])
+      assert.deepEqual(r, [ { id: 'node[~"wikipedia"~"foo"]' } ])
     })
 
     it ('node[~"wikipedia"~".",i]', function () {
@@ -821,7 +821,7 @@ describe('Filter', function () {
       assert.equal(f.toString(), 'node[~"wikipedia"~".",i];')
 
       var r = f.caches()
-      assert.deepEqual(r, [ { type:'node', filters:'[~"wikipedia"~".",i]' } ])
+      assert.deepEqual(r, [ { id: 'node[~"wikipedia"~".",i]' } ])
     })
 
     it ('node[~"wikipedia"~"foo",i]', function () {
@@ -834,7 +834,7 @@ describe('Filter', function () {
       assert.equal(f.toString(), 'node[~"wikipedia"~"foo",i];')
 
       var r = f.caches()
-      assert.deepEqual(r, [ { type:'node', filters:'[~"wikipedia"~"foo",i]' } ])
+      assert.deepEqual(r, [ { id: 'node[~"wikipedia"~"foo",i]' } ])
     })
   })
 
@@ -847,7 +847,7 @@ describe('Filter', function () {
       assert.deepEqual(f.toLokijs(), {"type":{"$eq":"way"},"tags.a":{"$eq":"b"}})
 
       var r = f.caches()
-      assert.deepEqual(r, [ { type:'way', filters:'["a"="b"]' } ])
+      assert.deepEqual(r, [ { id: 'way["a"="b"]' } ])
     })
   })
 
@@ -861,8 +861,8 @@ describe('Filter', function () {
 
       var r = f.caches()
       assert.deepEqual(r, [
-        { filters:'["name"~"49"]' },
-        { filters:'["ref"="49"]' }
+        { id: 'nwr["name"~"49"]' },
+        { id: 'nwr["ref"="49"]' }
       ])
     })
 
@@ -878,8 +878,8 @@ describe('Filter', function () {
 
       var r = f.caches()
       assert.deepEqual(r, [
-        { filters:'["name"~"49"]["route"="bus"]' },
-        { filters:'["ref"="49"]["route"="bus"]' }
+        { id: 'nwr["name"~"49"]["route"="bus"]' },
+        { id: 'nwr["ref"="49"]["route"="bus"]' }
       ])
     })
 
@@ -896,10 +896,10 @@ describe('Filter', function () {
 
       var r = f.caches()
       assert.deepEqual(r, [
-        { filters:'["name"~"49"]["route"="bus"]["operator"="ÖBB"]' },
-        { filters:'["ref"="49"]["route"="bus"]["operator"="ÖBB"]' },
-        { filters:'["name"~"49"]["route"="bus"]["operator"="WL"]' },
-        { filters:'["ref"="49"]["route"="bus"]["operator"="WL"]' }
+        { id: 'nwr["name"~"49"]["route"="bus"]["operator"="ÖBB"]' },
+        { id: 'nwr["ref"="49"]["route"="bus"]["operator"="ÖBB"]' },
+        { id: 'nwr["name"~"49"]["route"="bus"]["operator"="WL"]' },
+        { id: 'nwr["ref"="49"]["route"="bus"]["operator"="WL"]' }
       ])
     })
   })
@@ -915,7 +915,7 @@ describe('Filter', function () {
     check(f, [ 3, 5 ])
 
     var r = f.caches()
-    assert.deepEqual(r, [ { type:'node', filters:'["name"~"test"]' } ])
+    assert.deepEqual(r, [ { id: 'node["name"~"test"]' } ])
   })
 
   it('case-sensitive !regexp', function () {
@@ -929,7 +929,7 @@ describe('Filter', function () {
     check(f, [ 1, 2, 4, 6, 7 ])
 
     var r = f.caches()
-    assert.deepEqual(r, [ { type:'node', filters:'["name"!~"test"]' } ])
+    assert.deepEqual(r, [ { id: 'node["name"!~"test"]' } ])
   })
 
   it('case-insenstive regexp', function () {
@@ -943,7 +943,7 @@ describe('Filter', function () {
     check(f, [ 3, 4, 5, 6 ])
 
     var r = f.caches()
-    assert.deepEqual(r, [ { type:'node', filters:'["name"~"test",i]' } ])
+    assert.deepEqual(r, [ { id: 'node["name"~"test",i]' } ])
   })
 
   it('case-insenstive !regexp', function () {
@@ -957,7 +957,7 @@ describe('Filter', function () {
     check(f, [ 1, 2, 7 ])
 
     var r = f.caches()
-    assert.deepEqual(r, [ { type:'node', filters:'["name"!~"test",i]' } ])
+    assert.deepEqual(r, [ { id: 'node["name"!~"test",i]' } ])
   })
 
   it('!=', function () {
@@ -971,7 +971,7 @@ describe('Filter', function () {
     check(f, [ 1, 2, 4, 5, 6, 7 ])
 
     var r = f.caches()
-    assert.deepEqual(r, [ { type:'node', filters:'["name"!="test"]' } ])
+    assert.deepEqual(r, [ { id: 'node["name"!="test"]' } ])
   })
 
   it('key regexp', function () {
@@ -985,7 +985,7 @@ describe('Filter', function () {
     check(f, [ 2, 3, 4, 5, 6, 7 ])
 
     var r = f.caches()
-    assert.deepEqual(r, [ { type:'node', filters:'[~"na"~"."]' } ])
+    assert.deepEqual(r, [ { id: 'node[~"na"~"."]' } ])
   })
 
   it('strsearch', function () {
@@ -999,7 +999,7 @@ describe('Filter', function () {
     check(f, [ 3, 4, 5, 6, 7 ])
 
     var r = f.caches()
-    assert.deepEqual(r, [ { type:'node', filters:'["name"~"t[eèeéêëė][sß]t",i]' } ])
+    assert.deepEqual(r, [ { id: 'node["name"~"t[eèeéêëė][sß]t",i]' } ])
   })
 
   it('has', function () {
@@ -1013,7 +1013,7 @@ describe('Filter', function () {
     check(f, [ 2, 3, 4, 5 ])
 
     var r = f.caches()
-    assert.deepEqual(r, [ { type:'node', filters:'["cuisine"~"^(.*;|)ice_cream(|;.*)$"]' } ])
+    assert.deepEqual(r, [ { id: 'node["cuisine"~"^(.*;|)ice_cream(|;.*)$"]' } ])
   })
 
   it('has_key', function () {
@@ -1027,7 +1027,7 @@ describe('Filter', function () {
     check(f, [ 2, 3, 4, 5, 6 ])
 
     var r = f.caches()
-    assert.deepEqual(r, [ { type:'node', filters:'["cuisine"]' } ])
+    assert.deepEqual(r, [ { id: 'node["cuisine"]' } ])
   })
 
   it('not_exists', function () {
@@ -1041,7 +1041,7 @@ describe('Filter', function () {
     check(f, [ 1, 7 ])
 
     var r = f.caches()
-    assert.deepEqual(r, [ { type:'node', filters:'[!"cuisine"]' } ])
+    assert.deepEqual(r, [ { id: 'node[!"cuisine"]' } ])
   })
 
 })
@@ -1068,7 +1068,7 @@ describe('and', function () {
 
     var r = f.caches()
     console.log(r)
-    assert.deepEqual(r, [ { type: 'node', filters: '["amenity"="cafe"]["cuisine"~"^(.*;|)ice_cream(|;.*)$"]'}])
+    assert.deepEqual(r, [ { id: 'node["amenity"="cafe"]["cuisine"~"^(.*;|)ice_cream(|;.*)$"]'}])
   })
 
   it('and (mixed)', function () {
@@ -1108,7 +1108,7 @@ describe('and', function () {
     check(f, [])
 
     var r = f.caches()
-    assert.deepEqual(r, [ { filters: '["amenity"="restaurant"]["cuisine"]' } ])
+    assert.deepEqual(r, [ { id: 'nwr["amenity"="restaurant"]["cuisine"]' } ])
   })
 
   it('merge two filters - with or as first', function () {
@@ -1139,8 +1139,8 @@ describe('and', function () {
 
     var r = f.caches()
     assert.deepEqual(r, [
-      { type: 'node', filters: '["amenity"="restaurant"]["cuisine"]' },
-      { type: 'way', filters: '["amenity"="restaurant"]["cuisine"]' }
+      { id: 'node["amenity"="restaurant"]["cuisine"]' },
+      { id: 'way["amenity"="restaurant"]["cuisine"]' }
     ])
   })
 
@@ -1172,8 +1172,8 @@ describe('and', function () {
 
     var r = f.caches()
     assert.deepEqual(r, [
-      { type: 'node', filters: '["cuisine"]["amenity"="restaurant"]' },
-      { type: 'way', filters: '["cuisine"]["amenity"="restaurant"]' }
+      { id: 'node["cuisine"]["amenity"="restaurant"]' },
+      { id: 'way["cuisine"]["amenity"="restaurant"]' }
     ])
   })
 
@@ -1211,10 +1211,10 @@ describe('and', function () {
 
     var r = f.caches()
     assert.deepEqual(r, [
-      { type: 'node', filters: '["cuisine"]["amenity"="restaurant"]' },
-      { type: 'node', filters: '["diet"]["amenity"="restaurant"]' },
-      { type: 'way', filters: '["cuisine"]["amenity"="restaurant"]' },
-      { type: 'way', filters: '["diet"]["amenity"="restaurant"]' }
+      { id: 'node["cuisine"]["amenity"="restaurant"]' },
+      { id: 'node["diet"]["amenity"="restaurant"]' },
+      { id: 'way["cuisine"]["amenity"="restaurant"]' },
+      { id: 'way["diet"]["amenity"="restaurant"]' }
     ])
   })
 
@@ -1252,10 +1252,10 @@ describe('and', function () {
 
     var r = f.caches()
     assert.deepEqual(r, [
-      { type: 'node', filters: '["cuisine"]["amenity"="restaurant"]' },
-      { type: 'node', filters: '["diet"]["amenity"="restaurant"]' },
-      { type: 'way', filters: '["cuisine"]["amenity"="restaurant"]' },
-      { type: 'way', filters: '["diet"]["amenity"="restaurant"]' }
+      { id: 'node["cuisine"]["amenity"="restaurant"]' },
+      { id: 'node["diet"]["amenity"="restaurant"]' },
+      { id: 'way["cuisine"]["amenity"="restaurant"]' },
+      { id: 'way["diet"]["amenity"="restaurant"]' }
     ])
   })
 })
@@ -1272,7 +1272,7 @@ describe('Filter by id', function () {
     check(f, [ 3 ])
 
     var r = f.caches()
-    assert.deepEqual(r, [ { type:'node', filters:'', ids: [3] } ])
+    assert.deepEqual(r, [ { id: 'node', ids: [3] } ])
   })
 
   it('id:', function () {
@@ -1286,7 +1286,7 @@ describe('Filter by id', function () {
     check(f, [ 3 ])
 
     var r = f.caches()
-    assert.deepEqual(r, [ { type:'node', filters:'', ids: [3] } ])
+    assert.deepEqual(r, [ { id: 'node', ids: [3] } ])
   })
 
   it('id: (multiple)', function () {
@@ -1300,7 +1300,7 @@ describe('Filter by id', function () {
     check(f, [ 3, 4, 5 ])
 
     var r = f.caches()
-    assert.deepEqual(r, [ { type:'node', filters:'', ids: [3, 4, 5] } ])
+    assert.deepEqual(r, [ { id: 'node', ids: [3, 4, 5] } ])
   })
 
   it('id: (multiple with or)', function () {
@@ -1321,8 +1321,8 @@ describe('Filter by id', function () {
 
     var r = f.caches()
     assert.deepEqual(r, [
-      { type:'node', filters:'', ids: [3, 4, 5] },
-      { type:'way', filters:'', ids: [3, 4] }
+      { id: 'node', ids: [3, 4, 5] },
+      { id: 'way', ids: [3, 4] }
     ])
   })
 
@@ -1346,8 +1346,8 @@ describe('Filter by id', function () {
 
     var r = f.caches()
     assert.deepEqual(r, [
-      { filters:'["amenity"]', ids: [3, 4, 5] },
-      { filters:'["amenity"]', ids: [3, 4] }
+      { id: 'nwr["amenity"]', ids: [3, 4, 5] },
+      { id: 'nwr["amenity"]', ids: [3, 4] }
     ])
   })
 
@@ -1364,7 +1364,7 @@ describe('Filter by id', function () {
 
     var r = f.caches()
     assert.deepEqual(r, [
-      { type:'node', filters:'', ids: [1, 5] },
+      { id: 'node', ids: [1, 5] },
     ])
   })
 
@@ -1386,7 +1386,7 @@ describe('Filter by id', function () {
 
     var r = f.caches()
     assert.deepEqual(r, [
-      { filters:'', ids: [1, 5] },
+      { id: 'nwr', ids: [1, 5] },
     ])
   })
 })
@@ -1415,7 +1415,7 @@ describe('Function "around"', function () {
     check(f, [])
 
     var r = f.caches()
-    assert.deepEqual(r, [ { type:"node",filters:"",bounds:{"type":"Polygon","coordinates":[[[15.465769011510112,47.079116292410326],[15.46574364059531,47.079291741398514],[15.465668493825438,47.07946044852533],[15.465546458637188,47.07961593037691],[15.465382224499415,47.079752211732746],[15.465182102741352,47.0798640552115],[15.464953784026477,47.0799471625657],[15.46470604278992,47.07999833988624],[15.464448400000002,47.08001562036372],[15.464190757210083,47.07999833988624],[15.463943015973527,47.0799471625657],[15.463714697258652,47.0798640552115],[15.463514575500588,47.079752211732746],[15.463350341362815,47.07961593037691],[15.463228306174566,47.07946044852533],[15.463153159404694,47.079291741398514],[15.463127788489892,47.079116292410326],[15.463153167934774,47.07894084399987],[15.463228321936096,47.078772138518275],[15.463350361956252,47.078616659128976],[15.46351459779076,47.07848038067756],[15.463714717852085,47.07836854010326],[15.463943031735061,47.07828543521131],[15.464190765740163,47.07823425953603],[15.464448400000002,47.07821697963628],[15.46470603425984,47.07823425953603],[15.464953768264943,47.07828543521131],[15.46518208214792,47.07836854010326],[15.465382202209243,47.07848038067756],[15.465546438043752,47.078616659128976],[15.465668478063908,47.078772138518275],[15.46574363206523,47.07894084399987],[15.465769011510112,47.079116292410326]]]}}])
+    assert.deepEqual(r, [ { id:"node",bounds:{"type":"Polygon","coordinates":[[[15.465769011510112,47.079116292410326],[15.46574364059531,47.079291741398514],[15.465668493825438,47.07946044852533],[15.465546458637188,47.07961593037691],[15.465382224499415,47.079752211732746],[15.465182102741352,47.0798640552115],[15.464953784026477,47.0799471625657],[15.46470604278992,47.07999833988624],[15.464448400000002,47.08001562036372],[15.464190757210083,47.07999833988624],[15.463943015973527,47.0799471625657],[15.463714697258652,47.0798640552115],[15.463514575500588,47.079752211732746],[15.463350341362815,47.07961593037691],[15.463228306174566,47.07946044852533],[15.463153159404694,47.079291741398514],[15.463127788489892,47.079116292410326],[15.463153167934774,47.07894084399987],[15.463228321936096,47.078772138518275],[15.463350361956252,47.078616659128976],[15.46351459779076,47.07848038067756],[15.463714717852085,47.07836854010326],[15.463943031735061,47.07828543521131],[15.464190765740163,47.07823425953603],[15.464448400000002,47.07821697963628],[15.46470603425984,47.07823425953603],[15.464953768264943,47.07828543521131],[15.46518208214792,47.07836854010326],[15.465382202209243,47.07848038067756],[15.465546438043752,47.078616659128976],[15.465668478063908,47.078772138518275],[15.46574363206523,47.07894084399987],[15.465769011510112,47.079116292410326]]]}}])
   })
 })
 
@@ -1431,6 +1431,6 @@ describe('Function "bbox"', function () {
     check(f, [])
 
     var r = f.caches()
-    assert.deepEqual(r, [ { type:"node",filters:"",bounds:{"type":"Polygon","coordinates":[[[40,10.2],[45,10.2],[45,11],[40,11],[40,10.2]]]}}])
+    assert.deepEqual(r, [ { id:"node",bounds:{"type":"Polygon","coordinates":[[[40,10.2],[45,10.2],[45,11],[40,11],[40,10.2]]]}}])
   })
 })
