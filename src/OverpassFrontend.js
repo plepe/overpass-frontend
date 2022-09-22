@@ -7,6 +7,7 @@ const LokiJS = require('lokijs')
 const httpLoad = require('./httpLoad')
 const removeNullEntries = require('./removeNullEntries')
 
+const BBoxQueryCache = require('./BBoxQueryCache')
 const OverpassObject = require('./OverpassObject')
 const OverpassNode = require('./OverpassNode')
 const OverpassWay = require('./OverpassWay')
@@ -129,9 +130,9 @@ class OverpassFrontend {
   clearCache () {
     this.cacheElements = {}
     this.cacheElementsMemberOf = {}
-    this.cacheBBoxQueries = {}
     this.cacheTimestamp = timestamp()
     this.db.clear()
+    BBoxQueryCache.clear()
 
     // Set default properties
     this.hasStretchLon180 = false
@@ -624,9 +625,9 @@ class OverpassFrontend {
   }
 
   clearBBoxQuery (query) {
-    const filterId = new Filter(query).toString()
+    const id = new Filter(query).toString()
 
-    delete this.cacheBBoxQueries[filterId]
+    BBoxQueryCache.get({ id }).clear()
   }
 
   _abortRequest (request) {

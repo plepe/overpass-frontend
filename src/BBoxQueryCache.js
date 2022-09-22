@@ -1,13 +1,12 @@
 const BoundingBox = require('boundingbox')
 const turf = require('./turf')
 
-/**
- * When loading area after area of a map, it will be more and more complete.
- * This class manages which area is already known and which not.
- */
-class KnownArea {
-  constructor (area = null) {
-    this.area = area
+let list = {}
+
+class BBoxQueryCache {
+  constructor (id) {
+    this.id = id
+    this.area = null
   }
 
   /**
@@ -40,6 +39,14 @@ class KnownArea {
   }
 
   /**
+   * clear this cache
+   */
+  clear () {
+    this.area = null
+    delete list[this.id]
+  }
+
+  /**
    * return area as (multi)polygon
    */
   toGeoJSON () {
@@ -47,4 +54,16 @@ class KnownArea {
   }
 }
 
-module.exports = KnownArea
+BBoxQueryCache.get = (cacheInfo) => {
+  if (!(cacheInfo.id in list)) {
+    list[cacheInfo.id] = new BBoxQueryCache(cacheInfo.id)
+  }
+
+  return list[cacheInfo.id]
+}
+
+BBoxQueryCache.clear = () => {
+  list = {}
+}
+
+module.exports = BBoxQueryCache

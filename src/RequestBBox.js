@@ -1,7 +1,7 @@
 const Request = require('./Request')
 const overpassOutOptions = require('./overpassOutOptions')
 const defines = require('./defines')
-const KnownArea = require('./knownArea')
+const BBoxQueryCache = require('./BBoxQueryCache')
 const RequestBBoxMembers = require('./RequestBBoxMembers')
 const Filter = require('./Filter')
 const boundsToLokiQuery = require('./boundsToLokiQuery')
@@ -47,16 +47,7 @@ class RequestBBox extends Request {
         this.lokiQuery = { $and: [this.lokiQuery, boundsToLokiQuery(this.bbox, this.overpass)] }
       }
 
-      this.caches = this.filterQuery.caches()
-      this.caches.forEach(cacheInfo => {
-        if (!(cacheInfo.id in this.overpass.cacheBBoxQueries)) {
-          this.overpass.cacheBBoxQueries[cacheInfo.id] = {
-            requested: new KnownArea()
-          }
-        }
-
-        cacheInfo.cache = this.overpass.cacheBBoxQueries[cacheInfo.id]
-      })
+      this.caches = this.filterQuery.caches().map(c => BBoxQueryCache.get(c))
     } else {
       this.caches = []
     }
@@ -235,7 +226,7 @@ class RequestBBox extends Request {
       this.loadFinish = true
 
       this.caches.forEach(cache => {
-        cache.cache.requested.add(this.bbox)
+        cache.add(this.bbox)
       })
     }
   }
@@ -250,7 +241,7 @@ class RequestBBox extends Request {
     }
 
     return !this.caches.every(cache => {
-      return cache.cache.requested.check(this.bbox)
+      return cache.check(this.bbox)
     })
   }
 
