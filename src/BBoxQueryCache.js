@@ -1,7 +1,7 @@
 const BoundingBox = require('boundingbox')
 const turf = require('./turf')
 
-let list = {}
+const list = {}
 
 class BBoxQueryCache {
   constructor (id) {
@@ -63,7 +63,11 @@ BBoxQueryCache.get = (cacheInfo) => {
 }
 
 BBoxQueryCache.clear = () => {
-  list = {}
+  for (const k in list) {
+    delete list[k]
+  }
 }
+
+BBoxQueryCache.list = list
 
 module.exports = BBoxQueryCache
