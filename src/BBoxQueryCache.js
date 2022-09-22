@@ -1,11 +1,14 @@
 const BoundingBox = require('boundingbox')
 const turf = require('./turf')
 
+const Filter = require('./Filter')
+
 const list = {}
 
 class BBoxQueryCache {
   constructor (id) {
     this.id = id
+    this.filter = new Filter(id)
     this.area = null
   }
 
@@ -26,16 +29,28 @@ class BBoxQueryCache {
    * is the whole area known?
    */
   check (bbox) {
-    if (this.area === null) {
-      return false
-    }
-
     bbox = new BoundingBox(bbox).toGeoJSON()
 
-    const remaining = turf.difference(bbox, this.area)
-    // console.log(JSON.stringify(this.area), JSON.stringify(bbox), !remaining)
+    if (this.area) {
+      const remaining = turf.difference(bbox, this.area)
 
-    return !remaining
+      if (!remaining) {
+        return true
+      }
+    }
+
+    // check if a superset matches
+    return Object.values(list).some(cache => {
+      if (cache.id === this.id) { return false }
+
+      if (cache.filter.isSupersetOf(this.filter)) {
+        if (cache.area) {
+          return !turf.difference(bbox, cache.area)
+        }
+      }
+
+      return false
+    })
   }
 
   /**

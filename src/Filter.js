@@ -352,6 +352,11 @@ class Filter {
   }
 
   constructor (def) {
+    if (!def) {
+      this.def = []
+      return
+    }
+
     this.def = check(def)
   }
 
