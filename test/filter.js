@@ -1044,6 +1044,51 @@ describe('Filter', function () {
     assert.deepEqual(r, [ { id: 'node[!"cuisine"]' } ])
   })
 
+  describe('illegal filters', function () {
+    it('nod', function () {
+      try {
+        var f = new Filter('nod')
+      }
+      catch (e) {
+        return assert.equal(e.message, "Can't parse query, expected type of object (e.g. 'node'): nod")
+      }
+      assert.fail("Expect an Exception")
+    })
+
+    it('nodes', function () {
+      try {
+        var f = new Filter('nodes')
+      }
+      catch (e) {
+        return assert.equal(e.message, "Can't parse query, expected '[' or ';': s")
+      }
+      assert.fail("Expect an Exception")
+    })
+
+    it('node[amenity', function () {
+      return
+      try {
+        var f = new Filter('node[amenity')
+      }
+      catch (e) {
+        assert.equal(e.message, "Can't parse query, expected type of object (e.g. 'node'): nod")
+        return
+      }
+      assert.fail("Expect an Exception")
+    })
+
+    it('node[amenity=bench', function () {
+      return
+      try {
+        var f = new Filter('node[amenity')
+      }
+      catch (e) {
+        assert.equal(e.message, "Can't parse query, expected type of object (e.g. 'node'): nod")
+        return
+      }
+      assert.fail("Expect an Exception")
+    })
+  })
 })
 
 describe('and', function () {
