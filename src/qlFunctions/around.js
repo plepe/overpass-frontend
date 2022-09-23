@@ -1,8 +1,4 @@
-const turf = {
-  buffer: require('@turf/buffer').default,
-  distance: require('@turf/distance').default,
-  intersect: require('@turf/intersect').default
-}
+const turf = require('../turf')
 
 module.exports = {
   parse (str) {
