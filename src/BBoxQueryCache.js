@@ -6,7 +6,8 @@ const Filter = require('./Filter')
 const list = {}
 
 class BBoxQueryCache {
-  constructor (id) {
+  constructor (overpass, id) {
+    this.overpass = overpass
     this.id = id
     this.filter = new Filter(id)
     this.area = null
@@ -15,7 +16,7 @@ class BBoxQueryCache {
   /**
    * make another part of the map known
    */
-  add (bbox) {
+  add (bbox, cacheInfo = null) {
     bbox = new BoundingBox(bbox).toGeoJSON()
 
     if (this.area === null) {
@@ -28,7 +29,7 @@ class BBoxQueryCache {
   /**
    * is the whole area known?
    */
-  check (bbox) {
+  check (bbox, cacheInfo = null) {
     bbox = new BoundingBox(bbox).toGeoJSON()
 
     if (this.area) {
@@ -69,12 +70,12 @@ class BBoxQueryCache {
   }
 }
 
-BBoxQueryCache.get = (cacheInfo) => {
-  if (!(cacheInfo.id in list)) {
-    list[cacheInfo.id] = new BBoxQueryCache(cacheInfo.id)
+BBoxQueryCache.get = (overpass, id) => {
+  if (!(id in list)) {
+    list[id] = new BBoxQueryCache(overpass, id)
   }
 
-  return list[cacheInfo.id]
+  return list[id]
 }
 
 BBoxQueryCache.clear = () => {
