@@ -17,6 +17,11 @@ class BBoxQueryCache {
    * make another part of the map known
    */
   add (bbox, cacheInfo = null) {
+    // ignore requests for IDs
+    if (cacheInfo && cacheInfo.ids) {
+      return
+    }
+
     bbox = new BoundingBox(bbox).toGeoJSON()
 
     if (this.area === null) {
@@ -30,6 +35,19 @@ class BBoxQueryCache {
    * is the whole area known?
    */
   check (bbox, cacheInfo = null) {
+    if (cacheInfo && cacheInfo.ids) {
+      let types = [cacheInfo.id.match(/^(node|way|relation|nwr)/)[1]]
+      if (types[0] === 'nwr') {
+        types = ['node', 'way', 'relation']
+      }
+
+      return types.every(type =>
+        cacheInfo.ids.every(id =>
+          (type.substr(0, 1) + id) in this.overpass.cacheElements
+        )
+      )
+    }
+
     bbox = new BoundingBox(bbox).toGeoJSON()
 
     if (this.area) {

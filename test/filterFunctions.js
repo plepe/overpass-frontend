@@ -56,7 +56,7 @@ var overpassFrontend
           mode,
           query: 'node(id:378440)',
           expected: [ 'n378440' ],
-          expectedSubRequestCount: 1, // TODO: 0
+          expectedSubRequestCount: 0,
           expectedCacheInfo: [{
             id: 'node',
             ids: [378440]
@@ -82,7 +82,7 @@ var overpassFrontend
           mode,
           query: 'node(id:647991)',
           expected: [ 'n647991' ],
-          expectedSubRequestCount: 1, // TODO: 0
+          expectedSubRequestCount: 0,
           expectedCacheInfo: [{
             id: 'node',
             ids: [647991]
