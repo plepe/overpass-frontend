@@ -24,6 +24,10 @@ class BBoxQueryCache {
 
     bbox = new BoundingBox(bbox).toGeoJSON()
 
+    if (cacheInfo && cacheInfo.bounds) {
+      bbox = turf.intersect(bbox, cacheInfo.bounds)
+    }
+
     if (this.area === null) {
       this.area = bbox
     } else {
@@ -49,6 +53,10 @@ class BBoxQueryCache {
     }
 
     bbox = new BoundingBox(bbox).toGeoJSON()
+
+    if (cacheInfo && cacheInfo.bounds) {
+      bbox = turf.intersect(bbox, cacheInfo.bounds)
+    }
 
     if (this.area) {
       const remaining = turf.difference(bbox, this.area)

@@ -182,7 +182,7 @@ var overpassFrontend
           mode,
           query: 'node(around:10,48.19058,16.33721)',
           expected: [ 'n395262' ],
-          expectedSubRequestCount: 1, // TODO: 0
+          expectedSubRequestCount: 0,
           expectedCacheInfo: [{
             "id": "node",
             "bounds": {
@@ -218,7 +218,7 @@ var overpassFrontend
           mode,
           query: 'node(around:20,48.19058,16.33761)(around:20,48.19058,16.33721)',
           expected: [ 'n1599448219', 'n1871276160', 'n643386609' ],
-          expectedSubRequestCount: 1,
+          expectedSubRequestCount: 0,
           expectedCacheInfo: [{
             "id": "node",
             "bounds": {
@@ -292,7 +292,7 @@ var overpassFrontend
           mode,
           query: 'node(48.19045,16.33705,48.19065,16.33735)',
           expected: [ 'n395262' ],
-          expectedSubRequestCount: 1, // TODO: 0
+          expectedSubRequestCount: 0,
           expectedCacheInfo: [{
             "id": "node",
             "bounds": {
