@@ -2371,11 +2371,10 @@ describe('Overpass objects structure', function() {
           assert.fail('Query wrong, feature_callback should not be called')
         },
         function(err) {
-          if(err === null)
+          if (!err)
             done('Query wrong, should not be successful')
 
-          else if(err.message == "line 2: parse error: ']' expected - ';' found.\n" +
-            "line 4: parse error: Unexpected end of input.\n" +
+          else if(err.message == "line 2: parse error: ']' expected - '->' found.\n" +
             "line 4: parse error: Unexpected end of input.\n" +
             "line 4: parse error: Unexpected end of input.\n\n")
             done()

@@ -53,8 +53,6 @@ class RequestBBox extends Request {
           cacheInfo
         }
       })
-    } else {
-      this.caches = []
     }
 
     this.loadFinish = false
@@ -230,7 +228,7 @@ class RequestBBox extends Request {
         (this.options.split > subRequest.parts[0].count)) {
       this.loadFinish = true
 
-      this.caches.forEach(cache => {
+      this.caches && this.caches.forEach(cache => {
         cache.cache.add(this.bbox, cache.cacheInfo)
       })
     }
@@ -245,7 +243,7 @@ class RequestBBox extends Request {
       return false
     }
 
-    return !this.caches.every(cache => {
+    return !this.caches || !this.caches.every(cache => {
       return cache.cache.check(this.bbox, cache.cacheInfo)
     })
   }
