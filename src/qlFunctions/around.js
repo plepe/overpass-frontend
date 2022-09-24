@@ -37,5 +37,10 @@ module.exports = {
     } else {
       options.bounds = newBounds.geometry
     }
+  },
+
+  isSupersetOf (value, otherValue) {
+    const distance = turf.distance(value.geometry, otherValue.geometry, 'kilometers') * 1000
+    return distance < value.distance - otherValue.distance
   }
 }

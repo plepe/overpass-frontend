@@ -43,5 +43,9 @@ module.exports = {
     } else {
       options.bounds = newBounds.geometry
     }
+  },
+
+  isSupersetOf (value, otherValue) {
+    return otherValue.within(value)
   }
 }
