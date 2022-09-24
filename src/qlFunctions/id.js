@@ -35,7 +35,9 @@ module.exports = class id extends qlFunction {
     options.ids = v.sort()
   }
 
-  isSupersetOf (otherValue) {
-    return !otherValue.filter(id => !this.value.includes(id)).length
+  isSupersetOf (other) {
+    if (other instanceof id) {
+      return !other.value.filter(id => !this.value.includes(id)).length
+    }
   }
 }

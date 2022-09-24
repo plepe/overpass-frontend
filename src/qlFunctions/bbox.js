@@ -1,6 +1,4 @@
-const turf = {
-  intersect: require('@turf/intersect').default
-}
+const turf = require('../turf')
 
 const BoundingBox = require('boundingbox')
 
@@ -48,7 +46,17 @@ module.exports = class bbox extends qlFunction {
     }
   }
 
-  isSupersetOf (otherValue) {
-    return otherValue.within(this.value)
+  isSupersetOf (other) {
+    if (other instanceof bbox) {
+      return other.value.within(this.value)
+    }
+
+    if (other.bounds) {
+      return !!turf.difference(this.bounds(), other.bounds())
+    }
+  }
+
+  bounds () {
+    return this.value.toGeoJSON()
   }
 }

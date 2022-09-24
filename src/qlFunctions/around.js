@@ -29,11 +29,9 @@ module.exports = class around extends qlFunction {
   }
 
   cacheInfo (options) {
-    if (!this.bounds) {
-      this.bounds = turf.buffer(this.value.geometry, this.value.distance / 1000, { units: 'kilometers' })
-    }
+    const bounds = this.bounds()
 
-    const newBounds = options.bounds ? turf.intersect(options.bounds, this.bounds) : this.bounds
+    const newBounds = options.bounds ? turf.intersect(options.bounds, bounds) : bounds
     if (newBounds === null) {
       options.invalid = true
     } else {
@@ -41,8 +39,22 @@ module.exports = class around extends qlFunction {
     }
   }
 
-  isSupersetOf (otherValue) {
-    const distance = turf.distance(this.value.geometry, otherValue.geometry, 'kilometers') * 1000
-    return distance < this.value.distance - otherValue.distance
+  isSupersetOf (other) {
+    if (other instanceof around) {
+      const distance = turf.distance(this.value.geometry, other.value.geometry, 'kilometers') * 1000
+      return distance < this.value.distance - other.value.distance
+    }
+
+    if (other.bounds) {
+      return !!turf.difference(this.bounds(), other.bounds())
+    }
+  }
+
+  bounds () {
+    if (!this._bounds) {
+      this._bounds = turf.buffer(this.value.geometry, this.value.distance / 1000, { units: 'kilometers' })
+    }
+
+    return this._bounds
   }
 }

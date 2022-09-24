@@ -787,7 +787,7 @@ class Filter {
         if (part.op === 'has_key' && part.keyRegexp && otherPart.op && !['!=', '!~', '!~i', 'not_exists'].includes(otherPart.op) && otherPart.key.match(RegExp(part.key, part.keyRegexp === 'i' ? 'i' : ''))) {
           return true
         }
-        if (part instanceof qlFunction && otherPart.constructor.name === part.constructor.name && part.isSupersetOf(otherPart.value)) {
+        if (part instanceof qlFunction && otherPart instanceof qlFunction && part.isSupersetOf(otherPart)) {
           return true
         }
         return false
