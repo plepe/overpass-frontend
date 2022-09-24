@@ -73,6 +73,20 @@ describe('Filter', function () {
       assert.deepEqual(r, [ { id: 'nwr' } ])
     })
 
+    it('node', function () {
+      var f = new Filter('node')
+
+      assert.deepEqual(f.def, [{"type":"node"}])
+      assert.equal(f.toString(), 'node;')
+      assert.equal(f.toQl(), 'node;')
+      assert.deepEqual(f.toLokijs(), {type:{$eq:'node'}})
+
+      check(f, [ 1, 2, 3, 4, 5, 6, 7 ])
+
+      var r = f.caches()
+      assert.deepEqual(r, [ { id: 'node' } ])
+    })
+
     it ('nwr[amenity]', function () {
       var f = new Filter('nwr[amenity]')
       assert.deepEqual(f.def, [{"key":"amenity","op":"has_key"}])
@@ -1066,24 +1080,22 @@ describe('Filter', function () {
     })
 
     it('node[amenity', function () {
-      return
       try {
         var f = new Filter('node[amenity')
       }
       catch (e) {
-        assert.equal(e.message, "Can't parse query, expected type of object (e.g. 'node'): nod")
+        assert.equal(e.message, "Can't parse query, expected operator or ']': ")
         return
       }
       assert.fail("Expect an Exception")
     })
 
     it('node[amenity=bench', function () {
-      return
       try {
         var f = new Filter('node[amenity')
       }
       catch (e) {
-        assert.equal(e.message, "Can't parse query, expected type of object (e.g. 'node'): nod")
+        assert.equal(e.message, "Can't parse query, expected operator or ']': ")
         return
       }
       assert.fail("Expect an Exception")

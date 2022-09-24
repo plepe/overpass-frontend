@@ -136,8 +136,13 @@ function parse (def, rek = 0) {
   let m
   let keyRegexp = false
   let notExists = null
-  while (def.length) {
+  while (true) {
+    // console.log('rek' + rek, 'mode' + mode + '|', def.substr(0, 20), '->', script, 'next:', current)
     if (mode === 0) {
+      if (def.match(/^\s*$/)) {
+        return [rek === 0 && script.length === 1 ? script[0] : script, def]
+      }
+
       keyRegexp = false
       m = def.match(/^\s*(node|way|relation|rel|nwr|\()/)
       if (m && m[1] === '(') {
@@ -303,12 +308,6 @@ function parse (def, rek = 0) {
       }
     }
   }
-
-  if (current.length) {
-    script.push(current)
-  }
-
-  return [rek === 0 && script.length === 1 ? script[0] : script, def]
 }
 
 function check (def) {
