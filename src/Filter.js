@@ -317,6 +317,8 @@ function check (def) {
     return
   } else if (typeof def === 'object' && def.constructor.name === 'Filter') {
     def = def.def
+  } else if (Array.isArray(def)) {
+    def = def.map(d => check(d))
   }
   if (def.and) {
     def.and = def.and.map(p => check(p))
