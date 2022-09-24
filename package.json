@@ -68,7 +68,7 @@
     "preversion": "npm run lint && npm run test",
     "version": "rm -r doc/ && npm run doc && npm run build && npm run build-test && git add -A doc/ dist/",
     "prepare": "require-self",
-    "lint": "eslint --fix src/*.js index.js",
+    "lint": "eslint --fix src/*.js src/qlFunctions/*.js index.js",
     "doc": "jsdoc -d doc/ src/*.js"
   },
   "repository": {

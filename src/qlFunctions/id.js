@@ -1,33 +1,41 @@
-module.exports = {
-  parse (str) {
-    return str.split(/,/g).map(v => parseInt(v))
-  },
+const qlFunction = require('./qlFunction')
 
-  test (value, ob) {
-    return value.includes(ob.osm_id)
-  },
-
-  compileQL (value) {
-    return '(id:' + value.join(',') + ')'
-  },
-
-  compileLokiJS (value) {
-    if (value.length === 1) {
-      return [ 'osm_id', { $eq: value[0] } ]
+module.exports = class id extends qlFunction {
+  constructor (str) {
+    super()
+    if (Array.isArray(str)) {
+      this.value = str
     } else {
-      return [ 'osm_id', { $in: value } ]
+      this.value = str.split(/,/g).map(v => parseInt(v))
     }
-  },
+  }
 
-  cacheInfo (options, value) {
+  test (ob) {
+    return this.value.includes(ob.osm_id)
+  }
+
+  toString () {
+    return '(id:' + this.value.join(',') + ')'
+  }
+
+  compileLokiJS () {
+    if (this.value.length === 1) {
+      return ['osm_id', { $eq: this.value[0] }]
+    } else {
+      return ['osm_id', { $in: this.value }]
+    }
+  }
+
+  cacheInfo (options) {
+    let v = this.value
     if (options.ids) {
-      value = options.ids.filter(n => value.includes(n))
+      v = options.ids.filter(n => this.value.includes(n))
     }
 
-    options.ids = value.sort()
-  },
+    options.ids = v.sort()
+  }
 
-  isSupersetOf (value, otherValue) {
-    return !otherValue.filter(id => !value.includes(id)).length
+  isSupersetOf (otherValue) {
+    return !otherValue.filter(id => !this.value.includes(id)).length
   }
 }

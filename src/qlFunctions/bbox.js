@@ -4,8 +4,11 @@ const turf = {
 
 const BoundingBox = require('boundingbox')
 
-module.exports = {
-  parse (str) {
+const qlFunction = require('./qlFunction')
+
+module.exports = class bbox extends qlFunction {
+  constructor (str) {
+    super()
     let s = str.split(/,/g)
 
     if (s.length !== 4) {
@@ -14,28 +17,28 @@ module.exports = {
 
     s = s.map(v => parseFloat(v))
 
-    return new BoundingBox({
+    this.value = new BoundingBox({
       minlat: s[0],
       minlon: s[1],
       maxlat: s[2],
       maxlon: s[3]
     })
-  },
+  }
 
-  test (value, ob) {
-    return ob.intersects(value)
-  },
+  test (ob) {
+    return ob.intersects(this.value)
+  }
 
-  compileQL (value) {
-    return '(' + value.toLatLonString() + ')'
-  },
+  toString () {
+    return '(' + this.value.toLatLonString() + ')'
+  }
 
-  compileLokiJS (value) {
-    return [ null, null, true ]
-  },
+  compileLokiJS () {
+    return [null, null, true]
+  }
 
-  cacheInfo (options, value) {
-    const bounds = value.toGeoJSON()
+  cacheInfo (options) {
+    const bounds = this.value.toGeoJSON()
 
     const newBounds = options.bounds ? turf.intersect(options.bounds, bounds) : bounds
     if (newBounds === null) {
@@ -43,9 +46,9 @@ module.exports = {
     } else {
       options.bounds = newBounds.geometry
     }
-  },
+  }
 
-  isSupersetOf (value, otherValue) {
-    return otherValue.within(value)
+  isSupersetOf (otherValue) {
+    return otherValue.within(this.value)
   }
 }

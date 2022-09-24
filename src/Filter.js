@@ -3,6 +3,7 @@ const filterJoin = require('./filterJoin')
 const qlFunctions = require('./qlFunctions/index')
 const parseString = require('./parseString')
 const parseParantheses = require('./parseParantheses')
+const qlFunction = require('./qlFunctions/qlFunction')
 
 function qlesc (str) {
   return '"' + str.replace(/"/g, '\\"') + '"'
@@ -19,8 +20,8 @@ function compile (part) {
 
   const keyRegexp = (part.keyRegexp ? '~' : '')
 
-  if (part.fun) {
-    return qlFunctions[part.fun].compileQL(part.value)
+  if (part instanceof qlFunction) {
+    return part.toString()
   }
 
   if (part.type) {
@@ -94,8 +95,8 @@ function test (ob, part) {
     return false
   }
 
-  if (part.fun) {
-    return qlFunctions[part.fun].test(part.value, ob)
+  if (part instanceof qlFunction) {
+    return part.test(ob)
   }
 
   switch (part.op) {
@@ -290,22 +291,24 @@ function parse (def, rek = 0) {
       const mId = r[0].match(/^\s*(\d+)\s*$/)
       const mBbox = r[0].match(/^((\s*\d+(.\d+)?\s*,){3}\s*\d+(.\d+)?\s*)$/)
       const m = r[0].match(/^\s*(\w+)\s*:\s*(.*)\s*$/)
+      /* eslint-disable new-cap */
       if (mId) {
-        current.push({ fun: 'id', value: [parseInt(mId[1])] })
+        current.push(new qlFunctions.id(mId[1]))
         mode = 10
       } else if (mBbox) {
-        current.push({ fun: 'bbox', value: qlFunctions.bbox.parse(mBbox[1]) })
+        current.push(new qlFunctions.bbox(mBbox[1]))
         mode = 10
       } else if (m) {
         const fun = m[1]
         if (!qlFunctions[fun]) {
           throw new Error('Unsupported filter function: ' + fun)
         }
-        current.push({ fun, value: qlFunctions[fun].parse(m[2]) })
+        current.push(new qlFunctions[fun](m[2]))
         mode = 10
       } else {
         throw new Error("Can't parse query, expected id, bbox or function: " + def)
       }
+      /* eslint-enable new-cap */
     }
   }
 }
@@ -325,6 +328,8 @@ function check (def) {
   }
   if (def.or) {
     def.or = def.or.map(p => check(p))
+  } else if (def.fun) {
+    def = new qlFunctions[def.fun](def.value)
   }
 
   return def
@@ -547,8 +552,8 @@ class Filter {
         k = 'needMatch'
         v = true
         // can't query for key regexp, skip
-      } else if (filter.fun) {
-        const d = qlFunctions[filter.fun].compileLokiJS(filter.value)
+      } else if (filter instanceof qlFunction) {
+        const d = filter.compileLokiJS()
         ;[k, v] = d
         if (d[2]) {
           query.needMatch = true
@@ -672,9 +677,9 @@ class Filter {
           o.filters += compile(part)
           return o
         })
-      } else if (part.fun) {
+      } else if (part instanceof qlFunction) {
         options = options.map(o => {
-          qlFunctions[part.fun].cacheInfo(o, part.value)
+          part.cacheInfo(o)
           return o
         })
       } else if (part.or) {
@@ -782,7 +787,7 @@ class Filter {
         if (part.op === 'has_key' && part.keyRegexp && otherPart.op && !['!=', '!~', '!~i', 'not_exists'].includes(otherPart.op) && otherPart.key.match(RegExp(part.key, part.keyRegexp === 'i' ? 'i' : ''))) {
           return true
         }
-        if (part.fun && otherPart.fun === part.fun && qlFunctions[part.fun].isSupersetOf(part.value, otherPart.value)) {
+        if (part instanceof qlFunction && otherPart.constructor.name === part.constructor.name && part.isSupersetOf(otherPart.value)) {
           return true
         }
         return false
