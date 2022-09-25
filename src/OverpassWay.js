@@ -148,7 +148,7 @@ class OverpassWay extends OverpassObject {
       const coordinates = this.geometry
         .filter(point => point) // discard non-loaded points
         .map(point => [point.lon, point.lat])
-      const isClosed = this.members && this.members[0].id === this.members[this.members.length - 1].id
+      const isClosed = coordinates.length > 1 && this.members && this.members[0].id === this.members[this.members.length - 1].id
 
       if (isClosed) {
         result.geometry = {
