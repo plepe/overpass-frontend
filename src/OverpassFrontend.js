@@ -128,6 +128,10 @@ class OverpassFrontend {
    * clear all caches
    */
   clearCache () {
+    if (this.localOnly) {
+      return
+    }
+
     this.cacheElements = {}
     this.cacheElementsMemberOf = {}
     this.cacheTimestamp = timestamp()
