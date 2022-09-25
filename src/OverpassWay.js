@@ -4,9 +4,7 @@ const async = require('async')
 const BoundingBox = require('boundingbox')
 const OverpassObject = require('./OverpassObject')
 const OverpassFrontend = require('./defines')
-const turf = {
-  booleanIntersects: require('@turf/boolean-intersects').default
-}
+const turf = require('./turf')
 
 /**
  * A way
@@ -274,7 +272,7 @@ class OverpassWay extends OverpassObject {
     if (this.geometry) {
       let intersects
       if (bbox.toGeoJSON) {
-        // bbox is BoudingBox
+        // bbox is BoundingBox
         intersects = turf.booleanIntersects(this.GeoJSON(), bbox.toGeoJSON())
       } else {
         // bbox is GeoJSON

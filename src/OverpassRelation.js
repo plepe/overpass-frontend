@@ -6,9 +6,7 @@ const osmtogeojson = require('osmtogeojson')
 const OverpassObject = require('./OverpassObject')
 const OverpassFrontend = require('./defines')
 const geojsonShiftWorld = require('./geojsonShiftWorld')
-const turf = {
-  booleanIntersects: require('@turf/boolean-intersects').default
-}
+const turf = require('./turf')
 
 /**
  * A relation

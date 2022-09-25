@@ -2,11 +2,7 @@ const ee = require('event-emitter')
 const BoundingBox = require('boundingbox')
 const OverpassFrontend = require('./defines')
 const isGeoJSON = require('./isGeoJSON')
-const turf = {
-  booleanIntersects: require('@turf/boolean-intersects').default,
-  difference: require('@turf/difference'),
-  intersect: require('@turf/intersect').default
-}
+const turf = require('./turf')
 
 const booleanWithin = require('./booleanWithin')
 
