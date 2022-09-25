@@ -284,9 +284,25 @@ describe("Filters - test isSupersetOf", function () {
     assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should not be a super set of " + f1.toString())
   })
 
-  it("node(around:100,48,16) - node(bbox:47.995,15.995,48.005,16.005)", function () {
+  it("node(around:100,48,16,49,17) - node(around:50,48.5,16.5)", function () {
+    const f1 = new Filter("node(around:100,48,16,49,17)")
+    const f2 = new Filter("node(around:50,48.5,16.5)")
+
+    assert.equal(f1.isSupersetOf(f2), true, f1.toString() + " should be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should not be a super set of " + f1.toString())
+  })
+
+  it("node(around:1000,48,16) - node(bbox:47.995,15.995,48.005,16.005)", function () {
     const f1 = new Filter("node(around:1000,48,16)")
     const f2 = new Filter("node(bbox:47.995,15.995,48.005,16.005)")
+
+    assert.equal(f1.isSupersetOf(f2), true, f1.toString() + " should be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should not be a super set of " + f1.toString())
+  })
+
+  it("node(around:1000,48,16,49,17) - node(bbox:47.995,15.995,48.005,16.005)", function () {
+    const f1 = new Filter("node(around:1000,48,16,49,17)")
+    const f2 = new Filter("node(bbox:48.495,16.495,48.505,16.505)")
 
     assert.equal(f1.isSupersetOf(f2), true, f1.toString() + " should be a super set of " + f2.toString())
     assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should not be a super set of " + f1.toString())

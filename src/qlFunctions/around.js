@@ -1,4 +1,5 @@
 const turf = require('../turf')
+const arrayToCoords = require('../arrayToCoords')
 const qlFunction = require('./qlFunction')
 
 module.exports = class around extends qlFunction {
@@ -6,18 +7,19 @@ module.exports = class around extends qlFunction {
     super()
     const s = str.split(/,/g)
 
-    if (s.length !== 3) {
-      throw new Error('around function expects "distance,latitude,longitude"')
+    if (s.length < 3) {
+      throw new Error('around function expects "distance,latitude,longitude[,latitude,longitude[,...]]"')
+    } else if (s.length === 3) {
+      this.value = { distance: parseFloat(s[0]), geometry: { type: 'Point', coordinates: [parseFloat(s[2]), parseFloat(s[1])] } }
+    } else if (s.length % 2 === 1) {
+      this.value = { distance: parseFloat(s[0]), geometry: { type: 'LineString', coordinates: arrayToCoords(s.slice(1).map(v => parseFloat(v))) } }
+    } else {
+      throw new Error('around function expects "distance,latitude,longitude[,latitude,longitude[,...]]"')
     }
-
-    this.value = { distance: parseFloat(s[0]), geometry: { type: 'Point', coordinates: [parseFloat(s[2]), parseFloat(s[1])] } }
   }
 
   test (ob) {
-    const geojson = ob.GeoJSON()
-    if (geojson.geometry) {
-      return turf.distance(geojson, this.value.geometry, 'kilometers') < this.value.distance / 1000
-    }
+    return ob.intersects(this.bounds())
   }
 
   toString () {
@@ -40,7 +42,7 @@ module.exports = class around extends qlFunction {
   }
 
   isSupersetOf (other) {
-    if (other instanceof around) {
+    if (other instanceof around && this.value.geometry.type === 'Point' && other.value.geometry.type === 'Point') {
       const distance = turf.distance(this.value.geometry, other.value.geometry, 'kilometers') * 1000
       return distance < this.value.distance - other.value.distance
     }
