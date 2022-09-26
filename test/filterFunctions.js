@@ -107,6 +107,26 @@ var overpassFrontend
       })
     })
 
+    describe('Filter "uid"', function () {
+      it('numeric', function (done) {
+        test({
+          mode,
+          query: 'node(uid:908743)',
+          expected: [
+            'n1404275187', 'n2776031336',
+            'n2776031337', 'n2776073558',
+            'n33240913',   'n33240927',
+            'n377992',     'n451666726',
+            'n451666728',  'n451666730'
+          ],
+          expectedSubRequestCount: 1,
+          expectedCacheInfo: [{
+            id: 'node(uid:908743)',
+          }]
+        }, done)
+      })
+    })
+
     describe('Filter "around"', function () {
       it('simple', function (done) {
         test({
