@@ -29,6 +29,7 @@ var overpassFrontend
         test({
           mode,
           query: 'node(378440)',
+          expectedQuery: 'node(id:378440);',
           expected: [ 'n378440' ],
           expectedSubRequestCount: 1,
           expectedCacheInfo: [{
@@ -42,6 +43,7 @@ var overpassFrontend
         test({
           mode,
           query: 'node(378440)',
+          expectedQuery: 'node(id:378440);',
           expected: [ 'n378440' ],
           expectedSubRequestCount: 0,
           expectedCacheInfo: [{
@@ -68,6 +70,7 @@ var overpassFrontend
         test({
           mode,
           query: 'node(id:378440,647991,393161,1234)',
+          expectedQuery: 'node(id:1234,378440,393161,647991);',
           expected: [ 'n378440', 'n647991', 'n393161' ],
           expectedSubRequestCount: 1,
           expectedCacheInfo: [{
@@ -329,7 +332,6 @@ var overpassFrontend
           ]
         }, done)
       })
-
     })
 
     describe('Filter "bbox"', function () {
@@ -341,6 +343,7 @@ var overpassFrontend
         test({
           mode,
           query: 'node(48.1904,16.3370,48.1907,16.3374)',
+          expectedQuery: 'node(48.1904,16.337,48.1907,16.3374);',
           expected: [ 'n1599448219', 'n1871276160', 'n3765072046', 'n395262', 'n643386609' ],
           expectedSubRequestCount: 1,
           expectedCacheInfo: [{
@@ -363,6 +366,7 @@ var overpassFrontend
         test({
           mode,
           query: 'node(48.1904,16.3370,48.1907,16.3374)',
+          expectedQuery: 'node(48.1904,16.337,48.1907,16.3374);',
           expected: [ 'n1599448219', 'n1871276160', 'n3765072046', 'n395262', 'n643386609' ],
           expectedSubRequestCount: 0,
           expectedCacheInfo: [{
@@ -462,6 +466,7 @@ function test (options, callback) {
       found.push(ob.id)
     },
     (err) => {
+      assert.equal(request.filterQuery.toString(), options.expectedQuery || options.query + ';')
       const expected = (options.mode === 'via-server' ? options.expectedViaServer : options.expectedViaFile) || options.expected
       assert.deepEqual(found.sort(), expected.sort(), 'List of found objects wrong!')
       if (options.mode === 'via-server') {
