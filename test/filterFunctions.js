@@ -450,6 +450,69 @@ var overpassFrontend
         }, done)
       })
     })
+
+    describe('Filter "poly"', function () {
+      it('clear cache', function () {
+        overpassFrontend.clearCache()
+      })
+
+      it('simple', function (done) {
+        test({
+          mode,
+          query: 'node(poly:"48.1904 16.3370 48.1907 16.3370 48.1907 16.3374")',
+          expectedQuery: 'node(poly:"48.1904 16.337 48.1907 16.337 48.1907 16.3374");',
+          expected: [ 'n395262' ],
+          expectedSubRequestCount: 1,
+          expectedCacheInfo: [{
+            "id": "node",
+            "bounds": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [ 16.337, 48.1904 ], [ 16.337, 48.1907 ],
+                  [ 16.3374, 48.1907 ], [ 16.337, 48.1904 ],
+                ]
+              ]
+            }
+          }]
+        }, done)
+      })
+
+      it('simple (fully cached)', function (done) {
+        test({
+          mode,
+          query: 'node(poly:"48.1904 16.3370 48.1907 16.3370 48.1907 16.3374")',
+          expectedQuery: 'node(poly:"48.1904 16.337 48.1907 16.337 48.1907 16.3374");',
+          expected: [ 'n395262' ],
+          expectedSubRequestCount: 0,
+          expectedCacheInfo: [{
+            "id": "node",
+            "bounds": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [ 16.337, 48.1904 ], [ 16.337, 48.1907 ],
+                  [ 16.3374, 48.1907 ], [ 16.337, 48.1904 ],
+                ]
+              ]
+            }
+          }]
+        }, done)
+      })
+
+      it('no area left', function (done) {
+        test({
+          mode,
+          query: 'node(poly:"48.1904 16.3370 48.1907 16.3370 48.1907 16.3374")(poly:"1 2 2 2 2 3")',
+          expectedQuery: 'node(poly:"48.1904 16.337 48.1907 16.337 48.1907 16.3374")(poly:"1 2 2 2 2 3");',
+          expected: [ ],
+          expectedSubRequestCount: 1,
+          expectedCacheInfo: [{
+            "id": "node",
+            "invalid": true,
+          }]
+        }, done)
+      })
   })
 })
 
