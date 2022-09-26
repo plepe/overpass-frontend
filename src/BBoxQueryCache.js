@@ -39,6 +39,10 @@ class BBoxQueryCache {
    * is the whole area known?
    */
   check (bbox, cacheInfo = null) {
+    if (cacheInfo && cacheInfo.invalid) {
+      return false
+    }
+
     if (cacheInfo && cacheInfo.ids) {
       let types = [cacheInfo.id.match(/^(node|way|relation|nwr)/)[1]]
       if (types[0] === 'nwr') {

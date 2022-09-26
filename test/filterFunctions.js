@@ -513,6 +513,21 @@ var overpassFrontend
           }]
         }, done)
       })
+
+      it('invalid cache -> ignore cache', function (done) {
+        test({
+          mode,
+          query: 'node(poly:"48.1904 16.3370 48.1907 16.3370 48.1907 16.3374")(poly:"1 2 2 2 2 3")',
+          expectedQuery: 'node(poly:"48.1904 16.337 48.1907 16.337 48.1907 16.3374")(poly:"1 2 2 2 2 3");',
+          expected: [ ],
+          expectedSubRequestCount: 1,
+          expectedCacheInfo: [{
+            "id": "node",
+            "invalid": true,
+          }]
+        }, done)
+      })
+    })
   })
 })
 
