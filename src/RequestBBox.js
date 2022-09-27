@@ -32,11 +32,15 @@ class RequestBBox extends Request {
     }
 
     if (!('noCacheQuery' in this.options) || !this.options.noCacheQuery) {
-      if (this.options.filter) {
-        this.filterQuery = new Filter({ and: [this.query, this.options.filter] })
-        this.query = this.filterQuery.toString()
-      } else {
-        this.filterQuery = new Filter(this.query)
+      try {
+        if (this.options.filter) {
+          this.filterQuery = new Filter({ and: [this.query, this.options.filter] })
+          this.query = this.filterQuery.toString()
+        } else {
+          this.filterQuery = new Filter(this.query)
+        }
+      } catch (err) {
+        return this.finish(err)
       }
 
       this.lokiQuery = this.filterQuery.toLokijs()
