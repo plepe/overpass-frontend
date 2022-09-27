@@ -3,5 +3,6 @@ module.exports = {
   bbox: require('./bbox'),
   id: require('./id'),
   uid: require('./uid'),
+  user: require('./user'),
   poly: require('./poly')
 }

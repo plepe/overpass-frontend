@@ -135,6 +135,74 @@ var overpassFrontend
       })
     })
 
+    describe('Filter "user"', function () {
+      it('single without quotes', function (done) {
+        test({
+          mode,
+          query: 'node(user: rayquaza )',
+          expectedQuery: 'node(user:"rayquaza");',
+          expected: [ 'n60093107' ],
+          expectedSubRequestCount: 1,
+          expectedCacheInfo: [{
+            id: 'node(user:"rayquaza")',
+          }]
+        }, done)
+      })
+
+      it('multiple without quotes', function (done) {
+        test({
+          mode,
+          query: 'node(user: rayquaza ,foobar,  test)',
+          expectedQuery: 'node(user:"rayquaza","foobar","test");',
+          expected: [ 'n60093107' ],
+          expectedSubRequestCount: 1,
+          expectedCacheInfo: [{
+            id: 'node(user:"rayquaza","foobar","test")',
+          }]
+        }, done)
+      })
+
+      it('single with quotes', function (done) {
+        test({
+          mode,
+          query: 'node(user: "caigner" )',
+          expectedQuery: 'node(user:"caigner");',
+          expected: [ "n1497172555", "n1688783954", "n1757141639", "n1757141640",
+            "n2368032899", "n248526742", "n277838208", "n3189862142",
+            "n3189862152", "n3189876469", "n448895067", "n475245484",
+            "n68228729" ],
+          expectedSubRequestCount: 1,
+          expectedCacheInfo: [{
+            id: 'node(user:"caigner")',
+          }]
+        }, done)
+      })
+
+      it('multiple with quotes', function (done) {
+        test({
+          mode,
+          query: 'node(user: "caigner" ,"foobar",  \'test\')',
+          expectedQuery: 'node(user:"caigner","foobar","test");',
+          expected: [ "n1497172555", "n1688783954", "n1757141639", "n1757141640",
+            "n2368032899", "n248526742", "n277838208", "n3189862142",
+            "n3189862152", "n3189876469", "n448895067", "n475245484",
+            "n68228729" ],
+          expectedSubRequestCount: 1,
+          expectedCacheInfo: [{
+            id: 'node(user:"caigner","foobar","test")',
+          }]
+        }, done)
+      })
+
+      it('illegal value', function (done) {
+        test({
+          mode,
+          query: 'node(user:te st)',
+          expectException: "Can't parse user query: st",
+        }, done)
+      })
+    })
+
     describe('Filter "around"', function () {
       it('simple', function (done) {
         test({
