@@ -564,6 +564,15 @@ function test (options, callback) {
       found.push(ob.id)
     },
     (err) => {
+      if (err) {
+        if (options.expectException) {
+          assert.equal(err.message, options.expectException)
+          return callback()
+        }
+
+        return callback(err)
+      }
+
       assert.equal(request.filterQuery.toString(), options.expectedQuery || options.query + ';')
       const expected = (options.mode === 'via-server' ? options.expectedViaServer : options.expectedViaFile) || options.expected
       assert.deepEqual(found.sort(), expected.sort(), 'List of found objects wrong!')
@@ -572,14 +581,16 @@ function test (options, callback) {
       }
 
       request.off('subrequest-compile', compileListener)
-      callback(err)
+      callback()
     }
   )
 
   request.on('subrequest-compile', compileListener)
 
-  const cacheInfo = request.filterQuery.caches()
-  if (options.expectedCacheInfo) {
-    assert.deepEqual(cacheInfo, options.expectedCacheInfo, 'Expected cache info')
+  if (request.filterQuery) {
+    const cacheInfo = request.filterQuery.caches()
+    if (options.expectedCacheInfo) {
+      assert.deepEqual(cacheInfo, options.expectedCacheInfo, 'Expected cache info')
+    }
   }
 }
