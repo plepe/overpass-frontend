@@ -268,6 +268,30 @@ describe("Filters - test isSupersetOf", function () {
     assert.equal(f2.isSupersetOf(f1), true, f2.toString() + " should be a super set of " + f1.toString())
   })
 
+  it("node(uid:1,2,3) - node(uid:2)", function () {
+    const f1 = new Filter("node(uid:1,2,3)")
+    const f2 = new Filter("node(uid:2)")
+
+    assert.equal(f1.isSupersetOf(f2), true, f1.toString() + " should be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should not be a super set of " + f1.toString())
+  })
+
+  it("node(user:skunk) - node(user:'skunk')", function () {
+    const f1 = new Filter("node(user:skunk)")
+    const f2 = new Filter("node(user:'skunk')")
+
+    assert.equal(f1.isSupersetOf(f2), true, f1.toString() + " should be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), true, f2.toString() + " should be a super set of " + f1.toString())
+  })
+
+  it("node(user:skunk,abc) - node(user:'skunk')", function () {
+    const f1 = new Filter("node(user:skunk,abc)")
+    const f2 = new Filter("node(user:'skunk')")
+
+    assert.equal(f1.isSupersetOf(f2), true, f1.toString() + " should be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should not be a super set of " + f1.toString())
+  })
+
   it("node(around:100,48,16) - node(around:50,48,16)", function () {
     const f1 = new Filter("node(around:100,48,16)")
     const f2 = new Filter("node(around:50,48,16)")
