@@ -290,12 +290,14 @@ class OverpassFrontend {
     // preprocess all requests
     // e.g. call featureCallback for elements which were received in the
     // meantime
-    this.requests.forEach(request => {
+    this.requests.forEach((request, i) => {
       if (request && request.timestampPreprocess < this.cacheTimestamp) {
         request.preprocess()
         request.timestampPreprocess = this.cacheTimestamp
 
-        if (request.mayFinish() || this.localOnly) {
+        if (request.finished) {
+          this.requests[i] = null
+        } else if (request.mayFinish() || this.localOnly) {
           request.finish()
         }
       }
@@ -645,7 +647,10 @@ class OverpassFrontend {
   }
 
   _finishRequest (request) {
-    this.requests[this.requests.indexOf(request)] = null
+    const p = this.requests.indexOf(request)
+    if (p >= 0) {
+      this.requests[p] = null
+    }
   }
 
   _next () {
