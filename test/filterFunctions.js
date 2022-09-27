@@ -125,6 +125,14 @@ var overpassFrontend
           }]
         }, done)
       })
+
+      it('illegal value', function (done) {
+        test({
+          mode,
+          query: 'node(uid:test)',
+          expectException: "Error parsing uid filter, expect a numeric value: \"test\"",
+        }, done)
+      })
     })
 
     describe('Filter "around"', function () {

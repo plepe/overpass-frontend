@@ -3,7 +3,13 @@ const qlFunction = require('./qlFunction')
 module.exports = class uid extends qlFunction {
   constructor (str) {
     super()
-    this.value = str.split(/,/g).map(v => parseInt(v))
+    this.value = str.split(/,/g).map(v => {
+      if (!v.match(/^\s*\d+\s*/)) {
+        throw new Error('Error parsing uid filter, expect a numeric value: "' + v + '"')
+      }
+
+      return parseInt(v)
+    })
   }
 
   test (ob) {
