@@ -2,7 +2,7 @@ const strsearch2regexp = require('strsearch2regexp')
 const filterJoin = require('./filterJoin')
 const qlFunctions = require('./qlFunctions/index')
 const parseString = require('./parseString')
-const parseParantheses = require('./parseParantheses')
+const parseParentheses = require('./parseParentheses')
 const qlFunction = require('./qlFunctions/qlFunction')
 
 function qlesc (str) {
@@ -286,7 +286,7 @@ function parse (def, rek = 0) {
         throw new Error("Can't parse query, expected ']': " + def)
       }
     } else if (mode === 20) {
-      const r = parseParantheses(def)
+      const r = parseParentheses(def)
       def = r[1]
       const mId = r[0].match(/^\s*(\d+)\s*$/)
       const mBbox = r[0].match(/^((\s*\d+(.\d+)?\s*,){3}\s*\d+(.\d+)?\s*)$/)

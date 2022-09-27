@@ -1,6 +1,6 @@
 const parseString = require('./parseString')
 
-module.exports = function parseParantheses (str) {
+module.exports = function parseParentheses (str) {
   const openingChrs = '([{'
   const closingChrs = ')]}'
   const stringChrs = '\'"'
@@ -9,7 +9,7 @@ module.exports = function parseParantheses (str) {
   str = str.slice(1)
 
   if (!openingChrs.includes(chr)) {
-    throw new Error('parseParantheses(): ' + chr + ' is not a valid opening character')
+    throw new Error('parseParentheses(): ' + chr + ' is not a valid opening character')
   }
   const closingChr = closingChrs[openingChrs.indexOf(chr)]
 
@@ -25,17 +25,15 @@ module.exports = function parseParantheses (str) {
       } else if (openingChrs.includes(m[2])) {
         result += m[1]
         str = str.slice(m[1].length)
-        const r = parseParantheses(str)
+        const r = parseParentheses(str)
         result += m[2] + r[0] + closingChrs[openingChrs.indexOf(m[2])]
         str = r[1]
-        console.log('A', result, str)
       } else if (stringChrs.includes(m[2])) {
         result += m[1]
         str = str.slice(m[1].length)
         const r = parseString(str)
         result += m[2] + r[0] + m[2]
         str = r[1]
-        console.log('B', result, str)
       } else {
         throw new Error('haeh?')
       }
