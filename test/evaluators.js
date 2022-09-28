@@ -135,4 +135,57 @@ describe('parseEvaluators()', function () {
     const result = execEvaluators(actual, { name: 'foo' })
     assert.equal(result, expectedResult)
   })
+
+  it ('-1 * -3', function () {
+    const actual = parseEvaluators('-1 * -3')
+    const expected = {
+      left: -1,
+      op: '*',
+      right: -3
+    }
+    const expectedResult = 3
+
+    assert.deepEqual(actual, expected)
+
+    const result = execEvaluators(actual, { name: 'foo' })
+    assert.equal(result, expectedResult)
+  })
+
+  it ('!1', function () {
+    const actual = parseEvaluators('!1')
+    const expected = {
+      left: null,
+      op: '!',
+      right: 1,
+    }
+    const expectedResult = 0
+
+    assert.deepEqual(actual, expected)
+
+    const result = execEvaluators(actual, { name: 'foo' })
+    assert.equal(result, expectedResult)
+  })
+
+  it ('!1 + !0', function () {
+    const actual = parseEvaluators('!1 + !0')
+    const expected = {
+      left: {
+        left: null,
+        op: '!',
+        right: 1,
+      },
+      op: '+',
+      right: {
+        left: null,
+        op: '!',
+        right: 0
+      }
+    }
+    const expectedResult = 1
+
+    assert.deepEqual(actual, expected)
+
+    const result = execEvaluators(actual, { name: 'foo' })
+    assert.equal(result, expectedResult)
+  })
 })

@@ -25,7 +25,7 @@ function next (current, def) {
 
 function nextOp (current, op) {
   if (current && current.op && opPriorities[op] < opPriorities[current.op]) {
-    current.right = { op, left: current.right }
+    current.right = { op, left: current.right || null }
   } else {
     current = { op, left: current }
   }
@@ -40,7 +40,7 @@ module.exports = function parseEvaluators (str, rek = 0) {
   while (true) {
     // console.log('rek' + rek, 'mode' + mode + '|', str.substr(0, 20), '->', current)
     if (mode === 0) {
-      const m = str.match(/^(\s*)(([0-9]+(\.[0-9]+)?)|(["'!])|(t\[\s*)|([a-z_]+)\()/)
+      const m = str.match(/^(\s*)((-?[0-9]+(\.[0-9]+)?)|(["'!])|(t\[\s*)|([a-z_]+)\()/)
       if (!m) {
         throw new Error('mode 0')
       }
@@ -49,7 +49,10 @@ module.exports = function parseEvaluators (str, rek = 0) {
         current = next(current, parseFloat(m[3]))
         mode = 1
       }
-      if (m[5]) { // string
+      if (m[5] === '!') { // negation
+        current = nextOp(current, '!')
+        str = str.substr(m[1].length + m[5].length)
+      } else if (m[5]) {
         let s
         [s, str] = parseString(str.substr(m[1].length))
         current = next(current, s)

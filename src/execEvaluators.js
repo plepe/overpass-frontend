@@ -3,6 +3,7 @@ const operators = {
   '-': (a, b) => a - b,
   '*': (a, b) => a * b,
   '/': (a, b) => a / b,
+  '!': (a, b) => b ? 0 : 1,
   /* eslint-disable eqeqeq */
   '==': (a, b) => a == b
   /* eslint-enable eqeqeq */
@@ -12,7 +13,7 @@ const functions = {
 }
 
 module.exports = function execEvaluators (current, context) {
-  if (typeof current === 'number' || typeof current === 'string') {
+  if (current === null || typeof current === 'number' || typeof current === 'string') {
     return current
   }
 
