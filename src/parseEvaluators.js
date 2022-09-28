@@ -1,8 +1,21 @@
 const parseString = require('./parseString')
 
+const opPriorities = {
+  '==': 5,
+  '+': 3,
+  '-': 3,
+  '*': 2,
+  '/': 2,
+  '!': 1
+}
+
 function next (current, def) {
   if (current) {
-    current.right = def
+    if (current.right) {
+      current.right = next(current.right, def)
+    } else {
+      current.right = def
+    }
   } else {
     current = def
   }
@@ -11,7 +24,11 @@ function next (current, def) {
 }
 
 function nextOp (current, op) {
-  current = { op, left: current }
+  if (current && current.op && opPriorities[op] < opPriorities[current.op]) {
+    current.right = { op, left: current.right }
+  } else {
+    current = { op, left: current }
+  }
 
   return current
 }
@@ -23,12 +40,14 @@ module.exports = function parseEvaluators (str, rek = 0) {
   while (true) {
     // console.log('rek' + rek, 'mode' + mode + '|', str.substr(0, 20), '->', current)
     if (mode === 0) {
-      const m = str.match(/^(\s*)(([0-9]+(\.[0-9]+))|(["'!])|(t\[\s*)|([a-z_]+)\()/)
+      const m = str.match(/^(\s*)(([0-9]+(\.[0-9]+)?)|(["'!])|(t\[\s*)|([a-z_]+)\()/)
       if (!m) {
         throw new Error('mode 0')
       }
       if (m[3]) {
-        console.log(m[3])
+        str = str.substr(m[1].length + m[3].length)
+        current = next(current, parseFloat(m[3]))
+        mode = 1
       }
       if (m[5]) { // string
         let s
@@ -45,7 +64,7 @@ module.exports = function parseEvaluators (str, rek = 0) {
         return current
       }
 
-      const m = str.match(/^\s*(==)/)
+      const m = str.match(/^\s*(==|[+*-/])/)
       if (!m) { throw new Error('mode 1') }
       current = nextOp(current, m[1])
       str = str.substr(m[0].length)
