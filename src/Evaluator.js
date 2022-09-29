@@ -1,6 +1,7 @@
 const parseString = require('./parseString')
 
 const operators = {
+  '—': (a, b) => -b,
   '+': (a, b) => a + b,
   '-': (a, b) => a - b,
   '*': (a, b) => a * b,
@@ -20,7 +21,8 @@ const opPriorities = {
   '-': 3,
   '*': 2,
   '/': 2,
-  '!': 1
+  '!': 1,
+  '—': 0 // unary minus
 }
 
 function next (current, def) {
@@ -32,6 +34,16 @@ function next (current, def) {
     }
   } else {
     current = def
+  }
+
+  return current
+}
+
+function nextParam (current, def) {
+  if (current.right) {
+    nextParam(current.right, def)
+  } else {
+    current.parameters.push(def)
   }
 
   return current
@@ -55,7 +67,7 @@ class Evaluator {
     while (true) {
       // console.log('rek' + rek, 'mode' + mode + '|', str.substr(0, 20), '->', this.data)
       if (mode === 0) {
-        const m = str.match(/^(\s*)((-?[0-9]+(\.[0-9]+)?)|(["'!])|(t\[\s*)|([a-z_]*)\(|(,\)))/)
+        const m = str.match(/^(\s*)((-?[0-9]+(\.[0-9]+)?)|(["'!-])|(t\[\s*)|([a-z_]*)\(|(,\)))/)
         if (!m) {
           throw new Error('mode 0')
         }
@@ -63,8 +75,8 @@ class Evaluator {
           str = str.substr(m[1].length + m[3].length)
           this.data = next(this.data, parseFloat(m[3]))
           mode = 1
-        } else if (m[5] === '!') { // negation
-          this.data = nextOp(this.data, '!')
+        } else if (['!', '-'].includes(m[5])) { // negation or unary minus (—)
+          this.data = nextOp(this.data, m[5] === '-' ? '—' : m[5])
           str = str.substr(m[1].length + m[5].length)
         } else if (m[5]) {
           let s
@@ -108,11 +120,7 @@ class Evaluator {
         const s = new Evaluator()
         str = s.parse(str, rek + 1)
 
-        if (this.data.right) {
-          this.data.right.parameters.push(s.data)
-        } else {
-          this.data.parameters.push(s.data)
-        }
+        nextParam(this.data, s.data)
 
         const m = str.match(/^\s*([),])/)
         if (!m) { throw new Error('20') }

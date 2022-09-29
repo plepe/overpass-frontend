@@ -209,6 +209,62 @@ describe('evaluators', function () {
     assert.equal(result, expectedResult)
   })
 
+  it ('-(1 * 3)', function () {
+    const eval = new Evaluator()
+    const str = eval.parse('-(1 * 3)')
+    const expected = {
+      left: null,
+      op: '—',
+      right: {
+        fun: '',
+        parameters: [
+          {
+            left: 1,
+            op: '*',
+            right: 3
+          }
+        ]
+      }
+    }
+    const expectedResult = -3
+
+    assert.deepEqual(eval.data, expected)
+    assert.equal(str, '')
+
+    const result = eval.exec({ name: 'foo' })
+    assert.equal(result, expectedResult)
+  })
+
+  it ('2 + -(1 * 3)', function () {
+    const eval = new Evaluator()
+    const str = eval.parse('2 + -(1 * 3)')
+    const expected = {
+      left: 2,
+      op: '+',
+      right: {
+        left: null,
+        op: '—',
+        right: {
+          fun: '',
+          parameters: [
+            {
+              left: 1,
+              op: '*',
+              right: 3
+            }
+          ]
+        }
+      }
+    }
+    const expectedResult = -1
+
+    assert.deepEqual(eval.data, expected)
+    assert.equal(str, '')
+
+    const result = eval.exec({ name: 'foo' })
+    assert.equal(result, expectedResult)
+  })
+
   it ('!1', function () {
     const eval = new Evaluator()
     const str = eval.parse('!1')
