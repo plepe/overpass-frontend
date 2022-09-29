@@ -624,6 +624,25 @@ var overpassFrontend
         }, done)
       })
     })
+
+    describe('Filter "if"', function () {
+      it('clear cache', function () {
+        overpassFrontend.clearCache()
+      })
+
+      it('single without quotes', function (done) {
+        test({
+          mode,
+          query: 'node[highway](if: t["name"] == "Bahnhofstraße")',
+          expectedQuery: 'node["highway"](if:t["name"]=="Bahnhofstraße");',
+          expected: [ 'n647991' ],
+          expectedSubRequestCount: 1,
+          expectedCacheInfo: [{
+            id: 'node["highway"](if:t["name"]=="Bahnhofstraße")',
+          }]
+        }, done)
+      })
+    })
   })
 })
 
