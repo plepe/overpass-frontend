@@ -45,6 +45,19 @@ const opPriorities = {
   '!': 1,
   '—': 0 // unary minus
 }
+const compileLokiOperator = {
+  '==': function (left, right) {
+    if (left && left.property && right && right.value) {
+      return [left.property, { $eq: right.value }]
+    } else if (left && left.value && right && right.property) {
+      return [right.property, { $eq: left.value }]
+    } else {
+      return [null, null, true]
+    }
+
+    console.log(left, right)
+  }
+}
 
 function next (current, def) {
   if (current) {
@@ -209,6 +222,39 @@ class Evaluator {
         return 't[' + param[0] + ']'
       } else {
         return current.fun + '(' + param.join(',') + ')'
+      }
+    }
+  }
+
+  compileLokiJS (current = undefined) {
+    if (current === undefined) {
+      current = this.data
+    }
+
+    if (current === null) {
+      return null
+    }
+
+    if (current === null || typeof current === 'number' || typeof current === 'string') {
+      return { value: current }
+    }
+
+    if ('op' in current) {
+      const left = this.compileLokiJS(current.left)
+      const right = this.compileLokiJS(current.right)
+
+      return compileLokiOperator[current.op](left, right)
+    }
+
+    if ('fun' in current) {
+      const param = current.parameters.map(p => this.compileLokiJS(p))
+
+      if (current.fun === 'tag') {
+        if (param[0] && param[0].value) {
+          return { property: 'tags.' + param[0].value }
+        }
+      } else {
+        //return current.fun + '(' + param.join(',') + ')'
       }
     }
   }

@@ -13,6 +13,10 @@ describe('evaluators', function () {
     }
     const expectedResult = true
     const expectedCompiled = 't["name"]=="foo"'
+    const expectedLokiQuery = [
+      'tags.name',
+      { $eq: 'foo' }
+    ]
 
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
@@ -21,6 +25,7 @@ describe('evaluators', function () {
     assert.equal(result, expectedResult)
 
     assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
   })
 
   it ('t["name"] == t["operator"]', function () {
