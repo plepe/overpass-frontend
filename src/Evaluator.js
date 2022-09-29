@@ -53,10 +53,9 @@ class Evaluator {
     let mode = 0
 
     while (true) {
-      console.log('rek' + rek, 'mode' + mode + '|', str.substr(0, 20), '->', this.data)
+      // console.log('rek' + rek, 'mode' + mode + '|', str.substr(0, 20), '->', this.data)
       if (mode === 0) {
         const m = str.match(/^(\s*)((-?[0-9]+(\.[0-9]+)?)|(["'!])|(t\[\s*)|([a-z_]*)\(|(,\)))/)
-        console.log(m)
         if (!m) {
           throw new Error('mode 0')
         }
