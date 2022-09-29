@@ -484,7 +484,45 @@ describe('evaluators', function () {
     assert.deepEqual(eval.data, expected)
     assert.equal(str, ')')
 
-    const result = eval.exec({ name3: 'foo' })
+    const result = eval.exec({ tags: { name3: 'foo' } })
+    assert.equal(result, expectedResult)
+
+    assert.equal(eval.toString(), expectedCompiled)
+  })
+
+  it ('count_tags()', function () {
+    const eval = new Evaluator()
+    const str = eval.parse('count_tags()')
+    const expected = {
+      fun: 'count_tags',
+      parameters: []
+    }
+    const expectedResult = 1
+    const expectedCompiled = 'count_tags()'
+
+    assert.deepEqual(eval.data, expected)
+    assert.equal(str, '')
+
+    const result = eval.exec({ tags: { name3: 'foo' } })
+    assert.equal(result, expectedResult)
+
+    assert.equal(eval.toString(), expectedCompiled)
+  })
+
+  it ('count_tags() of object with not-loaded tags', function () {
+    const eval = new Evaluator()
+    const str = eval.parse('count_tags()')
+    const expected = {
+      fun: 'count_tags',
+      parameters: []
+    }
+    const expectedResult = null
+    const expectedCompiled = 'count_tags()'
+
+    assert.deepEqual(eval.data, expected)
+    assert.equal(str, '')
+
+    const result = eval.exec({})
     assert.equal(result, expectedResult)
 
     assert.equal(eval.toString(), expectedCompiled)

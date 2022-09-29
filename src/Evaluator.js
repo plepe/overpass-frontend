@@ -20,6 +20,7 @@ const operators = {
 }
 const functions = {
   '': (p, context, that) => that.exec(context, p[0]),
+  count_tags: (p, context) => context.tags ? Object.keys(context.tags).length : null,
   debug: (p) => {
     console.log(p[0])
     return p[0]
@@ -135,10 +136,12 @@ class Evaluator {
         str = str.substr(m[0].length)
         mode = 1
       } else if (mode === 20) {
-        const s = new Evaluator()
-        str = s.parse(str, rek + 1)
+        if (!str.match(/^\s*\)/)) {
+          const s = new Evaluator()
+          str = s.parse(str, rek + 1)
 
-        nextParam(this.data, s.data)
+          nextParam(this.data, s.data)
+        }
 
         const m = str.match(/^\s*([),])/)
         if (!m) { throw new Error('20') }
