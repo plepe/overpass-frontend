@@ -11,6 +11,7 @@ const operators = {
   /* eslint-enable eqeqeq */
 }
 const functions = {
+  '': (p, context, that) => that.exec(context, p[0]),
   tag: (p, context) => context[p[0]]
 }
 const opPriorities = {
@@ -131,15 +132,15 @@ class Evaluator {
       return current
     }
 
-    if (current.op) {
+    if ('op' in current) {
       const left = this.exec(context, current.left)
       const right = this.exec(context, current.right)
       return operators[current.op](left, right)
     }
 
-    if (current.fun) {
+    if ('fun' in current) {
       const param = current.parameters.map(p => this.exec(context, p))
-      return functions[current.fun](param, context)
+      return functions[current.fun](param, context, this)
     }
   }
 }

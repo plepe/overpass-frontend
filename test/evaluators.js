@@ -75,6 +75,32 @@ describe('evaluators', function () {
     assert.equal(result, expectedResult)
   })
 
+  it ('(2.5 + 3) * 4', function () {
+    const eval = new Evaluator()
+    const str = eval.parse('(2.5 + 3) * 4')
+    const expected = {
+      left: {
+        fun: '',
+        parameters: [
+          {
+            left: 2.5,
+            op: '+',
+            right: 3
+          }
+        ]
+      },
+      op: '*',
+      right: 4
+    }
+    const expectedResult = 22
+
+    assert.deepEqual(eval.data, expected)
+    assert.equal(str, '')
+
+    const result = eval.exec({ name: 'foo' })
+    assert.equal(result, expectedResult)
+  })
+
   it ('1 + 2.5 + 3 * 4', function () {
     const eval = new Evaluator()
     const str = eval.parse('1 + 2.5 + 3 * 4')
