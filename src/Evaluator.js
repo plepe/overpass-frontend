@@ -13,7 +13,7 @@ const operators = {
 }
 const functions = {
   '': (p, context, that) => that.exec(context, p[0]),
-  tag: (p, context) => context[p[0]]
+  tag: (p, context) => context.tags && context.tags[p[0]]
 }
 const opPriorities = {
   '==': 5,

@@ -17,7 +17,7 @@ describe('evaluators', function () {
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
 
-    const result = eval.exec({ name: 'foo' })
+    const result = eval.exec({ tags: { name: 'foo' } })
     assert.equal(result, expectedResult)
 
     assert.equal(eval.toString(), expectedCompiled)
@@ -37,7 +37,7 @@ describe('evaluators', function () {
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
 
-    const result = eval.exec({ name: 'foo' })
+    const result = eval.exec({ tags: { name: 'foo' } })
     assert.equal(result, expectedResult)
 
     assert.equal(eval.toString(), expectedCompiled)
@@ -57,7 +57,7 @@ describe('evaluators', function () {
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
 
-    const result = eval.exec({ name: 'foo' })
+    const result = eval.exec({ tags: { name: 'foo' } })
     assert.equal(result, expectedResult)
 
     assert.equal(eval.toString(), expectedCompiled)
@@ -81,7 +81,7 @@ describe('evaluators', function () {
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
 
-    const result = eval.exec({ name: 'foo' })
+    const result = eval.exec({ tags: { name: 'foo' } })
     assert.equal(result, expectedResult)
 
     assert.equal(eval.toString(), expectedCompiled)
@@ -110,7 +110,7 @@ describe('evaluators', function () {
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
 
-    const result = eval.exec({ name: 'foo' })
+    const result = eval.exec({ tags: { name: 'foo' } })
     assert.equal(result, expectedResult)
   })
 
@@ -136,7 +136,7 @@ describe('evaluators', function () {
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
 
-    const result = eval.exec({ name: 'foo' })
+    const result = eval.exec({ tags: { name: 'foo' } })
     assert.equal(result, expectedResult)
 
     assert.equal(eval.toString(), expectedCompiled)
@@ -160,7 +160,7 @@ describe('evaluators', function () {
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
 
-    const result = eval.exec({ name: 'foo' })
+    const result = eval.exec({ tags: { name: 'foo' } })
     assert.equal(result, expectedResult)
 
     assert.equal(eval.toString(), expectedCompiled)
@@ -183,7 +183,7 @@ describe('evaluators', function () {
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
 
-    const result = eval.exec({ name: 'foo' })
+    const result = eval.exec({ tags: { name: 'foo' } })
     assert.equal(result, expectedResult)
 
     assert.equal(eval.toString(), expectedCompiled)
@@ -211,7 +211,7 @@ describe('evaluators', function () {
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
 
-    const result = eval.exec({ name: 'foo' })
+    const result = eval.exec({ tags: { name: 'foo' } })
     assert.equal(result, expectedResult)
 
     assert.equal(eval.toString(), expectedCompiled)
@@ -231,7 +231,7 @@ describe('evaluators', function () {
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
 
-    const result = eval.exec({ name: 'foo' })
+    const result = eval.exec({ tags: { name: 'foo' } })
     assert.equal(result, expectedResult)
 
     assert.equal(eval.toString(), expectedCompiled)
@@ -260,7 +260,7 @@ describe('evaluators', function () {
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
 
-    const result = eval.exec({ name: 'foo' })
+    const result = eval.exec({ tags: { name: 'foo' } })
     assert.equal(result, expectedResult)
 
     assert.equal(eval.toString(), expectedCompiled)
@@ -293,7 +293,7 @@ describe('evaluators', function () {
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
 
-    const result = eval.exec({ name: 'foo' })
+    const result = eval.exec({ tags: { name: 'foo' } })
     assert.equal(result, expectedResult)
 
     assert.equal(eval.toString(), expectedCompiled)
@@ -313,7 +313,7 @@ describe('evaluators', function () {
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
 
-    const result = eval.exec({ name: 'foo' })
+    const result = eval.exec({ tags: { name: 'foo' } })
     assert.equal(result, expectedResult)
 
     assert.equal(eval.toString(), expectedCompiled)
@@ -341,7 +341,7 @@ describe('evaluators', function () {
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
 
-    const result = eval.exec({ name: 'foo' })
+    const result = eval.exec({ tags: { name: 'foo' } })
     assert.equal(result, expectedResult)
 
     assert.equal(eval.toString(), expectedCompiled)
@@ -370,7 +370,7 @@ describe('evaluators', function () {
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
 
-    const result = eval.exec({ name3: 'foo' })
+    const result = eval.exec({ tags: { name3: 'foo' } })
     assert.equal(result, expectedResult)
 
     assert.equal(eval.toString(), expectedCompiled)
