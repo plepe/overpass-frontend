@@ -130,7 +130,7 @@ class Evaluator {
     }
   }
 
-  exec (context, current) {
+  exec (context, current = undefined) {
     if (current === undefined) {
       current = this.data
     }
@@ -148,6 +148,45 @@ class Evaluator {
     if ('fun' in current) {
       const param = current.parameters.map(p => this.exec(context, p))
       return functions[current.fun](param, context, this)
+    }
+  }
+
+  toString (current = undefined) {
+    if (current === undefined) {
+      current = this.data
+    }
+
+    if (current === null) {
+      return '""'
+    }
+
+    if (typeof current === 'number') {
+      return '' + current
+    }
+
+    if (typeof current === 'string') {
+      return '"' + current
+        .replace(/\\/g, '\\\\')
+        .replace(/"/g, '\\"') + '"'
+    }
+
+    if ('op' in current) {
+      const right = this.toString(current.right)
+      if (current.left === null) {
+        return (current.op === '—' ? '-' : current.op) + right
+      } else {
+        const left = this.toString(current.left)
+        return left + current.op + right
+      }
+    }
+
+    if ('fun' in current) {
+      const param = current.parameters.map(p => this.toString(p))
+      if (current.fun === 'tag') {
+        return 't[' + param[0] + ']'
+      } else {
+        return current.fun + '(' + param.join(',') + ')'
+      }
     }
   }
 }

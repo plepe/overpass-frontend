@@ -12,12 +12,15 @@ describe('evaluators', function () {
       right: 'foo'
     }
     const expectedResult = true
+    const expectedCompiled = 't["name"]=="foo"'
 
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
 
     const result = eval.exec({ name: 'foo' })
     assert.equal(result, expectedResult)
+
+    assert.equal(eval.toString(), expectedCompiled)
   })
 
   it ('t["name"] == t["operator"]', function () {
@@ -29,12 +32,15 @@ describe('evaluators', function () {
       right: { fun: 'tag', parameters: [ 'operator' ] },
     }
     const expectedResult = false
+    const expectedCompiled = 't["name"]==t["operator"]'
 
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
 
     const result = eval.exec({ name: 'foo' })
     assert.equal(result, expectedResult)
+
+    assert.equal(eval.toString(), expectedCompiled)
   })
 
   it ('"test" + 2', function () {
@@ -46,12 +52,15 @@ describe('evaluators', function () {
       right: 2
     }
     const expectedResult = 'test2'
+    const expectedCompiled = '"test"+2'
 
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
 
     const result = eval.exec({ name: 'foo' })
     assert.equal(result, expectedResult)
+
+    assert.equal(eval.toString(), expectedCompiled)
   })
 
   it ('2.5 + 3 * 4', function () {
@@ -67,12 +76,15 @@ describe('evaluators', function () {
       },
     }
     const expectedResult = 14.5
+    const expectedCompiled = '2.5+3*4'
 
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
 
     const result = eval.exec({ name: 'foo' })
     assert.equal(result, expectedResult)
+
+    assert.equal(eval.toString(), expectedCompiled)
   })
 
   it ('(2.5 + 3) * 4', function () {
@@ -93,6 +105,7 @@ describe('evaluators', function () {
       right: 4
     }
     const expectedResult = 22
+    const expectedCompiled = '(2.5+3)*4'
 
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
@@ -118,12 +131,15 @@ describe('evaluators', function () {
       }
     }
     const expectedResult = 15.5
+    const expectedCompiled = '1+2.5+3*4'
 
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
 
     const result = eval.exec({ name: 'foo' })
     assert.equal(result, expectedResult)
+
+    assert.equal(eval.toString(), expectedCompiled)
   })
 
   it ('2.5 * 3 + 4', function () {
@@ -139,12 +155,15 @@ describe('evaluators', function () {
       right: 4,
     }
     const expectedResult = 11.5
+    const expectedCompiled = '2.5*3+4'
 
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
 
     const result = eval.exec({ name: 'foo' })
     assert.equal(result, expectedResult)
+
+    assert.equal(eval.toString(), expectedCompiled)
   })
 
   it ('2.5 - 3 + 4', function () {
@@ -159,12 +178,15 @@ describe('evaluators', function () {
       right: 4
     }
     const expectedResult = 3.5
+    const expectedCompiled = '2.5-3+4'
 
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
 
     const result = eval.exec({ name: 'foo' })
     assert.equal(result, expectedResult)
+
+    assert.equal(eval.toString(), expectedCompiled)
   })
 
   it ('2.5 * 3 + 4 * 5', function () {
@@ -184,12 +206,15 @@ describe('evaluators', function () {
       }
     }
     const expectedResult = 27.5
+    const expectedCompiled = '2.5*3+4*5'
 
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
 
     const result = eval.exec({ name: 'foo' })
     assert.equal(result, expectedResult)
+
+    assert.equal(eval.toString(), expectedCompiled)
   })
 
   it ('-1 * -3', function () {
@@ -201,12 +226,15 @@ describe('evaluators', function () {
       right: -3
     }
     const expectedResult = 3
+    const expectedCompiled = '-1*-3'
 
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
 
     const result = eval.exec({ name: 'foo' })
     assert.equal(result, expectedResult)
+
+    assert.equal(eval.toString(), expectedCompiled)
   })
 
   it ('-(1 * 3)', function () {
@@ -227,12 +255,15 @@ describe('evaluators', function () {
       }
     }
     const expectedResult = -3
+    const expectedCompiled = '-(1*3)'
 
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
 
     const result = eval.exec({ name: 'foo' })
     assert.equal(result, expectedResult)
+
+    assert.equal(eval.toString(), expectedCompiled)
   })
 
   it ('2 + -(1 * 3)', function () {
@@ -257,12 +288,15 @@ describe('evaluators', function () {
       }
     }
     const expectedResult = -1
+    const expectedCompiled = '2+-(1*3)'
 
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
 
     const result = eval.exec({ name: 'foo' })
     assert.equal(result, expectedResult)
+
+    assert.equal(eval.toString(), expectedCompiled)
   })
 
   it ('!1', function () {
@@ -274,12 +308,15 @@ describe('evaluators', function () {
       right: 1,
     }
     const expectedResult = 0
+    const expectedCompiled = '!1'
 
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
 
     const result = eval.exec({ name: 'foo' })
     assert.equal(result, expectedResult)
+
+    assert.equal(eval.toString(), expectedCompiled)
   })
 
   it ('!1 + !0', function () {
@@ -299,12 +336,15 @@ describe('evaluators', function () {
       }
     }
     const expectedResult = 1
+    const expectedCompiled = '!1+!0'
 
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
 
     const result = eval.exec({ name: 'foo' })
     assert.equal(result, expectedResult)
+
+    assert.equal(eval.toString(), expectedCompiled)
   })
 
   it ('tag("name" + 3) + "bar"', function () {
@@ -325,12 +365,15 @@ describe('evaluators', function () {
       right: 'bar'
     }
     const expectedResult = "foobar"
+    const expectedCompiled = 't["name"+3]+"bar"'
 
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
 
     const result = eval.exec({ name3: 'foo' })
     assert.equal(result, expectedResult)
+
+    assert.equal(eval.toString(), expectedCompiled)
   })
 
   it ('"name")', function () {
@@ -338,11 +381,14 @@ describe('evaluators', function () {
     const str = eval.parse('"name")')
     const expected = 'name'
     const expectedResult = "name"
+    const expectedCompiled = '"name"'
 
     assert.deepEqual(eval.data, expected)
     assert.equal(str, ')')
 
     const result = eval.exec({ name3: 'foo' })
     assert.equal(result, expectedResult)
+
+    assert.equal(eval.toString(), expectedCompiled)
   })
 })
