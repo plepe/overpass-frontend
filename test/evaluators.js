@@ -1,11 +1,11 @@
 const assert = require('assert').strict
 
-const parseEvaluators = require('../src/parseEvaluators')
-const execEvaluators = require('../src/execEvaluators')
+const Evaluator = require('../src/Evaluator')
 
-describe('parseEvaluators()', function () {
+describe('evaluators', function () {
   it ('t["name"] == "foo"', function () {
-    const [actual, str] = parseEvaluators('t["name"] == "foo"')
+    const eval = new Evaluator()
+    const str = eval.parse('t["name"] == "foo"')
     const expected = {
       op: '==',
       left: { fun: 'tag', parameters: [ 'name' ] },
@@ -13,14 +13,15 @@ describe('parseEvaluators()', function () {
     }
     const expectedResult = true
 
-    assert.deepEqual(actual, expected)
+    assert.deepEqual(eval.data, expected)
 
-    const result = execEvaluators(actual, { name: 'foo' })
+    const result = eval.exec({ name: 'foo' })
     assert.equal(result, expectedResult)
   })
 
   it ('t["name"] == t["operator"]', function () {
-    const [actual, str] = parseEvaluators('t["name"] == t["operator"]')
+    const eval = new Evaluator()
+    const str = eval.parse('t["name"] == t["operator"]')
     const expected = {
       op: '==',
       left: { fun: 'tag', parameters: [ 'name' ] },
@@ -28,14 +29,15 @@ describe('parseEvaluators()', function () {
     }
     const expectedResult = false
 
-    assert.deepEqual(actual, expected)
+    assert.deepEqual(eval.data, expected)
 
-    const result = execEvaluators(actual, { name: 'foo' })
+    const result = eval.exec({ name: 'foo' })
     assert.equal(result, expectedResult)
   })
 
   it ('"test" + 2', function () {
-    const [actual, str] = parseEvaluators('"test" + 2')
+    const eval = new Evaluator()
+    const str = eval.parse('"test" + 2')
     const expected = {
       op: '+',
       left: 'test',
@@ -43,14 +45,15 @@ describe('parseEvaluators()', function () {
     }
     const expectedResult = 'test2'
 
-    assert.deepEqual(actual, expected)
+    assert.deepEqual(eval.data, expected)
 
-    const result = execEvaluators(actual, { name: 'foo' })
+    const result = eval.exec({ name: 'foo' })
     assert.equal(result, expectedResult)
   })
 
   it ('2.5 + 3 * 4', function () {
-    const [actual, str] = parseEvaluators('2.5 + 3 * 4')
+    const eval = new Evaluator()
+    const str = eval.parse('2.5 + 3 * 4')
     const expected = {
       op: '+',
       left: 2.5,
@@ -62,14 +65,15 @@ describe('parseEvaluators()', function () {
     }
     const expectedResult = 14.5
 
-    assert.deepEqual(actual, expected)
+    assert.deepEqual(eval.data, expected)
 
-    const result = execEvaluators(actual, { name: 'foo' })
+    const result = eval.exec({ name: 'foo' })
     assert.equal(result, expectedResult)
   })
 
   it ('1 + 2.5 + 3 * 4', function () {
-    const [actual, str] = parseEvaluators('1 + 2.5 + 3 * 4')
+    const eval = new Evaluator()
+    const str = eval.parse('1 + 2.5 + 3 * 4')
     const expected = {
       op: '+',
       left: {
@@ -85,14 +89,15 @@ describe('parseEvaluators()', function () {
     }
     const expectedResult = 15.5
 
-    assert.deepEqual(actual, expected)
+    assert.deepEqual(eval.data, expected)
 
-    const result = execEvaluators(actual, { name: 'foo' })
+    const result = eval.exec({ name: 'foo' })
     assert.equal(result, expectedResult)
   })
 
   it ('2.5 * 3 + 4', function () {
-    const [actual, str] = parseEvaluators('2.5 * 3 + 4')
+    const eval = new Evaluator()
+    const str = eval.parse('2.5 * 3 + 4')
     const expected = {
       op: '+',
       left: {
@@ -104,14 +109,15 @@ describe('parseEvaluators()', function () {
     }
     const expectedResult = 11.5
 
-    assert.deepEqual(actual, expected)
+    assert.deepEqual(eval.data, expected)
 
-    const result = execEvaluators(actual, { name: 'foo' })
+    const result = eval.exec({ name: 'foo' })
     assert.equal(result, expectedResult)
   })
 
   it ('2.5 - 3 + 4', function () {
-    const [actual, str] = parseEvaluators('2.5 - 3 + 4')
+    const eval = new Evaluator()
+    const str = eval.parse('2.5 - 3 + 4')
     const expected = {
       op: '+',
       left: { op: '-',
@@ -122,14 +128,15 @@ describe('parseEvaluators()', function () {
     }
     const expectedResult = 3.5
 
-    assert.deepEqual(actual, expected)
+    assert.deepEqual(eval.data, expected)
 
-    const result = execEvaluators(actual, { name: 'foo' })
+    const result = eval.exec({ name: 'foo' })
     assert.equal(result, expectedResult)
   })
 
   it ('2.5 * 3 + 4 * 5', function () {
-    const [actual, str] = parseEvaluators('2.5 * 3 + 4 * 5')
+    const eval = new Evaluator()
+    const str = eval.parse('2.5 * 3 + 4 * 5')
     const expected = {
       left: {
         left: 2.5,
@@ -145,14 +152,15 @@ describe('parseEvaluators()', function () {
     }
     const expectedResult = 27.5
 
-    assert.deepEqual(actual, expected)
+    assert.deepEqual(eval.data, expected)
 
-    const result = execEvaluators(actual, { name: 'foo' })
+    const result = eval.exec({ name: 'foo' })
     assert.equal(result, expectedResult)
   })
 
   it ('-1 * -3', function () {
-    const [actual, str] = parseEvaluators('-1 * -3')
+    const eval = new Evaluator()
+    const str = eval.parse('-1 * -3')
     const expected = {
       left: -1,
       op: '*',
@@ -160,14 +168,15 @@ describe('parseEvaluators()', function () {
     }
     const expectedResult = 3
 
-    assert.deepEqual(actual, expected)
+    assert.deepEqual(eval.data, expected)
 
-    const result = execEvaluators(actual, { name: 'foo' })
+    const result = eval.exec({ name: 'foo' })
     assert.equal(result, expectedResult)
   })
 
   it ('!1', function () {
-    const [actual, str] = parseEvaluators('!1')
+    const eval = new Evaluator()
+    const str = eval.parse('!1')
     const expected = {
       left: null,
       op: '!',
@@ -175,14 +184,15 @@ describe('parseEvaluators()', function () {
     }
     const expectedResult = 0
 
-    assert.deepEqual(actual, expected)
+    assert.deepEqual(eval.data, expected)
 
-    const result = execEvaluators(actual, { name: 'foo' })
+    const result = eval.exec({ name: 'foo' })
     assert.equal(result, expectedResult)
   })
 
   it ('!1 + !0', function () {
-    const [actual, str] = parseEvaluators('!1 + !0')
+    const eval = new Evaluator()
+    const str = eval.parse('!1 + !0')
     const expected = {
       left: {
         left: null,
@@ -198,14 +208,15 @@ describe('parseEvaluators()', function () {
     }
     const expectedResult = 1
 
-    assert.deepEqual(actual, expected)
+    assert.deepEqual(eval.data, expected)
 
-    const result = execEvaluators(actual, { name: 'foo' })
+    const result = eval.exec({ name: 'foo' })
     assert.equal(result, expectedResult)
   })
 
   it ('tag("name" + 3) + "bar"', function () {
-    const [actual, str] = parseEvaluators('tag("name" + 3) + "bar"')
+    const eval = new Evaluator()
+    const str = eval.parse('tag("name" + 3) + "bar"')
     const expected = {
       left: {
         fun: 'tag',
@@ -222,9 +233,9 @@ describe('parseEvaluators()', function () {
     }
     const expectedResult = "foobar"
 
-    assert.deepEqual(actual, expected)
+    assert.deepEqual(eval.data, expected)
 
-    const result = execEvaluators(actual, { name3: 'foo' })
+    const result = eval.exec({ name3: 'foo' })
     assert.equal(result, expectedResult)
   })
 })
