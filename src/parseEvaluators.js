@@ -64,7 +64,7 @@ module.exports = function parseEvaluators (str, rek = 0) {
       }
     } else if (mode === 1) {
       if (str.match(/^\s*$/)) {
-        return current
+        return [current, str]
       }
 
       const m = str.match(/^\s*(==|[+*-/])/)

@@ -5,7 +5,7 @@ const execEvaluators = require('../src/execEvaluators')
 
 describe('parseEvaluators()', function () {
   it ('t["name"] == "foo"', function () {
-    const actual = parseEvaluators('t["name"] == "foo"')
+    const [actual, str] = parseEvaluators('t["name"] == "foo"')
     const expected = {
       op: '==',
       left: { fun: 'tag', parameters: [ 'name' ] },
@@ -20,7 +20,7 @@ describe('parseEvaluators()', function () {
   })
 
   it ('t["name"] == t["operator"]', function () {
-    const actual = parseEvaluators('t["name"] == t["operator"]')
+    const [actual, str] = parseEvaluators('t["name"] == t["operator"]')
     const expected = {
       op: '==',
       left: { fun: 'tag', parameters: [ 'name' ] },
@@ -34,8 +34,23 @@ describe('parseEvaluators()', function () {
     assert.equal(result, expectedResult)
   })
 
+  it ('"test" + 2', function () {
+    const [actual, str] = parseEvaluators('"test" + 2')
+    const expected = {
+      op: '+',
+      left: 'test',
+      right: 2
+    }
+    const expectedResult = 'test2'
+
+    assert.deepEqual(actual, expected)
+
+    const result = execEvaluators(actual, { name: 'foo' })
+    assert.equal(result, expectedResult)
+  })
+
   it ('2.5 + 3 * 4', function () {
-    const actual = parseEvaluators('2.5 + 3 * 4')
+    const [actual, str] = parseEvaluators('2.5 + 3 * 4')
     const expected = {
       op: '+',
       left: 2.5,
@@ -54,7 +69,7 @@ describe('parseEvaluators()', function () {
   })
 
   it ('1 + 2.5 + 3 * 4', function () {
-    const actual = parseEvaluators('1 + 2.5 + 3 * 4')
+    const [actual, str] = parseEvaluators('1 + 2.5 + 3 * 4')
     const expected = {
       op: '+',
       left: {
@@ -77,7 +92,7 @@ describe('parseEvaluators()', function () {
   })
 
   it ('2.5 * 3 + 4', function () {
-    const actual = parseEvaluators('2.5 * 3 + 4')
+    const [actual, str] = parseEvaluators('2.5 * 3 + 4')
     const expected = {
       op: '+',
       left: {
@@ -96,7 +111,7 @@ describe('parseEvaluators()', function () {
   })
 
   it ('2.5 - 3 + 4', function () {
-    const actual = parseEvaluators('2.5 - 3 + 4')
+    const [actual, str] = parseEvaluators('2.5 - 3 + 4')
     const expected = {
       op: '+',
       left: { op: '-',
@@ -114,7 +129,7 @@ describe('parseEvaluators()', function () {
   })
 
   it ('2.5 * 3 + 4 * 5', function () {
-    const actual = parseEvaluators('2.5 * 3 + 4 * 5')
+    const [actual, str] = parseEvaluators('2.5 * 3 + 4 * 5')
     const expected = {
       left: {
         left: 2.5,
@@ -137,7 +152,7 @@ describe('parseEvaluators()', function () {
   })
 
   it ('-1 * -3', function () {
-    const actual = parseEvaluators('-1 * -3')
+    const [actual, str] = parseEvaluators('-1 * -3')
     const expected = {
       left: -1,
       op: '*',
@@ -152,7 +167,7 @@ describe('parseEvaluators()', function () {
   })
 
   it ('!1', function () {
-    const actual = parseEvaluators('!1')
+    const [actual, str] = parseEvaluators('!1')
     const expected = {
       left: null,
       op: '!',
@@ -167,7 +182,7 @@ describe('parseEvaluators()', function () {
   })
 
   it ('!1 + !0', function () {
-    const actual = parseEvaluators('!1 + !0')
+    const [actual, str] = parseEvaluators('!1 + !0')
     const expected = {
       left: {
         left: null,
