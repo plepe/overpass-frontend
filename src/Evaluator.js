@@ -20,6 +20,10 @@ const operators = {
 }
 const functions = {
   '': (p, context, that) => that.exec(context, p[0]),
+  debug: (p) => {
+    console.log(p[0])
+    return p[0]
+  },
   tag: (p, context) => context.tags && context.tags[p[0]]
 }
 const opPriorities = {
