@@ -24,6 +24,7 @@ module.exports = function execEvaluators (current, context) {
   }
 
   if (current.fun) {
-    return functions[current.fun](current.parameters, context)
+    const param = current.parameters.map(p => execEvaluators(p, context))
+    return functions[current.fun](param, context)
   }
 }

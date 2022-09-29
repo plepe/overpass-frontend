@@ -203,4 +203,28 @@ describe('parseEvaluators()', function () {
     const result = execEvaluators(actual, { name: 'foo' })
     assert.equal(result, expectedResult)
   })
+
+  it ('tag("name" + 3) + "bar"', function () {
+    const [actual, str] = parseEvaluators('tag("name" + 3) + "bar"')
+    const expected = {
+      left: {
+        fun: 'tag',
+        parameters: [
+          {
+            left: 'name',
+            op: '+',
+            right: 3
+          }
+        ]
+      },
+      op: '+',
+      right: 'bar'
+    }
+    const expectedResult = "foobar"
+
+    assert.deepEqual(actual, expected)
+
+    const result = execEvaluators(actual, { name3: 'foo' })
+    assert.equal(result, expectedResult)
+  })
 })
