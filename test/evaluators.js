@@ -43,6 +43,104 @@ describe('evaluators', function () {
     assert.equal(eval.toString(), expectedCompiled)
   })
 
+  it ('1 < 2', function () {
+    const eval = new Evaluator()
+    const str = eval.parse('1 < 2')
+    const expected = {
+      op: '<',
+      left: 1,
+      right: 2
+    }
+    const expectedResult = true
+    const expectedCompiled = '1<2'
+
+    assert.deepEqual(eval.data, expected)
+    assert.equal(str, '')
+
+    const result = eval.exec({ tags: { name: 'foo' } })
+    assert.equal(result, expectedResult)
+
+    assert.equal(eval.toString(), expectedCompiled)
+  })
+
+  it ('2 <= 2', function () {
+    const eval = new Evaluator()
+    const str = eval.parse('2 <= 2')
+    const expected = {
+      op: '<=',
+      left: 2,
+      right: 2
+    }
+    const expectedResult = true
+    const expectedCompiled = '2<=2'
+
+    assert.deepEqual(eval.data, expected)
+    assert.equal(str, '')
+
+    const result = eval.exec({ tags: { name: 'foo' } })
+    assert.equal(result, expectedResult)
+
+    assert.equal(eval.toString(), expectedCompiled)
+  })
+
+  it ('1 || !1', function () {
+    const eval = new Evaluator()
+    const str = eval.parse('1 || !1')
+    const expected = {
+      op: '||',
+      left: 1,
+      right: {
+        left: null,
+        op: '!',
+        right: 1
+      }
+    }
+    const expectedResult = 1
+    const expectedCompiled = '1||!1'
+
+    assert.deepEqual(eval.data, expected)
+    assert.equal(str, '')
+
+    const result = eval.exec({ tags: { name: 'foo' } })
+    assert.equal(result, expectedResult)
+
+    assert.equal(eval.toString(), expectedCompiled)
+  })
+
+  it ('t["name"] == "foo" || t["name"] == "bar"', function () {
+    const eval = new Evaluator()
+    const str = eval.parse('t["name"] == "foo" || t["name"] == "bar"')
+    const expected = {
+      op: '||',
+      left: {
+        left: {
+          fun: 'tag',
+          parameters: ['name']
+        },
+        op: '==',
+        right: 'foo'
+      },
+      right: {
+        left: {
+          fun: 'tag',
+          parameters: ['name']
+        },
+        op: '==',
+        right: 'bar'
+      },
+    }
+    const expectedResult = true
+    const expectedCompiled = 't["name"]=="foo"||t["name"]=="bar"'
+
+    assert.deepEqual(eval.data, expected)
+    assert.equal(str, '')
+
+    const result = eval.exec({ tags: { name: 'foo' } })
+    assert.equal(result, expectedResult)
+
+    assert.equal(eval.toString(), expectedCompiled)
+  })
+
   it ('"test" + 2', function () {
     const eval = new Evaluator()
     const str = eval.parse('"test" + 2')

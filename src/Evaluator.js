@@ -1,22 +1,36 @@
 const parseString = require('./parseString')
 
 const operators = {
-  '—': (a, b) => -b,
+  '||': (a, b) => a || b,
+  '&&': (a, b) => a && b,
+  '!=': (a, b) => a != b,
+  /* eslint-disable eqeqeq */
+  '==': (a, b) => a == b,
+  /* eslint-enable eqeqeq */
+  '<': (a, b) => a < b,
+  '<=': (a, b) => a <= b,
+  '>': (a, b) => a > b,
+  '>=': (a, b) => a >= b,
   '+': (a, b) => a + b,
   '-': (a, b) => a - b,
   '*': (a, b) => a * b,
   '/': (a, b) => a / b,
   '!': (a, b) => b ? 0 : 1,
-  /* eslint-disable eqeqeq */
-  '==': (a, b) => a == b
-  /* eslint-enable eqeqeq */
+  '—': (a, b) => -b
 }
 const functions = {
   '': (p, context, that) => that.exec(context, p[0]),
   tag: (p, context) => context.tags && context.tags[p[0]]
 }
 const opPriorities = {
+  '||': 7,
+  '&&': 6,
+  '!=': 5,
   '==': 5,
+  '<': 4,
+  '<=': 4,
+  '>': 4,
+  '>=': 4,
   '+': 3,
   '-': 3,
   '*': 2,
@@ -101,7 +115,7 @@ class Evaluator {
           return str
         }
 
-        const m = str.match(/^\s*(==|[+*-/])/)
+        const m = str.match(/^\s*([=!]=|[<>]=?|[+*-/]|&&|\|\|)/)
         if (!m) { throw new Error('mode 1') }
         this.data = nextOp(this.data, m[1])
         str = str.substr(m[0].length)
