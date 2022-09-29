@@ -3,8 +3,8 @@ const parseString = require('./parseString')
 const operators = {
   '||': (a, b) => a || b,
   '&&': (a, b) => a && b,
-  '!=': (a, b) => a != b,
   /* eslint-disable eqeqeq */
+  '!=': (a, b) => a != b,
   '==': (a, b) => a == b,
   /* eslint-enable eqeqeq */
   '<': (a, b) => a < b,
