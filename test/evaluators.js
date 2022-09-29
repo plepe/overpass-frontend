@@ -14,6 +14,7 @@ describe('evaluators', function () {
     const expectedResult = true
 
     assert.deepEqual(eval.data, expected)
+    assert.equal(str, '')
 
     const result = eval.exec({ name: 'foo' })
     assert.equal(result, expectedResult)
@@ -30,6 +31,7 @@ describe('evaluators', function () {
     const expectedResult = false
 
     assert.deepEqual(eval.data, expected)
+    assert.equal(str, '')
 
     const result = eval.exec({ name: 'foo' })
     assert.equal(result, expectedResult)
@@ -46,6 +48,7 @@ describe('evaluators', function () {
     const expectedResult = 'test2'
 
     assert.deepEqual(eval.data, expected)
+    assert.equal(str, '')
 
     const result = eval.exec({ name: 'foo' })
     assert.equal(result, expectedResult)
@@ -66,6 +69,7 @@ describe('evaluators', function () {
     const expectedResult = 14.5
 
     assert.deepEqual(eval.data, expected)
+    assert.equal(str, '')
 
     const result = eval.exec({ name: 'foo' })
     assert.equal(result, expectedResult)
@@ -90,6 +94,7 @@ describe('evaluators', function () {
     const expectedResult = 15.5
 
     assert.deepEqual(eval.data, expected)
+    assert.equal(str, '')
 
     const result = eval.exec({ name: 'foo' })
     assert.equal(result, expectedResult)
@@ -110,6 +115,7 @@ describe('evaluators', function () {
     const expectedResult = 11.5
 
     assert.deepEqual(eval.data, expected)
+    assert.equal(str, '')
 
     const result = eval.exec({ name: 'foo' })
     assert.equal(result, expectedResult)
@@ -129,6 +135,7 @@ describe('evaluators', function () {
     const expectedResult = 3.5
 
     assert.deepEqual(eval.data, expected)
+    assert.equal(str, '')
 
     const result = eval.exec({ name: 'foo' })
     assert.equal(result, expectedResult)
@@ -153,6 +160,7 @@ describe('evaluators', function () {
     const expectedResult = 27.5
 
     assert.deepEqual(eval.data, expected)
+    assert.equal(str, '')
 
     const result = eval.exec({ name: 'foo' })
     assert.equal(result, expectedResult)
@@ -169,6 +177,7 @@ describe('evaluators', function () {
     const expectedResult = 3
 
     assert.deepEqual(eval.data, expected)
+    assert.equal(str, '')
 
     const result = eval.exec({ name: 'foo' })
     assert.equal(result, expectedResult)
@@ -185,6 +194,7 @@ describe('evaluators', function () {
     const expectedResult = 0
 
     assert.deepEqual(eval.data, expected)
+    assert.equal(str, '')
 
     const result = eval.exec({ name: 'foo' })
     assert.equal(result, expectedResult)
@@ -209,6 +219,7 @@ describe('evaluators', function () {
     const expectedResult = 1
 
     assert.deepEqual(eval.data, expected)
+    assert.equal(str, '')
 
     const result = eval.exec({ name: 'foo' })
     assert.equal(result, expectedResult)
@@ -234,6 +245,20 @@ describe('evaluators', function () {
     const expectedResult = "foobar"
 
     assert.deepEqual(eval.data, expected)
+    assert.equal(str, '')
+
+    const result = eval.exec({ name3: 'foo' })
+    assert.equal(result, expectedResult)
+  })
+
+  it ('"name")', function () {
+    const eval = new Evaluator()
+    const str = eval.parse('"name")')
+    const expected = 'name'
+    const expectedResult = "name"
+
+    assert.deepEqual(eval.data, expected)
+    assert.equal(str, ')')
 
     const result = eval.exec({ name3: 'foo' })
     assert.equal(result, expectedResult)
