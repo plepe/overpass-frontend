@@ -503,27 +503,40 @@ describe('evaluators', function () {
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
 
-    const result = eval.exec({ tags: { name3: 'foo' } })
+    // object with one tag
+    let result = eval.exec({ tags: { name3: 'foo' } })
     assert.equal(result, expectedResult)
+    // object with no tags
+    result = eval.exec({ tags: {} })
+    assert.equal(result, 0)
+    // without loaded tags
+    result = eval.exec({})
+    assert.equal(result, null)
 
     assert.equal(eval.toString(), expectedCompiled)
   })
 
-  it ('count_tags() of object with not-loaded tags', function () {
+  it ('id()', function () {
     const eval = new Evaluator()
-    const str = eval.parse('count_tags()')
+    const str = eval.parse('id() == 377992')
     const expected = {
-      fun: 'count_tags',
-      parameters: []
+      left: {
+        fun: 'id',
+        parameters: []
+      },
+      op: '==',
+      right: 377992
     }
-    const expectedResult = null
-    const expectedCompiled = 'count_tags()'
+    const expectedResult = true
+    const expectedCompiled = 'id()==377992'
 
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
 
-    const result = eval.exec({})
+    let result = eval.exec({ id: 'n377992', osm_id: 377992, type: 'node' })
     assert.equal(result, expectedResult)
+    result = eval.exec({ id: 'n377998', osm_id: 377998, type: 'node' })
+    assert.equal(result, false)
 
     assert.equal(eval.toString(), expectedCompiled)
   })

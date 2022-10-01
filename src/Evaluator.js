@@ -21,6 +21,8 @@ const operators = {
 const functions = {
   '': (p, context, that) => that.exec(context, p[0]),
   count_tags: (p, context) => context.tags ? Object.keys(context.tags).length : null,
+  id: (p, context) => context.osm_id,
+  type: (p, context) => context.type,
   debug: (p) => {
     console.log(p[0])
     return p[0]

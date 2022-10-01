@@ -630,17 +630,34 @@ var overpassFrontend
         overpassFrontend.clearCache()
       })
 
-      it('single without quotes', function (done) {
-        test({
-          mode,
-          query: 'node[highway](if: t["name"] == "Bahnhofstraße")',
-          expectedQuery: 'node["highway"](if:t["name"]=="Bahnhofstraße");',
-          expected: [ 'n647991' ],
-          expectedSubRequestCount: 1,
-          expectedCacheInfo: [{
-            id: 'node["highway"](if:t["name"]=="Bahnhofstraße")',
-          }]
-        }, done)
+      describe('tags', function (done) {
+        it('single without quotes', function (done) {
+          test({
+            mode,
+            query: 'node[highway](if: t["name"] == "Bahnhofstraße")',
+            expectedQuery: 'node["highway"](if:t["name"]=="Bahnhofstraße");',
+            expected: [ 'n647991' ],
+            expectedSubRequestCount: 1,
+            expectedCacheInfo: [{
+              id: 'node["highway"](if:t["name"]=="Bahnhofstraße")',
+            }]
+          }, done)
+        })
+      })
+
+      describe('type(), id()', function (done) {
+        it('both', function (done) {
+          test({
+            mode,
+            query: 'node[highway](if: id() == 377992 && type() == "node")',
+            expectedQuery: 'node["highway"](if:id()==377992&&type()=="node");',
+            expected: [ 'n377992' ],
+            expectedSubRequestCount: 1,
+            expectedCacheInfo: [{
+              id: 'node["highway"](if:id()==377992&&type()=="node")',
+            }]
+          }, done)
+        })
       })
     })
   })
