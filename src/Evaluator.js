@@ -54,8 +54,49 @@ const compileLokiOperator = {
     } else {
       return [null, null, true]
     }
+  },
+  '||': function (left, right) {
+    if (left[0] === null && right[0] !== null) {
+      return [null, null, !!(left[2] || right[2])]
+    }
+    if (left[0] !== null && right[0] === null) {
+      return [null, null, !!(left[2] || right[2])]
+    }
 
-    console.log(left, right)
+    const l = {}
+    const r = {}
+    l[left[0]] = left[1]
+    r[right[0]] = right[1]
+
+    return ['$or', [l, r], !!(left[2] || right[2])]
+  },
+  '&&': function (left, right) {
+    if (left[0] === null && right[0] !== null) {
+      return [right[0], right[1], !!(left[2] || right[2])]
+    }
+    if (left[0] !== null && right[0] === null) {
+      return [left[0], left[1], !!(left[2] || right[2])]
+    }
+
+    const l = {}
+    const r = {}
+    l[left[0]] = left[1]
+    r[right[0]] = right[1]
+
+    return ['$and', [l, r], !!(left[2] || right[2])]
+  }
+}
+const compileLokiFun = {
+  tag: (param) => {
+    if (param[0] && param[0].value) {
+      return { property: 'tags.' + param[0].value }
+    }
+  },
+  id: (param) => {
+    return { property: 'osm_id' }
+  },
+  type: (param) => {
+    return { property: 'type' }
   }
 }
 
@@ -249,13 +290,7 @@ class Evaluator {
     if ('fun' in current) {
       const param = current.parameters.map(p => this.compileLokiJS(p))
 
-      if (current.fun === 'tag') {
-        if (param[0] && param[0].value) {
-          return { property: 'tags.' + param[0].value }
-        }
-      } else {
-        //return current.fun + '(' + param.join(',') + ')'
-      }
+      return compileLokiFun[current.fun](param)
     }
   }
 }

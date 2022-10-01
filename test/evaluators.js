@@ -136,6 +136,13 @@ describe('evaluators', function () {
     }
     const expectedResult = true
     const expectedCompiled = 't["name"]=="foo"||t["name"]=="bar"'
+    const expectedLokiQuery = [
+      '$or', [
+        { 'tags.name': { $eq: 'foo' } },
+        { 'tags.name': { $eq: 'bar' } }
+      ],
+      false 
+    ]
 
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
@@ -144,6 +151,49 @@ describe('evaluators', function () {
     assert.equal(result, expectedResult)
 
     assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
+  })
+
+  it ('t["name"] == "foo" && t["name"] == "bar"', function () {
+    const eval = new Evaluator()
+    const str = eval.parse('t["name"] == "foo" && t["name"] == "bar"')
+    const expected = {
+      op: '&&',
+      left: {
+        left: {
+          fun: 'tag',
+          parameters: ['name']
+        },
+        op: '==',
+        right: 'foo'
+      },
+      right: {
+        left: {
+          fun: 'tag',
+          parameters: ['name']
+        },
+        op: '==',
+        right: 'bar'
+      },
+    }
+    const expectedResult = false
+    const expectedCompiled = 't["name"]=="foo"&&t["name"]=="bar"'
+    const expectedLokiQuery = [
+      '$and', [
+        { 'tags.name': { $eq: 'foo' } },
+        { 'tags.name': { $eq: 'bar' } }
+      ],
+      false
+    ]
+
+    assert.deepEqual(eval.data, expected)
+    assert.equal(str, '')
+
+    const result = eval.exec({ tags: { name: 'foo' } })
+    assert.equal(result, expectedResult)
+
+    assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
   })
 
   it ('"test" + 2', function () {
@@ -534,6 +584,10 @@ describe('evaluators', function () {
     }
     const expectedResult = true
     const expectedCompiled = 'id()==377992'
+    const expectedLokiQuery = [
+      'osm_id',
+      { $eq: 377992 }
+    ]
 
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
@@ -544,5 +598,49 @@ describe('evaluators', function () {
     assert.equal(result, false)
 
     assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
+  })
+
+  it ('id() && type', function () {
+    const eval = new Evaluator()
+    const str = eval.parse('id() == 377992 && type() == "node"')
+    const expected = {
+      left: {
+        left: {
+          fun: 'id',
+          parameters: []
+        },
+        op: '==',
+        right: 377992
+      },
+      op: '&&',
+      right: {
+        left: {
+          fun: 'type',
+          parameters: []
+        },
+        op: '==',
+        right: 'node'
+      }
+    }
+    const expectedResult = true
+    const expectedCompiled = 'id()==377992&&type()=="node"'
+    const expectedLokiQuery = [
+      '$and', [
+        { 'osm_id': { $eq: 377992 } },
+        { 'type': { $eq: 'node' } },
+      ], false
+    ]
+
+    assert.deepEqual(eval.data, expected)
+    assert.equal(str, '')
+
+    let result = eval.exec({ id: 'n377992', osm_id: 377992, type: 'node' })
+    assert.equal(result, expectedResult)
+    result = eval.exec({ id: 'n377998', osm_id: 377998, type: 'node' })
+    assert.equal(result, false)
+
+    assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
   })
 })
