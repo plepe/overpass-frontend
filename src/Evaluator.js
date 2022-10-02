@@ -57,6 +57,13 @@ function compileLokiOperatorComp (left, right, leftOp, rightOp) {
     return [null, null, true]
   }
 }
+function compileLokiOperatorMath (left, right, op) {
+  if (left.value && right.value) {
+    return { value: operators[op](left.value, right.value) }
+  } else {
+    return [null, null, true]
+  }
+}
 const compileLokiOperator = {
   '==': (left, right) => compileLokiOperatorComp(left, right, '$eq', '$eq'),
   '!=': (left, right) => compileLokiOperatorComp(left, right, '$ne', '$ne'),
@@ -64,6 +71,22 @@ const compileLokiOperator = {
   '>': (left, right) => compileLokiOperatorComp(left, right, '$gt', '$lt'),
   '<=': (left, right) => compileLokiOperatorComp(left, right, '$lte', '$gte'),
   '>=': (left, right) => compileLokiOperatorComp(left, right, '$gte', '$lte'),
+  '+': (left, right) => compileLokiOperatorMath(left, right, '+'),
+  '-': (left, right) => compileLokiOperatorMath(left, right, '-'),
+  '*': (left, right) => compileLokiOperatorMath(left, right, '*'),
+  '/': (left, right) => compileLokiOperatorMath(left, right, '/'),
+  '!': (left, right) => {
+    if (right.value) {
+      return { value: !right.value }
+    }
+    return [null, null, true]
+  },
+  '—': (left, right) => {
+    if (right.value) {
+      return { value: -right.value }
+    }
+    return [null, null, true]
+  },
   '||': function (left, right) {
     if (left[0] === null && right[0] !== null) {
       return [null, null, !!(left[2] || right[2])]
@@ -141,6 +164,15 @@ function nextOp (current, op) {
   }
 
   return current
+}
+function isNumber (v) {
+  if (typeof v === 'number') {
+    return true
+  }
+  if (typeof v === 'boolean' || v === null || v === undefined) {
+    return false
+  }
+  return !!v.match(/^[0-9]+(\.[0-9]+)?$/)
 }
 
 class Evaluator {
@@ -226,8 +258,12 @@ class Evaluator {
     }
 
     if ('op' in current) {
-      const left = this.exec(context, current.left)
-      const right = this.exec(context, current.right)
+      let left = this.exec(context, current.left)
+      let right = this.exec(context, current.right)
+      if (isNumber(left) && isNumber(right)) {
+        left = parseFloat(left)
+        right = parseFloat(right)
+      }
       return operators[current.op](left, right)
     }
 

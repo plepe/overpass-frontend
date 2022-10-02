@@ -581,6 +581,40 @@ describe('evaluators', function () {
     assert.equal(eval.toString(), expectedCompiled)
   })
 
+  it ('tag("name" + 3) == "bar"', function () {
+    const eval = new Evaluator()
+    const str = eval.parse('tag("name" + 3) == "bar"')
+    const expected = {
+      left: {
+        fun: 'tag',
+        parameters: [
+          {
+            left: 'name',
+            op: '+',
+            right: 3
+          }
+        ]
+      },
+      op: '==',
+      right: 'bar'
+    }
+    const expectedResult = false
+    const expectedCompiled = 't["name"+3]=="bar"'
+    const expectedLokiQuery = [
+      'tags.name3',
+      { $eq: 'bar' }
+    ]
+
+    assert.deepEqual(eval.data, expected)
+    assert.equal(str, '')
+
+    const result = eval.exec({ tags: { name3: 'foo' } })
+    assert.equal(result, expectedResult)
+
+    assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
+  })
+
   it ('"name")', function () {
     const eval = new Evaluator()
     const str = eval.parse('"name")')
