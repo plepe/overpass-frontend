@@ -45,16 +45,25 @@ const opPriorities = {
   '!': 1,
   '—': 0 // unary minus
 }
+function compileLokiOperatorComp (left, right, leftOp, rightOp) {
+  const comp = {}
+  if (left && left.property && right && right.value) {
+    comp[leftOp] = right.value
+    return [left.property, comp]
+  } else if (left && left.value && right && right.property) {
+    comp[rightOp] = left.value
+    return [right.property, comp]
+  } else {
+    return [null, null, true]
+  }
+}
 const compileLokiOperator = {
-  '==': function (left, right) {
-    if (left && left.property && right && right.value) {
-      return [left.property, { $eq: right.value }]
-    } else if (left && left.value && right && right.property) {
-      return [right.property, { $eq: left.value }]
-    } else {
-      return [null, null, true]
-    }
-  },
+  '==': (left, right) => compileLokiOperatorComp(left, right, '$eq', '$eq'),
+  '!=': (left, right) => compileLokiOperatorComp(left, right, '$ne', '$ne'),
+  '<': (left, right) => compileLokiOperatorComp(left, right, '$lt', '$gt'),
+  '>': (left, right) => compileLokiOperatorComp(left, right, '$gt', '$lt'),
+  '<=': (left, right) => compileLokiOperatorComp(left, right, '$lte', '$gte'),
+  '>=': (left, right) => compileLokiOperatorComp(left, right, '$gte', '$lte'),
   '||': function (left, right) {
     if (left[0] === null && right[0] !== null) {
       return [null, null, !!(left[2] || right[2])]

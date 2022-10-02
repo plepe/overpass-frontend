@@ -28,6 +28,56 @@ describe('evaluators', function () {
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
   })
 
+  it ('t["width"] < 10.5', function () {
+    const eval = new Evaluator()
+    const str = eval.parse('t["width"] < 10.5')
+    const expected = {
+      op: '<',
+      left: { fun: 'tag', parameters: [ 'width' ] },
+      right: 10.5
+    }
+    const expectedResult = true
+    const expectedCompiled = 't["width"]<10.5'
+    const expectedLokiQuery = [
+      'tags.width',
+      { $lt: 10.5 }
+    ]
+
+    assert.deepEqual(eval.data, expected)
+    assert.equal(str, '')
+
+    const result = eval.exec({ tags: { width: '5' } })
+    assert.equal(result, expectedResult)
+
+    assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
+  })
+
+  it ('"10.5" >= t["width"]', function () {
+    const eval = new Evaluator()
+    const str = eval.parse('"10.5">=t["width"]')
+    const expected = {
+      op: '>=',
+      right: { fun: 'tag', parameters: [ 'width' ] },
+      left: "10.5"
+    }
+    const expectedResult = true
+    const expectedCompiled = '"10.5">=t["width"]'
+    const expectedLokiQuery = [
+      'tags.width',
+      { $lte: "10.5" }
+    ]
+
+    assert.deepEqual(eval.data, expected)
+    assert.equal(str, '')
+
+    const result = eval.exec({ tags: { width: '5' } })
+    assert.equal(result, expectedResult)
+
+    assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
+  })
+
   it ('t["name"] == t["operator"]', function () {
     const eval = new Evaluator()
     const str = eval.parse('t["name"] == t["operator"]')
@@ -38,6 +88,7 @@ describe('evaluators', function () {
     }
     const expectedResult = false
     const expectedCompiled = 't["name"]==t["operator"]'
+    const expectedLokiQuery = [null, null, true]
 
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
@@ -46,6 +97,7 @@ describe('evaluators', function () {
     assert.equal(result, expectedResult)
 
     assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
   })
 
   it ('1 < 2', function () {
