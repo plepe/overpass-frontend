@@ -45,49 +45,55 @@ const opPriorities = {
   '!': 1,
   '—': 0 // unary minus
 }
-function compileLokiOperatorComp (left, right, leftOp, rightOp) {
+function compileLokiOperatorComp (left, right, leftOp, rightOp, op) {
   const comp = {}
-  if (left && left.property && right && right.value) {
+  if (left && left.property && right && 'value' in right) {
     comp[leftOp] = right.value
     return [left.property, comp]
-  } else if (left && left.value && right && right.property) {
+  } else if (left && 'value' in left && right && right.property) {
     comp[rightOp] = left.value
     return [right.property, comp]
+  } else if ('value' in left && 'value' in right) {
+    return { value: operators[op](left.value, right.value) }
   } else {
     return [null, null, true]
   }
 }
 function compileLokiOperatorMath (left, right, op) {
-  if (left.value && right.value) {
+  if ('value' in left && 'value' in right) {
     return { value: operators[op](left.value, right.value) }
   } else {
     return [null, null, true]
   }
 }
 const compileLokiOperator = {
-  '==': (left, right) => compileLokiOperatorComp(left, right, '$eq', '$eq'),
-  '!=': (left, right) => compileLokiOperatorComp(left, right, '$ne', '$ne'),
-  '<': (left, right) => compileLokiOperatorComp(left, right, '$lt', '$gt'),
-  '>': (left, right) => compileLokiOperatorComp(left, right, '$gt', '$lt'),
-  '<=': (left, right) => compileLokiOperatorComp(left, right, '$lte', '$gte'),
-  '>=': (left, right) => compileLokiOperatorComp(left, right, '$gte', '$lte'),
+  '==': (left, right) => compileLokiOperatorComp(left, right, '$eq', '$eq', '=='),
+  '!=': (left, right) => compileLokiOperatorComp(left, right, '$ne', '$ne', '!='),
+  '<': (left, right) => compileLokiOperatorComp(left, right, '$lt', '$gt', '<'),
+  '>': (left, right) => compileLokiOperatorComp(left, right, '$gt', '$lt', '>'),
+  '<=': (left, right) => compileLokiOperatorComp(left, right, '$lte', '$gte', '<='),
+  '>=': (left, right) => compileLokiOperatorComp(left, right, '$gte', '$lte', '>='),
   '+': (left, right) => compileLokiOperatorMath(left, right, '+'),
   '-': (left, right) => compileLokiOperatorMath(left, right, '-'),
   '*': (left, right) => compileLokiOperatorMath(left, right, '*'),
   '/': (left, right) => compileLokiOperatorMath(left, right, '/'),
   '!': (left, right) => {
-    if (right.value) {
+    if ('value' in right) {
       return { value: !right.value }
     }
     return [null, null, true]
   },
   '—': (left, right) => {
-    if (right.value) {
+    if ('value' in right) {
       return { value: -right.value }
     }
     return [null, null, true]
   },
   '||': function (left, right) {
+    if ('value' in left) {
+      return left.value ? { value: true } : right
+    }
+
     if (left[0] === null && right[0] !== null) {
       return [null, null, !!(left[2] || right[2])]
     }
@@ -119,8 +125,11 @@ const compileLokiOperator = {
   }
 }
 const compileLokiFun = {
+  '': (param) => {
+    return param[0]
+  },
   tag: (param) => {
-    if (param[0] && param[0].value) {
+    if (param[0] && 'value' in param[0]) {
       return { property: 'tags.' + param[0].value }
     }
   },
@@ -335,6 +344,10 @@ class Evaluator {
     if ('fun' in current) {
       const param = current.parameters.map(p => this.compileLokiJS(p))
 
+      if (!compileLokiFun[current.fun]) {
+        console.error('compile evaluator function not defined:', current.fun)
+        return [null, null, true]
+      }
       return compileLokiFun[current.fun](param)
     }
   }
