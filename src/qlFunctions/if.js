@@ -20,7 +20,14 @@ module.exports = class If extends qlFunction {
   }
 
   compileLokiJS () {
-    return this.value.compileLokiJS()
+    const r = this.value.compileLokiJS()
+    if ('value' in r) {
+      return { needMatch: !r.value } // TODO: remove needMatch; what to return if r.value is false/null/0/''?
+    }
+    if ('property' in r) {
+      return { needMatch: true }
+    }
+    return r
   }
 
   isSupersetOf (other) {

@@ -672,6 +672,50 @@ var overpassFrontend
           }, done)
         })
       })
+
+      describe('fixed value, property', function (done) {
+        it('value true', function (done) {
+          overpassFrontend.clearCache()
+          const r = test({
+            mode,
+            query: 'node[fixme](if: 1)',
+            expectedQuery: 'node["fixme"](if:1);',
+            expected: [ 'n2368032899', 'n325842980', 'n3592094592' ],
+            expectedSubRequestCount: 1,
+            expectedCacheInfo: [{
+              id: 'node["fixme"](if:1)',
+            }]
+          }, done)
+        })
+
+        it('property', function (done) {
+          overpassFrontend.clearCache()
+          const r = test({
+            mode,
+            query: 'node[fixme](if: t["highway"])',
+            expectedQuery: 'node["fixme"](if:t["highway"]);',
+            expected: [ 'n3592094592' ],
+            expectedSubRequestCount: 1,
+            expectedCacheInfo: [{
+              id: 'node["fixme"](if:t["highway"])',
+            }]
+          }, done)
+        })
+
+        it('value false', function (done) {
+          overpassFrontend.clearCache()
+          const r = test({
+            mode,
+            query: 'node[fixme](if: 0)',
+            expectedQuery: 'node["fixme"](if:0);',
+            expected: [],
+            expectedSubRequestCount: 1, // TODO: 0 - querying not necessary
+            expectedCacheInfo: [{
+              id: 'node["fixme"](if:0)',
+            }]
+          }, done)
+        })
+      })
     })
   })
 })
@@ -718,4 +762,6 @@ function test (options, callback) {
       assert.deepEqual(cacheInfo, options.expectedCacheInfo, 'Expected cache info')
     }
   }
+
+  return request
 }
