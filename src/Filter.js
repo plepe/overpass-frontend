@@ -554,9 +554,16 @@ class Filter {
         // can't query for key regexp, skip
       } else if (filter instanceof qlFunction) {
         const d = filter.compileLokiJS()
-        ;[k, v] = d
-        if (d[2]) {
+        if (d.needMatch) {
           query.needMatch = true
+        }
+        delete d.needMatch
+        if (Object.keys(d).length) {
+          if (query.$and) {
+            query.$and.push(d)
+          } else {
+            query.$and = [d]
+          }
         }
       } else if (filter.op === '=') {
         k = 'tags.' + filter.key

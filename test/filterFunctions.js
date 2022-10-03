@@ -658,6 +658,19 @@ var overpassFrontend
             }]
           }, done)
         })
+
+        it('both (fully cached)', function (done) {
+          test({
+            mode,
+            query: 'node[highway](if: id() == 377992 && type() == "node")',
+            expectedQuery: 'node["highway"](if:id()==377992&&type()=="node");',
+            expected: [ 'n377992' ],
+            expectedSubRequestCount: 0,
+            expectedCacheInfo: [{
+              id: 'node["highway"](if:id()==377992&&type()=="node")',
+            }]
+          }, done)
+        })
       })
     })
   })

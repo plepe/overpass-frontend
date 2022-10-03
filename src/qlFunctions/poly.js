@@ -27,7 +27,7 @@ module.exports = class poly extends qlFunction {
   }
 
   compileLokiJS () {
-    return [null, null, true]
+    return { needMatch: true }
   }
 
   cacheInfo (options) {

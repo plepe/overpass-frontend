@@ -20,9 +20,9 @@ module.exports = class id extends qlFunction {
 
   compileLokiJS () {
     if (this.value.length === 1) {
-      return ['osm_id', { $eq: this.value[0] }]
+      return { osm_id: { $eq: this.value[0] } }
     } else {
-      return ['osm_id', { $in: this.value }]
+      return { osm_id: { $in: this.value } }
     }
   }
 

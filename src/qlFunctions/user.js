@@ -49,9 +49,9 @@ module.exports = class user extends qlFunction {
 
   compileLokiJS () {
     if (this.value.length === 1) {
-      return ['osmMeta.user', { $eq: this.value[0] }]
+      return { 'osmMeta.user': { $eq: this.value[0] } }
     } else {
-      return ['osmMeta.user', { $in: this.value }]
+      return { 'osmMeta.user': { $in: this.value } }
     }
   }
 

@@ -26,9 +26,9 @@ module.exports = class uid extends qlFunction {
 
   compileLokiJS () {
     if (this.value.length === 1) {
-      return ['osmMeta.uid', { $eq: this.value[0] }]
+      return { 'osmMeta.uid': { $eq: this.value[0] } }
     } else {
-      return ['osmMeta.uid', { $in: this.value }]
+      return { 'osmMeta.uid': { $in: this.value } }
     }
   }
 

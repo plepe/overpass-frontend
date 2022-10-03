@@ -27,7 +27,7 @@ module.exports = class around extends qlFunction {
   }
 
   compileLokiJS () {
-    return [null, null, true]
+    return { needMatch: true }
   }
 
   cacheInfo (options) {
