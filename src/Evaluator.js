@@ -46,24 +46,27 @@ const opPriorities = {
   '—': 0 // unary minus
 }
 function compileLokiOperatorComp (left, right, leftOp, rightOp, op) {
+  const r = {}
   const comp = {}
   if (left && left.property && right && 'value' in right) {
     comp[leftOp] = right.value
-    return [left.property, comp]
+    r[left.property] = comp
+    return r
   } else if (left && 'value' in left && right && right.property) {
     comp[rightOp] = left.value
-    return [right.property, comp]
+    r[right.property] = comp
+    return r
   } else if ('value' in left && 'value' in right) {
     return { value: operators[op](left.value, right.value) }
   } else {
-    return [null, null, true]
+    return { needMatch: true }
   }
 }
 function compileLokiOperatorMath (left, right, op) {
   if ('value' in left && 'value' in right) {
     return { value: operators[op](left.value, right.value) }
   } else {
-    return [null, null, true]
+    return { needMatch: true }
   }
 }
 const compileLokiOperator = {
@@ -81,47 +84,55 @@ const compileLokiOperator = {
     if ('value' in right) {
       return { value: !right.value }
     }
-    return [null, null, true]
+    return { needMatch: true }
   },
   '—': (left, right) => {
     if ('value' in right) {
       return { value: -right.value }
     }
-    return [null, null, true]
+    return { needMatch: true }
   },
   '||': function (left, right) {
     if ('value' in left) {
       return left.value ? { value: true } : right
     }
 
-    if (left[0] === null && right[0] !== null) {
-      return [null, null, !!(left[2] || right[2])]
+    const leftNeedMatch = left.needMatch
+    const rightNeedMatch = right.needMatch
+    delete left.needMatch
+    delete right.needMatch
+    const leftKeys = Object.keys(left)
+    const rightKeys = Object.keys(right)
+
+    if (!leftKeys.length && rightKeys.length) {
+      right.needMatch = !!(left.needMatch || right.needMatch)
+      return right
     }
-    if (left[0] !== null && right[0] === null) {
-      return [null, null, !!(left[2] || right[2])]
+    if (leftKeys.length && !rightKeys.length) {
+      left.needMatch = !!(left.needMatch || right.needMatch)
+      return left
     }
 
-    const l = {}
-    const r = {}
-    l[left[0]] = left[1]
-    r[right[0]] = right[1]
-
-    return ['$or', [l, r], !!(left[2] || right[2])]
+    return { $or: [left, right], needMatch: !!(leftNeedMatch || rightNeedMatch) }
   },
   '&&': function (left, right) {
-    if (left[0] === null && right[0] !== null) {
-      return [right[0], right[1], !!(left[2] || right[2])]
+    const leftNeedMatch = left.needMatch
+    const rightNeedMatch = right.needMatch
+    delete left.needMatch
+    delete right.needMatch
+    const leftKeys = Object.keys(left)
+    const rightKeys = Object.keys(right)
+
+    if (!leftKeys.length && rightKeys.length) {
+      right.needMatch = !!(leftNeedMatch || rightNeedMatch)
+      return right
     }
-    if (left[0] !== null && right[0] === null) {
-      return [left[0], left[1], !!(left[2] || right[2])]
+    if (leftKeys.length && !rightKeys.length) {
+      left.needMatch = !!(leftNeedMatch || rightNeedMatch)
+      return left
     }
 
-    const l = {}
-    const r = {}
-    l[left[0]] = left[1]
-    r[right[0]] = right[1]
-
-    return ['$and', [l, r], !!(left[2] || right[2])]
+    return { $and: [left, right], needMatch: !!(leftNeedMatch || rightNeedMatch) }
   }
 }
 const compileLokiFun = {
@@ -346,7 +357,7 @@ class Evaluator {
 
       if (!compileLokiFun[current.fun]) {
         console.error('compile evaluator function not defined:', current.fun)
-        return [null, null, true]
+        return { needMatch: true }
       }
       return compileLokiFun[current.fun](param)
     }

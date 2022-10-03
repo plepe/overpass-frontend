@@ -13,10 +13,9 @@ describe('evaluators', function () {
     }
     const expectedResult = true
     const expectedCompiled = 't["name"]=="foo"'
-    const expectedLokiQuery = [
-      'tags.name',
-      { $eq: 'foo' }
-    ]
+    const expectedLokiQuery = {
+      'tags.name': { $eq: 'foo' }
+    }
 
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
@@ -38,10 +37,9 @@ describe('evaluators', function () {
     }
     const expectedResult = true
     const expectedCompiled = 't["width"]<10.5'
-    const expectedLokiQuery = [
-      'tags.width',
-      { $lt: 10.5 }
-    ]
+    const expectedLokiQuery = {
+      'tags.width': { $lt: 10.5 }
+    }
 
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
@@ -63,10 +61,9 @@ describe('evaluators', function () {
     }
     const expectedResult = true
     const expectedCompiled = '"10.5">=t["width"]'
-    const expectedLokiQuery = [
-      'tags.width',
-      { $lte: "10.5" }
-    ]
+    const expectedLokiQuery = {
+      'tags.width': { $lte: "10.5" }
+    }
 
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
@@ -88,7 +85,7 @@ describe('evaluators', function () {
     }
     const expectedResult = false
     const expectedCompiled = 't["name"]==t["operator"]'
-    const expectedLokiQuery = [null, null, true]
+    const expectedLokiQuery = { needMatch: true }
 
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
@@ -194,13 +191,13 @@ describe('evaluators', function () {
     }
     const expectedResult = true
     const expectedCompiled = 't["name"]=="foo"||t["name"]=="bar"'
-    const expectedLokiQuery = [
-      '$or', [
+    const expectedLokiQuery = {
+      '$or': [
         { 'tags.name': { $eq: 'foo' } },
         { 'tags.name': { $eq: 'bar' } }
       ],
-      false 
-    ]
+      needMatch: false
+    }
 
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
@@ -236,13 +233,13 @@ describe('evaluators', function () {
     }
     const expectedResult = false
     const expectedCompiled = 't["name"]=="foo"&&t["name"]=="bar"'
-    const expectedLokiQuery = [
-      '$and', [
+    const expectedLokiQuery = {
+      '$and': [
         { 'tags.name': { $eq: 'foo' } },
         { 'tags.name': { $eq: 'bar' } }
       ],
-      false
-    ]
+      needMatch: false
+    }
 
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
@@ -603,7 +600,7 @@ describe('evaluators', function () {
     }
     const expectedResult = "foobar"
     const expectedCompiled = 't["name"+3]+"bar"'
-    const expectedLokiQuery = [null, null, true]
+    const expectedLokiQuery = { needMatch: true }
 
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
@@ -634,10 +631,9 @@ describe('evaluators', function () {
     }
     const expectedResult = false
     const expectedCompiled = 't["name"+3]=="bar"'
-    const expectedLokiQuery = [
-      'tags.name3',
-      { $eq: 'bar' }
-    ]
+    const expectedLokiQuery = {
+      'tags.name3': { $eq: 'bar' }
+    }
 
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
@@ -662,7 +658,7 @@ describe('evaluators', function () {
     }
     const expectedResult = 0
     const expectedCompiled = 't["ref"]-5'
-    const expectedLokiQuery = [ null, null, true ]
+    const expectedLokiQuery = { needMatch: true }
 
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
@@ -701,7 +697,7 @@ describe('evaluators', function () {
     }
     const expectedResult = 1
     const expectedCompiled = 'count_tags()'
-    const expectedLokiQuery = [null, null, true]
+    const expectedLokiQuery = { needMatch: true }
 
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
@@ -733,10 +729,9 @@ describe('evaluators', function () {
     }
     const expectedResult = true
     const expectedCompiled = 'id()==377992'
-    const expectedLokiQuery = [
-      'osm_id',
-      { $eq: 377992 }
-    ]
+    const expectedLokiQuery = {
+      'osm_id': { $eq: 377992 }
+    }
 
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
@@ -774,12 +769,13 @@ describe('evaluators', function () {
     }
     const expectedResult = true
     const expectedCompiled = 'id()==377992&&type()=="node"'
-    const expectedLokiQuery = [
-      '$and', [
+    const expectedLokiQuery = {
+      '$and': [
         { 'osm_id': { $eq: 377992 } },
         { 'type': { $eq: 'node' } },
-      ], false
-    ]
+      ],
+      needMatch: false
+    }
 
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')

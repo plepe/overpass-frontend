@@ -20,7 +20,7 @@ module.exports = class If extends qlFunction {
   }
 
   compileLokiJS () {
-    return { needMatch: true }
+    return this.value.compileLokiJS()
   }
 
   isSupersetOf (other) {
