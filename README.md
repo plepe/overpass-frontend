@@ -9,6 +9,77 @@ npm install --save overpass-frontend
 # DOCUMENTATION
 Find documentation in [doc](https://rawgit.com/plepe/overpass-frontend/master/doc/OverpassFrontend.html). You can re-generate the documentation with `npm run doc`.
 
+## The following queries are supported:
+### Type
+| Type | Description
+|------|------------
+| node | Query all nodes
+| way  | Query all ways
+| relation | Query all relations
+| nwr  | Query any type (node, way, relation)
+
+### Filters
+Every query can have any amount of filters, e.g. `nwr[amenity=restraunt][name]` (all restaurants with a name).
+
+| Filter               | Description                                |
+|----------------------|--------------------------------------------|
+| nwr[name=Foo]        | Tag 'name' equals 'Foo'                    |
+| nwr["name"="Foo"]    | Tag 'name' equals 'Foo'                    |
+| nwr[name!=Foo]       | Tag 'name' not equals 'Foo'                |
+| nwr[name]            | Any object with a tag 'name', any value    |
+| nwr[!name]           | Any object without a tag 'name'            |
+| nwr[name&#126;"^foo$"]    | Regular expression, case sensitive         |
+| nwr[name&#126;"^foo$",i]  | Regular expression, case insenstive        |
+| nwr[&#126;"^name$"&#126;"^foo$"] | Regular expression for tag and value     |
+| nwr[&#126;"^name$"&#126;"^foo$",i] | Case insenstive regular expression for tag and value |
+| nwr[&#126;"^name$"&#126;"."]   | Regular expression for tag with any value  |
+| nwr[name!&#126;"foo"]     | Negated Regular expression                 |
+| nwr[cuisine^pizza]   | (non-standard) Search for semi-colon separated multi-value tags, containing the string (matches e.g. "kebap;pizza;noodles"). |
+| nwr[name%foo]        | (non-standard) Search for strings containing "foo" where diacritics match too (e.g. ö, ó, ...). |
+| nwr(48.1,16.1,48.2,16.2) | Query objects in the specified bounding-box (south,west,north,east) |
+| node(1234)           | Query by id                                |
+| node(id:1234,2345)   | Query by several ids                       |
+| node(around:10,48.1,16.1) | Query objects in distance (meters) around the location (lat,lon) |
+| node(around:10,48.1,16.1,48.2,16.2,...) | Query objects in distance (meters) around the linestring (pairs of lat,lon) |
+| node(poly:"48.1 16.1 48.2 16.1 48.2 16.2") | Query objects inside the polygon (min 3 pairs of lat lon) |
+| node(user:"Alice","Bob") | Query objects last edited by user "Alice" or "Bob"  |
+| node(uid:1,2,3)      | Query objects last edited by the users with uid 1, 2 or 3 |
+| node(if:t["name"]=="foo") | Conditional query filter, see below |
+
+### Conditional query filters
+node(if: &lt;Evaluator&gt;)
+
+Values can either by numbers (3, 3.14159) or strings ("foo" or 'foo'). 0 or empty string counts as false.
+
+The following operators are available (ordered weak to string binding):
+
+| Operator | Description                   |
+|----------|-------------------------------|
+| ||       | Logical disjunction           |
+| &amp;&amp; | Logical conjunction         |
+| == !=    | equality, inequality          |
+| &lt; &lt;= &gt; &gt;= | less, less-equal, greater, greater-equal |
+| + -      | plus, binary minus            |
+| * /      | times, devided                |
+| !        | logical negation              |
+| -        | unary minus (internally, — will be used) |
+
+The following functions are available:
+
+| Function | Description                   |
+|----------|-------------------------------|
+| t["name"] | Value of the tag "name" (internally, the identifier 'tag' will be used) |
+| id()     | Returns the ID of the object  |
+| type()   | Returns the type of the object |
+| debug(...) | Prints the value of the parameter to the JavaScript development console, returns the value |
+| count_tags() | Returns the count of tags of the object |
+
+Examples:
+```
+node(if:count_tags() > 5 || t["name"] == "foo")
+node(if:debug(id()))
+```
+
 # EXAMPLES
 ## By ID
 You can execute this example as: `node example-by-id.js`
