@@ -33,13 +33,17 @@ module.exports = class poly extends qlFunction {
   cacheInfo (options) {
     const bounds = this.bounds()
 
-    const newBounds = options.bounds ? turf.intersect(options.bounds, bounds) : bounds
-    if (newBounds === null) {
-      delete options.bounds
-      options.invalid = true
-    } else {
-      options.bounds = newBounds.geometry
-    }
+    options.forEach(d => {
+      const newBounds = d.bounds ? turf.intersect(d.bounds, bounds) : bounds
+      if (newBounds === null) {
+        delete d.bounds
+        d.invalid = true
+      } else {
+        d.bounds = newBounds.geometry
+      }
+    })
+
+    return options
   }
 
   isSupersetOf (other) {

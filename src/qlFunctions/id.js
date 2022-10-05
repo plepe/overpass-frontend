@@ -27,12 +27,16 @@ module.exports = class id extends qlFunction {
   }
 
   cacheInfo (options) {
-    let v = this.value
-    if (options.ids) {
-      v = options.ids.filter(n => this.value.includes(n))
-    }
+    options.forEach(o => {
+      let v = this.value
+      if (o.ids) {
+        v = o.ids.filter(n => this.value.includes(n))
+      }
 
-    options.ids = v.sort()
+      o.ids = v.sort()
+    })
+
+    return options
   }
 
   isSupersetOf (other) {

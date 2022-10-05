@@ -4,6 +4,10 @@ module.exports = class qlFunction {
   }
 
   cacheInfo (options) {
-    options.filters += this.toString()
+    options.forEach(d => {
+      d.filters += this.toString()
+    })
+
+    return options
   }
 }

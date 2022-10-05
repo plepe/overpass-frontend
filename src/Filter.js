@@ -685,10 +685,7 @@ class Filter {
           return o
         })
       } else if (part instanceof qlFunction) {
-        options = options.map(o => {
-          part.cacheInfo(o)
-          return o
-        })
+        options = part.cacheInfo(options)
       } else if (part.or) {
         const result = []
         part.or.forEach(e => {

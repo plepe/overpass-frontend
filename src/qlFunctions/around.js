@@ -33,12 +33,16 @@ module.exports = class around extends qlFunction {
   cacheInfo (options) {
     const bounds = this.bounds()
 
-    const newBounds = options.bounds ? turf.intersect(options.bounds, bounds) : bounds
-    if (newBounds === null) {
-      options.invalid = true
-    } else {
-      options.bounds = newBounds.geometry
-    }
+    options.forEach(d => {
+      const newBounds = d.bounds ? turf.intersect(d.bounds, bounds) : bounds
+      if (newBounds === null) {
+        d.invalid = true
+      } else {
+        d.bounds = newBounds.geometry
+      }
+    })
+
+    return options
   }
 
   isSupersetOf (other) {
