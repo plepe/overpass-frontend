@@ -26,8 +26,8 @@ module.exports = class id extends qlFunction {
     }
   }
 
-  cacheInfo (options) {
-    options.forEach(o => {
+  cacheDescriptors (descriptors) {
+    descriptors.forEach(o => {
       let v = this.value
       if (o.ids) {
         v = o.ids.filter(n => this.value.includes(n))
@@ -35,8 +35,6 @@ module.exports = class id extends qlFunction {
 
       o.ids = v.sort()
     })
-
-    return options
   }
 
   isSupersetOf (other) {

@@ -30,10 +30,10 @@ module.exports = class poly extends qlFunction {
     return { needMatch: true }
   }
 
-  cacheInfo (options) {
+  cacheDescriptors (descriptors) {
     const bounds = this.bounds()
 
-    options.forEach(d => {
+    descriptors.forEach(d => {
       const newBounds = d.bounds ? turf.intersect(d.bounds, bounds) : bounds
       if (newBounds === null) {
         delete d.bounds
@@ -42,8 +42,6 @@ module.exports = class poly extends qlFunction {
         d.bounds = newBounds.geometry
       }
     })
-
-    return options
   }
 
   isSupersetOf (other) {

@@ -3,11 +3,9 @@ module.exports = class qlFunction {
     this.fun = this.constructor.name
   }
 
-  cacheInfo (options) {
-    options.forEach(d => {
+  cacheDescriptors (descriptors) {
+    descriptors.forEach(d => {
       d.filters += this.toString()
     })
-
-    return options
   }
 }

@@ -35,10 +35,10 @@ module.exports = class bbox extends qlFunction {
     return { needMatch: true }
   }
 
-  cacheInfo (options) {
+  cacheDescriptors (descriptors) {
     const bounds = this.value.toGeoJSON()
 
-    options.forEach(d => {
+    descriptors.forEach(d => {
       const newBounds = d.bounds ? turf.intersect(d.bounds, bounds) : bounds
       if (newBounds === null) {
         d.invalid = true
@@ -46,8 +46,6 @@ module.exports = class bbox extends qlFunction {
         d.bounds = newBounds.geometry
       }
     })
-
-    return options
   }
 
   isSupersetOf (other) {
