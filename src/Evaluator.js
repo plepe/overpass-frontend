@@ -48,13 +48,15 @@ const opPriorities = {
 function compileLokiOperatorComp (left, right, leftOp, rightOp, op) {
   const r = {}
   const comp = {}
-  if (left && left.property && right && 'value' in right) {
+  if (left && Object.values(left) && JSON.stringify(Object.values(left)[0]) === '{"$exists":true}' && right && 'value' in right) {
+    const prop = Object.keys(left)[0]
     comp[leftOp] = right.value
-    r[left.property] = comp
+    r[prop] = comp
     return r
-  } else if (left && 'value' in left && right && right.property) {
+  } else if (left && 'value' in left && right && Object.values(right) && JSON.stringify(Object.values(right)[0]) === '{"$exists":true}') {
+    const prop = Object.keys(right)[0]
     comp[rightOp] = left.value
-    r[right.property] = comp
+    r[prop] = comp
     return r
   } else if ('value' in left && 'value' in right) {
     return { value: operators[op](left.value, right.value) }
@@ -141,14 +143,16 @@ const compileLokiFun = {
   },
   tag: (param) => {
     if (param[0] && 'value' in param[0]) {
-      return { property: 'tags.' + param[0].value }
+      const r = {}
+      r['tags.' + param[0].value] = { $exists: true }
+      return r
     }
   },
   id: (param) => {
-    return { property: 'osm_id' }
+    return { osm_id: { $exists: true } }
   },
   type: (param) => {
-    return { property: 'type' }
+    return { type: { $exists: true } }
   }
 }
 

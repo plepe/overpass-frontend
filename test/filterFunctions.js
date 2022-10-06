@@ -643,6 +643,19 @@ var overpassFrontend
             }]
           }, done)
         })
+
+        it('tag without comparison', function (done) {
+          test({
+            mode,
+            query: 'node[fixme](if: t["shop"])',
+            expectedQuery: 'node["fixme"](if:t["shop"]);',
+            expected: [ 'n2368032899' ],
+            expectedSubRequestCount: 1,
+            expectedCacheInfo: [{
+              id: 'node["fixme"](if:t["shop"])',
+            }]
+          }, done)
+        })
       })
 
       describe('type(), id()', function (done) {

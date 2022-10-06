@@ -34,6 +34,69 @@ describe('evaluators', function () {
     assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
 
+  it ('t["name"]', function () {
+    const eval = new Evaluator()
+    const str = eval.parse('t["name"]')
+    const expected = { fun: 'tag', parameters: [ 'name' ] }
+    const expectedResult = 'foo'
+    const expectedCompiled = 't["name"]'
+    const expectedLokiQuery = {
+      'tags.name': { $exists: true }
+    }
+    const expectedCacheDescriptors = [
+      { filters: '(if:t["name"])' }
+    ]
+
+    assert.deepEqual(eval.data, expected)
+    assert.equal(str, '')
+
+    const result = eval.exec({ tags: { name: 'foo' } })
+    assert.equal(result, expectedResult)
+
+    assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
+
+    descriptors = [{filters: ''}]
+    eval.cacheDescriptors(descriptors)
+    assert.deepEqual(descriptors, expectedCacheDescriptors)
+  })
+
+  it ('t["name"] || t["operator"]', function () {
+    const eval = new Evaluator()
+    const str = eval.parse('t["name"] || t["operator"]')
+    const expected = {
+      op: '||',
+      left: { fun: 'tag', parameters: [ 'name' ] },
+      right: { fun: 'tag', parameters: [ 'operator' ] }
+    }
+    const expectedResult = 'foo'
+    const expectedCompiled = 't["name"]||t["operator"]'
+    const expectedLokiQuery = {
+      $or: [
+        { 'tags.name': { $exists: true } },
+        { 'tags.operator': { $exists: true } }
+      ],
+      needMatch: false
+    }
+    const expectedCacheDescriptors = [
+      { filters: '(if:t["name"])' },
+      { filters: '(if:t["operator"])' }
+    ]
+
+    assert.deepEqual(eval.data, expected)
+    assert.equal(str, '')
+
+    const result = eval.exec({ tags: { name: 'foo' } })
+    assert.equal(result, expectedResult)
+
+    assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
+
+    descriptors = [{filters: ''}]
+    eval.cacheDescriptors(descriptors)
+    assert.deepEqual(descriptors, expectedCacheDescriptors)
+  })
+
   it ('t["width"] < 10.5', function () {
     const eval = new Evaluator()
     const str = eval.parse('t["width"] < 10.5')
