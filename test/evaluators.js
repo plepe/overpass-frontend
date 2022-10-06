@@ -16,6 +16,9 @@ describe('evaluators', function () {
     const expectedLokiQuery = {
       'tags.name': { $eq: 'foo' }
     }
+    const expectedCacheDescriptors = [
+      { filters: '(if:t["name"]=="foo")' }
+    ]
 
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
@@ -25,6 +28,10 @@ describe('evaluators', function () {
 
     assert.equal(eval.toString(), expectedCompiled)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
+
+    descriptors = [{filters: ''}]
+    eval.cacheDescriptors(descriptors)
+    assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
 
   it ('t["width"] < 10.5', function () {
@@ -40,6 +47,9 @@ describe('evaluators', function () {
     const expectedLokiQuery = {
       'tags.width': { $lt: 10.5 }
     }
+    const expectedCacheDescriptors = [
+      { filters: '(if:t["width"]<10.5)' }
+    ]
 
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
@@ -49,6 +59,10 @@ describe('evaluators', function () {
 
     assert.equal(eval.toString(), expectedCompiled)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
+
+    descriptors = [{filters: ''}]
+    eval.cacheDescriptors(descriptors)
+    assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
 
   it ('"10.5" >= t["width"]', function () {
@@ -64,6 +78,9 @@ describe('evaluators', function () {
     const expectedLokiQuery = {
       'tags.width': { $lte: "10.5" }
     }
+    const expectedCacheDescriptors = [
+      { filters: '(if:"10.5">=t["width"])' }
+    ]
 
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
@@ -73,6 +90,10 @@ describe('evaluators', function () {
 
     assert.equal(eval.toString(), expectedCompiled)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
+
+    descriptors = [{filters: ''}]
+    eval.cacheDescriptors(descriptors)
+    assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
 
   it ('t["name"] == t["operator"]', function () {
@@ -86,6 +107,9 @@ describe('evaluators', function () {
     const expectedResult = false
     const expectedCompiled = 't["name"]==t["operator"]'
     const expectedLokiQuery = { needMatch: true }
+    const expectedCacheDescriptors = [
+      { filters: '(if:t["name"]==t["operator"])' }
+    ]
 
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
@@ -95,6 +119,10 @@ describe('evaluators', function () {
 
     assert.equal(eval.toString(), expectedCompiled)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
+
+    descriptors = [{filters: ''}]
+    eval.cacheDescriptors(descriptors)
+    assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
 
   it ('1 < 2', function () {
@@ -108,6 +136,9 @@ describe('evaluators', function () {
     const expectedResult = true
     const expectedCompiled = '1<2'
     const expectedLokiQuery = { value: true }
+    const expectedCacheDescriptors = [
+      { filters: '(if:1<2)' }
+    ]
 
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
@@ -117,6 +148,10 @@ describe('evaluators', function () {
 
     assert.equal(eval.toString(), expectedCompiled)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
+
+    descriptors = [{filters: ''}]
+    eval.cacheDescriptors(descriptors)
+    assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
 
   it ('2 <= 2', function () {
@@ -130,6 +165,9 @@ describe('evaluators', function () {
     const expectedResult = true
     const expectedCompiled = '2<=2'
     const expectedLokiQuery = { value: true }
+    const expectedCacheDescriptors = [
+      { filters: '(if:2<=2)' }
+    ]
 
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
@@ -139,6 +177,10 @@ describe('evaluators', function () {
 
     assert.equal(eval.toString(), expectedCompiled)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
+
+    descriptors = [{filters: ''}]
+    eval.cacheDescriptors(descriptors)
+    assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
 
   it ('1 || !1', function () {
@@ -156,6 +198,10 @@ describe('evaluators', function () {
     const expectedResult = 1
     const expectedCompiled = '1||!1'
     const expectedLokiQuery = { value: true }
+    const expectedCacheDescriptors = [
+      { filters: '(if:1)' },
+      { filters: '(if:!1)' }
+    ]
 
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
@@ -165,6 +211,10 @@ describe('evaluators', function () {
 
     assert.equal(eval.toString(), expectedCompiled)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
+
+    descriptors = [{filters: ''}]
+    eval.cacheDescriptors(descriptors)
+    assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
 
   it ('t["name"] == "foo" || t["name"] == "bar"', function () {
@@ -198,6 +248,10 @@ describe('evaluators', function () {
       ],
       needMatch: false
     }
+    const expectedCacheDescriptors = [
+      { filters: '(if:t["name"]=="foo")' },
+      { filters: '(if:t["name"]=="bar")' }
+    ]
 
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
@@ -207,6 +261,75 @@ describe('evaluators', function () {
 
     assert.equal(eval.toString(), expectedCompiled)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
+
+    descriptors = [{filters: ''}]
+    eval.cacheDescriptors(descriptors)
+    assert.deepEqual(descriptors, expectedCacheDescriptors)
+  })
+
+  it ('t["name"] == "foo" || t["name"] == "bar" || t["alice"] == "bob"', function () {
+    const eval = new Evaluator()
+    const str = eval.parse('t["name"] == "foo" || t["name"] == "bar" || t["alice"] == "bob"')
+    const expected = {
+      op: '||',
+      left: {
+        left: {
+          left: {
+            fun: 'tag',
+            parameters: ['name']
+          },
+          op: '==',
+          right: 'foo'
+        },
+        op: '||',
+        right: {
+          left: {
+            fun: 'tag',
+            parameters: ['name']
+          },
+          op: '==',
+          right: 'bar'
+        }
+      },
+      right: {
+        left: {
+          fun: 'tag',
+          parameters: ['alice']
+        },
+        op: '==',
+        right: 'bob'
+      }
+    }
+    const expectedResult = true
+    const expectedCompiled = 't["name"]=="foo"||t["name"]=="bar"||t["alice"]=="bob"'
+    const expectedLokiQuery = {
+      '$or': [
+        { '$or': [
+          { 'tags.name': { $eq: 'foo' } },
+          { 'tags.name': { $eq: 'bar' } }
+        ] },
+        { 'tags.alice': { $eq: 'bob' } }
+      ],
+      needMatch: false
+    }
+    const expectedCacheDescriptors = [
+      { filters: '(if:t["name"]=="foo")' },
+      { filters: '(if:t["name"]=="bar")' },
+      { filters: '(if:t["alice"]=="bob")' }
+    ]
+
+    assert.deepEqual(eval.data, expected)
+    assert.equal(str, '')
+
+    const result = eval.exec({ tags: { name: 'foo' } })
+    assert.equal(result, expectedResult)
+
+    assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
+
+    descriptors = [{filters: ''}]
+    eval.cacheDescriptors(descriptors)
+    assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
 
   it ('t["name"] == "foo" && t["name"] == "bar"', function () {

@@ -33,4 +33,8 @@ module.exports = class If extends qlFunction {
   isSupersetOf (other) {
     return false
   }
+
+  cacheDescriptors (descriptors) {
+    this.value.cacheDescriptors(descriptors)
+  }
 }

@@ -362,6 +362,68 @@ class Evaluator {
       return compileLokiFun[current.fun](param)
     }
   }
+
+  cacheExplode (current) {
+    if (current === null || typeof current === 'number' || typeof current === 'string') {
+      return [current]
+    } else if ('fun' in current) {
+      const result = [{ fun: current.fun, parameters: [] }]
+      current.parameters.forEach(p => {
+        const pn = this.cacheExplode(p)
+        result.forEach(r => {
+          const orig = JSON.parse(JSON.stringify(r))
+          pn.forEach((n, i) => {
+            if (i === 0) {
+              r.parameters.push(n)
+            } else {
+              const next = JSON.parse(JSON.stringify(orig))
+              next.parameters.push(n)
+              result.push(next)
+            }
+          })
+        })
+      })
+      return result
+    } else if (current.op === '||') {
+      const result = []
+      const left = this.cacheExplode(current.left)
+      const right = this.cacheExplode(current.right)
+      result.push(...left)
+      result.push(...right)
+      return result
+    } else if (current.op) {
+      const result = []
+      const left = this.cacheExplode(current.left)
+      const right = this.cacheExplode(current.right)
+      left.forEach(l => {
+        right.forEach(r => {
+          result.push({ op: current.op, left: l, right: r })
+        })
+      })
+      return result
+    }
+  }
+
+  cacheDescriptors (descriptors, current = undefined) {
+    const list = this.cacheExplode(this.data)
+
+    if (current === undefined) {
+      current = this.data
+    }
+
+    descriptors.forEach(d => {
+      const orig = JSON.parse(JSON.stringify(d))
+      list.forEach((l, i) => {
+        let next = d
+        if (i > 0) {
+          next = JSON.parse(JSON.stringify(orig))
+          descriptors.push(next)
+        }
+
+        next.filters += '(if:' + this.toString(l) + ')'
+      })
+    })
+  }
 }
 
 module.exports = Evaluator
