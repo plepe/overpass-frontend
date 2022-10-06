@@ -683,7 +683,7 @@ var overpassFrontend
             expected: [ 'n2368032899', 'n325842980', 'n3592094592' ],
             expectedSubRequestCount: 1,
             expectedCacheInfo: [{
-              id: 'node["fixme"](if:1)',
+              id: 'node["fixme"]',
             }]
           }, done)
         })
@@ -711,7 +711,8 @@ var overpassFrontend
             expected: [],
             expectedSubRequestCount: 1, // TODO: 0 - querying not necessary
             expectedCacheInfo: [{
-              id: 'node["fixme"](if:0)',
+              id: 'node["fixme"]',
+              invalid: true
             }]
           }, done)
         })

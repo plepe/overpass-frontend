@@ -435,17 +435,21 @@ class Evaluator {
 
     descriptors.forEach(d => {
       const orig = JSON.parse(JSON.stringify(d))
-      list.forEach((l, i) => {
+      list.forEach((current, i) => {
         let next = d
         if (i > 0) {
           next = JSON.parse(JSON.stringify(orig))
           descriptors.push(next)
         }
 
-        if (l.fun === 'and') {
-          next.filters += l.parameters.map(l1 => '(if:' + this.toString(l1) + ')').join('')
+        if (current === null || ['number', 'string', 'boolean'].includes(typeof current)) {
+          if (!current) {
+            next.invalid = true
+          }
+        } else if (current.fun === 'and') {
+          next.filters += current.parameters.map(c => '(if:' + this.toString(c) + ')').join('')
         } else {
-          next.filters += '(if:' + this.toString(l) + ')'
+          next.filters += '(if:' + this.toString(current) + ')'
         }
       })
     })
