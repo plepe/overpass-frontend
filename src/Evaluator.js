@@ -400,6 +400,19 @@ class Evaluator {
       result.push(...left)
       result.push(...right)
       return result
+    } else if (current.op === '&&') {
+      const result = []
+      const left = this.cacheExplode(current.left)
+      const right = this.cacheExplode(current.right)
+      left.forEach(l => {
+        right.forEach(r => {
+          const entry = { fun: 'and', parameters: [] }
+          entry.parameters.push(...(l.fun === 'and' ? l.parameters : [l]))
+          entry.parameters.push(...(r.fun === 'and' ? r.parameters : [r]))
+          result.push(entry)
+        })
+      })
+      return result
     } else if (current.op) {
       const result = []
       const left = this.cacheExplode(current.left)
@@ -429,7 +442,11 @@ class Evaluator {
           descriptors.push(next)
         }
 
-        next.filters += '(if:' + this.toString(l) + ')'
+        if (l.fun === 'and') {
+          next.filters += l.parameters.map(l1 => '(if:' + this.toString(l1) + ')').join('')
+        } else {
+          next.filters += '(if:' + this.toString(l) + ')'
+        }
       })
     })
   }

@@ -331,37 +331,54 @@ describe('evaluators', function () {
     assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
 
-  it ('t["name"] == "foo" && t["name"] == "bar"', function () {
+  it ('t["name"] == "foo" && t["name"] == "bar" && t["alice"] == "bob"', function () {
     const eval = new Evaluator()
-    const str = eval.parse('t["name"] == "foo" && t["name"] == "bar"')
+    const str = eval.parse('t["name"] == "foo" && t["name"] == "bar" && t["alice"] == "bob"')
     const expected = {
       op: '&&',
       left: {
+        op: '&&',
         left: {
-          fun: 'tag',
-          parameters: ['name']
+          left: {
+            fun: 'tag',
+            parameters: ['name']
+          },
+          op: '==',
+          right: 'foo'
         },
-        op: '==',
-        right: 'foo'
+        right: {
+          left: {
+            fun: 'tag',
+            parameters: ['name']
+          },
+          op: '==',
+          right: 'bar'
+        }
       },
       right: {
         left: {
           fun: 'tag',
-          parameters: ['name']
+          parameters: ['alice']
         },
         op: '==',
-        right: 'bar'
-      },
+        right: 'bob'
+      }
     }
     const expectedResult = false
-    const expectedCompiled = 't["name"]=="foo"&&t["name"]=="bar"'
+    const expectedCompiled = 't["name"]=="foo"&&t["name"]=="bar"&&t["alice"]=="bob"'
     const expectedLokiQuery = {
-      '$and': [
-        { 'tags.name': { $eq: 'foo' } },
-        { 'tags.name': { $eq: 'bar' } }
+      '$and': [{
+        $and: [
+          { 'tags.name': { $eq: 'foo' } },
+          { 'tags.name': { $eq: 'bar' } }
+        ]},
+        { 'tags.alice': { $eq: 'bob' } }
       ],
       needMatch: false
     }
+    const expectedCacheDescriptors = [
+      { filters: '(if:t["name"]=="foo")(if:t["name"]=="bar")(if:t["alice"]=="bob")' }
+    ]
 
     assert.deepEqual(eval.data, expected)
     assert.equal(str, '')
@@ -371,6 +388,10 @@ describe('evaluators', function () {
 
     assert.equal(eval.toString(), expectedCompiled)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
+
+    descriptors = [{filters: ''}]
+    eval.cacheDescriptors(descriptors)
+    assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
 
   it ('"test" + 2', function () {
