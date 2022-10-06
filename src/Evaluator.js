@@ -341,11 +341,7 @@ class Evaluator {
       current = this.data
     }
 
-    if (current === null) {
-      return null
-    }
-
-    if (current === null || typeof current === 'number' || typeof current === 'string') {
+    if (current === null || ['number', 'string', 'boolean'].includes(typeof current)) {
       return { value: current }
     }
 
@@ -369,11 +365,11 @@ class Evaluator {
 
   cacheExplode (current) {
     const loki = this.compileLokiJS(current)
-    if (loki.value && !loki.needMatch) {
+    if ('value' in loki && !loki.needMatch) {
       return [loki.value]
     }
 
-    if (current === null || typeof current === 'number' || typeof current === 'string') {
+    if (current === null || ['number', 'string', 'boolean'].includes(typeof current)) {
       return [current]
     } else if ('fun' in current) {
       const result = [{ fun: current.fun, parameters: [] }]
