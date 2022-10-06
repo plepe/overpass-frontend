@@ -137,7 +137,7 @@ describe('evaluators', function () {
     const expectedCompiled = '1<2'
     const expectedLokiQuery = { value: true }
     const expectedCacheDescriptors = [
-      { filters: '(if:1<2)' }
+      { filters: '(if:1)' }
     ]
 
     assert.deepEqual(eval.data, expected)
@@ -166,7 +166,7 @@ describe('evaluators', function () {
     const expectedCompiled = '2<=2'
     const expectedLokiQuery = { value: true }
     const expectedCacheDescriptors = [
-      { filters: '(if:2<=2)' }
+      { filters: '(if:1)' }
     ]
 
     assert.deepEqual(eval.data, expected)
@@ -199,8 +199,7 @@ describe('evaluators', function () {
     const expectedCompiled = '1||!1'
     const expectedLokiQuery = { value: true }
     const expectedCacheDescriptors = [
-      { filters: '(if:1)' },
-      { filters: '(if:!1)' }
+      { filters: '(if:1)' }
     ]
 
     assert.deepEqual(eval.data, expected)

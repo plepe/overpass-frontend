@@ -312,6 +312,10 @@ class Evaluator {
         .replace(/"/g, '\\"') + '"'
     }
 
+    if (typeof current === 'boolean') {
+      return current ? '1' : '0'
+    }
+
     if ('op' in current) {
       const right = this.toString(current.right)
       if (current.left === null) {
@@ -364,6 +368,11 @@ class Evaluator {
   }
 
   cacheExplode (current) {
+    const loki = this.compileLokiJS(current)
+    if (loki.value && !loki.needMatch) {
+      return [loki.value]
+    }
+
     if (current === null || typeof current === 'number' || typeof current === 'string') {
       return [current]
     } else if ('fun' in current) {
