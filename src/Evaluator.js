@@ -155,6 +155,11 @@ const compileLokiFun = {
     return { type: { $exists: true } }
   }
 }
+const funIsSupersetOf = {
+  tag (current, other) {
+    return (other.fun === 'tag' && current.parameters[0] === other.parameters[0])
+  }
+}
 
 function next (current, def) {
   if (current) {
@@ -455,12 +460,33 @@ class Evaluator {
     })
   }
 
-  isSupersetOf (other, current = undefined) {
-    if (current === undefined) {
-      current = this.data
+  isSupersetOf (other) {
+    return this._isSupersetOf(this.data, other.data)
+  }
+
+  _isSupersetOf (current, other) {
+    if (current.op === '||') {
+      return this._isSupersetOf(current.left, other) || this._isSupersetOf(current.right, other)
+    } else if (current.op === '&&') {
+      return this._isSupersetOf(current.left, other) && this._isSupersetOf(current.right, other)
+    } else if (current.fun === 'and') {
+      return current.parameters.every(p => this._isSupersetOf(p, other))
     }
 
-    console.log(current, other.data)
+    if (other.op === '||') {
+      return this._isSupersetOf(current, other.left) && this._isSupersetOf(current, other.right)
+    } else if (other.op === '&&') {
+      return this._isSupersetOf(current, other.left) || this._isSupersetOf(current, other.right)
+    } else if (current.fun === 'and') {
+      return current.parameters.some(p => this._isSupersetOf(p, other))
+    }
+
+    if (current.op) {
+      return opIsSupersetOf[current.op](current, other)
+    }
+    if (current.fun) {
+      return funIsSupersetOf[current.fun](current, other)
+    }
   }
 }
 

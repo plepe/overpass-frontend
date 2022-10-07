@@ -388,15 +388,23 @@ describe("Filters - test isSupersetOf", function () {
     assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should not be a super set of " + f1.toString())
   })
 
-  /** TODO
+  it("node(if:t['amenity'] && t['tourism']) - node(if:t['amenity'])", function () {
+    const f1 = new Filter("node(if:t['amenity'] && t['tourism'])")
+    const f2 = new Filter("node(if:t['amenity'])")
+
+    assert.equal(f1.isSupersetOf(f2), false, f1.toString() + " should be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), true, f2.toString() + " should be not a super set of " + f1.toString())
+  })
+
   it("node(if:t['amenity']) - node(if:t['amenity'] && t['tourism'])", function () {
     const f1 = new Filter("node(if:t['amenity'])")
     const f2 = new Filter("node(if:t['amenity'] && t['tourism'])")
 
     assert.equal(f1.isSupersetOf(f2), true, f1.toString() + " should be a super set of " + f2.toString())
-    assert.equal(f2.isSupersetOf(f1), true, f2.toString() + " should be a super set of " + f1.toString())
+    assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should be not a super set of " + f1.toString())
   })
 
+  /** TODO
   it("node - nwr(if:type()=='node')", function () {
     const f1 = new Filter("node")
     const f2 = new Filter("nwr(if:type()=='node')")
