@@ -454,6 +454,14 @@ class Evaluator {
       })
     })
   }
+
+  isSupersetOf (other, current = undefined) {
+    if (current === undefined) {
+      current = this.data
+    }
+
+    console.log(current, other.data)
+  }
 }
 
 module.exports = Evaluator

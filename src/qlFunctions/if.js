@@ -30,11 +30,15 @@ module.exports = class If extends qlFunction {
     return r
   }
 
-  isSupersetOf (other) {
-    return false
-  }
-
   cacheDescriptors (descriptors) {
     this.value.cacheDescriptors(descriptors)
+  }
+
+  isSupersetOf (other) {
+    if (other.fun === 'if') {
+      return this.value.isSupersetOf(other.value)
+    }
+
+    return false
   }
 }
