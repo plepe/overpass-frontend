@@ -176,7 +176,9 @@ const opIsSupersetOfLeft = {
   '==' (currentValue, otherOp, otherValue) {
     switch (otherOp) {
       case '==':
+        /* eslint-disable eqeqeq */
         return currentValue == otherValue
+  /* eslint-enable eqeqeq */
     }
   },
   '!=' (currentValue, otherOp, otherValue) {
@@ -217,7 +219,9 @@ const opIsSupersetOfRight = {
   '==' (currentValue, otherOp, otherValue) {
     switch (otherOp) {
       case '==':
+        /* eslint-disable eqeqeq */
         return currentValue == otherValue
+  /* eslint-enable eqeqeq */
     }
   },
   '!=' (currentValue, otherOp, otherValue) {

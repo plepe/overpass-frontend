@@ -382,7 +382,7 @@ class OverpassObject {
       this.dbInsert()
     }
 
-    for (let k in values) {
+    for (const k in values) {
       this.dbData[k] = values[k]
     }
 
