@@ -344,7 +344,7 @@ describe("Filters - test isSupersetOf", function () {
     const f1 = new Filter("node(around:10,48,16)")
     const f2 = new Filter("node(poly:\"47.995 15.995 48.005 15.995 48 16.005\")")
 
-    assert.equal(f1.isSupersetOf(f2), false, f1.toString() + " should be not a super set of " + f2.toString())
+    assert.equal(f1.isSupersetOf(f2), false, f1.toString() + " should not be a super set of " + f2.toString())
     assert.equal(f2.isSupersetOf(f1), true, f2.toString() + " should be a super set of " + f1.toString())
   })
 
@@ -393,7 +393,7 @@ describe("Filters - test isSupersetOf", function () {
     const f2 = new Filter("node(if:t['amenity'])")
 
     assert.equal(f1.isSupersetOf(f2), false, f1.toString() + " should be a super set of " + f2.toString())
-    assert.equal(f2.isSupersetOf(f1), true, f2.toString() + " should be not a super set of " + f1.toString())
+    assert.equal(f2.isSupersetOf(f1), true, f2.toString() + " should not be a super set of " + f1.toString())
   })
 
   it("node(if:t['amenity']) - node(if:t['amenity'] && t['tourism'])", function () {
@@ -401,7 +401,103 @@ describe("Filters - test isSupersetOf", function () {
     const f2 = new Filter("node(if:t['amenity'] && t['tourism'])")
 
     assert.equal(f1.isSupersetOf(f2), true, f1.toString() + " should be a super set of " + f2.toString())
-    assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should be not a super set of " + f1.toString())
+    assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should not be a super set of " + f1.toString())
+  })
+
+  it("node(if:id() < 1000) - node(if:id() < 100)", function () {
+    const f1 = new Filter("node(if:id() < 1000)")
+    const f2 = new Filter("node(if:id() < 100)")
+
+    assert.equal(f1.isSupersetOf(f2), true, f1.toString() + " should be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should not be a super set of " + f1.toString())
+  })
+
+  it("node(if:1000 > id()) - node(if:100 > id())", function () {
+    const f1 = new Filter("node(if:1000 > id())")
+    const f2 = new Filter("node(if:100 > id())")
+
+    assert.equal(f1.isSupersetOf(f2), true, f1.toString() + " should be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should not be a super set of " + f1.toString())
+  })
+
+  it("node(if:id() <= 100) - node(if:id() < 100)", function () {
+    const f1 = new Filter("node(if:id() <= 100)")
+    const f2 = new Filter("node(if:id() < 100)")
+
+    assert.equal(f1.isSupersetOf(f2), true, f1.toString() + " should be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should not be a super set of " + f1.toString())
+  })
+
+  it("node(if:id() <= 99) - node(if:id() < 100)", function () {
+    const f1 = new Filter("node(if:id() <= 99)")
+    const f2 = new Filter("node(if:id() < 100)")
+
+    assert.equal(f1.isSupersetOf(f2), false, f1.toString() + " should be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), true, f2.toString() + " should not be a super set of " + f1.toString())
+  })
+
+  it("node(if:id() <= 100) - node(if:id() == 100)", function () {
+    const f1 = new Filter("node(if:id() <= 100)")
+    const f2 = new Filter("node(if:id() == 100)")
+
+    assert.equal(f1.isSupersetOf(f2), true, f1.toString() + " should be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should not be a super set of " + f1.toString())
+  })
+
+  it("node(if:id() <= 100) - node(if:id() == 50)", function () {
+    const f1 = new Filter("node(if:id() <= 100)")
+    const f2 = new Filter("node(if:id() == 50)")
+
+    assert.equal(f1.isSupersetOf(f2), true, f1.toString() + " should be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should not be a super set of " + f1.toString())
+  })
+
+  it("node(if:id() <= 100) - node(if:id() == 150)", function () {
+    const f1 = new Filter("node(if:id() <= 100)")
+    const f2 = new Filter("node(if:id() == 150)")
+
+    assert.equal(f1.isSupersetOf(f2), false, f1.toString() + " should not be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should not be a super set of " + f1.toString())
+  })
+
+  it("node(if:id() <= 100) - node(if:id() != 150)", function () {
+    const f1 = new Filter("node(if:id() <= 100)")
+    const f2 = new Filter("node(if:id() != 150)")
+
+    assert.equal(f1.isSupersetOf(f2), false, f1.toString() + " should not be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should not be a super set of " + f1.toString())
+  })
+
+  it("node(if:id() <= 100) - node(if:id() > 5 && id() < 50)", function () {
+    const f1 = new Filter("node(if:id() <= 100)")
+    const f2 = new Filter("node(if:id() > 5 && id() < 50)")
+
+    assert.equal(f1.isSupersetOf(f2), true, f1.toString() + " should be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should not be a super set of " + f1.toString())
+  })
+
+  it("node(if:id() <= 100) - node(if:id() > 5 && id() < 150)", function () {
+    const f1 = new Filter("node(if:id() <= 100)")
+    const f2 = new Filter("node(if:id() > 5 && id() < 150)")
+
+    assert.equal(f1.isSupersetOf(f2), false, f1.toString() + " should not be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should not be a super set of " + f1.toString())
+  })
+
+  it("node(if:id() >= 5 && id() <= 100) - node(if:id() > 5 && id() < 50)", function () {
+    const f1 = new Filter("node(if:id() >= 5 && id() <= 100)")
+    const f2 = new Filter("node(if:id() > 5 && id() < 50)")
+
+    assert.equal(f1.isSupersetOf(f2), true, f1.toString() + " should be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should not be a super set of " + f1.toString())
+  })
+
+  it("node(if:id() >= 5 && id() <= (2 * 100)) - node(if:id() > 5 && id() < 50)", function () {
+    const f1 = new Filter("node(if:id() >= 5 && id() <= (2 * 100))")
+    const f2 = new Filter("node(if:id() > 5 && id() < 50)")
+
+    assert.equal(f1.isSupersetOf(f2), true, f1.toString() + " should be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should not be a super set of " + f1.toString())
   })
 
   /** TODO

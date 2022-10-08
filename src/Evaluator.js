@@ -155,9 +155,86 @@ const compileLokiFun = {
     return { type: { $exists: true } }
   }
 }
-const funIsSupersetOf = {
-  tag (current, other) {
-    return (other.fun === 'tag' && current.parameters[0] === other.parameters[0])
+const opIsSupersetOfLeft = {
+  '==' (currentValue, otherOp, otherValue) {
+    switch (otherOp) {
+      case '==':
+        return currentValue == otherValue
+    }
+  },
+  '!=' (currentValue, otherOp, otherValue) {
+    return false
+  },
+  '<' (currentValue, otherOp, otherValue) {
+    switch (otherOp) {
+      case '<':
+      case '<=':
+        return currentValue > otherValue
+    }
+  },
+  '<=' (currentValue, otherOp, otherValue) {
+    switch (otherOp) {
+      case '<':
+      case '<=':
+      case '==':
+        return currentValue >= otherValue
+    }
+  },
+  '>' (currentValue, otherOp, otherValue) {
+    switch (otherOp) {
+      case '>':
+      case '>=':
+        return currentValue < otherValue
+    }
+  },
+  '>=' (currentValue, otherOp, otherValue) {
+    switch (otherOp) {
+      case '>':
+      case '>=':
+      case '==':
+        return currentValue <= otherValue
+    }
+  }
+}
+const opIsSupersetOfRight = {
+  '==' (currentValue, otherOp, otherValue) {
+    switch (otherOp) {
+      case '==':
+        return currentValue == otherValue
+    }
+  },
+  '!=' (currentValue, otherOp, otherValue) {
+    return false
+  },
+  '<' (currentValue, otherOp, otherValue) {
+    switch (otherOp) {
+      case '<':
+      case '<=':
+        return currentValue < otherValue
+    }
+  },
+  '<=' (currentValue, otherOp, otherValue) {
+    switch (otherOp) {
+      case '<':
+      case '<=':
+      case '==':
+        return currentValue <= otherValue
+    }
+  },
+  '>' (currentValue, otherOp, otherValue) {
+    switch (otherOp) {
+      case '>':
+      case '>=':
+        return currentValue > otherValue
+    }
+  },
+  '>=' (currentValue, otherOp, otherValue) {
+    switch (otherOp) {
+      case '>':
+      case '>=':
+      case '==':
+        return currentValue >= otherValue
+    }
   }
 }
 
@@ -469,6 +546,10 @@ class Evaluator {
   }
 
   _isSupersetOf (current, other) {
+    if (JSON.stringify(current) === JSON.stringify(other)) {
+      return true
+    }
+
     if (current.op === '||') {
       return this._isSupersetOf(current.left, other) || this._isSupersetOf(current.right, other)
     } else if (current.op === '&&') {
@@ -486,10 +567,18 @@ class Evaluator {
     }
 
     if (current.op) {
-      return opIsSupersetOf[current.op](current, other)
-    }
-    if (current.fun) {
-      return funIsSupersetOf[current.fun](current, other)
+      const left = this.compileLokiJS(current.left)
+      const right = this.compileLokiJS(current.right)
+      const otherLeft = this.compileLokiJS(other.left)
+      const otherRight = this.compileLokiJS(other.right)
+
+      if (current.left.fun && other.left.fun && JSON.stringify(current.left) === JSON.stringify(other.left) && 'value' in right && 'value' in otherRight) {
+        return current.op in opIsSupersetOfLeft && opIsSupersetOfLeft[current.op](right.value, other.op, otherRight.value)
+      }
+
+      if (current.right.fun && other.right.fun && JSON.stringify(current.right) === JSON.stringify(other.right) && 'value' in left && 'value' in otherLeft) {
+        return current.op in opIsSupersetOfRight && opIsSupersetOfRight[current.op](left.value, other.op, otherLeft.value)
+      }
     }
   }
 }
