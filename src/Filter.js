@@ -1,6 +1,6 @@
 const strsearch2regexp = require('strsearch2regexp')
 const filterJoin = require('./filterJoin')
-const qlFunctions = require('./qlFunctions/index')
+const qlFunctions = require('./qlFunctions/__index__')
 const parseString = require('./parseString')
 const parseParentheses = require('./parseParentheses')
 const qlFunction = require('./qlFunctions/qlFunction')
