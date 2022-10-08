@@ -1,5 +1,6 @@
-const turf = require('./turf')
 const parseString = require('./parseString')
+
+const evaluatorFunctions = require('./evaluator/__index__')
 
 const operators = {
   '||': (a, b) => a || b,
@@ -18,30 +19,6 @@ const operators = {
   '/': (a, b) => a / b,
   '!': (a, b) => b ? 0 : 1,
   '—': (a, b) => -b
-}
-const functions = {
-  '': (p, context, that) => that.exec(context, p[0]),
-  count_tags: (p, context) => context.tags ? Object.keys(context.tags).length : null,
-  id: (p, context) => context.osm_id,
-  type: (p, context) => context.type,
-  length: (p, context) => {
-    if ('geomLength' in context.dbData) {
-      return context.dbData.geomLength
-    } else {
-      const g = context.GeoJSON()
-      if (g && g.geometry) {
-        const geomLength = turf.length(g, { units: 'kilometers' }) * 1000
-        context.dbSet({ geomLength })
-        return geomLength
-      }
-    }
-    return null
-  },
-  debug: (p) => {
-    console.log(p[0])
-    return p[0]
-  },
-  tag: (p, context) => context.tags && context.tags[p[0]]
 }
 const opPriorities = {
   '||': 7,
@@ -149,27 +126,6 @@ const compileLokiOperator = {
     }
 
     return { $and: [left, right], needMatch: !!(leftNeedMatch || rightNeedMatch) }
-  }
-}
-const compileLokiFun = {
-  '': (param) => {
-    return param[0]
-  },
-  tag: (param) => {
-    if (param[0] && 'value' in param[0]) {
-      const r = {}
-      r['tags.' + param[0].value] = { $exists: true }
-      return r
-    }
-  },
-  id: (param) => {
-    return { osm_id: { $exists: true } }
-  },
-  type: (param) => {
-    return { type: { $exists: true } }
-  },
-  length: () => {
-    return { needMatch: true }
   }
 }
 const opIsSupersetOfLeft = {
@@ -399,7 +355,11 @@ class Evaluator {
 
     if ('fun' in current) {
       const param = current.parameters.map(p => this.exec(context, p))
-      return functions[current.fun](param, context, this)
+      if (!(current.fun in evaluatorFunctions)) {
+        console.error('No such evaluator function:', current.fun)
+      } else {
+        return evaluatorFunctions[current.fun].eval(param, context, this)
+      }
     }
   }
 
@@ -465,11 +425,11 @@ class Evaluator {
     if ('fun' in current) {
       const param = current.parameters.map(p => this.compileLokiJS(p))
 
-      if (!compileLokiFun[current.fun]) {
+      if (!evaluatorFunctions[current.fun] || !evaluatorFunctions[current.fun].compileLokiJS) {
         console.error('compile evaluator function not defined:', current.fun)
         return { needMatch: true }
       }
-      return compileLokiFun[current.fun](param)
+      return evaluatorFunctions[current.fun].compileLokiJS(param)
     }
   }
 
