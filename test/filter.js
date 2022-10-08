@@ -928,7 +928,7 @@ describe('Filter', function () {
 
     check(f, [ 3, 5 ])
 
-    var r = f.caches()
+    const r = f.caches()
     assert.deepEqual(r, [ { id: 'node["name"~"test"]' } ])
   })
 
@@ -942,7 +942,7 @@ describe('Filter', function () {
 
     check(f, [ 1, 2, 4, 6, 7 ])
 
-    var r = f.caches()
+    const r = f.caches()
     assert.deepEqual(r, [ { id: 'node["name"!~"test"]' } ])
   })
 

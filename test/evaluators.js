@@ -29,7 +29,7 @@ describe('evaluators', function () {
     assert.equal(eval.toString(), expectedCompiled)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
-    descriptors = [{filters: ''}]
+    const descriptors = [{filters: ''}]
     eval.cacheDescriptors(descriptors)
     assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
@@ -56,7 +56,7 @@ describe('evaluators', function () {
     assert.equal(eval.toString(), expectedCompiled)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
-    descriptors = [{filters: ''}]
+    const descriptors = [{filters: ''}]
     eval.cacheDescriptors(descriptors)
     assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
@@ -92,7 +92,7 @@ describe('evaluators', function () {
     assert.equal(eval.toString(), expectedCompiled)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
-    descriptors = [{filters: ''}]
+    const descriptors = [{filters: ''}]
     eval.cacheDescriptors(descriptors)
     assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
@@ -123,7 +123,7 @@ describe('evaluators', function () {
     assert.equal(eval.toString(), expectedCompiled)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
-    descriptors = [{filters: ''}]
+    const descriptors = [{filters: ''}]
     eval.cacheDescriptors(descriptors)
     assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
@@ -154,7 +154,7 @@ describe('evaluators', function () {
     assert.equal(eval.toString(), expectedCompiled)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
-    descriptors = [{filters: ''}]
+    const descriptors = [{filters: ''}]
     eval.cacheDescriptors(descriptors)
     assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
@@ -183,7 +183,7 @@ describe('evaluators', function () {
     assert.equal(eval.toString(), expectedCompiled)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
-    descriptors = [{filters: ''}]
+    const descriptors = [{filters: ''}]
     eval.cacheDescriptors(descriptors)
     assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
@@ -212,7 +212,7 @@ describe('evaluators', function () {
     assert.equal(eval.toString(), expectedCompiled)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
-    descriptors = [{filters: ''}]
+    const descriptors = [{filters: ''}]
     eval.cacheDescriptors(descriptors)
     assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
@@ -241,7 +241,7 @@ describe('evaluators', function () {
     assert.equal(eval.toString(), expectedCompiled)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
-    descriptors = [{filters: ''}]
+    const descriptors = [{filters: ''}]
     eval.cacheDescriptors(descriptors)
     assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
@@ -274,7 +274,7 @@ describe('evaluators', function () {
     assert.equal(eval.toString(), expectedCompiled)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
-    descriptors = [{filters: ''}]
+    const descriptors = [{filters: ''}]
     eval.cacheDescriptors(descriptors)
     assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
@@ -324,7 +324,7 @@ describe('evaluators', function () {
     assert.equal(eval.toString(), expectedCompiled)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
-    descriptors = [{filters: ''}]
+    const descriptors = [{filters: ''}]
     eval.cacheDescriptors(descriptors)
     assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
@@ -389,7 +389,7 @@ describe('evaluators', function () {
     assert.equal(eval.toString(), expectedCompiled)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
-    descriptors = [{filters: ''}]
+    const descriptors = [{filters: ''}]
     eval.cacheDescriptors(descriptors)
     assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
@@ -452,7 +452,7 @@ describe('evaluators', function () {
     assert.equal(eval.toString(), expectedCompiled)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
-    descriptors = [{filters: ''}]
+    const descriptors = [{filters: ''}]
     eval.cacheDescriptors(descriptors)
     assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
@@ -481,7 +481,7 @@ describe('evaluators', function () {
     assert.equal(eval.toString(), expectedCompiled)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
-    descriptors = [{filters: ''}]
+    const descriptors = [{filters: ''}]
     eval.cacheDescriptors(descriptors)
     assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
@@ -514,7 +514,7 @@ describe('evaluators', function () {
     assert.equal(eval.toString(), expectedCompiled)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
-    descriptors = [{filters: ''}]
+    const descriptors = [{filters: ''}]
     eval.cacheDescriptors(descriptors)
     assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
@@ -552,7 +552,7 @@ describe('evaluators', function () {
     assert.equal(eval.toString(), expectedCompiled)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
-    descriptors = [{filters: ''}]
+    const descriptors = [{filters: ''}]
     eval.cacheDescriptors(descriptors)
     assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
@@ -589,7 +589,7 @@ describe('evaluators', function () {
     assert.equal(eval.toString(), expectedCompiled)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
-    descriptors = [{filters: ''}]
+    const descriptors = [{filters: ''}]
     eval.cacheDescriptors(descriptors)
     assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
@@ -622,7 +622,7 @@ describe('evaluators', function () {
     assert.equal(eval.toString(), expectedCompiled)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
-    descriptors = [{filters: ''}]
+    const descriptors = [{filters: ''}]
     eval.cacheDescriptors(descriptors)
     assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
@@ -654,7 +654,7 @@ describe('evaluators', function () {
     assert.equal(eval.toString(), expectedCompiled)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
-    descriptors = [{filters: ''}]
+    const descriptors = [{filters: ''}]
     eval.cacheDescriptors(descriptors)
     assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
@@ -691,7 +691,7 @@ describe('evaluators', function () {
     assert.equal(eval.toString(), expectedCompiled)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
-    descriptors = [{filters: ''}]
+    const descriptors = [{filters: ''}]
     eval.cacheDescriptors(descriptors)
     assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
@@ -720,7 +720,7 @@ describe('evaluators', function () {
     assert.equal(eval.toString(), expectedCompiled)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
-    descriptors = [{filters: ''}]
+    const descriptors = [{filters: ''}]
     eval.cacheDescriptors(descriptors)
     assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
@@ -758,7 +758,7 @@ describe('evaluators', function () {
     assert.equal(eval.toString(), expectedCompiled)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
-    descriptors = [{filters: ''}]
+    const descriptors = [{filters: ''}]
     eval.cacheDescriptors(descriptors)
     assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
@@ -800,7 +800,7 @@ describe('evaluators', function () {
     assert.equal(eval.toString(), expectedCompiled)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
-    descriptors = [{filters: ''}]
+    const descriptors = [{filters: ''}]
     eval.cacheDescriptors(descriptors)
     assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
@@ -829,7 +829,7 @@ describe('evaluators', function () {
     assert.equal(eval.toString(), expectedCompiled)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
-    descriptors = [{filters: ''}]
+    const descriptors = [{filters: ''}]
     eval.cacheDescriptors(descriptors)
     assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
@@ -866,7 +866,7 @@ describe('evaluators', function () {
     assert.equal(eval.toString(), expectedCompiled)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
-    descriptors = [{filters: ''}]
+    const descriptors = [{filters: ''}]
     eval.cacheDescriptors(descriptors)
     assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
@@ -904,7 +904,7 @@ describe('evaluators', function () {
     assert.equal(eval.toString(), expectedCompiled)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
-    descriptors = [{filters: ''}]
+    const descriptors = [{filters: ''}]
     eval.cacheDescriptors(descriptors)
     assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
@@ -944,7 +944,7 @@ describe('evaluators', function () {
     assert.equal(eval.toString(), expectedCompiled)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
-    descriptors = [{filters: ''}]
+    const descriptors = [{filters: ''}]
     eval.cacheDescriptors(descriptors)
     assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
@@ -976,7 +976,7 @@ describe('evaluators', function () {
     assert.equal(eval.toString(), expectedCompiled)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
-    descriptors = [{filters: ''}]
+    const descriptors = [{filters: ''}]
     eval.cacheDescriptors(descriptors)
     assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
@@ -1001,7 +1001,7 @@ describe('evaluators', function () {
     assert.equal(eval.toString(), expectedCompiled)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
-    descriptors = [{filters: ''}]
+    const descriptors = [{filters: ''}]
     eval.cacheDescriptors(descriptors)
     assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
@@ -1036,7 +1036,7 @@ describe('evaluators', function () {
     assert.equal(eval.toString(), expectedCompiled)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
-    descriptors = [{filters: ''}]
+    const descriptors = [{filters: ''}]
     eval.cacheDescriptors(descriptors)
     assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
@@ -1072,7 +1072,7 @@ describe('evaluators', function () {
     assert.equal(eval.toString(), expectedCompiled)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
-    descriptors = [{filters: ''}]
+    const descriptors = [{filters: ''}]
     eval.cacheDescriptors(descriptors)
     assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
@@ -1123,7 +1123,7 @@ describe('evaluators', function () {
     assert.equal(eval.toString(), expectedCompiled)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
-    descriptors = [{filters: ''}]
+    const descriptors = [{filters: ''}]
     eval.cacheDescriptors(descriptors)
     assert.deepEqual(descriptors, expectedCacheDescriptors)
   })

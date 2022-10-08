@@ -295,7 +295,6 @@ function isValue (v) {
   return v === null || ['number', 'string', 'boolean'].includes(typeof v)
 }
 
-
 class Evaluator {
   parse (str, rek = 0) {
     this.data = null
