@@ -26,6 +26,7 @@
     "@turf/difference": "^6.5.0",
     "@turf/distance": "^6.5.0",
     "@turf/intersect": "^6.5.0",
+    "@turf/length": "^6.5.0",
     "@turf/union": "^6.5.0",
     "async": "^3.2.4",
     "boundingbox": "^1.4.0",

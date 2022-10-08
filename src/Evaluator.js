@@ -1,3 +1,4 @@
+const turf = require('./turf')
 const parseString = require('./parseString')
 
 const operators = {
@@ -23,6 +24,13 @@ const functions = {
   count_tags: (p, context) => context.tags ? Object.keys(context.tags).length : null,
   id: (p, context) => context.osm_id,
   type: (p, context) => context.type,
+  length: (p, context) => {
+    const g = context.GeoJSON()
+    if (g && g.geometry) {
+      return turf.length(g, { units: 'kilometers' }) * 1000
+    }
+    return null
+  },
   debug: (p) => {
     console.log(p[0])
     return p[0]
@@ -153,6 +161,9 @@ const compileLokiFun = {
   },
   type: (param) => {
     return { type: { $exists: true } }
+  },
+  length: () => {
+    return { needMatch: true }
   }
 }
 const opIsSupersetOfLeft = {

@@ -715,6 +715,19 @@ var overpassFrontend
           }, done)
         })
 
+        it('property (fully cached)', function (done) {
+          const r = test({
+            mode,
+            query: 'node[fixme](if: t["highway"])',
+            expectedQuery: 'node["fixme"](if:t["highway"]);',
+            expected: [ 'n3592094592' ],
+            expectedSubRequestCount: 0,
+            expectedCacheInfo: [{
+              id: 'node["fixme"](if:t["highway"])',
+            }]
+          }, done)
+        })
+
         it('value false', function (done) {
           overpassFrontend.clearCache()
           const r = test({
@@ -726,6 +739,93 @@ var overpassFrontend
             expectedCacheInfo: [{
               id: 'node["fixme"]',
               invalid: true
+            }]
+          }, done)
+        })
+      })
+
+      describe('length()', function (done) {
+        it('length()', function (done) {
+          overpassFrontend.clearCache()
+          test({
+            mode,
+            query: 'way[highway](if: length() > 300)',
+            queryOptions: { properties: OverpassFrontend.GEOM|OverpassFrontend.TAGS },
+            expectedQuery: 'way["highway"](if:length()>300);',
+            expected: [ 'w141233627', 'w162373026', 'w199261366', 'w211635132', 'w217030746', 'w244604984', 'w26739449', 'w28147563', 'w283595960', 'w28890734', 'w31275229', 'w4849338', 'w5003914', 'w5838278' ],
+            expectedSubRequestCount: 1,
+            expectedCacheInfo: [{
+              id: 'way["highway"](if:length()>300)',
+            }]
+          }, done)
+        })
+
+        it('length()', function (done) {
+          test({
+            mode,
+            query: 'way[highway](if: length() > 500)',
+            queryOptions: { properties: OverpassFrontend.GEOM|OverpassFrontend.TAGS },
+            expectedQuery: 'way["highway"](if:length()>500);',
+            expected: [ 'w199261366', 'w217030746', 'w244604984', 'w31275229' ],
+            expectedSubRequestCount: 0,
+            expectedCacheInfo: [{
+              id: 'way["highway"](if:length()>500)',
+            }]
+          }, done)
+        })
+
+        it('possibly closed ways', function (done) {
+          test({
+            mode,
+            query: 'way[leisure=park](if: length() > 300)',
+            queryOptions: { properties: OverpassFrontend.GEOM|OverpassFrontend.TAGS },
+            expectedQuery: 'way["leisure"="park"](if:length()>300);',
+            expected: [ 'w24867728', 'w299696929' ],
+            expectedSubRequestCount: 1,
+            expectedCacheInfo: [{
+              id: 'way["leisure"="park"](if:length()>300)',
+            }]
+          }, done)
+        })
+
+        it('possibly closed ways (fully cached)', function (done) {
+          test({
+            mode,
+            query: 'way[leisure=park](if: length() > 300)',
+            queryOptions: { properties: OverpassFrontend.GEOM|OverpassFrontend.TAGS },
+            expectedQuery: 'way["leisure"="park"](if:length()>300);',
+            expected: [ 'w24867728', 'w299696929' ],
+            expectedSubRequestCount: 0,
+            expectedCacheInfo: [{
+              id: 'way["leisure"="park"](if:length()>300)',
+            }]
+          }, done)
+        })
+
+        it('multi polygons', function (done) {
+          test({
+            mode,
+            query: 'relation[building](if: length() > 300)',
+            queryOptions: { properties: OverpassFrontend.GEOM|OverpassFrontend.TAGS|OverpassFrontend.MEMBERS },
+            expectedQuery: 'relation["building"](if:length()>300);',
+            expected: [ 'r1246553', 'r1283879', 'r2000126' ],
+            expectedSubRequestCount: 1,
+            expectedCacheInfo: [{
+              id: 'relation["building"](if:length()>300)',
+            }]
+          }, done)
+        })
+
+        it('multi polygons (fully cached)', function (done) {
+          test({
+            mode,
+            query: 'relation[building](if: length() > 300)',
+            queryOptions: { properties: OverpassFrontend.GEOM|OverpassFrontend.TAGS|OverpassFrontend.MEMBERS },
+            expectedQuery: 'relation["building"](if:length()>300);',
+            expected: [ 'r1246553', 'r1283879', 'r2000126' ],
+            expectedSubRequestCount: 0,
+            expectedCacheInfo: [{
+              id: 'relation["building"](if:length()>300)',
             }]
           }, done)
         })
@@ -742,7 +842,10 @@ function test (options, callback) {
     foundSubRequestCount++
   }
 
-  const request = overpassFrontend.BBoxQuery(options.query, null, {},
+  const request = overpassFrontend.BBoxQuery(
+    options.query,
+    null,
+    options.queryOptions || {},
     (err, ob) => {
       found.push(ob.id)
     },

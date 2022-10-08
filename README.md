@@ -73,6 +73,7 @@ The following functions are available:
 | type()   | Returns the type of the object |
 | debug(...) | Prints the value of the parameter to the JavaScript development console, returns the value |
 | count_tags() | Returns the count of tags of the object |
+| length() | Returns the length of the object in meters (0 for nodes) |
 
 Examples:
 ```
