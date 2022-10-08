@@ -1077,6 +1077,147 @@ describe('evaluators', function () {
     assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
 
+  it ('is_tag("name")', function () {
+    const eval = new Evaluator()
+    const str = eval.parse('is_tag("name")')
+    const expected = {
+      fun: 'is_tag',
+      parameters: ['name']
+    }
+    const expectedResult = 1
+    const expectedCompiled = 'is_tag("name")'
+    const expectedLokiQuery = {
+      'tags.name': { $exists: true }
+    }
+    const expectedCacheDescriptors = [
+      { filters: '(if:is_tag("name"))' }
+    ]
+
+    assert.deepEqual(eval.data, expected)
+    assert.equal(str, '')
+
+    let result = eval.exec({ id: 'n377992', osm_id: 377992, type: 'node', tags: { name: "foobar" } })
+    assert.equal(result, expectedResult)
+    result = eval.exec({ id: 'n377998', osm_id: 377998, type: 'node', tags: { operator: "bla" } })
+    assert.equal(result, 0)
+
+    assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
+
+    const descriptors = [{filters: ''}]
+    eval.cacheDescriptors(descriptors)
+    assert.deepEqual(descriptors, expectedCacheDescriptors)
+  })
+
+  /* TODO
+  it('is_tag("name") == 1', function () {
+    const eval = new Evaluator()
+    const str = eval.parse('is_tag("name") == 1')
+    const expected = {
+      left: {
+        fun: 'is_tag',
+        parameters: ['name']
+      },
+      op: '==',
+      right: 1
+    }
+    const expectedResult = 1
+    const expectedCompiled = 'is_tag("name")==1'
+    const expectedLokiQuery = {
+      'tags.name': { $exists: true }
+    }
+    const expectedCacheDescriptors = [
+      { filters: '(if:is_tag("name")==1)' }
+    ]
+
+    assert.deepEqual(eval.data, expected)
+    assert.equal(str, '')
+
+    let result = eval.exec({ id: 'n377992', osm_id: 377992, type: 'node', tags: { name: "foobar" } })
+    assert.equal(result, expectedResult)
+    result = eval.exec({ id: 'n377998', osm_id: 377998, type: 'node', tags: { operator: "bla" } })
+    assert.equal(result, 0)
+
+    assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
+
+    const descriptors = [{filters: ''}]
+    eval.cacheDescriptors(descriptors)
+    assert.deepEqual(descriptors, expectedCacheDescriptors)
+  })
+
+  it('is_tag("name") == 0', function () {
+    const eval = new Evaluator()
+    const str = eval.parse('is_tag("name") == 0')
+    const expected = {
+      left: {
+        fun: 'is_tag',
+        parameters: ['name']
+      },
+      op: '==',
+      right: 0
+    }
+    const expectedResult = 0
+    const expectedCompiled = 'is_tag("name")==0'
+    const expectedLokiQuery = {
+      'tags.name': { $exists: true }
+    }
+    const expectedCacheDescriptors = [
+      { filters: '(if:is_tag("name")==0)' }
+    ]
+
+    assert.deepEqual(eval.data, expected)
+    assert.equal(str, '')
+
+    let result = eval.exec({ id: 'n377992', osm_id: 377992, type: 'node', tags: { name: "foobar" } })
+    assert.equal(result, expectedResult)
+    result = eval.exec({ id: 'n377998', osm_id: 377998, type: 'node', tags: { operator: "bla" } })
+    assert.equal(result, 1)
+
+    assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
+
+    const descriptors = [{filters: ''}]
+    eval.cacheDescriptors(descriptors)
+    assert.deepEqual(descriptors, expectedCacheDescriptors)
+  })
+*/
+  it('!is_tag("name")', function () {
+    const eval = new Evaluator()
+    const str = eval.parse('!is_tag("name")')
+    const expected = {
+      left: null,
+      right: {
+        fun: 'is_tag',
+        parameters: ['name']
+      },
+      op: '!'
+    }
+    const expectedResult = 0
+    const expectedCompiled = '!is_tag("name")'
+    const expectedLokiQuery = {
+      'tags.name': { $exists: false }
+    }
+    const expectedCacheDescriptors = [
+      { filters: '(if:!is_tag("name"))' }
+    ]
+
+    assert.deepEqual(eval.data, expected)
+    assert.equal(str, '')
+
+    let result = eval.exec({ id: 'n377992', osm_id: 377992, type: 'node', tags: { name: "foobar" } })
+    assert.equal(result, expectedResult)
+    result = eval.exec({ id: 'n377998', osm_id: 377998, type: 'node', tags: { operator: "bla" } })
+    assert.equal(result, 1)
+
+    assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
+
+    const descriptors = [{filters: ''}]
+    eval.cacheDescriptors(descriptors)
+    assert.deepEqual(descriptors, expectedCacheDescriptors)
+  })
+
   it ('id() && type', function () {
     const eval = new Evaluator()
     const str = eval.parse('id() == 377992 && type() == "node"')

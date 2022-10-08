@@ -77,6 +77,13 @@ const compileLokiOperator = {
     if ('value' in right) {
       return { value: !right.value }
     }
+    if (right !== null && typeof right === 'object') {
+      const k = Object.keys(right)
+      if (k.length === 1 && '$exists' in right[k]) {
+        right[k].$exists = !right[k].$exists
+        return right
+      }
+    }
     return { needMatch: true }
   },
   '—': (left, right) => {
@@ -552,11 +559,11 @@ class Evaluator {
       const otherLeft = this.compileLokiJS(other.left)
       const otherRight = this.compileLokiJS(other.right)
 
-      if (current.left.fun && other.left.fun && JSON.stringify(current.left) === JSON.stringify(other.left) && 'value' in right && 'value' in otherRight) {
+      if (current.left && current.left.fun && other.left && other.left.fun && JSON.stringify(current.left) === JSON.stringify(other.left) && 'value' in right && 'value' in otherRight) {
         return current.op in opIsSupersetOfLeft && opIsSupersetOfLeft[current.op](right.value, other.op, otherRight.value)
       }
 
-      if (current.right.fun && other.right.fun && JSON.stringify(current.right) === JSON.stringify(other.right) && 'value' in left && 'value' in otherLeft) {
+      if (current.right && current.right.fun && other.right && other.right.fun && JSON.stringify(current.right) === JSON.stringify(other.right) && 'value' in left && 'value' in otherLeft) {
         return current.op in opIsSupersetOfRight && opIsSupersetOfRight[current.op](left.value, other.op, otherLeft.value)
       }
     }

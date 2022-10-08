@@ -744,6 +744,21 @@ var overpassFrontend
         })
       })
 
+      describe('is_tag()', function (done) {
+        it('single', function (done) {
+          test({
+            mode,
+            query: 'node[highway=crossing](if: is_tag("bicycle"))',
+            expectedQuery: 'node["highway"="crossing"](if:is_tag("bicycle"));',
+            expected: [ 'n252548482', 'n286198749', 'n286198796' ],
+            expectedSubRequestCount: 1,
+            expectedCacheInfo: [{
+              id: 'node["highway"="crossing"](if:is_tag("bicycle"))',
+            }]
+          }, done)
+        })
+      })
+
       describe('length()', function (done) {
         it('length()', function (done) {
           overpassFrontend.clearCache()

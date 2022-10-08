@@ -69,6 +69,7 @@ The following functions are available:
 | Function | Description                   |
 |----------|-------------------------------|
 | t["name"] | Value of the tag "name" (internally, the identifier 'tag' will be used) |
+| is_tag("name") | Returns 1 if the object has a tag "name", 0 otherwise. |
 | id()     | Returns the ID of the object  |
 | type()   | Returns the type of the object |
 | debug(...) | Prints the value of the parameter to the JavaScript development console, returns the value |
