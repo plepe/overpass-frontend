@@ -771,7 +771,14 @@ var overpassFrontend
             expectedCacheInfo: [{
               id: 'way["highway"](if:length()>500)',
             }]
-          }, done)
+          }, (err) => {
+            if (err) { return done(err) }
+
+            const ob = overpassFrontend.cacheElements.w199261366
+            assert.equal(ob.dbData.geomLength, 504.47617543211163, 'DB Data of object should have a length set')
+
+            done()
+          })
         })
 
         it('possibly closed ways', function (done) {

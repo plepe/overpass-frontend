@@ -376,6 +376,18 @@ class OverpassObject {
 
     return this.dbData
   }
+
+  dbSet (values) {
+    if (!this.dbData) {
+      this.dbInsert()
+    }
+
+    for (let k in values) {
+      this.dbData[k] = values[k]
+    }
+
+    this.overpass.db.update(this.dbData)
+  }
 }
 
 ee(OverpassObject.prototype)

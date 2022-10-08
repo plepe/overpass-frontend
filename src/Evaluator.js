@@ -25,9 +25,15 @@ const functions = {
   id: (p, context) => context.osm_id,
   type: (p, context) => context.type,
   length: (p, context) => {
-    const g = context.GeoJSON()
-    if (g && g.geometry) {
-      return turf.length(g, { units: 'kilometers' }) * 1000
+    if ('geomLength' in context.dbData) {
+      return context.dbData.geomLength
+    } else {
+      const g = context.GeoJSON()
+      if (g && g.geometry) {
+        const geomLength = turf.length(g, { units: 'kilometers' }) * 1000
+        context.dbSet({ geomLength })
+        return geomLength
+      }
     }
     return null
   },
