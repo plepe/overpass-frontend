@@ -203,6 +203,10 @@ function isNumber (v) {
   }
   return !!v.match(/^[0-9]+(\.[0-9]+)?$/)
 }
+function isValue (v) {
+  return v === null || ['number', 'string', 'boolean'].includes(typeof v)
+}
+
 
 class Evaluator {
   parse (str, rek = 0) {
@@ -350,7 +354,7 @@ class Evaluator {
       current = this.data
     }
 
-    if (current === null || ['number', 'string', 'boolean'].includes(typeof current)) {
+    if (isValue(current)) {
       return { value: current }
     }
 
@@ -378,7 +382,7 @@ class Evaluator {
       return [loki.value]
     }
 
-    if (current === null || ['number', 'string', 'boolean'].includes(typeof current)) {
+    if (isValue(current)) {
       return [current]
     } else if ('fun' in current) {
       const result = [{ fun: current.fun, parameters: [] }]
@@ -447,7 +451,7 @@ class Evaluator {
           descriptors.push(next)
         }
 
-        if (current === null || ['number', 'string', 'boolean'].includes(typeof current)) {
+        if (isValue(current)) {
           if (!current) {
             next.invalid = true
           }
