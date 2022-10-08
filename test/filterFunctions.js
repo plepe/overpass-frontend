@@ -852,6 +852,23 @@ var overpassFrontend
           }, done)
         })
       })
+
+      describe('is_closed()', function (done) {
+        it('is_closed()', function (done) {
+          overpassFrontend.clearCache()
+          test({
+            mode,
+            query: 'way[railway](if: is_closed())',
+            queryOptions: { properties: OverpassFrontend.GEOM|OverpassFrontend.TAGS },
+            expectedQuery: 'way["railway"](if:is_closed());',
+            expected: [ 'w122504890', 'w122504891', 'w140549303', 'w140994821', 'w140994822', 'w210845476', 'w228736330', 'w228788310', 'w228788312', 'w232385434', 'w232385435', 'w234116025', 'w235999782', 'w235999783', 'w235999784', 'w235999841', 'w236000374', 'w236000375', 'w236000518', 'w237737500', 'w237737503', 'w261111066', 'w29003228', 'w86282062' ],
+            expectedSubRequestCount: 1,
+            expectedCacheInfo: [{
+              id: 'way["railway"](if:is_closed())',
+            }]
+          }, done)
+        })
+      })
     })
   })
 })
