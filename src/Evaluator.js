@@ -217,18 +217,7 @@ class Evaluator {
       return current
     }
 
-    if ('op' in current) {
-      return current.eval(context)
-    }
-
-    if ('fun' in current) {
-      const param = current.parameters.map(p => this.exec(context, p))
-      if (!(current.fun in evaluatorFunctions)) {
-        console.error('No such evaluator function:', current.fun)
-      } else {
-        return current.eval(context)
-      }
-    }
+    return current.eval(context)
   }
 
   toString (current = undefined) {
@@ -283,9 +272,7 @@ class Evaluator {
       return { value: current }
     }
 
-    if ('op' in current || 'fun' in current) {
-      return current.compileLokiJS()
-    }
+    return current.compileLokiJS()
   }
 
   cacheExplode (current) {

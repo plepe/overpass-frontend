@@ -3,13 +3,5 @@ module.exports = function evaluatorExport (current) {
     return current
   }
 
-  if ('op' in current) {
-    return current.toJSON()
-  }
-
-  if ('fun' in current) {
-    return current.toJSON()
-  }
-
-  return current
+  return current.toJSON()
 }
