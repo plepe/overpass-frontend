@@ -20,7 +20,7 @@ describe('evaluators', function () {
       { filters: '(if:t["name"]=="foo")' }
     ]
 
-    assert.deepEqual(eval.export(), expected)
+    assert.deepEqual(eval.toJSON(), expected)
     assert.equal(str, '')
 
     const result = eval.exec({ tags: { name: 'foo' } })
@@ -47,7 +47,7 @@ describe('evaluators', function () {
       { filters: '(if:t["name"])' }
     ]
 
-    assert.deepEqual(eval.export(), expected)
+    assert.deepEqual(eval.toJSON(), expected)
     assert.equal(str, '')
 
     const result = eval.exec({ tags: { name: 'foo' } })
@@ -83,7 +83,7 @@ describe('evaluators', function () {
       { filters: '(if:t["operator"])' }
     ]
 
-    assert.deepEqual(eval.export(), expected)
+    assert.deepEqual(eval.toJSON(), expected)
     assert.equal(str, '')
 
     const result = eval.exec({ tags: { name: 'foo' } })
@@ -114,7 +114,7 @@ describe('evaluators', function () {
       { filters: '(if:t["width"]<10.5)' }
     ]
 
-    assert.deepEqual(eval.export(), expected)
+    assert.deepEqual(eval.toJSON(), expected)
     assert.equal(str, '')
 
     const result = eval.exec({ tags: { width: '5' } })
@@ -145,7 +145,7 @@ describe('evaluators', function () {
       { filters: '(if:"10.5">=t["width"])' }
     ]
 
-    assert.deepEqual(eval.export(), expected)
+    assert.deepEqual(eval.toJSON(), expected)
     assert.equal(str, '')
 
     const result = eval.exec({ tags: { width: '5' } })
@@ -174,7 +174,7 @@ describe('evaluators', function () {
       { filters: '(if:t["name"]==t["operator"])' }
     ]
 
-    assert.deepEqual(eval.export(), expected)
+    assert.deepEqual(eval.toJSON(), expected)
     assert.equal(str, '')
 
     const result = eval.exec({ tags: { name: 'foo' } })
@@ -203,7 +203,7 @@ describe('evaluators', function () {
       { filters: '' }
     ]
 
-    assert.deepEqual(eval.export(), expected)
+    assert.deepEqual(eval.toJSON(), expected)
     assert.equal(str, '')
 
     const result = eval.exec({ tags: { name: 'foo' } })
@@ -232,7 +232,7 @@ describe('evaluators', function () {
       { filters: '' }
     ]
 
-    assert.deepEqual(eval.export(), expected)
+    assert.deepEqual(eval.toJSON(), expected)
     assert.equal(str, '')
 
     const result = eval.exec({ tags: { name: 'foo' } })
@@ -265,7 +265,7 @@ describe('evaluators', function () {
       { filters: '' }
     ]
 
-    assert.deepEqual(eval.export(), expected)
+    assert.deepEqual(eval.toJSON(), expected)
     assert.equal(str, '')
 
     const result = eval.exec({ tags: { name: 'foo' } })
@@ -315,7 +315,7 @@ describe('evaluators', function () {
       { filters: '(if:t["name"]=="bar")' }
     ]
 
-    assert.deepEqual(eval.export(), expected)
+    assert.deepEqual(eval.toJSON(), expected)
     assert.equal(str, '')
 
     const result = eval.exec({ tags: { name: 'foo' } })
@@ -380,7 +380,7 @@ describe('evaluators', function () {
       { filters: '(if:t["alice"]=="bob")' }
     ]
 
-    assert.deepEqual(eval.export(), expected)
+    assert.deepEqual(eval.toJSON(), expected)
     assert.equal(str, '')
 
     const result = eval.exec({ tags: { name: 'foo' } })
@@ -443,7 +443,7 @@ describe('evaluators', function () {
       { filters: '(if:t["name"]=="foo")(if:t["name"]=="bar")(if:t["alice"]=="bob")' }
     ]
 
-    assert.deepEqual(eval.export(), expected)
+    assert.deepEqual(eval.toJSON(), expected)
     assert.equal(str, '')
 
     const result = eval.exec({ tags: { name: 'foo' } })
@@ -472,7 +472,7 @@ describe('evaluators', function () {
       { filters: '' }
     ]
 
-    assert.deepEqual(eval.export(), expected)
+    assert.deepEqual(eval.toJSON(), expected)
     assert.equal(str, '')
 
     const result = eval.exec({ tags: { name: 'foo' } })
@@ -505,7 +505,7 @@ describe('evaluators', function () {
       { filters: '' }
     ]
 
-    assert.deepEqual(eval.export(), expected)
+    assert.deepEqual(eval.toJSON(), expected)
     assert.equal(str, '')
 
     const result = eval.exec({ tags: { name: 'foo' } })
@@ -543,7 +543,7 @@ describe('evaluators', function () {
       { filters: '' }
     ]
 
-    assert.deepEqual(eval.export(), expected)
+    assert.deepEqual(eval.toJSON(), expected)
     assert.equal(str, '')
 
     const result = eval.exec({ tags: { name: 'foo' } })
@@ -580,7 +580,7 @@ describe('evaluators', function () {
       { filters: '' }
     ]
 
-    assert.deepEqual(eval.export(), expected)
+    assert.deepEqual(eval.toJSON(), expected)
     assert.equal(str, '')
 
     const result = eval.exec({ tags: { name: 'foo' } })
@@ -613,7 +613,7 @@ describe('evaluators', function () {
       { filters: '' }
     ]
 
-    assert.deepEqual(eval.export(), expected)
+    assert.deepEqual(eval.toJSON(), expected)
     assert.equal(str, '')
 
     const result = eval.exec({ tags: { name: 'foo' } })
@@ -645,7 +645,7 @@ describe('evaluators', function () {
       { filters: '' }
     ]
 
-    assert.deepEqual(eval.export(), expected)
+    assert.deepEqual(eval.toJSON(), expected)
     assert.equal(str, '')
 
     const result = eval.exec({ tags: { name: 'foo' } })
@@ -682,7 +682,7 @@ describe('evaluators', function () {
       { filters: '' }
     ]
 
-    assert.deepEqual(eval.export(), expected)
+    assert.deepEqual(eval.toJSON(), expected)
     assert.equal(str, '')
 
     const result = eval.exec({ tags: { name: 'foo' } })
@@ -711,7 +711,7 @@ describe('evaluators', function () {
       { filters: '' }
     ]
 
-    assert.deepEqual(eval.export(), expected)
+    assert.deepEqual(eval.toJSON(), expected)
     assert.equal(str, '')
 
     const result = eval.exec({ tags: { name: 'foo' } })
@@ -749,7 +749,7 @@ describe('evaluators', function () {
       { filters: '' }
     ]
 
-    assert.deepEqual(eval.export(), expected)
+    assert.deepEqual(eval.toJSON(), expected)
     assert.equal(str, '')
 
     const result = eval.exec({ tags: { name: 'foo' } })
@@ -791,7 +791,7 @@ describe('evaluators', function () {
       { filters: '' }
     ]
 
-    assert.deepEqual(eval.export(), expected)
+    assert.deepEqual(eval.toJSON(), expected)
     assert.equal(str, '')
 
     const result = eval.exec({ tags: { name: 'foo' } })
@@ -820,7 +820,7 @@ describe('evaluators', function () {
       { filters: '', invalid: true }
     ]
 
-    assert.deepEqual(eval.export(), expected)
+    assert.deepEqual(eval.toJSON(), expected)
     assert.equal(str, '')
 
     const result = eval.exec({ tags: { name: 'foo' } })
@@ -857,7 +857,7 @@ describe('evaluators', function () {
       { filters: '' }
     ]
 
-    assert.deepEqual(eval.export(), expected)
+    assert.deepEqual(eval.toJSON(), expected)
     assert.equal(str, '')
 
     const result = eval.exec({ tags: { name: 'foo' } })
@@ -895,7 +895,7 @@ describe('evaluators', function () {
       { filters: '(if:t["name3"]+"bar")' }
     ]
 
-    assert.deepEqual(eval.export(), expected)
+    assert.deepEqual(eval.toJSON(), expected)
     assert.equal(str, '')
 
     const result = eval.exec({ tags: { name3: 'foo' } })
@@ -935,7 +935,7 @@ describe('evaluators', function () {
       { filters: '(if:t["name3"]=="bar")' }
     ]
 
-    assert.deepEqual(eval.export(), expected)
+    assert.deepEqual(eval.toJSON(), expected)
     assert.equal(str, '')
 
     const result = eval.exec({ tags: { name3: 'foo' } })
@@ -967,7 +967,7 @@ describe('evaluators', function () {
       { filters: '(if:t["ref"]-5)' }
     ]
 
-    assert.deepEqual(eval.export(), expected)
+    assert.deepEqual(eval.toJSON(), expected)
     assert.equal(str, '')
 
     const result = eval.exec({ tags: { name3: 'foo', ref: '5' } })
@@ -992,7 +992,7 @@ describe('evaluators', function () {
       { filters: '' }
     ]
 
-    assert.deepEqual(eval.export(), expected)
+    assert.deepEqual(eval.toJSON(), expected)
     assert.equal(str, ')')
 
     const result = eval.exec({ tags: { name3: 'foo' } })
@@ -1020,7 +1020,7 @@ describe('evaluators', function () {
       { filters: '(if:count_tags())' }
     ]
 
-    assert.deepEqual(eval.export(), expected)
+    assert.deepEqual(eval.toJSON(), expected)
     assert.equal(str, '')
 
     // object with one tag
@@ -1061,7 +1061,7 @@ describe('evaluators', function () {
       { filters: '(if:id()==377992)' }
     ]
 
-    assert.deepEqual(eval.export(), expected)
+    assert.deepEqual(eval.toJSON(), expected)
     assert.equal(str, '')
 
     let result = eval.exec({ id: 'n377992', osm_id: 377992, type: 'node' })
@@ -1093,7 +1093,7 @@ describe('evaluators', function () {
       { filters: '(if:is_closed())' }
     ]
 
-    assert.deepEqual(eval.export(), expected)
+    assert.deepEqual(eval.toJSON(), expected)
     assert.equal(str, '')
 
     let result = eval.exec({ id: 'w377992', osm_id: 377992, type: 'way', members: [ {id: 'n1'}, {id: 'n2'}, {id: 'n1' }]})
@@ -1123,7 +1123,7 @@ describe('evaluators', function () {
       { filters: '(if:is_tag("name"))' }
     ]
 
-    assert.deepEqual(eval.export(), expected)
+    assert.deepEqual(eval.toJSON(), expected)
     assert.equal(str, '')
 
     let result = eval.exec({ id: 'n377992', osm_id: 377992, type: 'node', tags: { name: "foobar" } })
@@ -1160,7 +1160,7 @@ describe('evaluators', function () {
       { filters: '(if:is_tag("name")==1)' }
     ]
 
-    assert.deepEqual(eval.export(), expected)
+    assert.deepEqual(eval.toJSON(), expected)
     assert.equal(str, '')
 
     let result = eval.exec({ id: 'n377992', osm_id: 377992, type: 'node', tags: { name: "foobar" } })
@@ -1196,7 +1196,7 @@ describe('evaluators', function () {
       { filters: '(if:is_tag("name")==0)' }
     ]
 
-    assert.deepEqual(eval.export(), expected)
+    assert.deepEqual(eval.toJSON(), expected)
     assert.equal(str, '')
 
     let result = eval.exec({ id: 'n377992', osm_id: 377992, type: 'node', tags: { name: "foobar" } })
@@ -1233,7 +1233,7 @@ describe('evaluators', function () {
       { filters: '(if:!is_tag("name"))' }
     ]
 
-    assert.deepEqual(eval.export(), expected)
+    assert.deepEqual(eval.toJSON(), expected)
     assert.equal(str, '')
 
     let result = eval.exec({ id: 'n377992', osm_id: 377992, type: 'node', tags: { name: "foobar" } })
@@ -1284,7 +1284,7 @@ describe('evaluators', function () {
       { filters: '(if:id()==377992)(if:type()=="node")' }
     ]
 
-    assert.deepEqual(eval.export(), expected)
+    assert.deepEqual(eval.toJSON(), expected)
     assert.equal(str, '')
 
     let result = eval.exec({ id: 'n377992', osm_id: 377992, type: 'node' })

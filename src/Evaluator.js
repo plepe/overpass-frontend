@@ -132,7 +132,7 @@ function nextOp (current, op, that) {
 }
 
 class Evaluator {
-  export (current = undefined) {
+  toJSON () {
     return evaluatorExport(this.data)
   }
 

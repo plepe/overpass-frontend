@@ -7,10 +7,6 @@ module.exports = class EF {
     this.master = master
   }
 
-  export () {
-    return { fun: this.fun, parameters: this.parameters.map(p => evaluatorExport(p)) }
-  }
-
   toJSON () {
     return { fun: this.fun, parameters: this.parameters.map(p => evaluatorExport(p)) }
   }

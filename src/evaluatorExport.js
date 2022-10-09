@@ -4,11 +4,11 @@ module.exports = function evaluatorExport (current) {
   }
 
   if ('op' in current) {
-    return { op: current.op, left: evaluatorExport(current.left), right: evaluatorExport(current.right) }
+    return current.toJSON()
   }
 
   if ('fun' in current) {
-    return current.export()
+    return current.toJSON()
   }
 
   return current
