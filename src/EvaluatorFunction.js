@@ -11,6 +11,10 @@ module.exports = class EF {
     return { fun: this.fun, parameters: this.parameters.map(p => evaluatorExport(p)) }
   }
 
+  toJSON () {
+    return { fun: this.fun, parameters: this.parameters.map(p => evaluatorExport(p)) }
+  }
+
   compileLokiJS () {
     return { needMatch: true }
   }

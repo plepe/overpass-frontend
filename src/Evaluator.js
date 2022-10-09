@@ -1,141 +1,12 @@
 const parseString = require('./parseString')
 
-const evaluatorFunctions = require('./evaluator/__index__')
+const evaluatorFunctions = require('./evaluator/__functions__')
+const evaluatorOperators = require('./evaluator/__operators__')
 const evaluatorExport = require('./evaluatorExport')
+const evaluatorHelper = require('./evaluatorHelper')
+const isNumber = evaluatorHelper.isNumber
+const isValue = evaluatorHelper.isValue
 
-const operators = {
-  '||': (a, b) => a || b,
-  '&&': (a, b) => a && b,
-  /* eslint-disable eqeqeq */
-  '!=': (a, b) => a != b,
-  '==': (a, b) => a == b,
-  /* eslint-enable eqeqeq */
-  '<': (a, b) => a < b,
-  '<=': (a, b) => a <= b,
-  '>': (a, b) => a > b,
-  '>=': (a, b) => a >= b,
-  '+': (a, b) => a + b,
-  '-': (a, b) => a - b,
-  '*': (a, b) => a * b,
-  '/': (a, b) => a / b,
-  '!': (a, b) => b ? 0 : 1,
-  '—': (a, b) => -b
-}
-const opPriorities = {
-  '||': 7,
-  '&&': 6,
-  '!=': 5,
-  '==': 5,
-  '<': 4,
-  '<=': 4,
-  '>': 4,
-  '>=': 4,
-  '+': 3,
-  '-': 3,
-  '*': 2,
-  '/': 2,
-  '!': 1,
-  '—': 0 // unary minus
-}
-function compileLokiOperatorComp (left, right, leftOp, rightOp, op) {
-  const r = {}
-  const comp = {}
-  if (left && Object.values(left) && JSON.stringify(Object.values(left)[0]) === '{"$exists":true}' && right && 'value' in right) {
-    const prop = Object.keys(left)[0]
-    comp[leftOp] = right.value
-    r[prop] = comp
-    return r
-  } else if (left && 'value' in left && right && Object.values(right) && JSON.stringify(Object.values(right)[0]) === '{"$exists":true}') {
-    const prop = Object.keys(right)[0]
-    comp[rightOp] = left.value
-    r[prop] = comp
-    return r
-  } else if ('value' in left && 'value' in right) {
-    return { value: operators[op](left.value, right.value) }
-  } else {
-    return { needMatch: true }
-  }
-}
-function compileLokiOperatorMath (left, right, op) {
-  if ('value' in left && 'value' in right) {
-    return { value: operators[op](left.value, right.value) }
-  } else {
-    return { needMatch: true }
-  }
-}
-const compileLokiOperator = {
-  '==': (left, right) => compileLokiOperatorComp(left, right, '$eq', '$eq', '=='),
-  '!=': (left, right) => compileLokiOperatorComp(left, right, '$ne', '$ne', '!='),
-  '<': (left, right) => compileLokiOperatorComp(left, right, '$lt', '$gt', '<'),
-  '>': (left, right) => compileLokiOperatorComp(left, right, '$gt', '$lt', '>'),
-  '<=': (left, right) => compileLokiOperatorComp(left, right, '$lte', '$gte', '<='),
-  '>=': (left, right) => compileLokiOperatorComp(left, right, '$gte', '$lte', '>='),
-  '+': (left, right) => compileLokiOperatorMath(left, right, '+'),
-  '-': (left, right) => compileLokiOperatorMath(left, right, '-'),
-  '*': (left, right) => compileLokiOperatorMath(left, right, '*'),
-  '/': (left, right) => compileLokiOperatorMath(left, right, '/'),
-  '!': (left, right) => {
-    if ('value' in right) {
-      return { value: !right.value }
-    }
-    if (right !== null && typeof right === 'object') {
-      const k = Object.keys(right)
-      if (k.length === 1 && '$exists' in right[k]) {
-        right[k].$exists = !right[k].$exists
-        return right
-      }
-    }
-    return { needMatch: true }
-  },
-  '—': (left, right) => {
-    if ('value' in right) {
-      return { value: -right.value }
-    }
-    return { needMatch: true }
-  },
-  '||': function (left, right) {
-    if ('value' in left) {
-      return left.value ? { value: true } : right
-    }
-
-    const leftNeedMatch = left.needMatch
-    const rightNeedMatch = right.needMatch
-    delete left.needMatch
-    delete right.needMatch
-    const leftKeys = Object.keys(left)
-    const rightKeys = Object.keys(right)
-
-    if (!leftKeys.length && rightKeys.length) {
-      right.needMatch = !!(left.needMatch || right.needMatch)
-      return right
-    }
-    if (leftKeys.length && !rightKeys.length) {
-      left.needMatch = !!(left.needMatch || right.needMatch)
-      return left
-    }
-
-    return { $or: [left, right], needMatch: !!(leftNeedMatch || rightNeedMatch) }
-  },
-  '&&': function (left, right) {
-    const leftNeedMatch = left.needMatch
-    const rightNeedMatch = right.needMatch
-    delete left.needMatch
-    delete right.needMatch
-    const leftKeys = Object.keys(left)
-    const rightKeys = Object.keys(right)
-
-    if (!leftKeys.length && rightKeys.length) {
-      right.needMatch = !!(leftNeedMatch || rightNeedMatch)
-      return right
-    }
-    if (leftKeys.length && !rightKeys.length) {
-      left.needMatch = !!(leftNeedMatch || rightNeedMatch)
-      return left
-    }
-
-    return { $and: [left, right], needMatch: !!(leftNeedMatch || rightNeedMatch) }
-  }
-}
 const opIsSupersetOfLeft = {
   '==' (currentValue, otherOp, otherValue) {
     switch (otherOp) {
@@ -247,26 +118,17 @@ function nextParam (current, def) {
   return current
 }
 
-function nextOp (current, op) {
-  if (current && current.op && opPriorities[op] < opPriorities[current.op]) {
-    current.right = { op, left: current.right || null }
+function nextOp (current, op, that) {
+  const c = new evaluatorOperators[op](op, current, null, that)
+
+  if (current && current.op && c.priority() < current.priority()) {
+    c.left = current.right || null
+    current.right = c
   } else {
-    current = { op, left: current }
+    current = c
   }
 
   return current
-}
-function isNumber (v) {
-  if (typeof v === 'number') {
-    return true
-  }
-  if (typeof v === 'boolean' || v === null || v === undefined) {
-    return false
-  }
-  return !!v.match(/^[0-9]+(\.[0-9]+)?$/)
-}
-function isValue (v) {
-  return v === null || ['number', 'string', 'boolean'].includes(typeof v)
 }
 
 class Evaluator {
@@ -290,7 +152,7 @@ class Evaluator {
           this.data = next(this.data, parseFloat(m[3]))
           mode = 1
         } else if (['!', '-'].includes(m[5])) { // negation or unary minus (—)
-          this.data = nextOp(this.data, m[5] === '-' ? '—' : m[5])
+          this.data = nextOp(this.data, m[5] === '-' ? '—' : m[5], this)
           str = str.substr(m[1].length + m[5].length)
         } else if (m[5]) {
           let s
@@ -317,7 +179,7 @@ class Evaluator {
 
         const m = str.match(/^\s*([=!]=|[<>]=?|[+*-/]|&&|\|\|)/)
         if (!m) { throw new Error('mode 1') }
-        this.data = nextOp(this.data, m[1])
+        this.data = nextOp(this.data, m[1], this)
         str = str.substr(m[0].length)
         mode = 0
       } else if (mode === 10) {
@@ -356,13 +218,7 @@ class Evaluator {
     }
 
     if ('op' in current) {
-      let left = this.exec(context, current.left)
-      let right = this.exec(context, current.right)
-      if (isNumber(left) && isNumber(right)) {
-        left = parseFloat(left)
-        right = parseFloat(right)
-      }
-      return operators[current.op](left, right)
+      return current.eval(context)
     }
 
     if ('fun' in current) {
@@ -427,14 +283,7 @@ class Evaluator {
       return { value: current }
     }
 
-    if ('op' in current) {
-      const left = this.compileLokiJS(current.left)
-      const right = this.compileLokiJS(current.right)
-
-      return compileLokiOperator[current.op](left, right)
-    }
-
-    if ('fun' in current) {
+    if ('op' in current || 'fun' in current) {
       return current.compileLokiJS()
     }
   }
