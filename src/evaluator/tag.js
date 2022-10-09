@@ -6,6 +6,11 @@ module.exports = class EF_tag extends EF {
     return context.tags && context.tags[param[0]]
   }
 
+  toString () {
+    const param = this.parameters[0].toString()
+    return 't[' + param + ']'
+  }
+
   compileLokiJS () {
     const param = this.parameters.map(p => this.master.compileLokiJS(p))
 

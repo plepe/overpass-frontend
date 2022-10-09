@@ -14,6 +14,10 @@ module.exports = class EO_negation extends EO {
     return 1
   }
 
+  toString () {
+    return '!' + this.right.toString()
+  }
+
   compileLokiJS () {
     const right = this.master.compileLokiJS(this.right)
 

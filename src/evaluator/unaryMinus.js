@@ -10,6 +10,10 @@ module.exports = class EO_unaryMinus extends EO {
     return -right
   }
 
+  toString () {
+    return '-' + this.right.toString()
+  }
+
   priority () {
     return 0
   }

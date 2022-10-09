@@ -16,6 +16,10 @@ module.exports = class EO_conjunction extends EO {
     return 6
   }
 
+  toString () {
+    return this.left.toString() + '&&' + this.right.toString()
+  }
+
   compileLokiJS () {
     const left = this.master.compileLokiJS(this.left)
     const right = this.master.compileLokiJS(this.right)

@@ -12,6 +12,10 @@ module.exports = class EO_disjunction extends EO {
     return left || right
   }
 
+  toString () {
+    return this.left.toString() + '||' + this.right.toString()
+  }
+
   priority () {
     return 7
   }

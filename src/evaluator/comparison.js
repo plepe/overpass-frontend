@@ -47,6 +47,10 @@ module.exports = class EO_comparison extends EO {
     return functions[this.op](left, right)
   }
 
+  toString () {
+    return this.left.toString() + this.op + this.right.toString()
+  }
+
   priority () {
     return priorities[this.op]
   }
