@@ -4,6 +4,7 @@ const evaluatorFunctions = require('./evaluator/__functions__')
 const evaluatorOperators = require('./evaluator/__operators__')
 const evaluatorExport = require('./evaluatorExport')
 const evaluatorHelper = require('./evaluatorHelper')
+const EvaluatorValue = require('./EvaluatorValue')
 const isNumber = evaluatorHelper.isNumber
 const isValue = evaluatorHelper.isValue
 
@@ -149,7 +150,7 @@ class Evaluator {
         }
         if (m[3]) {
           str = str.substr(m[1].length + m[3].length)
-          this.data = next(this.data, parseFloat(m[3]))
+          this.data = next(this.data, new EvaluatorValue(parseFloat(m[3]), this))
           mode = 1
         } else if (['!', '-'].includes(m[5])) { // negation or unary minus (—)
           this.data = nextOp(this.data, m[5] === '-' ? '—' : m[5], this)
@@ -157,7 +158,7 @@ class Evaluator {
         } else if (m[5]) {
           let s
           [s, str] = parseString(str.substr(m[1].length))
-          this.data = next(this.data, s)
+          this.data = next(this.data, new EvaluatorValue(s, this))
           mode = 1
         } else if (m[6]) {
           mode = 10
@@ -185,7 +186,7 @@ class Evaluator {
       } else if (mode === 10) {
         let s
         [s, str] = parseString(str)
-        this.data = next(this.data, new evaluatorFunctions.tag('tag', [s], this))
+        this.data = next(this.data, new evaluatorFunctions.tag('tag', [new EvaluatorValue(s)], this))
         mode = 11
       } else if (mode === 11) {
         const m = str.match(/^\s*\]/)
@@ -225,6 +226,7 @@ class Evaluator {
       current = this.data
     }
 
+    /* to remove */
     if (current === null) {
       return '""'
     }
@@ -242,25 +244,9 @@ class Evaluator {
     if (typeof current === 'boolean') {
       return current ? '1' : '0'
     }
+    /* /to remove */
 
-    if ('op' in current) {
-      const right = this.toString(current.right)
-      if (current.left === null) {
-        return (current.op === '—' ? '-' : current.op) + right
-      } else {
-        const left = this.toString(current.left)
-        return left + current.op + right
-      }
-    }
-
-    if ('fun' in current) {
-      const param = current.parameters.map(p => this.toString(p))
-      if (current.fun === 'tag') {
-        return 't[' + param[0] + ']'
-      } else {
-        return current.fun + '(' + param.join(',') + ')'
-      }
-    }
+    return current.toString()
   }
 
   compileLokiJS (current = undefined) {
