@@ -1,7 +1,7 @@
 const EO = require('../EvaluatorOperator')
 const evaluatorHelper = require('../evaluatorHelper')
 
-module.exports = class EO_simpleMath extends EO {
+module.exports = class EO_disjunction extends EO {
   eval (context) {
     let left = this.master.exec(context, this.left)
     let right = this.master.exec(context, this.right)

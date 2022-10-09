@@ -1,6 +1,6 @@
 const EF = require('../EvaluatorFunction')
 
-module.exports = class EF_is_closed extends EF {
+module.exports = class EF_tag extends EF {
   eval (context) {
     const param = this.parameters.map(p => this.master.exec(context, p))
     return context.tags && context.tags[param[0]]
