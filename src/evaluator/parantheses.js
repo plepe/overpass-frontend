@@ -6,6 +6,6 @@ module.exports = class EF_parantheses extends EF {
   }
 
   compileLokiJS () {
-    return this.parameters[0]
+    return this.master.compileLokiJS(this.parameters[0])
   }
 }

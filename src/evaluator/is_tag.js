@@ -2,13 +2,16 @@ const EF = require('../EvaluatorFunction')
 
 module.exports = class EF_is_tag extends EF {
   eval (context) {
-    return context.tags && this.parameters[0] in context.tags ? 1 : 0
+    const param = this.parameters.map(p => this.master.exec(context, p))
+    return (context.tags && param[0] in context.tags) ? 1 : 0
   }
 
   compileLokiJS () {
-    if (this.parameters[0] && 'value' in this.parameters[0]) {
+    const param = this.parameters.map(p => this.master.compileLokiJS(p))
+
+    if (param[0] && 'value' in param[0]) {
       const r = {}
-      r['tags.' + this.parameters[0].value] = { $exists: true }
+      r['tags.' + param[0].value] = { $exists: true }
       return r
     }
   }

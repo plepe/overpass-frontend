@@ -1,6 +1,7 @@
 const parseString = require('./parseString')
 
 const evaluatorFunctions = require('./evaluator/__index__')
+const evaluatorExport = require('./evaluatorExport')
 
 const operators = {
   '||': (a, b) => a || b,
@@ -269,6 +270,10 @@ function isValue (v) {
 }
 
 class Evaluator {
+  export (current = undefined) {
+    return evaluatorExport(this.data)
+  }
+
   parse (str, rek = 0) {
     this.data = null
     let mode = 0
@@ -298,7 +303,7 @@ class Evaluator {
         } else if (m[7] !== undefined) {
           mode = 20
           str = str.substr(m[1].length + m[7].length + 1)
-          this.data = next(this.data, { fun: m[7], parameters: [] })
+          this.data = next(this.data, new evaluatorFunctions[m[7]](m[7], [], this))
         } else if (m[8]) {
           str = str.substr(m[1].length)
           return str
@@ -318,7 +323,7 @@ class Evaluator {
       } else if (mode === 10) {
         let s
         [s, str] = parseString(str)
-        this.data = next(this.data, new evaluatorFunctions.tag('tag', [s]))
+        this.data = next(this.data, new evaluatorFunctions.tag('tag', [s], this))
         mode = 11
       } else if (mode === 11) {
         const m = str.match(/^\s*\]/)
@@ -365,7 +370,7 @@ class Evaluator {
       if (!(current.fun in evaluatorFunctions)) {
         console.error('No such evaluator function:', current.fun)
       } else {
-        return evaluatorFunctions[current.fun].eval(param, context, this)
+        return current.eval(context)
       }
     }
   }
@@ -430,13 +435,7 @@ class Evaluator {
     }
 
     if ('fun' in current) {
-      const param = current.parameters.map(p => this.compileLokiJS(p))
-
-      if (!evaluatorFunctions[current.fun] || !evaluatorFunctions[current.fun].compileLokiJS) {
-        console.error('compile evaluator function not defined:', current.fun)
-        return { needMatch: true }
-      }
-      return evaluatorFunctions[current.fun].compileLokiJS(param)
+      return current.compileLokiJS()
     }
   }
 
