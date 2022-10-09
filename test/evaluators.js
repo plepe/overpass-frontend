@@ -1139,7 +1139,6 @@ describe('evaluators', function () {
     assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
 
-  /* TODO
   it('is_tag("name") == 1', function () {
     const eval = new Evaluator()
     const str = eval.parse('is_tag("name") == 1')
@@ -1211,7 +1210,7 @@ describe('evaluators', function () {
     eval.cacheDescriptors(descriptors)
     assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
-*/
+
   it('!is_tag("name")', function () {
     const eval = new Evaluator()
     const str = eval.parse('!is_tag("name")')

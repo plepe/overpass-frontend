@@ -1,9 +1,11 @@
-module.exports = {
-  eval (p, context, that) {
-    return that.exec(context, p[0])
-  },
+const EF = require('../EvaluatorFunction')
 
-  compileLokiJS (param) {
-    return param[0]
+module.exports = class EF_parantheses extends EF {
+  eval (context) {
+    return this.master.exec(context, this.parameters[0])
+  }
+
+  compileLokiJS () {
+    return this.parameters[0]
   }
 }

@@ -1,7 +1,8 @@
 const turf = require('../turf')
+const EF = require('../EvaluatorFunction')
 
-module.exports = {
-  eval (p, context) {
+module.exports = class EF_length extends EF {
+  eval (context) {
     if ('geomLength' in context.dbData) {
       return context.dbData.geomLength
     } else {
@@ -13,7 +14,7 @@ module.exports = {
       }
     }
     return null
-  },
+  }
 
   compileLokiJS (param) {
     return { needMatch: true }

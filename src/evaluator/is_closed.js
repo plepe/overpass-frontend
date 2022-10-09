@@ -1,5 +1,7 @@
-module.exports = {
-  eval (p, context) {
+const EF = require('../EvaluatorFunction')
+
+module.exports = class EF_is_closed extends EF {
+  eval (context) {
     if (context.type !== 'way') {
       return 0
     }

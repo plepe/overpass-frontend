@@ -1,9 +1,11 @@
-module.exports = {
-  eval (p, context) {
-    return context.osm_id
-  },
+const EF = require('../EvaluatorFunction')
 
-  compileLokiJS (param) {
+module.exports = class EF_id extends EF {
+  eval (context) {
+    return context.osm_id
+  }
+
+  compileLokiJS () {
     return { osm_id: { $exists: true } }
   }
 }

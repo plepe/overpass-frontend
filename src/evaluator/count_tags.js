@@ -1,8 +1,7 @@
-module.exports = {
-  eval (p, context) {
-    return context.tags ? Object.keys(context.tags).length : null
-  },
+const EF = require('../EvaluatorFunction')
 
-//  compileLokiJS (param) {
-//  }
+module.exports = class EF_count_tags extends EF {
+  eval (context) {
+    return context.tags ? Object.keys(context.tags).length : null
+  }
 }

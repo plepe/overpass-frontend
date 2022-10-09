@@ -318,7 +318,7 @@ class Evaluator {
       } else if (mode === 10) {
         let s
         [s, str] = parseString(str)
-        this.data = next(this.data, { fun: 'tag', parameters: [s] })
+        this.data = next(this.data, new evaluatorFunctions.tag('tag', [s]))
         mode = 11
       } else if (mode === 11) {
         const m = str.match(/^\s*\]/)
@@ -449,7 +449,7 @@ class Evaluator {
     if (isValue(current)) {
       return [current]
     } else if ('fun' in current) {
-      const result = [{ fun: current.fun, parameters: [] }]
+      const result = [new evaluatorFunctions[current.fun](current.fun, [], this)]
       current.parameters.forEach(p => {
         const pn = this.cacheExplode(p)
         result.forEach(r => {
