@@ -35,6 +35,92 @@ const lokiOperatorRight = {
   '>': '$lt',
   '>=': '$lte'
 }
+const opIsSupersetOfLeft = {
+  '==' (currentValue, otherOp, otherValue) {
+    switch (otherOp) {
+      case '==':
+        /* eslint-disable eqeqeq */
+        return currentValue == otherValue
+  /* eslint-enable eqeqeq */
+    }
+  },
+  '!=' (currentValue, otherOp, otherValue) {
+    return false
+  },
+  '<' (currentValue, otherOp, otherValue) {
+    switch (otherOp) {
+      case '<':
+      case '<=':
+        return currentValue > otherValue
+    }
+  },
+  '<=' (currentValue, otherOp, otherValue) {
+    switch (otherOp) {
+      case '<':
+      case '<=':
+      case '==':
+        return currentValue >= otherValue
+    }
+  },
+  '>' (currentValue, otherOp, otherValue) {
+    switch (otherOp) {
+      case '>':
+      case '>=':
+        return currentValue < otherValue
+    }
+  },
+  '>=' (currentValue, otherOp, otherValue) {
+    switch (otherOp) {
+      case '>':
+      case '>=':
+      case '==':
+        return currentValue <= otherValue
+    }
+  }
+}
+const opIsSupersetOfRight = {
+  '==' (currentValue, otherOp, otherValue) {
+    switch (otherOp) {
+      case '==':
+        /* eslint-disable eqeqeq */
+        return currentValue == otherValue
+  /* eslint-enable eqeqeq */
+    }
+  },
+  '!=' (currentValue, otherOp, otherValue) {
+    return false
+  },
+  '<' (currentValue, otherOp, otherValue) {
+    switch (otherOp) {
+      case '<':
+      case '<=':
+        return currentValue < otherValue
+    }
+  },
+  '<=' (currentValue, otherOp, otherValue) {
+    switch (otherOp) {
+      case '<':
+      case '<=':
+      case '==':
+        return currentValue <= otherValue
+    }
+  },
+  '>' (currentValue, otherOp, otherValue) {
+    switch (otherOp) {
+      case '>':
+      case '>=':
+        return currentValue > otherValue
+    }
+  },
+  '>=' (currentValue, otherOp, otherValue) {
+    switch (otherOp) {
+      case '>':
+      case '>=':
+      case '==':
+        return currentValue >= otherValue
+    }
+  }
+}
 
 module.exports = class EO_comparison extends EO {
   eval (context) {
@@ -77,6 +163,26 @@ module.exports = class EO_comparison extends EO {
       return { value: functions[this.op](left.value, right.value) }
     } else {
       return { needMatch: true }
+    }
+  }
+
+  isSupersetOf (other) {
+    const r = super.isSupersetOf(other)
+    if (r !== undefined) {
+      return r
+    }
+
+    const left = this.left.compileLokiJS()
+    const right = this.right.compileLokiJS()
+    const otherLeft = other.left.compileLokiJS()
+    const otherRight = other.right.compileLokiJS()
+
+    if (this.left && this.left.fun && other.left && other.left.fun && JSON.stringify(this.left) === JSON.stringify(other.left) && 'value' in right && 'value' in otherRight) {
+      return this.op in opIsSupersetOfLeft && opIsSupersetOfLeft[this.op](right.value, other.op, otherRight.value)
+    }
+
+    if (this.right && this.right.fun && other.right && other.right.fun && JSON.stringify(this.right) === JSON.stringify(other.right) && 'value' in left && 'value' in otherLeft) {
+      return this.op in opIsSupersetOfRight && opIsSupersetOfRight[this.op](left.value, other.op, otherLeft.value)
     }
   }
 }

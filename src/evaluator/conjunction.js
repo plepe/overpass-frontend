@@ -41,4 +41,15 @@ module.exports = class EO_conjunction extends EO {
 
     return { $and: [left, right], needMatch: !!(leftNeedMatch || rightNeedMatch) }
   }
+
+  isSupersetOf (other) {
+    const r = super.isSupersetOf(other)
+    if (r !== undefined) {
+      return r
+    }
+
+    if (this.left.isSupersetOf(other) && this.right.isSupersetOf(other)) {
+      return true
+    }
+  }
 }

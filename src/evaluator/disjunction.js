@@ -46,4 +46,15 @@ module.exports = class EO_disjunction extends EO {
 
     return { $or: [left, right], needMatch: !!(leftNeedMatch || rightNeedMatch) }
   }
+
+  isSupersetOf (other) {
+    const r = super.isSupersetOf(other)
+    if (r !== undefined) {
+      return r
+    }
+
+    if (this.left.isSupersetOf(other) || this.right.isSupersetOf(other)) {
+      return true
+    }
+  }
 }

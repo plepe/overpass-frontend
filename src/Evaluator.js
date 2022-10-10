@@ -8,93 +8,6 @@ const EvaluatorValue = require('./EvaluatorValue')
 const isNumber = evaluatorHelper.isNumber
 const isValue = evaluatorHelper.isValue
 
-const opIsSupersetOfLeft = {
-  '==' (currentValue, otherOp, otherValue) {
-    switch (otherOp) {
-      case '==':
-        /* eslint-disable eqeqeq */
-        return currentValue == otherValue
-  /* eslint-enable eqeqeq */
-    }
-  },
-  '!=' (currentValue, otherOp, otherValue) {
-    return false
-  },
-  '<' (currentValue, otherOp, otherValue) {
-    switch (otherOp) {
-      case '<':
-      case '<=':
-        return currentValue > otherValue
-    }
-  },
-  '<=' (currentValue, otherOp, otherValue) {
-    switch (otherOp) {
-      case '<':
-      case '<=':
-      case '==':
-        return currentValue >= otherValue
-    }
-  },
-  '>' (currentValue, otherOp, otherValue) {
-    switch (otherOp) {
-      case '>':
-      case '>=':
-        return currentValue < otherValue
-    }
-  },
-  '>=' (currentValue, otherOp, otherValue) {
-    switch (otherOp) {
-      case '>':
-      case '>=':
-      case '==':
-        return currentValue <= otherValue
-    }
-  }
-}
-const opIsSupersetOfRight = {
-  '==' (currentValue, otherOp, otherValue) {
-    switch (otherOp) {
-      case '==':
-        /* eslint-disable eqeqeq */
-        return currentValue == otherValue
-  /* eslint-enable eqeqeq */
-    }
-  },
-  '!=' (currentValue, otherOp, otherValue) {
-    return false
-  },
-  '<' (currentValue, otherOp, otherValue) {
-    switch (otherOp) {
-      case '<':
-      case '<=':
-        return currentValue < otherValue
-    }
-  },
-  '<=' (currentValue, otherOp, otherValue) {
-    switch (otherOp) {
-      case '<':
-      case '<=':
-      case '==':
-        return currentValue <= otherValue
-    }
-  },
-  '>' (currentValue, otherOp, otherValue) {
-    switch (otherOp) {
-      case '>':
-      case '>=':
-        return currentValue > otherValue
-    }
-  },
-  '>=' (currentValue, otherOp, otherValue) {
-    switch (otherOp) {
-      case '>':
-      case '>=':
-      case '==':
-        return currentValue >= otherValue
-    }
-  }
-}
-
 function next (current, def) {
   if (current) {
     if (current.right) {
@@ -350,44 +263,7 @@ class Evaluator {
   }
 
   isSupersetOf (other) {
-    return this._isSupersetOf(this.data, other.data)
-  }
-
-  _isSupersetOf (current, other) {
-    if (JSON.stringify(current) === JSON.stringify(other)) {
-      return true
-    }
-
-    if (current.op === '||') {
-      return this._isSupersetOf(current.left, other) || this._isSupersetOf(current.right, other)
-    } else if (current.op === '&&') {
-      return this._isSupersetOf(current.left, other) && this._isSupersetOf(current.right, other)
-    } else if (current.fun === 'and') {
-      return current.parameters.every(p => this._isSupersetOf(p, other))
-    }
-
-    if (other.op === '||') {
-      return this._isSupersetOf(current, other.left) && this._isSupersetOf(current, other.right)
-    } else if (other.op === '&&') {
-      return this._isSupersetOf(current, other.left) || this._isSupersetOf(current, other.right)
-    } else if (current.fun === 'and') {
-      return current.parameters.some(p => this._isSupersetOf(p, other))
-    }
-
-    if (current.op) {
-      const left = this.compileLokiJS(current.left)
-      const right = this.compileLokiJS(current.right)
-      const otherLeft = this.compileLokiJS(other.left)
-      const otherRight = this.compileLokiJS(other.right)
-
-      if (current.left && current.left.fun && other.left && other.left.fun && JSON.stringify(current.left) === JSON.stringify(other.left) && 'value' in right && 'value' in otherRight) {
-        return current.op in opIsSupersetOfLeft && opIsSupersetOfLeft[current.op](right.value, other.op, otherRight.value)
-      }
-
-      if (current.right && current.right.fun && other.right && other.right.fun && JSON.stringify(current.right) === JSON.stringify(other.right) && 'value' in left && 'value' in otherLeft) {
-        return current.op in opIsSupersetOfRight && opIsSupersetOfRight[current.op](left.value, other.op, otherLeft.value)
-      }
-    }
+    return this.data.isSupersetOf(other.data)
   }
 }
 
