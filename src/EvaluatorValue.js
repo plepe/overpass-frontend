@@ -11,6 +11,10 @@ module.exports = class EvaluatorValue extends EvaluatorPart {
   }
 
   toJSON () {
+    if (typeof this.value === 'boolean') {
+      return this.value ? 1 : 0
+    }
+
     return this.value
   }
 
