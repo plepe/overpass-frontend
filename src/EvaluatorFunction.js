@@ -1,5 +1,6 @@
 const evaluatorExport = require('./evaluatorExport')
 const EvaluatorPart = require('./EvaluatorPart')
+const EvaluatorValue = require('./EvaluatorValue')
 
 module.exports = class EvaluatorFunction extends EvaluatorPart {
   constructor (fun, parameters, master) {
@@ -19,6 +20,15 @@ module.exports = class EvaluatorFunction extends EvaluatorPart {
 
   toValue () {
     return null
+  }
+
+  simplify () {
+    const v = this.toValue()
+    if (v !== null) {
+      return new EvaluatorValue(v, this.master)
+    }
+    const param = this.parameters.map(p => p.simplify())
+    return new this.constructor(this.fun, param, this.master)
   }
 
   compileLokiJS () {

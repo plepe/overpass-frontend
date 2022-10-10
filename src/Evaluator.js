@@ -135,6 +135,10 @@ class Evaluator {
     return current.eval(context)
   }
 
+  simplify () {
+    return this.data.simplify()
+  }
+
   toString (current = undefined) {
     if (current === undefined) {
       current = this.data

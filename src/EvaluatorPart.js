@@ -21,6 +21,10 @@ module.exports = class EvaluatorPart {
     }
   }
 
+  simplify () {
+    return this
+  }
+
   cacheDescriptors (descriptors) {
     descriptors.forEach((d, i) => {
       descriptors[i] += this.toString()
