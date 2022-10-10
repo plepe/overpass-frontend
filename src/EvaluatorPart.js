@@ -1,8 +1,4 @@
 module.exports = class EvaluatorPart {
-  constructor (master) {
-    this.master = master
-  }
-
   compileLokiJS () {
     return { needMatch: true }
   }

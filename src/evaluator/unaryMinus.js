@@ -3,7 +3,7 @@ const evaluatorHelper = require('../evaluatorHelper')
 
 module.exports = class EvaluatorOperatorUnaryMinus extends EvaluatorOperator {
   eval (context) {
-    let right = this.master.exec(context, this.right)
+    let right = this.right.eval(context)
     if (evaluatorHelper.isNumber(right)) {
       right = parseFloat(right)
     }
@@ -26,7 +26,7 @@ module.exports = class EvaluatorOperatorUnaryMinus extends EvaluatorOperator {
   }
 
   compileLokiJS () {
-    const right = this.master.compileLokiJS(this.right)
+    const right = this.right.compileLokiJS()
 
     if ('value' in right) {
       return { value: -right.value }

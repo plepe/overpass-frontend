@@ -3,8 +3,8 @@ const EvaluatorPart = require('./EvaluatorPart')
 const EvaluatorValue = require('./EvaluatorValue')
 
 module.exports = class EvaluatorFunction extends EvaluatorPart {
-  constructor (fun, parameters, master) {
-    super(master)
+  constructor (fun, parameters) {
+    super()
     this.fun = fun
     this.parameters = parameters
   }

@@ -3,8 +3,8 @@ const evaluatorHelper = require('../evaluatorHelper')
 
 module.exports = class EvaluatorOperatorDisjunction extends EvaluatorOperator {
   eval (context) {
-    let left = this.master.exec(context, this.left)
-    let right = this.master.exec(context, this.right)
+    let left = this.left.eval(context)
+    let right = this.right.eval(context)
     if (evaluatorHelper.isNumber(left) && evaluatorHelper.isNumber(right)) {
       left = parseFloat(left)
       right = parseFloat(right)
@@ -21,8 +21,8 @@ module.exports = class EvaluatorOperatorDisjunction extends EvaluatorOperator {
   }
 
   compileLokiJS () {
-    const left = this.master.compileLokiJS(this.left)
-    const right = this.master.compileLokiJS(this.right)
+    const left = this.left.compileLokiJS()
+    const right = this.right.compileLokiJS()
 
     if ('value' in left) {
       return left.value ? { value: true } : right

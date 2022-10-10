@@ -1,8 +1,8 @@
 const EvaluatorPart = require('./EvaluatorPart')
 
 module.exports = class EvaluatorValue extends EvaluatorPart {
-  constructor (value, master) {
-    super(master)
+  constructor (value) {
+    super()
     this.value = value
   }
 

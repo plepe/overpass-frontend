@@ -3,8 +3,8 @@ const EvaluatorPart = require('./EvaluatorPart')
 const EvaluatorValue = require('./EvaluatorValue')
 
 module.exports = class EvaluatorOperator extends EvaluatorPart {
-  constructor (op, left, right, master) {
-    super(master)
+  constructor (op, left, right) {
+    super()
     this.op = op
     this.left = left
     this.right = right

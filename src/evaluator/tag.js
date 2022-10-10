@@ -2,7 +2,7 @@ const EvaluatorFunction = require('../EvaluatorFunction')
 
 module.exports = class EvaluatorFunctionTag extends EvaluatorFunction {
   eval (context) {
-    const param = this.parameters.map(p => this.master.exec(context, p))
+    const param = this.parameters.map(p => p.eval(context))
     return context.tags && context.tags[param[0]]
   }
 
@@ -12,7 +12,7 @@ module.exports = class EvaluatorFunctionTag extends EvaluatorFunction {
   }
 
   compileLokiJS () {
-    const param = this.parameters.map(p => this.master.compileLokiJS(p))
+    const param = this.parameters.map(p => p.compileLokiJS())
 
     if (param[0] && 'value' in param[0]) {
       const r = {}
