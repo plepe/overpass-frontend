@@ -20,4 +20,10 @@ module.exports = class EvaluatorPart {
       return other.parameters.some(p => this.isSupersetOf(p))
     }
   }
+
+  cacheDescriptors (descriptors) {
+    descriptors.forEach((d, i) => {
+      descriptors[i] += this.toString()
+    })
+  }
 }

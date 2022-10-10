@@ -234,12 +234,9 @@ class Evaluator {
     }
   }
 
-  cacheDescriptors (descriptors, current = undefined) {
-    const list = this.cacheExplode(this.data)
-
-    if (current === undefined) {
-      current = this.data
-    }
+  cacheDescriptors (descriptors) {
+    const list = ['']
+    this.data.cacheDescriptors(list)
 
     descriptors.forEach(d => {
       const orig = JSON.parse(JSON.stringify(d))
@@ -249,16 +246,7 @@ class Evaluator {
           next = JSON.parse(JSON.stringify(orig))
           descriptors.push(next)
         }
-
-        if (isValue(current)) {
-          if (!current) {
-            next.invalid = true
-          }
-        } else if (current.fun === 'and') {
-          next.filters += current.parameters.map(c => '(if:' + this.toString(c) + ')').join('')
-        } else {
-          next.filters += '(if:' + this.toString(current) + ')'
-        }
+        next.filters += '(if:' + current + ')'
       })
     })
   }

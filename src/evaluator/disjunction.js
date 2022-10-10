@@ -57,4 +57,11 @@ module.exports = class EvaluatorOperatorDisjunction extends EvaluatorOperator {
       return true
     }
   }
+
+  cacheDescriptors (descriptors) {
+    const copy = JSON.parse(JSON.stringify(descriptors))
+    this.left.cacheDescriptors(descriptors)
+    this.right.cacheDescriptors(copy)
+    descriptors.push(...copy)
+  }
 }
