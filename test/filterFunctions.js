@@ -667,7 +667,7 @@ var overpassFrontend
             expected: [ 'n377992' ],
             expectedSubRequestCount: 1,
             expectedCacheInfo: [{
-              id: 'node["highway"](if:id()==377992)(if:type()=="node")',
+              id: 'node["highway"](if:id()==377992&&type()=="node")',
             }]
           }, done)
         })
@@ -680,7 +680,7 @@ var overpassFrontend
             expected: [ 'n377992' ],
             expectedSubRequestCount: 0,
             expectedCacheInfo: [{
-              id: 'node["highway"](if:id()==377992)(if:type()=="node")',
+              id: 'node["highway"](if:id()==377992&&type()=="node")',
             }]
           }, done)
         })

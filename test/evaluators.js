@@ -451,7 +451,7 @@ describe('evaluators', function () {
       needMatch: false
     }
     const expectedCacheDescriptors = [
-      { filters: '(if:t["name"]=="foo")(if:t["name"]=="bar")(if:t["alice"]=="bob")' }
+      { filters: '(if:t["name"]=="foo"&&t["name"]=="bar"&&t["alice"]=="bob")' }
     ]
 
     assert.deepEqual(eval.toJSON(), expected)
@@ -1316,7 +1316,7 @@ describe('evaluators', function () {
       needMatch: false
     }
     const expectedCacheDescriptors = [
-      { filters: '(if:id()==377992)(if:type()=="node")' }
+      { filters: '(if:id()==377992&&type()=="node")' }
     ]
 
     assert.deepEqual(eval.toJSON(), expected)

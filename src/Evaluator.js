@@ -246,8 +246,21 @@ class Evaluator {
   }
 
   cacheDescriptors (descriptors) {
+    if (!this.simplified) {
+      this.simplified = this.simplify()
+    }
+
+    if ('value' in this.simplified) {
+      descriptors.forEach(d => {
+        if (!this.simplified.value) {
+          d.invalid = true
+        }
+      })
+      return
+    }
+
     const list = ['']
-    this.data.cacheDescriptors(list)
+    this.simplified.cacheDescriptors(list)
 
     descriptors.forEach(d => {
       const orig = JSON.parse(JSON.stringify(d))
