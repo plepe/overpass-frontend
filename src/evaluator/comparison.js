@@ -174,8 +174,8 @@ module.exports = class EvaluatorOperatorComparison extends EvaluatorOperator {
 
     const left = this.left.compileLokiJS()
     const right = this.right.compileLokiJS()
-    const otherLeft = other.left.compileLokiJS()
-    const otherRight = other.right.compileLokiJS()
+    const otherLeft = other.left ? other.left.compileLokiJS() : null
+    const otherRight = other.right ? other.right.compileLokiJS() : null
 
     if (this.left && this.left.fun && other.left && other.left.fun && JSON.stringify(this.left) === JSON.stringify(other.left) && 'value' in right && 'value' in otherRight) {
       return this.op in opIsSupersetOfLeft && opIsSupersetOfLeft[this.op](right.value, other.op, otherRight.value)
