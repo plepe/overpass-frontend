@@ -1335,4 +1335,39 @@ describe('evaluators', function () {
     eval.cacheDescriptors(descriptors)
     assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
+
+  it ('timestamp()', function () {
+    const eval = new Evaluator()
+    const str = eval.parse('timestamp() < "2012-12-01T12:00:00Z"')
+    const expected = {
+      left: {
+        fun: 'timestamp',
+        parameters: []
+      },
+      op: '<',
+      right: '2012-12-01T12:00:00Z'
+    }
+    const expectedResult = true
+    const expectedCompiled = 'timestamp()<"2012-12-01T12:00:00Z"'
+    const expectedLokiQuery = {
+      'osmMeta.timestamp': { $lt: '2012-12-01T12:00:00Z' }
+    }
+    const expectedCacheDescriptors = [
+      { filters: '(if:timestamp()<"2012-12-01T12:00:00Z")' }
+    ]
+
+    assert.deepEqual(eval.toJSON(), expected)
+    assert.equal(str, '')
+
+    let result = eval.exec({ id: 'n377992', osm_id: 377992, type: 'node', meta: { timestamp: '2011-12-10T02:06:54Z' } })
+    assert.equal(result, expectedResult)
+
+    assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.toValue(), null)
+    assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
+
+    const descriptors = [{filters: ''}]
+    eval.cacheDescriptors(descriptors)
+    assert.deepEqual(descriptors, expectedCacheDescriptors)
+  })
 })

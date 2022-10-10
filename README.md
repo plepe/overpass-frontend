@@ -73,6 +73,11 @@ The following functions are available:
 | is_closed() | For ways, returns 1 if the first member equals the last member. 0 otherwise.
 | id()     | Returns the ID of the object  |
 | type()   | Returns the type of the object |
+| version() | Returns the version number of the object |
+| timestamp() | Returns the timestamp of the last edit of the object |
+| changeset() | Returns the changeset id of the object in which it has been last edited |
+| uid() | Returns the id of the user who last edited the object |
+| user() | Returns the name of the user who last edited the object |
 | debug(...) | Prints the value of the parameter to the JavaScript development console, returns the value |
 | count_tags() | Returns the count of tags of the object |
 | length() | Returns the length of the object in meters (0 for nodes) |
