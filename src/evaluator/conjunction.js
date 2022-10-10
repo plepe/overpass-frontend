@@ -1,7 +1,7 @@
-const EO = require('../EvaluatorOperator')
+const EvaluatorOperator = require('../EvaluatorOperator')
 const evaluatorHelper = require('../evaluatorHelper')
 
-module.exports = class EO_conjunction extends EO {
+module.exports = class EvaluatorOperatorConjunction extends EvaluatorOperator {
   eval (context) {
     let left = this.master.exec(context, this.left)
     let right = this.master.exec(context, this.right)

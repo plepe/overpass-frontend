@@ -1,11 +1,10 @@
 const parseString = require('./parseString')
 
-const evaluatorFunctions = require('./evaluator/__functions__')
-const evaluatorOperators = require('./evaluator/__operators__')
+const EvaluatorFunctions = require('./evaluator/__functions__')
+const EvaluatorOperators = require('./evaluator/__operators__')
 const evaluatorExport = require('./evaluatorExport')
 const evaluatorHelper = require('./evaluatorHelper')
 const EvaluatorValue = require('./EvaluatorValue')
-const isNumber = evaluatorHelper.isNumber
 const isValue = evaluatorHelper.isValue
 
 function next (current, def) {
@@ -33,7 +32,7 @@ function nextParam (current, def) {
 }
 
 function nextOp (current, op, that) {
-  const c = new evaluatorOperators[op](op, current, null, that)
+  const c = new EvaluatorOperators[op](op, current, null, that)
 
   if (current && current.op && c.priority() < current.priority()) {
     c.left = current.right || null
@@ -79,7 +78,7 @@ class Evaluator {
         } else if (m[7] !== undefined) {
           mode = 20
           str = str.substr(m[1].length + m[7].length + 1)
-          this.data = next(this.data, new evaluatorFunctions[m[7]](m[7], [], this))
+          this.data = next(this.data, new EvaluatorFunctions[m[7]](m[7], [], this))
         } else if (m[8]) {
           str = str.substr(m[1].length)
           return str
@@ -99,7 +98,9 @@ class Evaluator {
       } else if (mode === 10) {
         let s
         [s, str] = parseString(str)
-        this.data = next(this.data, new evaluatorFunctions.tag('tag', [new EvaluatorValue(s)], this))
+        /* eslint-disable new-cap */
+        this.data = next(this.data, new EvaluatorFunctions.tag('tag', [new EvaluatorValue(s)], this))
+        /* eslint-enable new-cap */
         mode = 11
       } else if (mode === 11) {
         const m = str.match(/^\s*\]/)
@@ -183,7 +184,7 @@ class Evaluator {
     if (isValue(current)) {
       return [current]
     } else if ('fun' in current) {
-      const result = [new evaluatorFunctions[current.fun](current.fun, [], this)]
+      const result = [new EvaluatorFunctions[current.fun](current.fun, [], this)]
       current.parameters.forEach(p => {
         const pn = this.cacheExplode(p)
         result.forEach(r => {

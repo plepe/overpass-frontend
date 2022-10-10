@@ -1,6 +1,6 @@
-const EF = require('../EvaluatorFunction')
+const EvaluatorFunction = require('../EvaluatorFunction')
 
-module.exports = class EF_is_closed extends EF {
+module.exports = class EvaluatorFunctionIsClosed extends EvaluatorFunction {
   eval (context) {
     if (context.type !== 'way') {
       return 0

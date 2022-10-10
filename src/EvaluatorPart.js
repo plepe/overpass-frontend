@@ -1,5 +1,3 @@
-const evaluatorExport = require('./evaluatorExport')
-
 module.exports = class EvaluatorPart {
   constructor (master) {
     this.master = master

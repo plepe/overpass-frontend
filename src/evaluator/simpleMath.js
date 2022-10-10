@@ -1,4 +1,4 @@
-const EO = require('../EvaluatorOperator')
+const EvaluatorOperator = require('../EvaluatorOperator')
 const evaluatorHelper = require('../evaluatorHelper')
 
 const functions = {
@@ -14,7 +14,7 @@ const priorities = {
   '/': 2
 }
 
-module.exports = class EO_simpleMath extends EO {
+module.exports = class EvaluatorOperatorSimpleMath extends EvaluatorOperator {
   eval (context) {
     let left = this.master.exec(context, this.left)
     let right = this.master.exec(context, this.right)

@@ -1,4 +1,4 @@
-const EO = require('../EvaluatorOperator')
+const EvaluatorOperator = require('../EvaluatorOperator')
 const evaluatorHelper = require('../evaluatorHelper')
 
 const functions = {
@@ -122,7 +122,7 @@ const opIsSupersetOfRight = {
   }
 }
 
-module.exports = class EO_comparison extends EO {
+module.exports = class EvaluatorOperatorComparison extends EvaluatorOperator {
   eval (context) {
     let left = this.master.exec(context, this.left)
     let right = this.master.exec(context, this.right)

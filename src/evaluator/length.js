@@ -1,7 +1,7 @@
 const turf = require('../turf')
-const EF = require('../EvaluatorFunction')
+const EvaluatorFunction = require('../EvaluatorFunction')
 
-module.exports = class EF_length extends EF {
+module.exports = class EvaluatorFunctionLength extends EvaluatorFunction {
   eval (context) {
     if ('geomLength' in context.dbData) {
       return context.dbData.geomLength

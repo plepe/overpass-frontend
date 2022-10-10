@@ -1,7 +1,7 @@
-const EO = require('../EvaluatorOperator')
+const EvaluatorOperator = require('../EvaluatorOperator')
 const evaluatorHelper = require('../evaluatorHelper')
 
-module.exports = class EO_negation extends EO {
+module.exports = class EvaluatorOperatorNegation extends EvaluatorOperator {
   eval (context) {
     let right = this.master.exec(context, this.right)
     if (evaluatorHelper.isNumber(right)) {

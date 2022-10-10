@@ -1,6 +1,6 @@
-const EF = require('../EvaluatorFunction')
+const EvaluatorFunction = require('../EvaluatorFunction')
 
-module.exports = class EF_type extends EF {
+module.exports = class EvaluatorFunctionType extends EvaluatorFunction {
   eval (context) {
     return context.type
   }
