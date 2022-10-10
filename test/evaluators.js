@@ -27,6 +27,7 @@ describe('evaluators', function () {
     assert.equal(result, expectedResult)
 
     assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.toValue(), null)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
     const descriptors = [{filters: ''}]
@@ -54,6 +55,7 @@ describe('evaluators', function () {
     assert.equal(result, expectedResult)
 
     assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.toValue(), null)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
     const descriptors = [{filters: ''}]
@@ -90,6 +92,7 @@ describe('evaluators', function () {
     assert.equal(result, expectedResult)
 
     assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.toValue(), null)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
     const descriptors = [{filters: ''}]
@@ -121,6 +124,7 @@ describe('evaluators', function () {
     assert.equal(result, expectedResult)
 
     assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.toValue(), null)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
     const descriptors = [{filters: ''}]
@@ -152,6 +156,7 @@ describe('evaluators', function () {
     assert.equal(result, expectedResult)
 
     assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.toValue(), null)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
     const descriptors = [{filters: ''}]
@@ -181,6 +186,7 @@ describe('evaluators', function () {
     assert.equal(result, expectedResult)
 
     assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.toValue(), null)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
     const descriptors = [{filters: ''}]
@@ -210,6 +216,7 @@ describe('evaluators', function () {
     assert.equal(result, expectedResult)
 
     assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.toValue(), true)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
     const descriptors = [{filters: ''}]
@@ -239,6 +246,7 @@ describe('evaluators', function () {
     assert.equal(result, expectedResult)
 
     assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.toValue(), true)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
     const descriptors = [{filters: ''}]
@@ -272,6 +280,7 @@ describe('evaluators', function () {
     assert.equal(result, expectedResult)
 
     assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.toValue(), 1)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
     const descriptors = [{filters: ''}]
@@ -322,6 +331,7 @@ describe('evaluators', function () {
     assert.equal(result, expectedResult)
 
     assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.toValue(), null)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
     const descriptors = [{filters: ''}]
@@ -387,6 +397,7 @@ describe('evaluators', function () {
     assert.equal(result, expectedResult)
 
     assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.toValue(), null)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
     const descriptors = [{filters: ''}]
@@ -450,6 +461,7 @@ describe('evaluators', function () {
     assert.equal(result, expectedResult)
 
     assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.toValue(), null)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
     const descriptors = [{filters: ''}]
@@ -479,6 +491,7 @@ describe('evaluators', function () {
     assert.equal(result, expectedResult)
 
     assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.toValue(), 'test2')
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
     const descriptors = [{filters: ''}]
@@ -512,6 +525,7 @@ describe('evaluators', function () {
     assert.equal(result, expectedResult)
 
     assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.toValue(), 14.5)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
     const descriptors = [{filters: ''}]
@@ -550,6 +564,7 @@ describe('evaluators', function () {
     assert.equal(result, expectedResult)
 
     assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.toValue(), 22)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
     const descriptors = [{filters: ''}]
@@ -587,6 +602,7 @@ describe('evaluators', function () {
     assert.equal(result, expectedResult)
 
     assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.toValue(), 15.5)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
     const descriptors = [{filters: ''}]
@@ -620,6 +636,7 @@ describe('evaluators', function () {
     assert.equal(result, expectedResult)
 
     assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.toValue(), 11.5)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
     const descriptors = [{filters: ''}]
@@ -652,6 +669,7 @@ describe('evaluators', function () {
     assert.equal(result, expectedResult)
 
     assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.toValue(), 3.5)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
     const descriptors = [{filters: ''}]
@@ -689,6 +707,7 @@ describe('evaluators', function () {
     assert.equal(result, expectedResult)
 
     assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.toValue(), 27.5)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
     const descriptors = [{filters: ''}]
@@ -718,6 +737,7 @@ describe('evaluators', function () {
     assert.equal(result, expectedResult)
 
     assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.toValue(), 3)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
     const descriptors = [{filters: ''}]
@@ -756,6 +776,7 @@ describe('evaluators', function () {
     assert.equal(result, expectedResult)
 
     assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.toValue(), -3)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
     const descriptors = [{filters: ''}]
@@ -798,6 +819,7 @@ describe('evaluators', function () {
     assert.equal(result, expectedResult)
 
     assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.toValue(), -1)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
     const descriptors = [{filters: ''}]
@@ -827,6 +849,7 @@ describe('evaluators', function () {
     assert.equal(result, expectedResult)
 
     assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.toValue(), 0)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
     const descriptors = [{filters: ''}]
@@ -864,6 +887,7 @@ describe('evaluators', function () {
     assert.equal(result, expectedResult)
 
     assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.toValue(), 1)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
     const descriptors = [{filters: ''}]
@@ -902,6 +926,7 @@ describe('evaluators', function () {
     assert.equal(result, expectedResult)
 
     assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.toValue(), null)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
     const descriptors = [{filters: ''}]
@@ -942,6 +967,7 @@ describe('evaluators', function () {
     assert.equal(result, expectedResult)
 
     assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.toValue(), null)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
     const descriptors = [{filters: ''}]
@@ -974,6 +1000,7 @@ describe('evaluators', function () {
     assert.equal(result, expectedResult)
 
     assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.toValue(), null)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
     const descriptors = [{filters: ''}]
@@ -999,6 +1026,7 @@ describe('evaluators', function () {
     assert.equal(result, expectedResult)
 
     assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.toValue(), 'name')
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
     const descriptors = [{filters: ''}]
@@ -1034,6 +1062,7 @@ describe('evaluators', function () {
     assert.equal(result, null)
 
     assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.toValue(), null)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
     const descriptors = [{filters: ''}]
@@ -1070,6 +1099,7 @@ describe('evaluators', function () {
     assert.equal(result, false)
 
     assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.toValue(), null)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
     const descriptors = [{filters: ''}]
@@ -1100,6 +1130,7 @@ describe('evaluators', function () {
     assert.equal(result, expectedResult)
 
     assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.toValue(), null)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
     const descriptors = [{filters: ''}]
@@ -1132,6 +1163,7 @@ describe('evaluators', function () {
     assert.equal(result, 0)
 
     assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.toValue(), null)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
     const descriptors = [{filters: ''}]
@@ -1169,6 +1201,7 @@ describe('evaluators', function () {
     assert.equal(result, 0)
 
     assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.toValue(), null)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
     const descriptors = [{filters: ''}]
@@ -1205,6 +1238,7 @@ describe('evaluators', function () {
     assert.equal(result, 1)
 
     assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.toValue(), null)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
     const descriptors = [{filters: ''}]
@@ -1242,6 +1276,7 @@ describe('evaluators', function () {
     assert.equal(result, 1)
 
     assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.toValue(), null)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
     const descriptors = [{filters: ''}]
@@ -1293,6 +1328,7 @@ describe('evaluators', function () {
     assert.equal(result, false)
 
     assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.toValue(), null)
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
     const descriptors = [{filters: ''}]

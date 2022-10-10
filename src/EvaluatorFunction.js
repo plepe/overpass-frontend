@@ -17,6 +17,10 @@ module.exports = class EvaluatorFunction extends EvaluatorPart {
     return this.fun + '(' + param.join(',') + ')'
   }
 
+  toValue () {
+    return null
+  }
+
   compileLokiJS () {
     return { needMatch: true }
   }

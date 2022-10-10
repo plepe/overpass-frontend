@@ -13,6 +13,13 @@ module.exports = class EvaluatorOperator extends EvaluatorPart {
     return { op: this.op, left: evaluatorExport(this.left), right: evaluatorExport(this.right) }
   }
 
+  toValue () {
+    if (this.left.toValue() === null || this.right.toValue() === null) {
+      return null
+    }
+    return this.eval({})
+  }
+
   compileLokiJS () {
     return { needMatch: true }
   }

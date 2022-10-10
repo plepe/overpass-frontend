@@ -18,6 +18,13 @@ module.exports = class EvaluatorOperatorNegation extends EvaluatorOperator {
     return '!' + this.right.toString()
   }
 
+  toValue () {
+    if (this.right.toValue() === null) {
+      return null
+    }
+    return this.eval({})
+  }
+
   compileLokiJS () {
     const right = this.master.compileLokiJS(this.right)
 

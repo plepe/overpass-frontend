@@ -30,6 +30,10 @@ module.exports = class EvaluatorValue extends EvaluatorPart {
     }
   }
 
+  toValue () {
+    return this.value
+  }
+
   compileLokiJS () {
     return { value: this.value }
   }

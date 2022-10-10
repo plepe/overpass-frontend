@@ -14,6 +14,13 @@ module.exports = class EvaluatorOperatorUnaryMinus extends EvaluatorOperator {
     return '-' + this.right.toString()
   }
 
+  toValue () {
+    if (this.right.toValue() === null) {
+      return null
+    }
+    return this.eval({})
+  }
+
   priority () {
     return 0
   }

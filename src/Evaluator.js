@@ -163,6 +163,13 @@ class Evaluator {
     return current.toString()
   }
 
+  /**
+   * return null, if depends on the object
+   */
+  toValue () {
+    return this.data.toValue()
+  }
+
   compileLokiJS (current = undefined) {
     if (current === undefined) {
       current = this.data
