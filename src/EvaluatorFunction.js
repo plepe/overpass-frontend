@@ -1,10 +1,11 @@
 const evaluatorExport = require('./evaluatorExport')
+const EvaluatorPart = require('./EvaluatorPart')
 
-module.exports = class EF {
+module.exports = class EvaluatorFunction extends EvaluatorPart {
   constructor (fun, parameters, master) {
+    super(master)
     this.fun = fun
     this.parameters = parameters
-    this.master = master
   }
 
   toJSON () {
