@@ -34,7 +34,8 @@ var overpassFrontend
           expectedSubRequestCount: 1,
           expectedCacheDescriptors: [{
             id: 'node',
-            ids: [378440]
+            ids: [378440],
+            properties: OverpassFrontend.ID_ONLY
           }]
         }, done)
       })
@@ -48,7 +49,8 @@ var overpassFrontend
           expectedSubRequestCount: 0,
           expectedCacheDescriptors: [{
             id: 'node',
-            ids: [378440]
+            ids: [378440],
+            properties: OverpassFrontend.ID_ONLY
           }]
         }, done)
       })
@@ -61,7 +63,8 @@ var overpassFrontend
           expectedSubRequestCount: 0,
           expectedCacheDescriptors: [{
             id: 'node',
-            ids: [378440]
+            ids: [378440],
+            properties: OverpassFrontend.ID_ONLY
           }]
         }, done)
       })
@@ -75,7 +78,8 @@ var overpassFrontend
           expectedSubRequestCount: 1,
           expectedCacheDescriptors: [{
             id: 'node',
-            ids: [1234, 378440, 393161, 647991]
+            ids: [1234, 378440, 393161, 647991],
+            properties: OverpassFrontend.ID_ONLY
           }]
         }, done)
       })
@@ -88,7 +92,8 @@ var overpassFrontend
           expectedSubRequestCount: 0,
           expectedCacheDescriptors: [{
             id: 'node',
-            ids: [647991]
+            ids: [647991],
+            properties: OverpassFrontend.ID_ONLY
           }]
         }, done)
       })
@@ -101,7 +106,8 @@ var overpassFrontend
           expectedSubRequestCount: 1, // TODO: 0
           expectedCacheDescriptors: [{
             id: 'node',
-            ids: [1234]
+            ids: [1234],
+            properties: OverpassFrontend.ID_ONLY
           }]
         }, done)
       })
@@ -122,6 +128,7 @@ var overpassFrontend
           expectedSubRequestCount: 1,
           expectedCacheDescriptors: [{
             id: 'node(uid:908743)',
+            properties: OverpassFrontend.META
           }]
         }, done)
       })
@@ -145,6 +152,7 @@ var overpassFrontend
           expectedSubRequestCount: 1,
           expectedCacheDescriptors: [{
             id: 'node(user:"rayquaza")',
+            properties: OverpassFrontend.ID_ONLY
           }]
         }, done)
       })
@@ -158,6 +166,7 @@ var overpassFrontend
           expectedSubRequestCount: 1,
           expectedCacheDescriptors: [{
             id: 'node(user:"rayquaza","foobar","test")',
+            properties: OverpassFrontend.ID_ONLY
           }]
         }, done)
       })
@@ -174,6 +183,7 @@ var overpassFrontend
           expectedSubRequestCount: 1,
           expectedCacheDescriptors: [{
             id: 'node(user:"caigner")',
+            properties: OverpassFrontend.ID_ONLY
           }]
         }, done)
       })
@@ -190,6 +200,7 @@ var overpassFrontend
           expectedSubRequestCount: 1,
           expectedCacheDescriptors: [{
             id: 'node(user:"caigner","foobar","test")',
+            properties: OverpassFrontend.ID_ONLY
           }]
         }, done)
       })
@@ -235,7 +246,8 @@ var overpassFrontend
                   [ 16.337479800820528, 48.190579999684346 ]
                 ]
               ]
-            }
+            },
+            properties: OverpassFrontend.GEOM
           }]
         }, done)
       })
@@ -271,7 +283,8 @@ var overpassFrontend
                   [ 16.337479800820528, 48.190579999684346 ]
                 ]
               ]
-            }
+            },
+            properties: OverpassFrontend.GEOM
           }]
         }, done)
       })
@@ -307,7 +320,8 @@ var overpassFrontend
                   [ 16.337479800820528, 48.190579999684346 ]
                 ]
               ]
-            }
+            },
+            properties: OverpassFrontend.GEOM
           }]
         }, done)
       })
@@ -343,7 +357,8 @@ var overpassFrontend
                   [ 16.337344900410265, 48.190579999921084 ]
                 ]
               ]
-            }
+            },
+            properties: OverpassFrontend.GEOM
           }]
         }, done)
       })
@@ -371,7 +386,8 @@ var overpassFrontend
                   [ 16.337340199179472, 48.190579999684346 ]
                 ]
               ]
-            }
+            },
+            properties: OverpassFrontend.GEOM
           }]
         }, done)
       })
@@ -424,7 +440,9 @@ var overpassFrontend
                 [ 16.33761000070198, 48.19075986407274 ],
                 [ 16.33720999929802, 48.19075986407274 ]
               ]]
-            }}
+            },
+            properties: OverpassFrontend.GEOM
+            }
           ]
         }, done)
       })
@@ -453,7 +471,8 @@ var overpassFrontend
                   [ 16.337, 48.1904 ]
                 ]
               ]
-            }
+            },
+            properties: OverpassFrontend.GEOM
           }]
         }, done)
       })
@@ -476,7 +495,8 @@ var overpassFrontend
                   [ 16.337, 48.1904 ]
                 ]
               ]
-            }
+            },
+            properties: OverpassFrontend.GEOM
           }]
         }, done)
       })
@@ -498,7 +518,8 @@ var overpassFrontend
                   [ 16.33705, 48.19045 ]
                 ]
               ]
-            }
+            },
+            properties: OverpassFrontend.GEOM
           }]
         }, done)
       })
@@ -525,7 +546,8 @@ var overpassFrontend
                     [ 16.33705, 48.19045 ]
                   ]
                 ]
-              }
+              },
+              properties: OverpassFrontend.GEOM
             },
             {
               "id": "way",
@@ -540,7 +562,8 @@ var overpassFrontend
                     [ 16.33705, 48.19045 ]
                   ]
                 ]
-              }
+              },
+              properties: OverpassFrontend.GEOM
             }
           ]
         }, done)
@@ -569,7 +592,8 @@ var overpassFrontend
                   [ 16.3374, 48.1907 ], [ 16.337, 48.1904 ],
                 ]
               ]
-            }
+            },
+            properties: OverpassFrontend.GEOM
           }]
         }, done)
       })
@@ -591,7 +615,8 @@ var overpassFrontend
                   [ 16.3374, 48.1907 ], [ 16.337, 48.1904 ],
                 ]
               ]
-            }
+            },
+            properties: OverpassFrontend.GEOM
           }]
         }, done)
       })
@@ -606,6 +631,7 @@ var overpassFrontend
           expectedCacheDescriptors: [{
             "id": "node",
             "invalid": true,
+            properties: OverpassFrontend.GEOM
           }]
         }, done)
       })
@@ -620,6 +646,7 @@ var overpassFrontend
           expectedCacheDescriptors: [{
             "id": "node",
             "invalid": true,
+            properties: OverpassFrontend.GEOM
           }]
         }, done)
       })
@@ -640,6 +667,7 @@ var overpassFrontend
             expectedSubRequestCount: 1,
             expectedCacheDescriptors: [{
               id: 'node["highway"](if:t["name"]=="Bahnhofstraße")',
+              properties: OverpassFrontend.TAGS
             }]
           }, done)
         })
@@ -653,6 +681,7 @@ var overpassFrontend
             expectedSubRequestCount: 1,
             expectedCacheDescriptors: [{
               id: 'node["fixme"](if:t["shop"])',
+              properties: OverpassFrontend.TAGS
             }]
           }, done)
         })
@@ -668,6 +697,7 @@ var overpassFrontend
             expectedSubRequestCount: 1,
             expectedCacheDescriptors: [{
               id: 'node["highway"](if:id()==377992&&type()=="node")',
+            properties: OverpassFrontend.TAGS
             }]
           }, done)
         })
@@ -681,6 +711,7 @@ var overpassFrontend
             expectedSubRequestCount: 0,
             expectedCacheDescriptors: [{
               id: 'node["highway"](if:id()==377992&&type()=="node")',
+              properties: OverpassFrontend.TAGS
             }]
           }, done)
         })
@@ -697,6 +728,7 @@ var overpassFrontend
             expectedSubRequestCount: 1,
             expectedCacheDescriptors: [{
               id: 'node["fixme"]',
+              properties: OverpassFrontend.TAGS
             }]
           }, done)
         })
@@ -711,6 +743,7 @@ var overpassFrontend
             expectedSubRequestCount: 1,
             expectedCacheDescriptors: [{
               id: 'node["fixme"](if:t["highway"])',
+              properties: OverpassFrontend.TAGS
             }]
           }, done)
         })
@@ -724,6 +757,7 @@ var overpassFrontend
             expectedSubRequestCount: 0,
             expectedCacheDescriptors: [{
               id: 'node["fixme"](if:t["highway"])',
+              properties: OverpassFrontend.TAGS
             }]
           }, done)
         })
@@ -738,7 +772,8 @@ var overpassFrontend
             expectedSubRequestCount: 1, // TODO: 0 - querying not necessary
             expectedCacheDescriptors: [{
               id: 'node["fixme"]',
-              invalid: true
+              invalid: true,
+              properties: OverpassFrontend.TAGS
             }]
           }, done)
         })
@@ -754,6 +789,7 @@ var overpassFrontend
             expectedSubRequestCount: 1,
             expectedCacheDescriptors: [{
               id: 'node["highway"="crossing"](if:is_tag("bicycle"))',
+              properties: OverpassFrontend.TAGS
             }]
           }, done)
         })
@@ -771,6 +807,7 @@ var overpassFrontend
             expectedSubRequestCount: 1,
             expectedCacheDescriptors: [{
               id: 'way["highway"](if:length()>300)',
+              properties: OverpassFrontend.TAGS|OverpassFrontend.GEOM
             }]
           }, done)
         })
@@ -785,6 +822,7 @@ var overpassFrontend
             expectedSubRequestCount: 0,
             expectedCacheDescriptors: [{
               id: 'way["highway"](if:length()>500)',
+              properties: OverpassFrontend.TAGS|OverpassFrontend.GEOM
             }]
           }, (err) => {
             if (err) { return done(err) }
@@ -806,6 +844,7 @@ var overpassFrontend
             expectedSubRequestCount: 1,
             expectedCacheDescriptors: [{
               id: 'way["leisure"="park"](if:length()>300)',
+              properties: OverpassFrontend.TAGS|OverpassFrontend.GEOM
             }]
           }, done)
         })
@@ -820,6 +859,7 @@ var overpassFrontend
             expectedSubRequestCount: 0,
             expectedCacheDescriptors: [{
               id: 'way["leisure"="park"](if:length()>300)',
+              properties: OverpassFrontend.TAGS|OverpassFrontend.GEOM
             }]
           }, done)
         })
@@ -834,6 +874,7 @@ var overpassFrontend
             expectedSubRequestCount: 1,
             expectedCacheDescriptors: [{
               id: 'relation["building"](if:length()>300)',
+              properties: OverpassFrontend.TAGS|OverpassFrontend.GEOM
             }]
           }, done)
         })
@@ -848,6 +889,7 @@ var overpassFrontend
             expectedSubRequestCount: 0,
             expectedCacheDescriptors: [{
               id: 'relation["building"](if:length()>300)',
+              properties: OverpassFrontend.TAGS|OverpassFrontend.GEOM
             }]
           }, done)
         })
@@ -865,6 +907,7 @@ var overpassFrontend
             expectedSubRequestCount: 1,
             expectedCacheDescriptors: [{
               id: 'way["railway"](if:is_closed())',
+              properties: OverpassFrontend.TAGS|OverpassFrontend.MEMBERS
             }]
           }, done)
         })

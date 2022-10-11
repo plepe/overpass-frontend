@@ -1,6 +1,9 @@
 const EvaluatorFunction = require('../EvaluatorFunction')
+const OverpassFrontend = require('../defines')
 
 module.exports = class EvaluatorFunctionIsTag extends EvaluatorFunction {
+  requestProperties = OverpassFrontend.TAGS
+
   eval (context) {
     const param = this.parameters.map(p => p.eval(context))
     return (context.tags && param[0] in context.tags) ? 1 : 0

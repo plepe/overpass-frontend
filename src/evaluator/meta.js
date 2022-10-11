@@ -1,6 +1,16 @@
 const EvaluatorFunction = require('../EvaluatorFunction')
+const OverpassFrontend = require('../defines')
 
 module.exports = class EvaluatorFunctionMeta extends EvaluatorFunction {
+  constructor (fun, parameters) {
+    super(fun, parameters)
+    if (['id', 'type'].includes(this.fun)) {
+      this.requestProperties = OverpassFrontend.ID_ONLY
+    } else {
+      this.requestProperties = OverpassFrontend.META
+    }
+  }
+
   eval (context) {
     switch (this.fun) {
       case 'id': return context.osm_id

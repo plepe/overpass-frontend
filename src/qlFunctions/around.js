@@ -1,5 +1,6 @@
 const turf = require('../turf')
 const arrayToCoords = require('../arrayToCoords')
+const OverpassFrontend = require('../defines')
 const qlFunction = require('./qlFunction')
 
 module.exports = class around extends qlFunction {
@@ -39,6 +40,7 @@ module.exports = class around extends qlFunction {
         d.invalid = true
       } else {
         d.bounds = newBounds.geometry
+        d.properties |= OverpassFrontend.GEOM
       }
     })
   }

@@ -1,7 +1,6 @@
-const turf = require('../turf')
-
 const BoundingBox = require('boundingbox')
-
+const turf = require('../turf')
+const OverpassFrontend = require('../defines')
 const qlFunction = require('./qlFunction')
 
 module.exports = class bbox extends qlFunction {
@@ -44,6 +43,7 @@ module.exports = class bbox extends qlFunction {
         d.invalid = true
       } else {
         d.bounds = newBounds.geometry
+        d.properties |= OverpassFrontend.GEOM
       }
     })
   }

@@ -1,7 +1,10 @@
 const turf = require('../turf')
 const EvaluatorFunction = require('../EvaluatorFunction')
+const OverpassFrontend = require('../defines')
 
 module.exports = class EvaluatorFunctionLength extends EvaluatorFunction {
+  requestProperties = OverpassFrontend.GEOM
+
   eval (context) {
     if ('geomLength' in context.dbData) {
       return context.dbData.geomLength

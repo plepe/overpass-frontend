@@ -158,7 +158,7 @@ class Evaluator {
       return
     }
 
-    const list = [{ filters: '' }]
+    const list = [{ filters: '', properties: 0 }]
     this.simplified.cacheDescriptors(list)
 
     descriptors.forEach(d => {
@@ -170,6 +170,7 @@ class Evaluator {
           descriptors.push(next)
         }
         next.filters += '(if:' + current.filters + ')'
+        next.properties |= current.properties
       })
     })
   }

@@ -34,4 +34,12 @@ module.exports = class EvaluatorFunction extends EvaluatorPart {
   compileLokiJS () {
     return { needMatch: true }
   }
+
+  calcRequestProperties () {
+    let result = this.requestProperties
+    this.parameters.forEach(p => {
+      result |= p.calcRequestProperties()
+    })
+    return result
+  }
 }

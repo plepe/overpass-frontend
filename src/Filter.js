@@ -1,5 +1,6 @@
 const strsearch2regexp = require('strsearch2regexp')
 const filterJoin = require('./filterJoin')
+const OverpassFrontend = require('./defines')
 const qlFunctions = require('./qlFunctions/__index__')
 const parseString = require('./parseString')
 const parseParentheses = require('./parseParentheses')
@@ -650,7 +651,7 @@ class Filter {
   }
 
   _caches (def) {
-    let options = [{ filters: '' }]
+    let options = [{ filters: '', properties: 0 }]
 
     if (def.or) {
       let result = []
@@ -682,6 +683,7 @@ class Filter {
       } else if (part.op) {
         options = options.map(o => {
           o.filters += compile(part)
+          o.properties |= OverpassFrontend.TAGS
           return o
         })
       } else if (part instanceof qlFunction) {
@@ -727,6 +729,7 @@ class Filter {
       r[k] = a[k]
     }
     r.filters += b.filters
+    r.properties |= b.properties
 
     if (b.type) {
       if (a.type && a.type !== b.type) {

@@ -1,3 +1,4 @@
+const OverpassFrontend = require('../defines')
 const qlFunction = require('./qlFunction')
 
 module.exports = class id extends qlFunction {
@@ -34,6 +35,7 @@ module.exports = class id extends qlFunction {
       }
 
       o.ids = v.sort()
+      o.properties |= OverpassFrontend.ID_ONLY
     })
   }
 

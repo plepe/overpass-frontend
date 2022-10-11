@@ -1,6 +1,9 @@
+const OverpassFrontend = require('../defines')
 const qlFunction = require('./qlFunction')
 
 module.exports = class uid extends qlFunction {
+  requestProperties = OverpassFrontend.META
+
   constructor (str) {
     super()
     this.value = str.split(/,/g).map(v => {
