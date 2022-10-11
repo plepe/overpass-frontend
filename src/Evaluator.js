@@ -158,7 +158,7 @@ class Evaluator {
       return
     }
 
-    const list = ['']
+    const list = [{ filters: '' }]
     this.simplified.cacheDescriptors(list)
 
     descriptors.forEach(d => {
@@ -169,7 +169,7 @@ class Evaluator {
           next = JSON.parse(JSON.stringify(orig))
           descriptors.push(next)
         }
-        next.filters += '(if:' + current + ')'
+        next.filters += '(if:' + current.filters + ')'
       })
     })
   }

@@ -22,8 +22,8 @@ module.exports = class EvaluatorPart {
   }
 
   cacheDescriptors (descriptors) {
-    descriptors.forEach((d, i) => {
-      descriptors[i] += this.toString()
+    descriptors.forEach(d => {
+      d.filters += this.toString()
     })
   }
 }
