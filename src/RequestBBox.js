@@ -51,10 +51,10 @@ class RequestBBox extends Request {
         this.lokiQuery = { $and: [this.lokiQuery, boundsToLokiQuery(this.bbox, this.overpass)] }
       }
 
-      this.caches = this.filterQuery.caches().map(cacheInfo => {
+      this.cacheDescriptors = this.filterQuery.cacheDescriptors().map(cacheDescriptors => {
         return {
-          cache: BBoxQueryCache.get(this.overpass, cacheInfo.id),
-          cacheInfo
+          cache: BBoxQueryCache.get(this.overpass, cacheDescriptors.id),
+          cacheDescriptors
         }
       })
     }
@@ -232,8 +232,8 @@ class RequestBBox extends Request {
         (this.options.split > subRequest.parts[0].count)) {
       this.loadFinish = true
 
-      this.caches && this.caches.forEach(cache => {
-        cache.cache.add(this.bbox, cache.cacheInfo)
+      this.cacheDescriptors && this.cacheDescriptors.forEach(cache => {
+        cache.cache.add(this.bbox, cache.cacheDescriptors)
       })
     }
   }
@@ -247,8 +247,8 @@ class RequestBBox extends Request {
       return false
     }
 
-    return !this.caches || !this.caches.every(cache => {
-      return cache.cache.check(this.bbox, cache.cacheInfo)
+    return !this.cacheDescriptors || !this.cacheDescriptors.every(cache => {
+      return cache.cache.check(this.bbox, cache.cacheDescriptors)
     })
   }
 

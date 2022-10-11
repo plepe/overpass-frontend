@@ -32,7 +32,7 @@ var overpassFrontend
           expectedQuery: 'node(id:378440);',
           expected: [ 'n378440' ],
           expectedSubRequestCount: 1,
-          expectedCacheInfo: [{
+          expectedCacheDescriptors: [{
             id: 'node',
             ids: [378440]
           }]
@@ -46,7 +46,7 @@ var overpassFrontend
           expectedQuery: 'node(id:378440);',
           expected: [ 'n378440' ],
           expectedSubRequestCount: 0,
-          expectedCacheInfo: [{
+          expectedCacheDescriptors: [{
             id: 'node',
             ids: [378440]
           }]
@@ -59,7 +59,7 @@ var overpassFrontend
           query: 'node(id:378440)',
           expected: [ 'n378440' ],
           expectedSubRequestCount: 0,
-          expectedCacheInfo: [{
+          expectedCacheDescriptors: [{
             id: 'node',
             ids: [378440]
           }]
@@ -73,7 +73,7 @@ var overpassFrontend
           expectedQuery: 'node(id:1234,378440,393161,647991);',
           expected: [ 'n378440', 'n647991', 'n393161' ],
           expectedSubRequestCount: 1,
-          expectedCacheInfo: [{
+          expectedCacheDescriptors: [{
             id: 'node',
             ids: [1234, 378440, 393161, 647991]
           }]
@@ -86,7 +86,7 @@ var overpassFrontend
           query: 'node(id:647991)',
           expected: [ 'n647991' ],
           expectedSubRequestCount: 0,
-          expectedCacheInfo: [{
+          expectedCacheDescriptors: [{
             id: 'node',
             ids: [647991]
           }]
@@ -99,7 +99,7 @@ var overpassFrontend
           query: 'node(id:1234)',
           expected: [],
           expectedSubRequestCount: 1, // TODO: 0
-          expectedCacheInfo: [{
+          expectedCacheDescriptors: [{
             id: 'node',
             ids: [1234]
           }]
@@ -120,7 +120,7 @@ var overpassFrontend
             'n451666728',  'n451666730'
           ],
           expectedSubRequestCount: 1,
-          expectedCacheInfo: [{
+          expectedCacheDescriptors: [{
             id: 'node(uid:908743)',
           }]
         }, done)
@@ -143,7 +143,7 @@ var overpassFrontend
           expectedQuery: 'node(user:"rayquaza");',
           expected: [ 'n60093107' ],
           expectedSubRequestCount: 1,
-          expectedCacheInfo: [{
+          expectedCacheDescriptors: [{
             id: 'node(user:"rayquaza")',
           }]
         }, done)
@@ -156,7 +156,7 @@ var overpassFrontend
           expectedQuery: 'node(user:"rayquaza","foobar","test");',
           expected: [ 'n60093107' ],
           expectedSubRequestCount: 1,
-          expectedCacheInfo: [{
+          expectedCacheDescriptors: [{
             id: 'node(user:"rayquaza","foobar","test")',
           }]
         }, done)
@@ -172,7 +172,7 @@ var overpassFrontend
             "n3189862152", "n3189876469", "n448895067", "n475245484",
             "n68228729" ],
           expectedSubRequestCount: 1,
-          expectedCacheInfo: [{
+          expectedCacheDescriptors: [{
             id: 'node(user:"caigner")',
           }]
         }, done)
@@ -188,7 +188,7 @@ var overpassFrontend
             "n3189862152", "n3189876469", "n448895067", "n475245484",
             "n68228729" ],
           expectedSubRequestCount: 1,
-          expectedCacheInfo: [{
+          expectedCacheDescriptors: [{
             id: 'node(user:"caigner","foobar","test")',
           }]
         }, done)
@@ -210,7 +210,7 @@ var overpassFrontend
           query: 'node(around:20,48.19058,16.33721)',
           expected: [ 'n395262', 'n643386609', 'n1599448219', 'n1871276160', 'n3765072046' ],
           expectedSubRequestCount: 1,
-          expectedCacheInfo: [{
+          expectedCacheDescriptors: [{
             "id": "node",
             "bounds": {
               "type": "Polygon",
@@ -246,7 +246,7 @@ var overpassFrontend
           query: 'way(around:20,48.19058,16.33721)',
           expected: [ 'w146678755', 'w31275229', 'w383507544' ],
           expectedSubRequestCount: 1,
-          expectedCacheInfo: [{
+          expectedCacheDescriptors: [{
             "id": "way",
             "bounds": {
               "type": "Polygon",
@@ -282,7 +282,7 @@ var overpassFrontend
           query: 'node(around:20,48.19058,16.33721)',
           expected: [ 'n395262', 'n643386609', 'n1599448219', 'n1871276160', 'n3765072046' ],
           expectedSubRequestCount: 0,
-          expectedCacheInfo: [{
+          expectedCacheDescriptors: [{
             "id": "node",
             "bounds": {
               "type": "Polygon",
@@ -318,7 +318,7 @@ var overpassFrontend
           query: 'node(around:10,48.19058,16.33721)',
           expected: [ 'n395262' ],
           expectedSubRequestCount: 0,
-          expectedCacheInfo: [{
+          expectedCacheDescriptors: [{
             "id": "node",
             "bounds": {
               "type": "Polygon",
@@ -354,7 +354,7 @@ var overpassFrontend
           query: 'node(around:20,48.19058,16.33761)(around:20,48.19058,16.33721)',
           expected: [ 'n1599448219', 'n1871276160', 'n643386609' ],
           expectedSubRequestCount: 0,
-          expectedCacheInfo: [{
+          expectedCacheDescriptors: [{
             "id": "node",
             "bounds": {
               "type": "Polygon",
@@ -383,7 +383,7 @@ var overpassFrontend
           query: 'node(around:20,48.19058,16.33761,48.19058,16.33721)',
           expected: [ 'n1599448219', 'n1871276160', 'n643386609' ],
           expectedSubRequestCount: 0,
-          expectedCacheInfo: [{
+          expectedCacheDescriptors: [{
             "id": "node",
             "bounds": {
               "type": "Polygon",
@@ -442,7 +442,7 @@ var overpassFrontend
           expectedQuery: 'node(48.1904,16.337,48.1907,16.3374);',
           expected: [ 'n1599448219', 'n1871276160', 'n3765072046', 'n395262', 'n643386609' ],
           expectedSubRequestCount: 1,
-          expectedCacheInfo: [{
+          expectedCacheDescriptors: [{
             "id": "node",
             "bounds": {
               "type": "Polygon",
@@ -465,7 +465,7 @@ var overpassFrontend
           expectedQuery: 'node(48.1904,16.337,48.1907,16.3374);',
           expected: [ 'n1599448219', 'n1871276160', 'n3765072046', 'n395262', 'n643386609' ],
           expectedSubRequestCount: 0,
-          expectedCacheInfo: [{
+          expectedCacheDescriptors: [{
             "id": "node",
             "bounds": {
               "type": "Polygon",
@@ -487,7 +487,7 @@ var overpassFrontend
           query: 'node(48.19045,16.33705,48.19065,16.33735)',
           expected: [ 'n395262' ],
           expectedSubRequestCount: 0,
-          expectedCacheInfo: [{
+          expectedCacheDescriptors: [{
             "id": "node",
             "bounds": {
               "type": "Polygon",
@@ -511,7 +511,7 @@ var overpassFrontend
           expectedViaFile: [ 'n395262', 'w31275229', 'w383507544' ],
           // Overpass Server won't include ways, where no nodes are inside the bounding box. Overpass-Frontend will include theses ways.
           expectedSubRequestCount: 1, // TODO: 0
-          expectedCacheInfo: [
+          expectedCacheDescriptors: [
             {
               "id": "node",
               "bounds": {
@@ -559,7 +559,7 @@ var overpassFrontend
           expectedQuery: 'node(poly:"48.1904 16.337 48.1907 16.337 48.1907 16.3374");',
           expected: [ 'n395262' ],
           expectedSubRequestCount: 1,
-          expectedCacheInfo: [{
+          expectedCacheDescriptors: [{
             "id": "node",
             "bounds": {
               "type": "Polygon",
@@ -581,7 +581,7 @@ var overpassFrontend
           expectedQuery: 'node(poly:"48.1904 16.337 48.1907 16.337 48.1907 16.3374");',
           expected: [ 'n395262' ],
           expectedSubRequestCount: 0,
-          expectedCacheInfo: [{
+          expectedCacheDescriptors: [{
             "id": "node",
             "bounds": {
               "type": "Polygon",
@@ -603,7 +603,7 @@ var overpassFrontend
           expectedQuery: 'node(poly:"48.1904 16.337 48.1907 16.337 48.1907 16.3374")(poly:"1 2 2 2 2 3");',
           expected: [ ],
           expectedSubRequestCount: 1,
-          expectedCacheInfo: [{
+          expectedCacheDescriptors: [{
             "id": "node",
             "invalid": true,
           }]
@@ -617,7 +617,7 @@ var overpassFrontend
           expectedQuery: 'node(poly:"48.1904 16.337 48.1907 16.337 48.1907 16.3374")(poly:"1 2 2 2 2 3");',
           expected: [ ],
           expectedSubRequestCount: 1,
-          expectedCacheInfo: [{
+          expectedCacheDescriptors: [{
             "id": "node",
             "invalid": true,
           }]
@@ -638,7 +638,7 @@ var overpassFrontend
             expectedQuery: 'node["highway"](if:t["name"]=="Bahnhofstraße");',
             expected: [ 'n647991' ],
             expectedSubRequestCount: 1,
-            expectedCacheInfo: [{
+            expectedCacheDescriptors: [{
               id: 'node["highway"](if:t["name"]=="Bahnhofstraße")',
             }]
           }, done)
@@ -651,7 +651,7 @@ var overpassFrontend
             expectedQuery: 'node["fixme"](if:t["shop"]);',
             expected: [ 'n2368032899' ],
             expectedSubRequestCount: 1,
-            expectedCacheInfo: [{
+            expectedCacheDescriptors: [{
               id: 'node["fixme"](if:t["shop"])',
             }]
           }, done)
@@ -666,7 +666,7 @@ var overpassFrontend
             expectedQuery: 'node["highway"](if:id()==377992&&type()=="node");',
             expected: [ 'n377992' ],
             expectedSubRequestCount: 1,
-            expectedCacheInfo: [{
+            expectedCacheDescriptors: [{
               id: 'node["highway"](if:id()==377992&&type()=="node")',
             }]
           }, done)
@@ -679,7 +679,7 @@ var overpassFrontend
             expectedQuery: 'node["highway"](if:id()==377992&&type()=="node");',
             expected: [ 'n377992' ],
             expectedSubRequestCount: 0,
-            expectedCacheInfo: [{
+            expectedCacheDescriptors: [{
               id: 'node["highway"](if:id()==377992&&type()=="node")',
             }]
           }, done)
@@ -695,7 +695,7 @@ var overpassFrontend
             expectedQuery: 'node["fixme"](if:1);',
             expected: [ 'n2368032899', 'n325842980', 'n3592094592' ],
             expectedSubRequestCount: 1,
-            expectedCacheInfo: [{
+            expectedCacheDescriptors: [{
               id: 'node["fixme"]',
             }]
           }, done)
@@ -709,7 +709,7 @@ var overpassFrontend
             expectedQuery: 'node["fixme"](if:t["highway"]);',
             expected: [ 'n3592094592' ],
             expectedSubRequestCount: 1,
-            expectedCacheInfo: [{
+            expectedCacheDescriptors: [{
               id: 'node["fixme"](if:t["highway"])',
             }]
           }, done)
@@ -722,7 +722,7 @@ var overpassFrontend
             expectedQuery: 'node["fixme"](if:t["highway"]);',
             expected: [ 'n3592094592' ],
             expectedSubRequestCount: 0,
-            expectedCacheInfo: [{
+            expectedCacheDescriptors: [{
               id: 'node["fixme"](if:t["highway"])',
             }]
           }, done)
@@ -736,7 +736,7 @@ var overpassFrontend
             expectedQuery: 'node["fixme"](if:0);',
             expected: [],
             expectedSubRequestCount: 1, // TODO: 0 - querying not necessary
-            expectedCacheInfo: [{
+            expectedCacheDescriptors: [{
               id: 'node["fixme"]',
               invalid: true
             }]
@@ -752,7 +752,7 @@ var overpassFrontend
             expectedQuery: 'node["highway"="crossing"](if:is_tag("bicycle"));',
             expected: [ 'n252548482', 'n286198749', 'n286198796' ],
             expectedSubRequestCount: 1,
-            expectedCacheInfo: [{
+            expectedCacheDescriptors: [{
               id: 'node["highway"="crossing"](if:is_tag("bicycle"))',
             }]
           }, done)
@@ -769,7 +769,7 @@ var overpassFrontend
             expectedQuery: 'way["highway"](if:length()>300);',
             expected: [ 'w141233627', 'w162373026', 'w199261366', 'w211635132', 'w217030746', 'w244604984', 'w26739449', 'w28147563', 'w283595960', 'w28890734', 'w31275229', 'w4849338', 'w5003914', 'w5838278' ],
             expectedSubRequestCount: 1,
-            expectedCacheInfo: [{
+            expectedCacheDescriptors: [{
               id: 'way["highway"](if:length()>300)',
             }]
           }, done)
@@ -783,7 +783,7 @@ var overpassFrontend
             expectedQuery: 'way["highway"](if:length()>500);',
             expected: [ 'w199261366', 'w217030746', 'w244604984', 'w31275229' ],
             expectedSubRequestCount: 0,
-            expectedCacheInfo: [{
+            expectedCacheDescriptors: [{
               id: 'way["highway"](if:length()>500)',
             }]
           }, (err) => {
@@ -804,7 +804,7 @@ var overpassFrontend
             expectedQuery: 'way["leisure"="park"](if:length()>300);',
             expected: [ 'w24867728', 'w299696929' ],
             expectedSubRequestCount: 1,
-            expectedCacheInfo: [{
+            expectedCacheDescriptors: [{
               id: 'way["leisure"="park"](if:length()>300)',
             }]
           }, done)
@@ -818,7 +818,7 @@ var overpassFrontend
             expectedQuery: 'way["leisure"="park"](if:length()>300);',
             expected: [ 'w24867728', 'w299696929' ],
             expectedSubRequestCount: 0,
-            expectedCacheInfo: [{
+            expectedCacheDescriptors: [{
               id: 'way["leisure"="park"](if:length()>300)',
             }]
           }, done)
@@ -832,7 +832,7 @@ var overpassFrontend
             expectedQuery: 'relation["building"](if:length()>300);',
             expected: [ 'r1246553', 'r1283879', 'r2000126' ],
             expectedSubRequestCount: 1,
-            expectedCacheInfo: [{
+            expectedCacheDescriptors: [{
               id: 'relation["building"](if:length()>300)',
             }]
           }, done)
@@ -846,7 +846,7 @@ var overpassFrontend
             expectedQuery: 'relation["building"](if:length()>300);',
             expected: [ 'r1246553', 'r1283879', 'r2000126' ],
             expectedSubRequestCount: 0,
-            expectedCacheInfo: [{
+            expectedCacheDescriptors: [{
               id: 'relation["building"](if:length()>300)',
             }]
           }, done)
@@ -863,7 +863,7 @@ var overpassFrontend
             expectedQuery: 'way["railway"](if:is_closed());',
             expected: [ 'w122504890', 'w122504891', 'w140549303', 'w140994821', 'w140994822', 'w210845476', 'w228736330', 'w228788310', 'w228788312', 'w232385434', 'w232385435', 'w234116025', 'w235999782', 'w235999783', 'w235999784', 'w235999841', 'w236000374', 'w236000375', 'w236000518', 'w237737500', 'w237737503', 'w261111066', 'w29003228', 'w86282062' ],
             expectedSubRequestCount: 1,
-            expectedCacheInfo: [{
+            expectedCacheDescriptors: [{
               id: 'way["railway"](if:is_closed())',
             }]
           }, done)
@@ -913,9 +913,9 @@ function test (options, callback) {
   request.on('subrequest-compile', compileListener)
 
   if (request.filterQuery) {
-    const cacheInfo = request.filterQuery.caches()
-    if (options.expectedCacheInfo) {
-      assert.deepEqual(cacheInfo, options.expectedCacheInfo, 'Expected cache info')
+    const cacheDescriptors = request.filterQuery.cacheDescriptors()
+    if (options.expectedCacheDescriptors) {
+      assert.deepEqual(cacheDescriptors, options.expectedCacheDescriptors, 'Expected cache info')
     }
   }
 

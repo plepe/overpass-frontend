@@ -629,7 +629,7 @@ class Filter {
     return query
   }
 
-  caches () {
+  cacheDescriptors () {
     let result
 
     if (Array.isArray(this.def) && Array.isArray(this.def[0])) {
