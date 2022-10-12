@@ -631,9 +631,11 @@ class OverpassFrontend {
   }
 
   clearBBoxQuery (query) {
-    const id = new Filter(query).toString()
+    const cacheDescriptors = new Filter(query).cacheDescriptors()
 
-    BBoxQueryCache.get({ id }).clear()
+    cacheDescriptors.forEach(id => {
+      BBoxQueryCache.get({ id }).clear()
+    })
   }
 
   _abortRequest (request) {
