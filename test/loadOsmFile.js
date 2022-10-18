@@ -3,7 +3,7 @@ var assert = require('assert')
 const loadOsmFile = require('../src/loadOsmFile')
 if (typeof XMLHttpRequest === 'undefined') {
   global.XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest
-  const DOMParser = require('xmldom').DOMParser
+  const DOMParser = require('@xmldom/xmldom').DOMParser
 }
 
 var parsedData

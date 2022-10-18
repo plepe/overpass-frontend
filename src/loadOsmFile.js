@@ -1,5 +1,5 @@
 const fs = require('fs')
-const DOMParser = require('xmldom').DOMParser
+const DOMParser = require('@xmldom/xmldom').DOMParser
 const bzip2 = require('bzip2')
 
 const convertFromXML = require('./convertFromXML')
