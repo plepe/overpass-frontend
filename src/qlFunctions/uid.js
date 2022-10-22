@@ -2,10 +2,9 @@ const OverpassFrontend = require('../defines')
 const qlFunction = require('./qlFunction')
 
 module.exports = class uid extends qlFunction {
-  requestProperties = OverpassFrontend.META
-
   constructor (str) {
     super()
+    this.requestProperties = OverpassFrontend.META
     this.value = str.split(/,/g).map(v => {
       if (!v.match(/^\s*\d+\s*/)) {
         throw new Error('Error parsing uid filter, expect a numeric value: "' + v + '"')

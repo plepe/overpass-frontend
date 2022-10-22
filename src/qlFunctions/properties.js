@@ -1,4 +1,3 @@
-const OverpassFrontend = require('../defines')
 const qlFunction = require('./qlFunction')
 
 module.exports = class properties extends qlFunction {

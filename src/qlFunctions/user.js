@@ -3,11 +3,10 @@ const qlFunction = require('./qlFunction')
 const parseString = require('../parseString')
 
 module.exports = class user extends qlFunction {
-  requestProperties = OverpassFrontend.META
-
   constructor (str) {
     super()
 
+    this.requestProperties = OverpassFrontend.META
     this.value = []
     let cont = true
     while (cont) {

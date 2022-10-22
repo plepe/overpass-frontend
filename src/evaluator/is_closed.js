@@ -2,7 +2,10 @@ const EvaluatorFunction = require('../EvaluatorFunction')
 const OverpassFrontend = require('../defines')
 
 module.exports = class EvaluatorFunctionIsClosed extends EvaluatorFunction {
-  requestProperties = OverpassFrontend.MEMBERS
+  constructor (fun, parameters) {
+    super(fun, parameters)
+    this.requestProperties = OverpassFrontend.MEMBERS
+  }
 
   eval (context) {
     if (context.type !== 'way') {

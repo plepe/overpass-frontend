@@ -2,7 +2,10 @@ const EvaluatorFunction = require('../EvaluatorFunction')
 const OverpassFrontend = require('../defines')
 
 module.exports = class EvaluatorFunctionIsTag extends EvaluatorFunction {
-  requestProperties = OverpassFrontend.TAGS
+  constructor (fun, parameters) {
+    super(fun, parameters)
+    this.requestProperties = OverpassFrontend.TAGS
+  }
 
   eval (context) {
     const param = this.parameters.map(p => p.eval(context))

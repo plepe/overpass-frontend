@@ -3,7 +3,10 @@ const EvaluatorFunction = require('../EvaluatorFunction')
 const OverpassFrontend = require('../defines')
 
 module.exports = class EvaluatorFunctionLength extends EvaluatorFunction {
-  requestProperties = OverpassFrontend.GEOM
+  constructor (fun, parameters) {
+    super(fun, parameters)
+    this.requestProperties = OverpassFrontend.GEOM
+  }
 
   eval (context) {
     if ('geomLength' in context.dbData) {
