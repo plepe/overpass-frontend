@@ -399,7 +399,7 @@ class Filter {
    * @return {string}
    */
   toString (def) {
-    return this.toQl({}, def)
+    return this.toQl({ toString: true }, def)
   }
 
   /**
@@ -650,9 +650,10 @@ class Filter {
     }
 
     result.forEach(entry => {
-      entry.id = (entry.type || 'nwr') + entry.filters
+      entry.id = (entry.type || 'nwr') + entry.filters + '(properties:' + entry.properties + ')'
       delete entry.type
       delete entry.filters
+      delete entry.properties
     })
 
     return result
@@ -787,7 +788,7 @@ class Filter {
         if (part.type && otherPart.type) {
           return part.type === otherPart.type
         }
-        if (compile(otherPart) === compile(part)) {
+        if (compile(otherPart, { toString: true }) === compile(part, { toString: true })) {
           return true
         }
         if (['~', '~i'].includes(part.op) && otherPart.op === '=' && part.key === otherPart.key && otherPart.value.match(RegExp(part.value, part.op === '~i' ? 'i' : ''))) {

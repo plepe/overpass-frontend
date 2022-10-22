@@ -500,6 +500,30 @@ describe("Filters - test isSupersetOf", function () {
     assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should not be a super set of " + f1.toString())
   })
 
+  it("node(properties: 15) - node(properties: 4)", function () {
+    const f1 = new Filter("node(properties: 15)")
+    const f2 = new Filter("node(properties: 4)")
+
+    assert.equal(f1.isSupersetOf(f2), true, f1.toString() + " should be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should not be a super set of " + f1.toString())
+  })
+
+  it("node(properties: 15) - node(properties: 16)", function () {
+    const f1 = new Filter("node(properties: 15)")
+    const f2 = new Filter("node(properties: 16)")
+
+    assert.equal(f1.isSupersetOf(f2), false, f1.toString() + " should not be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should not be a super set of " + f1.toString())
+  })
+
+  it("node(properties: 15) - node(properties: 4)(properties:11)", function () {
+    const f1 = new Filter("node(properties: 15)")
+    const f2 = new Filter("node(properties:4)(properties: 11)")
+
+    assert.equal(f1.isSupersetOf(f2), true, f1.toString() + " should be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should not be a super set of " + f1.toString())
+  })
+
   /** TODO
   it("node - nwr(if:type()=='node')", function () {
     const f1 = new Filter("node")
