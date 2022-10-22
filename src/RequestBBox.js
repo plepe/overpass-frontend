@@ -51,7 +51,10 @@ class RequestBBox extends Request {
         this.lokiQuery = { $and: [this.lokiQuery, boundsToLokiQuery(this.bbox, this.overpass)] }
       }
 
-      this.cacheDescriptors = this.filterQuery.cacheDescriptors().map(cacheDescriptors => {
+      const cacheFilter = new Filter({ and: [this.filterQuery, new Filter('nwr(properties:' + this.options.properties + ')')] })
+      this.options.properties = cacheFilter.properties()
+
+      this.cacheDescriptors = cacheFilter.cacheDescriptors().map(cacheDescriptors => {
         return {
           cache: BBoxQueryCache.get(this.overpass, cacheDescriptors.id),
           cacheDescriptors
