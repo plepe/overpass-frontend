@@ -80,7 +80,12 @@ The following functions are available:
 | user() | Returns the name of the user who last edited the object |
 | debug(...) | Prints the value of the parameter to the JavaScript development console, returns the value |
 | count_tags() | Returns the count of tags of the object |
+| count_members() | Returns the number of members |
+| count_by_role(...) | Returns the number of members with the specified role |
+| count_distinct_members() | Returns the distinct number of members |
+| count_distinct_by_role(...) | Returns the distinct number of members with the specified role |
 | length() | Returns the length of the object in meters (0 for nodes) |
+| is_closed() | Returns 1 if the object is a way and the first member is equal to the last member. |
 
 Examples:
 ```
