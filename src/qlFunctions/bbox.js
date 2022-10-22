@@ -6,6 +6,11 @@ const qlFunction = require('./qlFunction')
 module.exports = class bbox extends qlFunction {
   constructor (str) {
     super()
+    if (str instanceof BoundingBox) {
+      this.value = str
+      return
+    }
+
     let s = str.split(/,/g)
 
     if (s.length !== 4) {
