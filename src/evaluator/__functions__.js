@@ -1,6 +1,7 @@
 module.exports = {
   '': require('./parantheses'),
   changeset: require('./meta'),
+  debug: require('./debug'),
   id: require('./meta'),
   is_closed: require('./is_closed'),
   is_tag: require('./is_tag'),
