@@ -129,8 +129,12 @@ class Evaluator {
     return this.data.simplify()
   }
 
-  toString (options = {}) {
+  toString (options = { toString: true }) {
     return this.data.toString(options)
+  }
+
+  toQl () {
+    return this.data.toString({})
   }
 
   /**
