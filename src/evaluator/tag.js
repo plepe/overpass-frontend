@@ -9,8 +9,8 @@ module.exports = class EvaluatorFunctionTag extends EvaluatorFunction {
     return context.tags && context.tags[param[0]]
   }
 
-  toString () {
-    const param = this.parameters[0].toString()
+  toString (options) {
+    const param = this.parameters[0].toString(options)
     return 't[' + param + ']'
   }
 

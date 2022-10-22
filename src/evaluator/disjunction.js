@@ -12,8 +12,8 @@ module.exports = class EvaluatorOperatorDisjunction extends EvaluatorOperator {
     return left || right
   }
 
-  toString () {
-    return this.left.toString() + '||' + this.right.toString()
+  toString (options) {
+    return this.left.toString(options) + '||' + this.right.toString(options)
   }
 
   priority () {

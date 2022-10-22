@@ -10,8 +10,8 @@ module.exports = class EvaluatorOperatorUnaryMinus extends EvaluatorOperator {
     return -right
   }
 
-  toString () {
-    return '-' + this.right.toString()
+  toString (options) {
+    return '-' + this.right.toString(options)
   }
 
   toValue () {

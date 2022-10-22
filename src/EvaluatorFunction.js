@@ -13,8 +13,8 @@ module.exports = class EvaluatorFunction extends EvaluatorPart {
     return { fun: this.fun, parameters: this.parameters.map(p => evaluatorExport(p)) }
   }
 
-  toString () {
-    const param = this.parameters.map(p => p.toString())
+  toString (options) {
+    const param = this.parameters.map(p => p.toString(options))
     return this.fun + '(' + param.join(',') + ')'
   }
 

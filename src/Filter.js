@@ -10,7 +10,7 @@ function qlesc (str) {
   return '"' + str.replace(/"/g, '\\"') + '"'
 }
 
-function compile (part) {
+function compile (part, options = {}) {
   if (Array.isArray(part)) {
     return part.map(compile).join('')
   }
@@ -22,7 +22,7 @@ function compile (part) {
   const keyRegexp = (part.keyRegexp ? '~' : '')
 
   if (part instanceof qlFunction) {
-    return part.toString()
+    return part.toString(options)
   }
 
   if (part.type) {
@@ -469,7 +469,7 @@ class Filter {
 
     const queries = filterJoin(def
       .filter(part => !part.type)
-      .map(compile))
+      .map(part => compile(part, options)))
 
     let result
     if (queries.length > 1) {

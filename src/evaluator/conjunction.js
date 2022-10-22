@@ -16,8 +16,8 @@ module.exports = class EvaluatorOperatorConjunction extends EvaluatorOperator {
     return 6
   }
 
-  toString () {
-    return this.left.toString() + '&&' + this.right.toString()
+  toString (options) {
+    return this.left.toString(options) + '&&' + this.right.toString(options)
   }
 
   compileLokiJS () {

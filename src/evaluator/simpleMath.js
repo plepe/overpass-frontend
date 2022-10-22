@@ -28,8 +28,8 @@ module.exports = class EvaluatorOperatorSimpleMath extends EvaluatorOperator {
     return functions[this.op](left, right)
   }
 
-  toString () {
-    return this.left.toString() + this.op + this.right.toString()
+  toString (options) {
+    return this.left.toString(options) + this.op + this.right.toString(options)
   }
 
   priority () {

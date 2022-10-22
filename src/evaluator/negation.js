@@ -14,8 +14,8 @@ module.exports = class EvaluatorOperatorNegation extends EvaluatorOperator {
     return 1
   }
 
-  toString () {
-    return '!' + this.right.toString()
+  toString (options) {
+    return '!' + this.right.toString(options)
   }
 
   toValue () {

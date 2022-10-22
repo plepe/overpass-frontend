@@ -23,7 +23,7 @@ module.exports = class EvaluatorPart {
 
   cacheDescriptors (descriptors) {
     descriptors.forEach(d => {
-      d.filters += this.toString()
+      d.filters += this.toString({})
       d.properties |= this.calcRequestProperties()
     })
   }

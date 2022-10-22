@@ -15,8 +15,8 @@ module.exports = class If extends qlFunction {
     return this.value.exec(ob)
   }
 
-  toString () {
-    return '(if:' + this.value.toString() + ')'
+  toString (options = {}) {
+    return '(if:' + this.value.toString(options) + ')'
   }
 
   compileLokiJS () {
