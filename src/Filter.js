@@ -414,23 +414,15 @@ class Filter {
       def = this.def
     }
 
-    if (!options.inputSet) {
-      options.inputSet = ''
-    }
-
-    if (!options.outputSet) {
-      options.outputSet = ''
-    }
-
     if (Array.isArray(def) && Array.isArray(def[0])) {
-      return def.map(d => this.toQl({}, d)).join('')
+      return def.map(d => this.toQl(options, d)).join('')
     }
 
     if (def.or) {
       return '(' + def.or.map(part => {
-        const subOptions = {
-          inputSet: options.inputSet
-        }
+        const subOptions = JSON.parse(JSON.stringify(options))
+        subOptions.inputSet = options.inputSet
+        subOptions.outputSet = ''
         return this.toQl(subOptions, part)
       }).join('') + ')' + (options.outputSet ? '->' + options.outputSet : '') + ';'
     }
@@ -440,9 +432,25 @@ class Filter {
       const last = def.and[def.and.length - 1]
       const others = def.and.concat().slice(1, def.and.length - 1)
       const set = '.x' + this.uniqId()
-      return this.toQl({ inputSet: options.inputSet, outputSet: set }, first) +
-        others.map(part => this.toQl({ inputSet: set, outputSet: set }, part)).join('') +
-        this.toQl({ inputSet: set, outputSet: options.outputSet }, last)
+      const subOptions1 = JSON.parse(JSON.stringify(options))
+      const subOptions2 = JSON.parse(JSON.stringify(options))
+      const subOptions3 = JSON.parse(JSON.stringify(options))
+      subOptions1.outputSet = set
+      subOptions2.inputSet = set
+      subOptions2.outputSet = set
+      subOptions3.inputSet = set
+
+      return this.toQl(subOptions1, first) +
+        others.map(part => this.toQl(subOptions2, part)).join('') +
+        this.toQl(subOptions3, last)
+    }
+
+    if (!options.inputSet) {
+      options.inputSet = ''
+    }
+
+    if (!options.outputSet) {
+      options.outputSet = ''
     }
 
     const parts = def.filter(part => part.type)
