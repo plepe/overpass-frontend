@@ -810,6 +810,23 @@ class Filter {
       })
     })
   }
+
+  /**
+   * @returns {number} properties which are required for this filter
+   */
+  properties () {
+    let result
+
+    if (Array.isArray(this.def) && Array.isArray(this.def[0])) {
+      // script with several statements detected. only compile the last one, as previous statements
+      // can't have an effect on the last statement yet.
+      result = this._caches(this.def[this.def.length - 1])
+    } else {
+      result = this._caches(this.def)
+    }
+
+    return result.reduce((current, entry) => current | entry.properties, 0)
+  }
 }
 
 module.exports = Filter
