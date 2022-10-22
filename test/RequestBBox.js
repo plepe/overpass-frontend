@@ -82,7 +82,6 @@ describe('Overpass BBoxQuery', function() {
       },
       function (err) {
         assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
-        console.log(found)
         if (err) {
           return done(err)
         }
@@ -792,8 +791,6 @@ describe('Overpass BBoxQuery - with filter', function() {
       )
 
       req.on('subrequest-finish', function (subRequest) {
-        // console.log(subRequest.query)
-        // console.log('-> got ' + subRequest.parts[0].count + ' results')
         foundSubRequestCount++
       })
     })

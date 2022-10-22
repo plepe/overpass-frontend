@@ -31,9 +31,7 @@ module.exports = class properties extends qlFunction {
 
   isSupersetOf (other) {
     if (other instanceof properties) {
-      const v = (other.value & this.value) === other.value
-      console.log(this.value, other.value, other.value & this.value, v)
-      return v
+      return (other.value & this.value) === other.value
     }
   }
 }

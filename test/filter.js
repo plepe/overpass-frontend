@@ -1154,7 +1154,6 @@ describe('and', function () {
     check(f, [ 2, 3, 4, 5 ])
 
     var r = f.cacheDescriptors()
-    console.log(r)
     assert.deepEqual(r, [ { id: 'node["amenity"="cafe"]["cuisine"~"^(.*;|)ice_cream(|;.*)$"](properties:1)' }])
   })
 
