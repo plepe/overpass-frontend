@@ -1444,4 +1444,144 @@ describe('evaluators', function () {
     eval.cacheDescriptors(descriptors)
     assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
+
+  it ('count_members()', function () {
+    const eval = new Evaluator()
+    const str = eval.parse('count_members() < 3')
+    const expected = {
+      left: {
+        fun: 'count_members',
+        parameters: []
+      },
+      op: '<',
+      right: 3
+    }
+    const expectedResult = false
+    const expectedCompiled = 'count_members()<3'
+    const expectedLokiQuery = {
+      needMatch: true
+    }
+    const expectedCacheDescriptors = [
+      { filters: '(if:count_members()<3)', properties: OverpassFrontend.MEMBERS }
+    ]
+
+    assert.deepEqual(eval.toJSON(), expected)
+    assert.equal(str, '')
+
+    let result = eval.exec({ id: 'n377992', osm_id: 377992, type: 'node', meta: { timestamp: '2011-12-10T02:06:54Z' }, members: [{id: 'n1', role: 'foo'}, {id: 'n2', role: 'bar'}, {id: 'n1'}, {id: 'n3', role: 'foo' }]})
+    assert.equal(result, expectedResult)
+
+    assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.toValue(), null)
+    assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
+
+    const descriptors = [{filters: ''}]
+    eval.cacheDescriptors(descriptors)
+    assert.deepEqual(descriptors, expectedCacheDescriptors)
+  })
+
+  it ('count_distinct_members()', function () {
+    const eval = new Evaluator()
+    const str = eval.parse('count_distinct_members() == 3')
+    const expected = {
+      left: {
+        fun: 'count_distinct_members',
+        parameters: []
+      },
+      op: '==',
+      right: 3
+    }
+    const expectedResult = true
+    const expectedCompiled = 'count_distinct_members()==3'
+    const expectedLokiQuery = {
+      needMatch: true
+    }
+    const expectedCacheDescriptors = [
+      { filters: '(if:count_distinct_members()==3)', properties: OverpassFrontend.MEMBERS }
+    ]
+
+    assert.deepEqual(eval.toJSON(), expected)
+    assert.equal(str, '')
+
+    let result = eval.exec({ id: 'n377992', osm_id: 377992, type: 'node', meta: { timestamp: '2011-12-10T02:06:54Z' }, members: [{id: 'n1', role: 'foo'}, {id: 'n2', role: 'bar'}, {id: 'n1'}, {id: 'n3', role: 'foo' }]})
+    assert.equal(result, expectedResult)
+
+    assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.toValue(), null)
+    assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
+
+    const descriptors = [{filters: ''}]
+    eval.cacheDescriptors(descriptors)
+    assert.deepEqual(descriptors, expectedCacheDescriptors)
+  })
+
+  it ('count_by_role("foo")', function () {
+    const eval = new Evaluator()
+    const str = eval.parse('count_by_role("foo") == 3')
+    const expected = {
+      left: {
+        fun: 'count_by_role',
+        parameters: ['foo']
+      },
+      op: '==',
+      right: 3
+    }
+    const expectedResult = true
+    const expectedCompiled = 'count_by_role("foo")==3'
+    const expectedLokiQuery = {
+      needMatch: true
+    }
+    const expectedCacheDescriptors = [
+      { filters: '(if:count_by_role("foo")==3)', properties: OverpassFrontend.MEMBERS }
+    ]
+
+    assert.deepEqual(eval.toJSON(), expected)
+    assert.equal(str, '')
+
+    let result = eval.exec({ id: 'n377992', osm_id: 377992, type: 'node', meta: { timestamp: '2011-12-10T02:06:54Z' }, members: [{id: 'n1', role: 'foo'}, {id: 'n2', role: 'bar'}, {id: 'n1'}, {id: 'n3', role: 'foo' }, {id: 'n3', role: 'foo' }]})
+    assert.equal(result, expectedResult)
+
+    assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.toValue(), null)
+    assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
+
+    const descriptors = [{filters: ''}]
+    eval.cacheDescriptors(descriptors)
+    assert.deepEqual(descriptors, expectedCacheDescriptors)
+  })
+
+  it ('count_distinct_by_role("foo")', function () {
+    const eval = new Evaluator()
+    const str = eval.parse('count_distinct_by_role("foo") == 2')
+    const expected = {
+      left: {
+        fun: 'count_distinct_by_role',
+        parameters: ['foo']
+      },
+      op: '==',
+      right: 2
+    }
+    const expectedResult = true
+    const expectedCompiled = 'count_distinct_by_role("foo")==2'
+    const expectedLokiQuery = {
+      needMatch: true
+    }
+    const expectedCacheDescriptors = [
+      { filters: '(if:count_distinct_by_role("foo")==2)', properties: OverpassFrontend.MEMBERS }
+    ]
+
+    assert.deepEqual(eval.toJSON(), expected)
+    assert.equal(str, '')
+
+    let result = eval.exec({ id: 'n377992', osm_id: 377992, type: 'node', meta: { timestamp: '2011-12-10T02:06:54Z' }, members: [{id: 'n1', role: 'foo'}, {id: 'n2', role: 'bar'}, {id: 'n1'}, {id: 'n3', role: 'foo' }, {id: 'n3', role: 'foo' }]})
+    assert.equal(result, expectedResult)
+
+    assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.toValue(), null)
+    assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
+
+    const descriptors = [{filters: ''}]
+    eval.cacheDescriptors(descriptors)
+    assert.deepEqual(descriptors, expectedCacheDescriptors)
+  })
 })

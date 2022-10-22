@@ -1,6 +1,10 @@
 module.exports = {
   '': require('./parantheses'),
   changeset: require('./meta'),
+  count_distinct_members: require('./count_members'),
+  count_members: require('./count_members'),
+  count_by_role: require('./count_members'),
+  count_distinct_by_role: require('./count_members'),
   debug: require('./debug'),
   id: require('./meta'),
   is_closed: require('./is_closed'),
