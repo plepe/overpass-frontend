@@ -1626,4 +1626,23 @@ describe('evaluators', function () {
     eval.cacheDescriptors(descriptors)
     assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
+
+  it ('parsing errors', function () {
+    const templates = [
+      't["name"',
+      '1+',
+      'is_tag("foo"',
+      '"foo'
+    ]
+
+    templates.forEach(str => {
+      const eval = new Evaluator()
+      try {
+        eval.parse(str)
+      } catch (e) {
+        return
+      }
+      assert.fail('expect parsing error: ' + str)
+    })
+  })
 })
