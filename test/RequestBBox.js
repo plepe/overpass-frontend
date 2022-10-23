@@ -1161,4 +1161,120 @@ describe('BBoxQuery - Consecutive queries with different properties', function (
 
     request.on('subrequest-compile', compileListener)
   })
+
+  it('clear cache', function () {
+    overpassFrontend.clearCache()
+  })
+
+  it('first query (with more properties)', function (done) {
+    var expected = ['n441576820', 'n442066582', 'n442972880', 'n1467109667', 'n355123976', 'n1955278832', 'n441576823', 'n2083468740', 'n2099023017', 'w369989037', 'w370577069']
+    var found = []
+    var error = ''
+
+    var expectedSubRequestCount = 1
+    var foundSubRequestCount = 0
+
+    function compileListener (subRequest) {
+      foundSubRequestCount++
+    }
+
+    var request = overpassFrontend.BBoxQuery(
+      "nwr[amenity=restaurant]",
+      {
+        "maxlat": 48.200,
+        "maxlon": 16.345,
+        "minlat": 48.195,
+        "minlon": 16.335
+      },
+      {
+        properties: OverpassFrontend.META
+      },
+      function (err, result) {
+        found.push(result.id)
+
+        if (expected.indexOf(result.id) === -1) {
+          error += 'Unexpected result ' + result.id + '\n'
+        }
+      },
+      function (err) {
+        if (err) {
+          return done(err)
+        }
+
+        if (error) {
+          return done(error)
+        }
+
+        if (found.length !== expected.length) {
+          return done('Wrong count of objects returned:\n' +
+               'Expected: ' + expected.join(', ') + '\n' +
+               'Found: ' + found.join(', '))
+        }
+
+        assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
+
+        request.off('subrequest-compile', compileListener)
+
+        done()
+      }
+    )
+
+    request.on('subrequest-compile', compileListener)
+  })
+
+  it('second query (fully cached, less properties)', function (done) {
+    var expected = ['n441576820', 'n442066582', 'n442972880', 'n1467109667', 'n355123976', 'n1955278832', 'n441576823', 'n2083468740', 'n2099023017', 'w369989037', 'w370577069']
+    var found = []
+    var error = ''
+
+    var expectedSubRequestCount = 0
+    var foundSubRequestCount = 0
+
+    function compileListener (subRequest) {
+      foundSubRequestCount++
+    }
+
+    var request = overpassFrontend.BBoxQuery(
+      "nwr[amenity=restaurant]",
+      {
+        "maxlat": 48.200,
+        "maxlon": 16.345,
+        "minlat": 48.195,
+        "minlon": 16.335
+      },
+      {
+        properties: 0
+      },
+      function (err, result) {
+        found.push(result.id)
+
+        if (expected.indexOf(result.id) === -1) {
+          error += 'Unexpected result ' + result.id + '\n'
+        }
+      },
+      function (err) {
+        if (err) {
+          return done(err)
+        }
+
+        if (error) {
+          return done(error)
+        }
+
+        if (found.length !== expected.length) {
+          return done('Wrong count of objects returned:\n' +
+               'Expected: ' + expected.join(', ') + '\n' +
+               'Found: ' + found.join(', '))
+        }
+
+        assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
+
+        request.off('subrequest-compile', compileListener)
+
+        done()
+      }
+    )
+
+    request.on('subrequest-compile', compileListener)
+  })
 })
