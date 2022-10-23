@@ -1,6 +1,6 @@
 const evaluatorExport = require('../evaluatorExport')
 const EvaluatorOperator = require('../EvaluatorOperator')
-const evaluatorHelper = require('../evaluatorHelper')
+const EvaluatorValue = require('../EvaluatorValue')
 
 module.exports = class EvaluatorOperatorTernary extends EvaluatorOperator {
   constructor (op, condition, left, right) {
@@ -12,7 +12,7 @@ module.exports = class EvaluatorOperatorTernary extends EvaluatorOperator {
   }
 
   eval (context) {
-    let condition = this.condition.eval(context)
+    const condition = this.condition.eval(context)
     if (condition) {
       return this.left.eval(context)
     } else {

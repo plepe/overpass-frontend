@@ -50,7 +50,6 @@ class Evaluator {
   parse (str, rek = 0) {
     this.data = null
     let mode = 0
-    let ternary = 0
 
     while (true) {
       // console.log('rek' + rek, 'mode' + mode + '|', str.substr(0, 20), '->', this.data)
@@ -83,30 +82,33 @@ class Evaluator {
           return str
         }
       } else if (mode === 1) {
-        const m1 = str.match(/^(\s*)([),].*|)$/)
+        const m1 = str.match(/^(\s*)([),:].*|)$/)
         if (m1) {
           str = str.substr(m1[1].length)
           return str
         }
 
-        const m = str.match(/^\s*([=!]=|[<>]=?|[+*-/]|&&|\|\||\?|:)/)
+        const m = str.match(/^\s*([=!]=|[<>]=?|[+*-/]|&&|\|\||\?)/)
         if (!m) { throw new Error('mode 1') }
-        if (m[1] === ':') {
-          if (--ternary < 0) {
-            throw new Error('mode 1 - ternary 2nd parameter')
-          }
-          this.data.left = this.data.right
-          delete this.data.right
-        }
-        else {
-          if (m[1] === '?') {
-            ternary++
-          }
 
-          this.data = nextOp(this.data, m[1])
-        }
         str = str.substr(m[0].length)
+        this.data = nextOp(this.data, m[1])
         mode = 0
+
+        if (m[1] === '?') {
+          const s = new Evaluator()
+          str = s.parse(str, rek + 1, true)
+          this.data.left = s.data
+          const m1 = str.match(/^\s*:/)
+          if (!m1) {
+            throw new Error('mode 1 - ternary 2nd parameter expected')
+          }
+          str = str.substr(m1[0].length)
+          // console.log('rek' + rek, 'mode1t|', str.substr(0, 20), '->', this.data)
+          str = s.parse(str, rek + 1)
+          this.data.right = s.data
+          mode = 1
+        }
       } else if (mode === 10) {
         let s
         [s, str] = parseString(str)

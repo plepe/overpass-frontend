@@ -198,7 +198,6 @@ describe('evaluators', function () {
   it ('t["name"] == "foo" ? "match" : "no match"', function () {
     const eval = new Evaluator()
     const str = eval.parse('t["name"] == "foo" ? "match" : "no match"')
-    console.log('HERE', JSON.stringify(eval, null, '  '))
     const expected = {
       op: '?',
       condition: {
@@ -221,7 +220,6 @@ describe('evaluators', function () {
       { filters: '(if:"no match")', properties: OverpassFrontend.ID_ONLY }
     ]
 
-    console.log(JSON.stringify(eval.toJSON(), null, '  '))
     assert.deepEqual(eval.toJSON(), expected)
     assert.equal(str, '')
 
@@ -230,6 +228,42 @@ describe('evaluators', function () {
 
     assert.equal(eval.toString(), expectedCompiled)
     assert.deepEqual(eval.toValue(), null)
+    assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
+
+    const descriptors = [{filters: ''}]
+    eval.cacheDescriptors(descriptors)
+    assert.deepEqual(descriptors, expectedCacheDescriptors)
+  })
+
+  it ('1 ? 1 ? "a" : "b": "c"', function () {
+    const eval = new Evaluator()
+    const str = eval.parse('1 ? 1 ? "a" : "b": "c"')
+    const expected = {
+      op: '?',
+      condition: 1,
+      left: {
+        op: '?',
+        condition: 1,
+        left: 'a',
+        right: 'b'
+      },
+      right: 'c'
+    }
+    const expectedResult = 'a'
+    const expectedCompiled = '1?1?"a":"b":"c"'
+    const expectedLokiQuery = { needMatch: true }
+    const expectedCacheDescriptors = [
+      { filters: '' },
+    ]
+
+    assert.deepEqual(eval.toJSON(), expected)
+    assert.equal(str, '')
+
+    const result = eval.exec({ tags: { name: 'foo' } })
+    assert.equal(result, expectedResult)
+
+    assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.toValue(), 'a')
     assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
 
     const descriptors = [{filters: ''}]
@@ -1632,7 +1666,8 @@ describe('evaluators', function () {
       't["name"',
       '1+',
       'is_tag("foo"',
-      '"foo'
+      '"foo',
+      '"test"?"left"'
     ]
 
     templates.forEach(str => {
