@@ -329,7 +329,7 @@ function check (def) {
   }
   if (def.or) {
     def.or = def.or.map(p => check(p))
-  } else if (def.fun) {
+  } else if (def.fun && !(def instanceof qlFunction)) {
     def = new qlFunctions[def.fun](def.value)
   }
 
