@@ -33,7 +33,9 @@ module.exports = class EvaluatorOperatorNegation extends EvaluatorOperator {
     }
     if (right !== null && typeof right === 'object') {
       const k = Object.keys(right)
-      if (k.length === 1 && '$exists' in right[k]) {
+      if (k.length === 1 && 'needMatch' in right) {
+        return { needMatch: true }
+      } else if (k.length === 1 && '$exists' in right[k]) {
         right[k].$exists = !right[k].$exists
         return right
       }

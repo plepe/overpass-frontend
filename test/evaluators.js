@@ -1215,6 +1215,41 @@ describe('evaluators', function () {
     assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
 
+  it('!is_closed()', function () {
+    const eval = new Evaluator()
+    const str = eval.parse('!is_closed()')
+    const expected = {
+      left: null,
+      right: {
+        fun: 'is_closed',
+        parameters: []
+      },
+      op: '!'
+    }
+    const expectedResult = 0
+    const expectedCompiled = '!is_closed()'
+    const expectedLokiQuery = {
+      needMatch: true
+    }
+    const expectedCacheDescriptors = [
+      { filters: '(if:!is_closed())', properties: OverpassFrontend.MEMBERS }
+    ]
+
+    assert.deepEqual(eval.toJSON(), expected)
+    assert.equal(str, '')
+
+    let result = eval.exec({ id: 'w377992', osm_id: 377992, type: 'way', members: [ {id: 'n1'}, {id: 'n2'}, {id: 'n1' }]})
+    assert.equal(result, expectedResult)
+
+    assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.toValue(), null)
+    assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
+
+    const descriptors = [{filters: ''}]
+    eval.cacheDescriptors(descriptors)
+    assert.deepEqual(descriptors, expectedCacheDescriptors)
+  })
+
   it ('is_tag("name")', function () {
     const eval = new Evaluator()
     const str = eval.parse('is_tag("name")')
