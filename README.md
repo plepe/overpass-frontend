@@ -44,6 +44,7 @@ Every query can have any amount of filters, e.g. `nwr[amenity=restraunt][name]` 
 | node(poly:"48.1 16.1 48.2 16.1 48.2 16.2") | Query objects inside the polygon (min 3 pairs of lat lon) |
 | node(user:"Alice","Bob") | Query objects last edited by user "Alice" or "Bob"  |
 | node(uid:1,2,3)      | Query objects last edited by the users with uid 1, 2 or 3 |
+| node(newer:"2020-01-01T00:00:00Z") | Query objects that are newer (or equal) than the specified timestamp |
 | node(if:t["name"]=="foo") | Conditional query filter, see below |
 
 ### Conditional query filters

@@ -3,6 +3,7 @@ module.exports = {
   bbox: require('./bbox'),
   id: require('./id'),
   if: require('./if'),
+  newer: require('./newer'),
   uid: require('./uid'),
   user: require('./user'),
   poly: require('./poly'),

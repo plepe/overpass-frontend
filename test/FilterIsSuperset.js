@@ -500,6 +500,14 @@ describe("Filters - test isSupersetOf", function () {
     assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should not be a super set of " + f1.toString())
   })
 
+  it("node(newer:'2020-01-01T00:00:00Z') - node(newer:'2022-01-01T00:00:00Z')", function () {
+    const f1 = new Filter("node(newer:'2020-01-01T00:00:00Z')")
+    const f2 = new Filter("node(newer:'2022-01-01T00:00:00Z')")
+
+    assert.equal(f1.isSupersetOf(f2), true, f1.toString() + " should be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should not be a super set of " + f1.toString())
+  })
+
   it("node(properties: 15) - node(properties: 4)", function () {
     const f1 = new Filter("node(properties: 15)")
     const f2 = new Filter("node(properties: 4)")

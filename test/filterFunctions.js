@@ -627,6 +627,38 @@ var overpassFrontend
       })
     })
 
+    describe('Filter "newer"', function () {
+      it('clear cache', function () {
+        overpassFrontend.clearCache()
+      })
+
+      it('first', function (done) {
+        test({
+          mode,
+          query: 'node[amenity](newer:"2016-05-01T00:00:00Z")',
+          expectedQuery: 'node["amenity"](newer:"2016-05-01T00:00:00Z");',
+          expected: [ 'n1863103576', 'n1870541458', 'n252549219', 'n4100076539', 'n4302904972', 'n441576820' ],
+          expectedSubRequestCount: 1,
+          expectedCacheDescriptors: [{
+            "id": 'node["amenity"](newer:"2016-05-01T00:00:00Z")(properties:3)'
+          }]
+        }, done)
+      })
+
+      it('second (even newer)', function (done) {
+        test({
+          mode,
+          query: 'node[amenity](newer:"2016-07-01T00:00:00Z")',
+          expectedQuery: 'node["amenity"](newer:"2016-07-01T00:00:00Z");',
+          expected: [ 'n1870541458', 'n4302904972', 'n441576820' ],
+          expectedSubRequestCount: 0,
+          expectedCacheDescriptors: [{
+            "id": 'node["amenity"](newer:"2016-07-01T00:00:00Z")(properties:3)'
+          }]
+        }, done)
+      })
+    })
+
     describe('Filter "if"', function () {
       it('clear cache', function () {
         overpassFrontend.clearCache()
