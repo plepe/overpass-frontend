@@ -1316,6 +1316,58 @@ describe('evaluators', function () {
     assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
 
+  it ('t["name"] == "foo" ? debug("match") : debug(is_closed())', function () {
+    const eval = new Evaluator()
+    const str = eval.parse('t["name"] == "foo" ? debug("match") : debug(is_closed())')
+    const expected = {
+      op: '?',
+      condition: {
+        op: '==',
+        left: {
+          fun: 'tag',
+          parameters: ['name']
+        },
+        right: 'foo'
+      },
+      left: {
+        fun: 'debug',
+        parameters: ['match'],
+      },
+      right: {
+        fun: 'debug',
+        parameters: [{
+          fun: 'is_closed',
+          parameters: []
+        }]
+      }
+    }
+    const expectedResult = 'match'
+    const expectedCompiled = 't["name"]=="foo"?debug("match"):debug(is_closed())'
+    const expectedQl = 't["name"]=="foo"?"match":is_closed()'
+    const expectedLokiQuery = { needMatch: true }
+    const expectedCacheDescriptors = [
+      { filters: '(if:t["name"]=="foo")', properties: OverpassFrontend.TAGS },
+      { filters: '(if:"match")', properties: OverpassFrontend.ID_ONLY },
+      { filters: '(if:is_closed())', properties: OverpassFrontend.MEMBERS }
+    ]
+
+    assert.deepEqual(eval.toJSON(), expected)
+    assert.equal(str, '')
+
+    const result = eval.exec({ tags: { name: 'foo' } })
+    assert.equal(result, expectedResult)
+
+    assert.equal(eval.toString(), expectedCompiled)
+    assert.equal(eval.toQl(), expectedQl)
+    assert.deepEqual(eval.toValue(), null)
+    assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
+
+    const descriptors = [{filters: ''}]
+    eval.cacheDescriptors(descriptors)
+    assert.deepEqual(descriptors, expectedCacheDescriptors)
+  })
+
+
 /* TODO
   it('is_tag("name") == 1', function () {
     const eval = new Evaluator()
