@@ -1,4 +1,5 @@
 module.exports = {
+  '?': require('./ternary'),
   '||': require('./disjunction'),
   '&&': require('./conjunction'),
   '==': require('./comparison'),

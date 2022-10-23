@@ -195,6 +195,48 @@ describe('evaluators', function () {
     assert.deepEqual(descriptors, expectedCacheDescriptors)
   })
 
+  it ('t["name"] == "foo" ? "match" : "no match"', function () {
+    const eval = new Evaluator()
+    const str = eval.parse('t["name"] == "foo" ? "match" : "no match"')
+    console.log('HERE', JSON.stringify(eval, null, '  '))
+    const expected = {
+      op: '?',
+      condition: {
+        op: '==',
+        left: {
+          fun: 'tag',
+          parameters: ['name']
+        },
+        right: 'foo'
+      },
+      left: 'match',
+      right: 'no match'
+    }
+    const expectedResult = 'match'
+    const expectedCompiled = 't["name"]=="foo"?"match":"no match"'
+    const expectedLokiQuery = { needMatch: true }
+    const expectedCacheDescriptors = [
+      { filters: '(if:t["name"]=="foo")', properties: OverpassFrontend.TAGS },
+      { filters: '(if:"match")', properties: OverpassFrontend.ID_ONLY },
+      { filters: '(if:"no match")', properties: OverpassFrontend.ID_ONLY }
+    ]
+
+    console.log(JSON.stringify(eval.toJSON(), null, '  '))
+    assert.deepEqual(eval.toJSON(), expected)
+    assert.equal(str, '')
+
+    const result = eval.exec({ tags: { name: 'foo' } })
+    assert.equal(result, expectedResult)
+
+    assert.equal(eval.toString(), expectedCompiled)
+    assert.deepEqual(eval.toValue(), null)
+    assert.deepEqual(eval.compileLokiJS(), expectedLokiQuery)
+
+    const descriptors = [{filters: ''}]
+    eval.cacheDescriptors(descriptors)
+    assert.deepEqual(descriptors, expectedCacheDescriptors)
+  })
+
   it ('1 < 2', function () {
     const eval = new Evaluator()
     const str = eval.parse('1 < 2')

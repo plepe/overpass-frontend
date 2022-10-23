@@ -55,6 +55,7 @@ The following operators are available (ordered weak to string binding):
 
 | Operator | Description                   |
 |----------|-------------------------------|
+| ?:       | Ternary operator              |
 | ||       | Logical disjunction           |
 | &amp;&amp; | Logical conjunction         |
 | == !=    | equality, inequality          |

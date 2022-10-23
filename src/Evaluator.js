@@ -50,6 +50,7 @@ class Evaluator {
   parse (str, rek = 0) {
     this.data = null
     let mode = 0
+    let ternary = 0
 
     while (true) {
       // console.log('rek' + rek, 'mode' + mode + '|', str.substr(0, 20), '->', this.data)
@@ -88,9 +89,22 @@ class Evaluator {
           return str
         }
 
-        const m = str.match(/^\s*([=!]=|[<>]=?|[+*-/]|&&|\|\|)/)
+        const m = str.match(/^\s*([=!]=|[<>]=?|[+*-/]|&&|\|\||\?|:)/)
         if (!m) { throw new Error('mode 1') }
-        this.data = nextOp(this.data, m[1])
+        if (m[1] === ':') {
+          if (--ternary < 0) {
+            throw new Error('mode 1 - ternary 2nd parameter')
+          }
+          this.data.left = this.data.right
+          delete this.data.right
+        }
+        else {
+          if (m[1] === '?') {
+            ternary++
+          }
+
+          this.data = nextOp(this.data, m[1])
+        }
         str = str.substr(m[0].length)
         mode = 0
       } else if (mode === 10) {
