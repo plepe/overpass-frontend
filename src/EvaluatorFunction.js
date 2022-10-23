@@ -25,10 +25,10 @@ module.exports = class EvaluatorFunction extends EvaluatorPart {
   simplify () {
     const v = this.toValue()
     if (v !== null) {
-      return new EvaluatorValue(v, this.master)
+      return new EvaluatorValue(v)
     }
     const param = this.parameters.map(p => p.simplify())
-    return new this.constructor(this.fun, param, this.master)
+    return new this.constructor(this.fun, param)
   }
 
   compileLokiJS () {

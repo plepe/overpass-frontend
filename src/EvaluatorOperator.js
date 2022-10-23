@@ -24,11 +24,11 @@ module.exports = class EvaluatorOperator extends EvaluatorPart {
   simplify () {
     const v = this.toValue()
     if (v !== null) {
-      return new EvaluatorValue(v, this.master)
+      return new EvaluatorValue(v)
     }
     const left = this.left ? this.left.simplify() : null
     const right = this.right ? this.right.simplify() : null
-    return new this.constructor(this.op, left, right, this.master)
+    return new this.constructor(this.op, left, right)
   }
 
   compileLokiJS () {
