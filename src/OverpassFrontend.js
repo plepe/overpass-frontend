@@ -7,6 +7,7 @@ const LokiJS = require('lokijs')
 const httpLoad = require('./httpLoad')
 const removeNullEntries = require('./removeNullEntries')
 
+const BBoxQueryCache = require('./BBoxQueryCache')
 const OverpassObject = require('./OverpassObject')
 const OverpassNode = require('./OverpassNode')
 const OverpassWay = require('./OverpassWay')
@@ -127,11 +128,15 @@ class OverpassFrontend {
    * clear all caches
    */
   clearCache () {
+    if (this.localOnly) {
+      return
+    }
+
     this.cacheElements = {}
     this.cacheElementsMemberOf = {}
-    this.cacheBBoxQueries = {}
     this.cacheTimestamp = timestamp()
     this.db.clear()
+    BBoxQueryCache.clear()
 
     // Set default properties
     this.hasStretchLon180 = false
@@ -285,12 +290,14 @@ class OverpassFrontend {
     // preprocess all requests
     // e.g. call featureCallback for elements which were received in the
     // meantime
-    this.requests.forEach(request => {
+    this.requests.forEach((request, i) => {
       if (request && request.timestampPreprocess < this.cacheTimestamp) {
         request.preprocess()
         request.timestampPreprocess = this.cacheTimestamp
 
-        if (request.mayFinish() || this.localOnly) {
+        if (request.finished) {
+          this.requests[i] = null
+        } else if (request.mayFinish() || this.localOnly) {
           request.finish()
         }
       }
@@ -624,9 +631,11 @@ class OverpassFrontend {
   }
 
   clearBBoxQuery (query) {
-    const filterId = new Filter(query).toString()
+    const cacheDescriptors = new Filter(query).cacheDescriptors()
 
-    delete this.cacheBBoxQueries[filterId]
+    cacheDescriptors.forEach(id => {
+      BBoxQueryCache.get({ id }).clear()
+    })
   }
 
   _abortRequest (request) {
@@ -640,7 +649,10 @@ class OverpassFrontend {
   }
 
   _finishRequest (request) {
-    this.requests[this.requests.indexOf(request)] = null
+    const p = this.requests.indexOf(request)
+    if (p >= 0) {
+      this.requests[p] = null
+    }
   }
 
   _next () {

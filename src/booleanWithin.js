@@ -1,6 +1,4 @@
-const turf = {
-  booleanWithin: require('@turf/boolean-within').default
-}
+const turf = require('./turf')
 
 module.exports = function booleanWithin (feature1, feature2) {
   const features1 = splitGeometry(feature1)

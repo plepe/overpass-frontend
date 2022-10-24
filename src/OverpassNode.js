@@ -3,9 +3,7 @@
 const OverpassObject = require('./OverpassObject')
 const BoundingBox = require('boundingbox')
 const OverpassFrontend = require('./defines')
-const turf = {
-  booleanIntersects: require('@turf/boolean-intersects').default
-}
+const turf = require('./turf')
 
 /**
  * A node
