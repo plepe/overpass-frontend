@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: RequestMulti.js</title>
+    <title>JSDoc: Source: BBoxQueryCache.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: RequestMulti.js</h1>
+    <h1 class="page-title">Source: BBoxQueryCache.js</h1>
 
     
 
@@ -26,61 +26,125 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>const Request = require('./Request')
+            <pre class="prettyprint source linenums"><code>const BoundingBox = require('boundingbox')
+const turf = require('./turf')
 
-/**
- * A request consisting of several requests - duplicate results will be filtered
- * @extends Request
- */
-class RequestMulti extends Request {
-  constructor (overpass, options, requests) {
-    super(overpass, options)
-    this.type = 'RequestMulti'
+const Filter = require('./Filter')
 
-    this.doneFeatures = {}
-    this.requests = requests
+const list = {}
 
-    this.requests.forEach(req => {
-      req.on('finish', () => {
-        this.requests.splice(this.requests.indexOf(req), 1)
-      })
+class BBoxQueryCache {
+  constructor (overpass, id) {
+    this.overpass = overpass
+    this.id = id
+    this.filter = new Filter(id)
+    this.area = null
+  }
 
-      req.on('subrequest-compile', (subRequest) => this.emit('subrequest-compile', subRequest))
-      req.on('subrequest-finish', (subRequest) => this.emit('subrequest-finish', subRequest))
+  /**
+   * make another part of the map known
+   */
+  add (bbox, cacheDescriptors = null) {
+    // ignore requests for IDs
+    if (cacheDescriptors &amp;&amp; cacheDescriptors.ids) {
+      return
+    }
 
-      req.featureCallback = (err, ob) => {
-        if (!(ob.id in this.doneFeatures)) {
-          this.doneFeatures[ob.id] = true
-          this.featureCallback(err, ob)
+    bbox = new BoundingBox(bbox).toGeoJSON()
+
+    if (cacheDescriptors &amp;&amp; cacheDescriptors.bounds) {
+      bbox = turf.intersect(bbox, cacheDescriptors.bounds)
+    }
+
+    if (this.area === null) {
+      this.area = bbox
+    } else {
+      this.area = turf.union(bbox, this.area)
+    }
+  }
+
+  /**
+   * is the whole area known?
+   */
+  check (bbox, cacheDescriptors = null) {
+    if (cacheDescriptors &amp;&amp; cacheDescriptors.invalid) {
+      return false
+    }
+
+    if (cacheDescriptors &amp;&amp; cacheDescriptors.ids) {
+      let types = [cacheDescriptors.id.match(/^(node|way|relation|nwr)/)[1]]
+      if (types[0] === 'nwr') {
+        types = ['node', 'way', 'relation']
+      }
+
+      return types.every(type =>
+        cacheDescriptors.ids.every(id =>
+          (type.substr(0, 1) + id) in this.overpass.cacheElements
+        )
+      )
+    }
+
+    bbox = new BoundingBox(bbox).toGeoJSON()
+
+    if (cacheDescriptors &amp;&amp; cacheDescriptors.bounds) {
+      bbox = turf.intersect(bbox, cacheDescriptors.bounds)
+    }
+
+    if (this.area) {
+      const remaining = turf.difference(bbox, this.area)
+
+      if (!remaining) {
+        return true
+      }
+    }
+
+    // check if a superset matches
+    return Object.values(list).some(cache => {
+      if (cache.id === this.id) { return false }
+
+      if (cache.filter.isSupersetOf(this.filter)) {
+        if (cache.area) {
+          return !turf.difference(bbox, cache.area)
         }
       }
-      req.finalCallback = () => {}
 
-      this.overpass.requests.push(req)
+      return false
     })
   }
 
   /**
-   * abort this request and sub requests
+   * clear this cache
    */
-  abort () {
-    this.requests.forEach(req => req.abort())
-    super.abort()
+  clear () {
+    this.area = null
+    delete list[this.id]
   }
 
-  willInclude () {
-    return false
-  }
-
-  preprocess () {
-  }
-
-  mayFinish () {
-    return !this.requests.length
+  /**
+   * return area as (multi)polygon
+   */
+  toGeoJSON () {
+    return this.area
   }
 }
 
-module.exports = RequestMulti
+BBoxQueryCache.get = (overpass, id) => {
+  if (!(id in list)) {
+    list[id] = new BBoxQueryCache(overpass, id)
+  }
+
+  return list[id]
+}
+
+BBoxQueryCache.clear = () => {
+  for (const k in list) {
+    delete list[k]
+  }
+}
+
+BBoxQueryCache.list = list
+
+module.exports = BBoxQueryCache
 </code></pre>
         </article>
     </section>
