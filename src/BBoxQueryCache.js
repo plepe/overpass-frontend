@@ -51,7 +51,7 @@ class BBoxQueryCache {
 
       return types.every(type =>
         cacheDescriptors.ids.every(id =>
-          (type.substr(0, 1) + id) in this.overpass.cacheElements
+          this.overpass.cache.has(type.substr(0, 1) + id)
         )
       )
     }
