@@ -170,7 +170,7 @@ function parse (def, rek = 0) {
         throw new Error("Can't parse query, expected type of object (e.g. 'node'): " + def)
       }
     } else if (mode === 1) {
-      m = def.match(/^\s*\);?/)
+      m = def.match(/^\s*\)\s*;?\s*/)
       if (m) {
         def = def.slice(m[0].length)
         return [rek === 0 && script.length === 1 ? script[0] : script, def]
