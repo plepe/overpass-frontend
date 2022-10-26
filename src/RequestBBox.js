@@ -6,7 +6,6 @@ const RequestBBoxMembers = require('./RequestBBoxMembers')
 const Filter = require('./Filter')
 const boundsToLokiQuery = require('./boundsToLokiQuery')
 const boundsIsFullWorld = require('./boundsIsFullWorld')
-const isodate = require('./isodate')
 
 /**
  * A BBox request
@@ -23,12 +22,6 @@ class RequestBBox extends Request {
 
     if (typeof this.options.properties === 'undefined') {
       this.options.properties = defines.DEFAULT
-    }
-    if (this.overpass.options.attic) {
-      this.options.properties |= defines.META
-    }
-    if (this.options.date) {
-      this.options.date = isodate(this.options.date)
     }
     this.options.properties |= defines.BBOX
     this.options.minEffort = this.options.minEffort || 256
@@ -50,22 +43,18 @@ class RequestBBox extends Request {
         return this.finish(err)
       }
 
+      // if attic date is enabled, we have to check again to filter out false
+      // positives (an older version of an object might have matched)
+      if (this.overpass.options.attic) {
+        this.filterQuery = new Filter({ and: [this.filterQuery, new Filter('nwr(date:' + (this.options.date || '') + ')')] })
+      }
+
       this.lokiQuery = this.filterQuery.toLokijs()
       this.lokiQueryNeedMatch = !!this.lokiQuery.needMatch
       delete this.lokiQuery.needMatch
 
       if (!boundsIsFullWorld(this.bounds)) {
         this.lokiQuery = { $and: [this.lokiQuery, boundsToLokiQuery(this.bbox, this.overpass)] }
-      }
-
-      if (this.options.date) {
-        this.lokiQuery = { $and: [this.lokiQuery, { timestamp: { $lte: isodate(this.options.date) } }] }
-      }
-
-      // if attic date is enabled, we have to check again to filter out false
-      // positives (an older version of an object might have matched)
-      if (this.overpass.options.attic) {
-        this.lokiQueryNeedMatch = true
       }
 
       const cacheFilter = new Filter({ and: [this.filterQuery, new Filter('nwr(properties:' + this.options.properties + ')')] })
