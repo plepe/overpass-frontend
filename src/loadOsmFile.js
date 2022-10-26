@@ -1,5 +1,5 @@
 const fs = require('fs')
-const DOMParser = require('xmldom').DOMParser
+const DOMParser = require('@xmldom/xmldom').DOMParser
 const bzip2 = require('bzip2')
 
 const convertFromXML = require('./convertFromXML')
@@ -37,7 +37,7 @@ module.exports = function loadOsmFile (url, callback) {
     return
   }
 
-  const req = new window.XMLHttpRequest()
+  const req = new global.XMLHttpRequest()
 
   req.onreadystatechange = function () {
     if (req.readyState === 4) {
@@ -72,7 +72,7 @@ module.exports = function loadOsmFile (url, callback) {
     if (typeof location === 'undefined') {
       url = 'https:' + url
     } else {
-      url = window.location.protocol + url
+      url = global.location.protocol + url
     }
   }
 

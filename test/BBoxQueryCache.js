@@ -2,12 +2,12 @@ var assert = require('assert')
 var async = require('async')
 
 var BoundingBox = require('boundingbox')
-var KnownArea = require('../src/knownArea')
+var BBoxQueryCache = require('../src/BBoxQueryCache')
 
-describe('KnownArea', function() {
+describe('BBoxQueryCache', function() {
   describe('add', function() {
     it('single add', function () {
-      var area = new KnownArea()
+      var area = new BBoxQueryCache()
 
       area.add({
             minlon: 16,
@@ -24,7 +24,7 @@ describe('KnownArea', function() {
     })
 
     it('two add', function () {
-      var area = new KnownArea()
+      var area = new BBoxQueryCache()
 
       area.add({
             minlon: 16,
@@ -46,7 +46,8 @@ describe('KnownArea', function() {
     })
 
     it('init with area, single add', function () {
-      var area = new KnownArea({"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[16,48],[17,48],[17,49],[16,49],[16,48]]]}})
+      var area = new BBoxQueryCache()
+      area.add({"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[16,48],[17,48],[17,49],[16,49],[16,48]]]}})
       area.add({
             minlon: 15.5,
             minlat: 48,
@@ -61,7 +62,7 @@ describe('KnownArea', function() {
     })
 
     it('two add - disconnected', function () {
-      var area = new KnownArea()
+      var area = new BBoxQueryCache()
 
       area.add({
             minlon: 16,
@@ -83,7 +84,7 @@ describe('KnownArea', function() {
     })
 
     it('three add', function () {
-      var area = new KnownArea()
+      var area = new BBoxQueryCache()
 
       area.add({
             minlon: 16,
@@ -113,7 +114,8 @@ describe('KnownArea', function() {
 
   describe('check', function() {
     it('exact match', function () {
-      var area = new KnownArea({"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[16,48],[17,48],[17,49],[16,49],[16,48]]]}})
+      var area = new BBoxQueryCache()
+      area.add({"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[16,48],[17,48],[17,49],[16,49],[16,48]]]}})
 
       var result = area.check({
             minlon: 16,
@@ -126,7 +128,8 @@ describe('KnownArea', function() {
     })
 
     it('fully within', function () {
-      var area = new KnownArea({"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[16,48.4],[15,48.4],[15,48],[14,48],[14,49],[15,49],[15,48.6],[16,48.6],[16,49],[17,49],[17,48],[16,48],[16,48.4]]]},"properties":{}})
+      var area = new BBoxQueryCache()
+      area.add({"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[16,48.4],[15,48.4],[15,48],[14,48],[14,49],[15,49],[15,48.6],[16,48.6],[16,49],[17,49],[17,48],[16,48],[16,48.4]]]},"properties":{}})
 
       var result = area.check({
             minlon: 14.5,
@@ -139,7 +142,8 @@ describe('KnownArea', function() {
     })
 
     it('larger', function () {
-      var area = new KnownArea({"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[16,48.4],[15,48.4],[15,48],[14,48],[14,49],[15,49],[15,48.6],[16,48.6],[16,49],[17,49],[17,48],[16,48],[16,48.4]]]},"properties":{}})
+      var area = new BBoxQueryCache()
+      area.add({"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[16,48.4],[15,48.4],[15,48],[14,48],[14,49],[15,49],[15,48.6],[16,48.6],[16,49],[17,49],[17,48],[16,48],[16,48.4]]]},"properties":{}})
 
       var result = area.check({
             minlon: 13,
@@ -152,7 +156,8 @@ describe('KnownArea', function() {
     })
 
     it('outside', function () {
-      var area = new KnownArea({"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[16,48.4],[15,48.4],[15,48],[14,48],[14,49],[15,49],[15,48.6],[16,48.6],[16,49],[17,49],[17,48],[16,48],[16,48.4]]]},"properties":{}})
+      var area = new BBoxQueryCache()
+      area.add({"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[16,48.4],[15,48.4],[15,48],[14,48],[14,49],[15,49],[15,48.6],[16,48.6],[16,49],[17,49],[17,48],[16,48],[16,48.4]]]},"properties":{}})
 
       var result = area.check({
             minlon: 13.5,
@@ -165,7 +170,8 @@ describe('KnownArea', function() {
     })
 
     it('overlap', function () {
-      var area = new KnownArea({"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[16,48.4],[15,48.4],[15,48],[14,48],[14,49],[15,49],[15,48.6],[16,48.6],[16,49],[17,49],[17,48],[16,48],[16,48.4]]]},"properties":{}})
+      var area = new BBoxQueryCache()
+      area.add({"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[16,48.4],[15,48.4],[15,48],[14,48],[14,49],[15,49],[15,48.6],[16,48.6],[16,49],[17,49],[17,48],[16,48],[16,48.4]]]},"properties":{}})
 
       var result = area.check({
             minlon: 13.5,
@@ -178,7 +184,7 @@ describe('KnownArea', function() {
     })
 
     it('another example', function () {
-      var area = new KnownArea()
+      var area = new BBoxQueryCache()
       area.add({
         maxlat: 48.19953,
         maxlon: 16.33506,

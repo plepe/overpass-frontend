@@ -32,9 +32,7 @@ const async = require('async')
 const BoundingBox = require('boundingbox')
 const OverpassObject = require('./OverpassObject')
 const OverpassFrontend = require('./defines')
-const turf = {
-  booleanIntersects: require('@turf/boolean-intersects').default
-}
+const turf = require('./turf')
 
 /**
  * A way
@@ -81,23 +79,23 @@ class OverpassWay extends OverpassObject {
           type: 'node'
         })
 
-        let obProperties = OverpassFrontend.ID_ONLY
+        const memberOptions = JSON.parse(JSON.stringify(options))
+
+        memberOptions.properties = OverpassFrontend.ID_ONLY
         const ob = {
           id: this.data.nodes[i],
           type: 'node'
         }
 
         if (data.geometry &amp;&amp; data.geometry[i]) {
-          obProperties = obProperties | OverpassFrontend.GEOM
+          memberOptions.properties |= OverpassFrontend.GEOM
           ob.lat = data.geometry[i].lat
           ob.lon = data.geometry[i].lon
         }
 
-        const memberOb = this.overpass.createOrUpdateOSMObject(ob, {
-          properties: obProperties
-        })
+        const memberMetaOb = this.overpass.createOrUpdateOSMObject(ob, memberOptions)
 
-        memberOb.notifyMemberOf(this, null, i)
+        memberMetaOb.notifyMemberOf(this, null, i)
       }
     }
 
@@ -112,10 +110,9 @@ class OverpassWay extends OverpassObject {
 
   checkGeometry () {
     if (this.members &amp;&amp; (this.properties &amp; OverpassFrontend.GEOM) === 0) {
-      this.geometry = this.members.map(
-        member => {
-          const node = this.overpass.cacheElements[member.id]
-          return node ? node.geometry : null
+      this.geometry = this.memberObjects().map(
+        node => {
+          return node.ob ? node.ob.geometry : null
         }
       ).filter(geom => geom)
 
@@ -178,7 +175,7 @@ class OverpassWay extends OverpassObject {
       const coordinates = this.geometry
         .filter(point => point) // discard non-loaded points
         .map(point => [point.lon, point.lat])
-      const isClosed = this.members &amp;&amp; this.members[0].id === this.members[this.members.length - 1].id
+      const isClosed = coordinates.length > 1 &amp;&amp; this.members &amp;&amp; this.members[0].id === this.members[this.members.length - 1].id
 
       if (isClosed) {
         result.geometry = {
@@ -210,7 +207,7 @@ class OverpassWay extends OverpassObject {
         if (this.members) {
           async.each(this.members,
             (member, done) => {
-              const memberOb = this.overpass.cacheElements[member.id]
+              const memberOb = this.overpass.cache.get(member.id)
 
               const nd = parentNode.ownerDocument.createElement('nd')
               nd.setAttribute('ref', memberOb.osm_id)
@@ -245,7 +242,7 @@ class OverpassWay extends OverpassObject {
 
           async.each(this.members,
             (member, done) => {
-              const memberOb = this.overpass.cacheElements[member.id]
+              const memberOb = this.overpass.cache.get(member.id)
 
               result.nodes.push(memberOb.osm_id)
 
@@ -302,7 +299,7 @@ class OverpassWay extends OverpassObject {
     if (this.geometry) {
       let intersects
       if (bbox.toGeoJSON) {
-        // bbox is BoudingBox
+        // bbox is BoundingBox
         intersects = turf.booleanIntersects(this.GeoJSON(), bbox.toGeoJSON())
       } else {
         // bbox is GeoJSON
@@ -327,13 +324,13 @@ module.exports = OverpassWay
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Filter.html">Filter</a></li><li><a href="KnownArea.html">KnownArea</a></li><li><a href="OverpassFrontend.html">OverpassFrontend</a></li><li><a href="OverpassNode.html">OverpassNode</a></li><li><a href="OverpassObject.html">OverpassObject</a></li><li><a href="OverpassRelation.html">OverpassRelation</a></li><li><a href="OverpassWay.html">OverpassWay</a></li><li><a href="Request.html">Request</a></li><li><a href="RequestBBox.html">RequestBBox</a></li><li><a href="RequestGet.html">RequestGet</a></li><li><a href="RequestMulti.html">RequestMulti</a></li></ul><h3>Events</h3><ul><li><a href="OverpassFrontend.html#event:error">error</a></li><li><a href="OverpassFrontend.html#event:load">load</a></li><li><a href="OverpassFrontend.html#event:reject">reject</a></li><li><a href="OverpassFrontend.html#event:start">start</a></li><li><a href="OverpassFrontend.html#event:update">update</a></li><li><a href="Request.html#event:abort">abort</a></li><li><a href="Request.html#event:finish">finish</a></li><li><a href="Request.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="Request.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestBBox.html#event:abort">abort</a></li><li><a href="RequestBBox.html#event:finish">finish</a></li><li><a href="RequestBBox.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestBBox.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestGet.html#event:abort">abort</a></li><li><a href="RequestGet.html#event:finish">finish</a></li><li><a href="RequestGet.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestGet.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestMulti.html#event:abort">abort</a></li><li><a href="RequestMulti.html#event:finish">finish</a></li><li><a href="RequestMulti.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestMulti.html#event:subrequest-finished">subrequest-finished</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Filter.html">Filter</a></li><li><a href="OverpassFrontend.html">OverpassFrontend</a></li><li><a href="OverpassNode.html">OverpassNode</a></li><li><a href="OverpassObject.html">OverpassObject</a></li><li><a href="OverpassRelation.html">OverpassRelation</a></li><li><a href="OverpassWay.html">OverpassWay</a></li><li><a href="Request.html">Request</a></li><li><a href="RequestBBox.html">RequestBBox</a></li><li><a href="RequestGet.html">RequestGet</a></li><li><a href="RequestMulti.html">RequestMulti</a></li><li><a href="RequestTimeline.html">RequestTimeline</a></li></ul><h3>Events</h3><ul><li><a href="OverpassFrontend.html#event:error">error</a></li><li><a href="OverpassFrontend.html#event:load">load</a></li><li><a href="OverpassFrontend.html#event:reject">reject</a></li><li><a href="OverpassFrontend.html#event:start">start</a></li><li><a href="OverpassFrontend.html#event:update">update</a></li><li><a href="Request.html#event:abort">abort</a></li><li><a href="Request.html#event:finish">finish</a></li><li><a href="Request.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="Request.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestBBox.html#event:abort">abort</a></li><li><a href="RequestBBox.html#event:finish">finish</a></li><li><a href="RequestBBox.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestBBox.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestGet.html#event:abort">abort</a></li><li><a href="RequestGet.html#event:finish">finish</a></li><li><a href="RequestGet.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestGet.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestMulti.html#event:abort">abort</a></li><li><a href="RequestMulti.html#event:finish">finish</a></li><li><a href="RequestMulti.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestMulti.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestTimeline.html#event:abort">abort</a></li><li><a href="RequestTimeline.html#event:finish">finish</a></li><li><a href="RequestTimeline.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestTimeline.html#event:subrequest-finished">subrequest-finished</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Thu Dec 30 2021 17:10:11 GMT+0100 (Central European Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.11</a> on Wed Oct 26 2022 16:23:48 GMT+0200 (Mitteleuropäische Sommerzeit)
 </footer>
 
 <script> prettyPrint(); </script>

@@ -35,12 +35,12 @@ const LokiJS = require('lokijs')
 const httpLoad = require('./httpLoad')
 const removeNullEntries = require('./removeNullEntries')
 
-const OverpassObject = require('./OverpassObject')
-const OverpassNode = require('./OverpassNode')
-const OverpassWay = require('./OverpassWay')
-const OverpassRelation = require('./OverpassRelation')
+const OverpassMetaObject = require('./OverpassMetaObject')
+const OverpassAtticObject = require('./OverpassAtticObject')
+const BBoxQueryCache = require('./BBoxQueryCache')
 const RequestGet = require('./RequestGet')
 const RequestBBox = require('./RequestBBox')
+const RequestTimeline = require('./RequestTimeline')
 const RequestMulti = require('./RequestMulti')
 const defines = require('./defines')
 const loadOsmFile = require('./loadOsmFile')
@@ -49,6 +49,7 @@ const timestamp = require('./timestamp')
 const Filter = require('./Filter')
 const isGeoJSON = require('./isGeoJSON')
 const boundsIsFullWorld = require('./boundsIsFullWorld')
+const Cache = require('./Cache')
 
 /**
  * An error occured
@@ -109,6 +110,7 @@ const boundsIsFullWorld = require('./boundsIsFullWorld')
  * @param {number} [options.timeGap=10] A short time gap between two requests to the Overpass API (milliseconds).
  * @param {number} [options.timeGap429=500] A longer time gap after a 429 response from Overpass API (milliseconds).
  * @param {number} [options.timeGap429Exp=3] If we keep getting 429 responses, increase the time exponentially with the specified factor (e.g. 2: 500ms, 1000ms, 2000ms, ...; 3: 500ms, 1500ms, 4500ms, ...)
+ * @param {boolean} [options.attic] Support attic data (history of OpenStreetMap)
  * @param {number} [options.loadChunkSize=1000] When loading a file (instead connecting to an Overpass URL) load elements in chunks of n items.
  * @property {boolean} hasStretchLon180=false Are there any map features in the cache which stretch over lon=180/-180?
  */
@@ -130,7 +132,8 @@ class OverpassFrontend {
     }
 
     const db = new LokiJS()
-    this.db = db.addCollection('osm', { unique: ['id'] })
+    // id is not unique when attic data used
+    this.db = db.addCollection('osm', { unique: this.options.attic ? [] : ['id'] })
 
     this.clearCache()
 
@@ -141,7 +144,7 @@ class OverpassFrontend {
     this.pendingNotifyMemberUpdate = {}
     this.pendingUpdateEmit = {}
 
-    if (this.url.match(/\.(json|osm\.bz2|osm)$/)) {
+    if (this.url.match(/\.(json|os[hm]\.bz2|os[hm])$/)) {
       this.localOnly = true
       this.ready = false
       this._loadFile()
@@ -155,11 +158,15 @@ class OverpassFrontend {
    * clear all caches
    */
   clearCache () {
-    this.cacheElements = {}
+    if (this.localOnly) {
+      return
+    }
+
+    this.cache = new Cache()
     this.cacheElementsMemberOf = {}
-    this.cacheBBoxQueries = {}
     this.cacheTimestamp = timestamp()
     this.db.clear()
+    BBoxQueryCache.clear()
 
     // Set default properties
     this.hasStretchLon180 = false
@@ -190,12 +197,12 @@ class OverpassFrontend {
           (chunk, done) => {
             chunk.forEach(
               (element) => {
-                const ob = this.createOrUpdateOSMObject(element, {
+                const metaOb = this.createOrUpdateOSMObject(element, {
                   osm3sMeta,
                   properties: OverpassFrontend.TAGS | OverpassFrontend.META | OverpassFrontend.MEMBERS
                 })
 
-                obs.push(ob)
+                obs.push(metaOb)
               }
             )
 
@@ -205,13 +212,16 @@ class OverpassFrontend {
             this.pendingNotifies()
 
             // Set objects to fully known, as no more data can be loaded from the file
-            obs.forEach(ob => {
-              ob.properties |= OverpassFrontend.ALL
-              if (osm3sMeta.bounds) {
-                osm3sMeta.bounds.extend(ob.bounds)
-              } else {
-                osm3sMeta.bounds = new BoundingBox(ob.bounds)
-              }
+            obs.forEach(metaOb => {
+              metaOb.getAll().forEach(ob => {
+                ob.properties |= OverpassFrontend.ALL
+                if (osm3sMeta.bounds) {
+                  osm3sMeta.bounds.extend(ob.bounds)
+                } else {
+                  osm3sMeta.bounds = new BoundingBox(ob.bounds)
+                }
+              })
+              metaOb.finishTimeline()
             })
 
             if (err) {
@@ -232,6 +242,7 @@ class OverpassFrontend {
   /**
    * @param {string|string[]} ids - Id or array of Ids of OSM map features, e.g. [ 'n123', 'w2345', 'n123' ]. Illegal IDs will not produce an error but generate a 'null' object.
    * @param {object} options Various options, see below
+   * @param {string} [options.date] - Specify timestamp of query
    * @param {number} [options.priority=0] - Priority for loading these objects. The lower the sooner they will be requested.
    * @param {string|boolean} [options.sort=false] - When set to true or "index", the function featureCallback will be called in order of the "ids" array. When set to false or null, the featureCallback will be called as soon as the object is loaded (e.g. immediately, if it is cached). When set to "BBoxDiagonalLength", the objects are ordered by the length of the diagonal of the bounding box.
    * @param {"asc"|"desc"} [options.sortDir="asc"] Sort direction.
@@ -264,7 +275,7 @@ class OverpassFrontend {
    * @param {string} id - Id of an OSM map feature
    * @param {object} options
    * @param {int} [options.properties] - Which properties have to be known (default: OverpassFrontend.DEFAULT)
-   * @return {null|false|OverpassObject} - null: does not exist in the database; false: may exist, but has not been loaded yet (or not enough properties known); OverpassObject: sucessful object
+   * @returns {OverpassObject|false|null|undefined} - if an object is loaded, returns the object. If the object does not exist, returns false. If the object might exist and a query to the database server is required, return null. If the object might already be loaded and the code is waiting for further information, return undefined (no query to the database server will be done at this time).
    */
   getCached (id, options) {
     if (typeof options === 'undefined') {
@@ -275,18 +286,13 @@ class OverpassFrontend {
       options.properties = defines.DEFAULT
     }
 
-    if (!(id in this.cacheElements)) {
-      return false
-    }
-
-    const ob = this.cacheElements[id]
-
-    if (ob.missingObject) {
-      return null
+    const ob = this.cache.get(id, options)
+    if (!ob) {
+      return ob
     }
 
     if ((options.properties &amp; ob.properties) !== options.properties) {
-      return false
+      return null
     }
 
     return ob
@@ -300,6 +306,7 @@ class OverpassFrontend {
    * @property {Request[]} requests - List of all requests in the context
    * @property {Request#SubRequest[]} subRequests - List of all subRequests in the context
    * @property {BoundingBox} bbox - when there are any BBox requests, add this global bbox
+   * @property {string} date - Date specified
    * @property {int} maxEffort - how many queries can we still add to this context
    * @property {object} todo - list of items which should be loaded via get requests to avoid duplicates
    */
@@ -313,12 +320,14 @@ class OverpassFrontend {
     // preprocess all requests
     // e.g. call featureCallback for elements which were received in the
     // meantime
-    this.requests.forEach(request => {
+    this.requests.forEach((request, i) => {
       if (request &amp;&amp; request.timestampPreprocess &lt; this.cacheTimestamp) {
         request.preprocess()
         request.timestampPreprocess = this.cacheTimestamp
 
-        if (request.mayFinish() || this.localOnly) {
+        if (request.finished) {
+          this.requests[i] = null
+        } else if (request.mayFinish() || this.localOnly) {
           request.finish()
         }
       }
@@ -344,6 +353,7 @@ class OverpassFrontend {
 
     const context = {
       bbox: null,
+      date: undefined,
       todo: {},
       requests: [],
       subRequests: [],
@@ -413,6 +423,9 @@ class OverpassFrontend {
     context.queryOptions = '[out:json]'
     if (context.bbox &amp;&amp; !boundsIsFullWorld(context.bbox)) {
       context.queryOptions += '[bbox:' + context.bbox.toLatLonString() + ']'
+    }
+    if (context.date) {
+      context.queryOptions += '[date:"' + context.date + '"]'
     }
 
     const query = context.queryOptions + ';\n' + context.query
@@ -496,9 +509,7 @@ class OverpassFrontend {
       part.count = 0
     }
 
-    for (let i = 0; i &lt; results.elements.length; i++) {
-      const el = results.elements[i]
-
+    results.elements.forEach((el, i) => {
       if (isSeparator(el)) {
         partIndex++
 
@@ -521,52 +532,20 @@ class OverpassFrontend {
           part = subRequest.parts[partIndex]
         }
 
-        continue
-      }
-
-      part.osm3sMeta = osm3sMeta
-      const ob = this.createOrUpdateOSMObject(el, part)
-      delete context.todo[ob.id]
-
-      const members = this.cacheElements[ob.id].memberIds()
-      if (members) {
-        for (let j = 0; j &lt; members.length; j++) {
-          if (!(members[j] in this.cacheElementsMemberOf)) {
-            this.cacheElementsMemberOf[members[j]] = [this.cacheElements[ob.id]]
-          } else {
-            this.cacheElementsMemberOf[members[j]].push(this.cacheElements[ob.id])
-          }
-        }
+        return
       }
 
       part.count++
-      if (part.receiveObject) {
-        part.receiveObject(ob)
-      }
-      if (!request.aborted &amp;&amp; !request.finished &amp;&amp; part.featureCallback &amp;&amp; (!part.checkFeatureCallback || part.checkFeatureCallback(ob, part))) {
-        part.featureCallback(err, ob)
-      }
-    }
+      this.elementNotifyFromRequest(el, context, request, part, osm3sMeta)
+    })
 
     if (!(subRequestsIndex === context.subRequests.length - 1 || partIndex === context.subRequests[subRequestsIndex].parts.length - 1)) {
       console.log('too many parts!!!!')
     }
 
     for (const id in context.todo) {
-      if (!(id in this.cacheElements)) {
-        const ob = new OverpassObject()
-        ob.id = id
-        ob.type = { n: 'node', w: 'way', r: 'relation' }[id.substr(0, 1)]
-        ob.osm_id = id.substr(1)
-        ob.properties = OverpassFrontend.ALL
-        ob.missingObject = true
-        this.cacheElements[id] = ob
-        this.db.insert(ob.dbInsert())
-      } else {
-        const ob = this.cacheElements[id]
-        ob.missingObject = true
-        this.db.update(ob.dbInsert())
-      }
+      const ob = this.createOrGetMetaObject(id)
+      ob.addMissingObject(context)
     }
 
     this.cacheTimestamp = timestamp()
@@ -578,10 +557,60 @@ class OverpassFrontend {
     this._next()
   }
 
+  elementNotifyFromRequest (el, context, request, part, osm3sMeta) {
+    const options = {
+      date: context.date,
+      properties: part.properties,
+      bounds: part.bounds,
+      boundsNoMatch: part.boundsNoMatch,
+      osm3sMeta
+    }
+
+    const metaOb = this.createOrUpdateOSMObject(el, options)
+    delete context.todo[metaOb.id]
+
+    const ob = this.cache.get(metaOb.id, { date: context.date, properties: 0 })
+    // TODO: ob might be false/null/undefined
+
+    if (part.receiveObject) {
+      part.receiveObject(ob, metaOb)
+    }
+
+    if (!ob) {
+      return
+    }
+
+    const members = ob ? ob.memberIds() : null
+    if (members) {
+      members.forEach(member => {
+        if (!(member in this.cacheElementsMemberOf)) {
+          this.cacheElementsMemberOf[member] = [this.cache.get(ob.id, options)]
+        } else {
+          this.cacheElementsMemberOf[member].push(this.cache.get(ob.id, options))
+        }
+      })
+    }
+
+    if (!request.aborted &amp;&amp; !request.finished &amp;&amp; part.featureCallback &amp;&amp; (!part.checkFeatureCallback || part.checkFeatureCallback(ob, part))) {
+      part.featureCallback(null, ob)
+    }
+  }
+
+  createOrGetMetaObject (id, options) {
+    let ob = this.cache.getMeta(id, options)
+    if (!ob) {
+      ob = new (this.options.attic ? OverpassAtticObject : OverpassMetaObject)(id, this)
+      this.cache.add(id, ob)
+    }
+
+    return ob
+  }
+
   /**
    * @param {string} query - Query for requesting objects from Overpass API, e.g. "node[amenity=restaurant]" or "(node[amenity];way[highway~'^(primary|secondary)$];)". See &lt;a href='Filter.html'>Filter&lt;/a> for details.
    * @param {BoundingBox|GeoJSON} bounds - Boundaries where to load objects, can be a BoundingBox object, Leaflet Bounds object (e.g. from map.getBounds()) or a GeoJSON Polygon/Multipolygon.
    * @param {object} options
+   * @param {string} [options.date] - Specify timestamp of query
    * @param {number} [options.priority=0] - Priority for loading these objects. The lower the sooner they will be requested.
    * @param {boolean|string} [options.sort=false] - If false, it will be called as soon as the features are availabe (e.g. immediately when cached).
    * @param {bit_array} [options.properties] Which properties of the features should be downloaded: OVERPASS_ID_ONLY, OVERPASS_BBOX, OVERPASS_TAGS, OVERPASS_GEOM, OVERPASS_META. Combine by binary OR: ``OVERPASS_ID | OVERPASS_BBOX``. Default: OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.BBOX
@@ -651,10 +680,29 @@ class OverpassFrontend {
     return request
   }
 
-  clearBBoxQuery (query) {
-    const filterId = new Filter(query).toString()
+  /* load the timeline of an object
+   */
+  getTimeline (ids, options, featureCallback, finalCallback) {
+    const request = new RequestTimeline(this, {
+      ids,
+      options,
+      featureCallback,
+      finalCallback
+    })
 
-    delete this.cacheBBoxQueries[filterId]
+    this.requests.push(request)
+
+    this._next()
+
+    return request
+  }
+
+  clearBBoxQuery (query) {
+    const cacheDescriptors = new Filter(query).cacheDescriptors()
+
+    cacheDescriptors.forEach(id => {
+      BBoxQueryCache.get({ id }).clear()
+    })
   }
 
   _abortRequest (request) {
@@ -668,7 +716,10 @@ class OverpassFrontend {
   }
 
   _finishRequest (request) {
-    this.requests[this.requests.indexOf(request)] = null
+    const p = this.requests.indexOf(request)
+    if (p >= 0) {
+      this.requests[p] = null
+    }
   }
 
   _next () {
@@ -678,15 +729,16 @@ class OverpassFrontend {
   }
 
   abortAllRequests () {
-    for (let j = 0; j &lt; this.requests.length; j++) {
-      if (this.requests[j] === null) {
-        continue
+    this.requests.forEach(request => {
+      if (!request) {
+        return
       }
 
-      this.requests[j].abort()
-    }
+      request.abort()
+    })
 
     this.requests = []
+    this.requestIsActive = false
   }
 
   removeFromCache (ids) {
@@ -694,24 +746,23 @@ class OverpassFrontend {
       ids = [ids]
     }
 
-    for (let i = 0; i &lt; ids.length; i++) {
-      if (ids[i] in this.cacheElements) {
-        const ob = this.cacheElements[ids[i]]
-
+    ids.forEach(id => {
+      const ob = this.cache.get(id)
+      if (ob) {
         // remove all memberOf references
         if (ob.members) {
           ob.members.forEach(member => {
-            const memberOb = this.cacheElements[member.id]
+            const memberOb = this.cache.get(member.id)
             memberOb.memberOf = memberOb.memberOf
               .filter(memberOf => memberOf.id !== ob.id)
           })
         }
 
-        const lokiOb = this.cacheElements[ids[i]].dbData
-        delete this.cacheElements[ids[i]]
+        const lokiOb = this.cache.get(id).dbData
+        this.cache.remove(id)
         this.db.remove(lokiOb)
       }
-    }
+    })
   }
 
   notifyMemberUpdates () {
@@ -719,10 +770,10 @@ class OverpassFrontend {
     this.pendingNotifyMemberUpdate = {}
 
     for (const k in todo) {
-      const ob = this.cacheElements[k]
-      ob.notifyMemberUpdate(todo[k])
+      const metaOb = this.cache.getMeta(k)
+      metaOb.notifyMemberUpdate(todo[k])
 
-      this.pendingUpdateEmit[ob.id] = ob
+      this.pendingUpdateEmit[metaOb.id] = metaOb
     }
   }
 
@@ -732,59 +783,40 @@ class OverpassFrontend {
     const todo = Object.values(this.pendingUpdateEmit)
     this.pendingUpdateEmit = {}
 
-    todo.forEach(ob => {
-      ob.emit('update', ob)
-      this.db.update(ob.dbInsert())
+    todo.forEach(metaOb => {
+      metaOb.emitUpdate()
+      metaOb.dbInsert(this.db)
     })
   }
 
   createOrUpdateOSMObject (el, options) {
-    const id = el.type.substr(0, 1) + el.id
-    let ob = null
-    let create = true
+    let id = el.type.substr(0, 1) + el.id
 
-    if (id in this.cacheElements &amp;&amp; !this.cacheElements[id]) {
-      console.log('why can this be null?', id)
+    if (el.type === 'timeline') {
+      id = el.tags.reftype.substr(0, 1) + el.tags.ref
     }
 
-    if (id in this.cacheElements &amp;&amp; this.cacheElements[id]) {
-      ob = this.cacheElements[id]
-      create = false
+    const metaOb = this.createOrGetMetaObject(id)
 
-      // no new information -> return
-      if (~ob.properties &amp; options.properties === 0) {
-        return ob
-      }
-    } else if (el.type === 'relation') {
-      ob = new OverpassRelation(id)
-    } else if (el.type === 'way') {
-      ob = new OverpassWay(id)
-    } else if (el.type === 'node') {
-      ob = new OverpassNode(id)
-    } else {
-      ob = new OverpassObject(id)
+    if (el.type === 'timeline') {
+      return metaOb.updateTimeline(el.tags)
     }
 
-    ob.overpass = this
-    ob.updateData(el, options)
+    const ob = metaOb.updateData(el, options)
 
     ob.memberOf.forEach(entry => {
       if (entry.id in this.pendingNotifyMemberUpdate) {
-        this.pendingNotifyMemberUpdate[entry.id].push(ob)
+        this.pendingNotifyMemberUpdate[entry.id].push(ob.id)
       } else {
-        this.pendingNotifyMemberUpdate[entry.id] = [ob]
+        this.pendingNotifyMemberUpdate[entry.id] = [ob.id]
       }
     })
-    this.pendingUpdateEmit[ob.id] = ob
 
-    if (create) {
-      this.db.insert(ob.dbInsert())
-    } else {
-      this.db.update(ob.dbInsert())
-    }
+    this.pendingUpdateEmit[metaOb.id] = metaOb
 
-    this.cacheElements[id] = ob
-    return ob
+    metaOb.dbInsert(this.db)
+
+    return metaOb
   }
 
   regexpEscape (str) {
@@ -828,13 +860,13 @@ module.exports = OverpassFrontend
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Filter.html">Filter</a></li><li><a href="KnownArea.html">KnownArea</a></li><li><a href="OverpassFrontend.html">OverpassFrontend</a></li><li><a href="OverpassNode.html">OverpassNode</a></li><li><a href="OverpassObject.html">OverpassObject</a></li><li><a href="OverpassRelation.html">OverpassRelation</a></li><li><a href="OverpassWay.html">OverpassWay</a></li><li><a href="Request.html">Request</a></li><li><a href="RequestBBox.html">RequestBBox</a></li><li><a href="RequestGet.html">RequestGet</a></li><li><a href="RequestMulti.html">RequestMulti</a></li></ul><h3>Events</h3><ul><li><a href="OverpassFrontend.html#event:error">error</a></li><li><a href="OverpassFrontend.html#event:load">load</a></li><li><a href="OverpassFrontend.html#event:reject">reject</a></li><li><a href="OverpassFrontend.html#event:start">start</a></li><li><a href="OverpassFrontend.html#event:update">update</a></li><li><a href="Request.html#event:abort">abort</a></li><li><a href="Request.html#event:finish">finish</a></li><li><a href="Request.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="Request.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestBBox.html#event:abort">abort</a></li><li><a href="RequestBBox.html#event:finish">finish</a></li><li><a href="RequestBBox.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestBBox.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestGet.html#event:abort">abort</a></li><li><a href="RequestGet.html#event:finish">finish</a></li><li><a href="RequestGet.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestGet.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestMulti.html#event:abort">abort</a></li><li><a href="RequestMulti.html#event:finish">finish</a></li><li><a href="RequestMulti.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestMulti.html#event:subrequest-finished">subrequest-finished</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Filter.html">Filter</a></li><li><a href="OverpassFrontend.html">OverpassFrontend</a></li><li><a href="OverpassNode.html">OverpassNode</a></li><li><a href="OverpassObject.html">OverpassObject</a></li><li><a href="OverpassRelation.html">OverpassRelation</a></li><li><a href="OverpassWay.html">OverpassWay</a></li><li><a href="Request.html">Request</a></li><li><a href="RequestBBox.html">RequestBBox</a></li><li><a href="RequestGet.html">RequestGet</a></li><li><a href="RequestMulti.html">RequestMulti</a></li><li><a href="RequestTimeline.html">RequestTimeline</a></li></ul><h3>Events</h3><ul><li><a href="OverpassFrontend.html#event:error">error</a></li><li><a href="OverpassFrontend.html#event:load">load</a></li><li><a href="OverpassFrontend.html#event:reject">reject</a></li><li><a href="OverpassFrontend.html#event:start">start</a></li><li><a href="OverpassFrontend.html#event:update">update</a></li><li><a href="Request.html#event:abort">abort</a></li><li><a href="Request.html#event:finish">finish</a></li><li><a href="Request.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="Request.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestBBox.html#event:abort">abort</a></li><li><a href="RequestBBox.html#event:finish">finish</a></li><li><a href="RequestBBox.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestBBox.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestGet.html#event:abort">abort</a></li><li><a href="RequestGet.html#event:finish">finish</a></li><li><a href="RequestGet.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestGet.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestMulti.html#event:abort">abort</a></li><li><a href="RequestMulti.html#event:finish">finish</a></li><li><a href="RequestMulti.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestMulti.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestTimeline.html#event:abort">abort</a></li><li><a href="RequestTimeline.html#event:finish">finish</a></li><li><a href="RequestTimeline.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestTimeline.html#event:subrequest-finished">subrequest-finished</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Thu Dec 30 2021 17:10:11 GMT+0100 (Central European Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.11</a> on Wed Oct 26 2022 16:23:48 GMT+0200 (Mitteleuropäische Sommerzeit)
 </footer>
 
 <script> prettyPrint(); </script>

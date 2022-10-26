@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: BBoxQueryCache.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: BBoxQueryCache.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const BoundingBox = require('boundingbox')
+const turf = require('./turf')
+
+const Filter = require('./Filter')
+
+const list = {}
+
+class BBoxQueryCache {
+  constructor (overpass, id) {
+    this.overpass = overpass
+    this.id = id
+    this.filter = new Filter(id)
+    this.area = null
+  }
+
+  /**
+   * make another part of the map known
+   */
+  add (bbox, cacheDescriptors = null) {
+    // ignore requests for IDs
+    if (cacheDescriptors &amp;&amp; cacheDescriptors.ids) {
+      return
+    }
+
+    bbox = new BoundingBox(bbox).toGeoJSON()
+
+    if (cacheDescriptors &amp;&amp; cacheDescriptors.bounds) {
+      bbox = turf.intersect(bbox, cacheDescriptors.bounds)
+    }
+
+    if (this.area === null) {
+      this.area = bbox
+    } else {
+      this.area = turf.union(bbox, this.area)
+    }
+  }
+
+  /**
+   * is the whole area known?
+   */
+  check (bbox, cacheDescriptors = null) {
+    if (cacheDescriptors &amp;&amp; cacheDescriptors.invalid) {
+      return false
+    }
+
+    if (cacheDescriptors &amp;&amp; cacheDescriptors.ids) {
+      let types = [cacheDescriptors.id.match(/^(node|way|relation|nwr)/)[1]]
+      if (types[0] === 'nwr') {
+        types = ['node', 'way', 'relation']
+      }
+
+      return types.every(type =>
+        cacheDescriptors.ids.every(id =>
+          (type.substr(0, 1) + id) in this.overpass.cacheElements
+        )
+      )
+    }
+
+    bbox = new BoundingBox(bbox).toGeoJSON()
+
+    if (cacheDescriptors &amp;&amp; cacheDescriptors.bounds) {
+      bbox = turf.intersect(bbox, cacheDescriptors.bounds)
+    }
+
+    if (this.area) {
+      const remaining = turf.difference(bbox, this.area)
+
+      if (!remaining) {
+        return true
+      }
+    }
+
+    // check if a superset matches
+    return Object.values(list).some(cache => {
+      if (cache.id === this.id) { return false }
+
+      if (cache.filter.isSupersetOf(this.filter)) {
+        if (cache.area) {
+          return !turf.difference(bbox, cache.area)
+        }
+      }
+
+      return false
+    })
+  }
+
+  /**
+   * clear this cache
+   */
+  clear () {
+    this.area = null
+    delete list[this.id]
+  }
+
+  /**
+   * return area as (multi)polygon
+   */
+  toGeoJSON () {
+    return this.area
+  }
+}
+
+BBoxQueryCache.get = (overpass, id) => {
+  if (!(id in list)) {
+    list[id] = new BBoxQueryCache(overpass, id)
+  }
+
+  return list[id]
+}
+
+BBoxQueryCache.clear = () => {
+  for (const k in list) {
+    delete list[k]
+  }
+}
+
+BBoxQueryCache.list = list
+
+module.exports = BBoxQueryCache
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Filter.html">Filter</a></li><li><a href="OverpassFrontend.html">OverpassFrontend</a></li><li><a href="OverpassNode.html">OverpassNode</a></li><li><a href="OverpassObject.html">OverpassObject</a></li><li><a href="OverpassRelation.html">OverpassRelation</a></li><li><a href="OverpassWay.html">OverpassWay</a></li><li><a href="Request.html">Request</a></li><li><a href="RequestBBox.html">RequestBBox</a></li><li><a href="RequestGet.html">RequestGet</a></li><li><a href="RequestMulti.html">RequestMulti</a></li><li><a href="RequestTimeline.html">RequestTimeline</a></li></ul><h3>Events</h3><ul><li><a href="OverpassFrontend.html#event:error">error</a></li><li><a href="OverpassFrontend.html#event:load">load</a></li><li><a href="OverpassFrontend.html#event:reject">reject</a></li><li><a href="OverpassFrontend.html#event:start">start</a></li><li><a href="OverpassFrontend.html#event:update">update</a></li><li><a href="Request.html#event:abort">abort</a></li><li><a href="Request.html#event:finish">finish</a></li><li><a href="Request.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="Request.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestBBox.html#event:abort">abort</a></li><li><a href="RequestBBox.html#event:finish">finish</a></li><li><a href="RequestBBox.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestBBox.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestGet.html#event:abort">abort</a></li><li><a href="RequestGet.html#event:finish">finish</a></li><li><a href="RequestGet.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestGet.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestMulti.html#event:abort">abort</a></li><li><a href="RequestMulti.html#event:finish">finish</a></li><li><a href="RequestMulti.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestMulti.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestTimeline.html#event:abort">abort</a></li><li><a href="RequestTimeline.html#event:finish">finish</a></li><li><a href="RequestTimeline.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestTimeline.html#event:subrequest-finished">subrequest-finished</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.11</a> on Wed Oct 26 2022 16:23:48 GMT+0200 (Mitteleuropäische Sommerzeit)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

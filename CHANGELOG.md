@@ -1,8 +1,14 @@
-# Version 3 - unreleased
+# Version 4 - unreleased
 * The notifiers if an object is not existant/not loaded have changed:
   * false: does not exist
   * null: might exist, database server should be queries
   * undefined: might exist, code is waiting for further information on another channel (no query)
+
+# Version 3.0.0 - release 2022-10-24
+* Improved cache handling - the query checks, if a super-set of that query has successfully been downloaded for the given area, which reduces the need for server requests. Example: if 'nwr[amenity]' for the given area has been downloaded, 'node[amenity=restaurant]' or 'way[amenity][cuisine]' are included.
+* New filters: `(id:...)`, bbox `(lat,lon,lat,lon)`, `(around:...)`, `(user:...)`, `(uid:...)`, `(poly:...)`, `(if:...`), `(newer:...)`.
+* For the `(if:...)` filter, the following evaluators functions are available: t[], is_tag(), is_closed(), id(), type(), version(), timestamp(), changeset(), uid(), user(), count_tags(), count_members(), count_by_role(), count_distinct_members(), count_distinct_by_role(), length(), is_closed() as well as the following operators: ternary `...?...:...`, ||, &amp;&amp;, ==, !=, &lt;, &lt;=, &gt;, &gt;=, +, -, *, /, !, -.
+>>>>>>> master
 
 # Version 2.7.0 - release 2021-12-30
 * Bounds and memberBounds for .get() and .BBoxQuery() accept GeoJSON polygons/multipolygons

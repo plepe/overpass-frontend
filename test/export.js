@@ -12,8 +12,8 @@ var async = require('async')
 var OverpassFrontend = require('../src/OverpassFrontend')
 var BoundingBox = require('boundingbox')
 var overpassFrontend = new OverpassFrontend(conf.url)
-var DOMParser = require('xmldom').DOMParser
-var XMLSerializer = require('xmldom').XMLSerializer
+var DOMParser = require('@xmldom/xmldom').DOMParser
+var XMLSerializer = require('@xmldom/xmldom').XMLSerializer
 var document = new DOMParser().parseFromString('<xml></xml>', 'text/xml').documentElement
 
 describe('Overpass exportGeoJSON', function() {

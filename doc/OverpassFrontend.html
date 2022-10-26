@@ -427,6 +427,43 @@
 
         <tr>
             
+                <td class="name"><code>attic</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">Support attic data (history of OpenStreetMap)</td>
+        </tr>
+
+    
+
+        <tr>
+            
                 <td class="name"><code>loadChunkSize</code></td>
             
 
@@ -567,7 +604,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line87">line 87</a>
+        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line89">line 89</a>
     </li></ul></dd>
     
 
@@ -754,6 +791,43 @@
     </thead>
 
     <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>date</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">Specify timestamp of query</td>
+        </tr>
+
     
 
         <tr>
@@ -1273,7 +1347,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line572">line 572</a>
+        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line601">line 601</a>
     </li></ul></dd>
     
 
@@ -1379,7 +1453,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line129">line 129</a>
+        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line132">line 132</a>
     </li></ul></dd>
     
 
@@ -1523,6 +1597,43 @@
     </thead>
 
     <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>date</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">Specify timestamp of query</td>
+        </tr>
+
     
 
         <tr>
@@ -1930,7 +2041,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line219">line 219</a>
+        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line230">line 230</a>
     </li></ul></dd>
     
 
@@ -1984,7 +2095,7 @@
     
 
     
-    <h4 class="name" id="getCached"><span class="type-signature"></span>getCached<span class="signature">(id, options)</span><span class="type-signature"> &rarr; {null|false|<a href="OverpassObject.html">OverpassObject</a>}</span></h4>
+    <h4 class="name" id="getCached"><span class="type-signature"></span>getCached<span class="signature">(id, options)</span><span class="type-signature"> &rarr; {<a href="OverpassObject.html">OverpassObject</a>|false|null|undefined}</span></h4>
     
 
     
@@ -2169,7 +2280,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line241">line 241</a>
+        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line252">line 252</a>
     </li></ul></dd>
     
 
@@ -2198,7 +2309,7 @@
 
         
 <div class="param-desc">
-    - null: does not exist in the database; false: may exist, but has not been loaded yet (or not enough properties known); OverpassObject: sucessful object
+    - if an object is loaded, returns the object. If the object does not exist, returns false. If the object might exist and a query to the database server is required, return null. If the object might already be loaded and the code is waiting for further information, return undefined (no query to the database server will be done at this time).
 </div>
 
 
@@ -2209,13 +2320,16 @@
     </dt>
     <dd>
         
-<span class="param-type">null</span>
+<span class="param-type"><a href="OverpassObject.html">OverpassObject</a></span>
 |
 
 <span class="param-type">false</span>
 |
 
-<span class="param-type"><a href="OverpassObject.html">OverpassObject</a></span>
+<span class="param-type">null</span>
+|
+
+<span class="param-type">undefined</span>
 
 
     </dd>
@@ -2401,6 +2515,29 @@
 
         <tr>
             
+                <td class="name"><code>date</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Date specified</td>
+        </tr>
+
+    
+
+        <tr>
+            
                 <td class="name"><code>maxEffort</code></td>
             
 
@@ -2479,7 +2616,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line267">line 267</a>
+        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line273">line 273</a>
     </li></ul></dd>
     
 
@@ -2706,7 +2843,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line46">line 46</a>
+        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line47">line 47</a>
     </li></ul></dd>
     
 
@@ -2878,7 +3015,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line25">line 25</a>
+        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line26">line 26</a>
     </li></ul></dd>
     
 
@@ -3243,7 +3380,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line55">line 55</a>
+        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line56">line 56</a>
     </li></ul></dd>
     
 
@@ -3403,7 +3540,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line39">line 39</a>
+        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line40">line 40</a>
     </li></ul></dd>
     
 
@@ -3563,7 +3700,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line32">line 32</a>
+        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line33">line 33</a>
     </li></ul></dd>
     
 
@@ -3706,7 +3843,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line67">line 67</a>
+        <a href="OverpassFrontend.js.html">OverpassFrontend.js</a>, <a href="OverpassFrontend.js.html#line68">line 68</a>
     </li></ul></dd>
     
 
@@ -3748,13 +3885,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Filter.html">Filter</a></li><li><a href="KnownArea.html">KnownArea</a></li><li><a href="OverpassFrontend.html">OverpassFrontend</a></li><li><a href="OverpassNode.html">OverpassNode</a></li><li><a href="OverpassObject.html">OverpassObject</a></li><li><a href="OverpassRelation.html">OverpassRelation</a></li><li><a href="OverpassWay.html">OverpassWay</a></li><li><a href="Request.html">Request</a></li><li><a href="RequestBBox.html">RequestBBox</a></li><li><a href="RequestGet.html">RequestGet</a></li><li><a href="RequestMulti.html">RequestMulti</a></li></ul><h3>Events</h3><ul><li><a href="OverpassFrontend.html#event:error">error</a></li><li><a href="OverpassFrontend.html#event:load">load</a></li><li><a href="OverpassFrontend.html#event:reject">reject</a></li><li><a href="OverpassFrontend.html#event:start">start</a></li><li><a href="OverpassFrontend.html#event:update">update</a></li><li><a href="Request.html#event:abort">abort</a></li><li><a href="Request.html#event:finish">finish</a></li><li><a href="Request.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="Request.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestBBox.html#event:abort">abort</a></li><li><a href="RequestBBox.html#event:finish">finish</a></li><li><a href="RequestBBox.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestBBox.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestGet.html#event:abort">abort</a></li><li><a href="RequestGet.html#event:finish">finish</a></li><li><a href="RequestGet.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestGet.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestMulti.html#event:abort">abort</a></li><li><a href="RequestMulti.html#event:finish">finish</a></li><li><a href="RequestMulti.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestMulti.html#event:subrequest-finished">subrequest-finished</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Filter.html">Filter</a></li><li><a href="OverpassFrontend.html">OverpassFrontend</a></li><li><a href="OverpassNode.html">OverpassNode</a></li><li><a href="OverpassObject.html">OverpassObject</a></li><li><a href="OverpassRelation.html">OverpassRelation</a></li><li><a href="OverpassWay.html">OverpassWay</a></li><li><a href="Request.html">Request</a></li><li><a href="RequestBBox.html">RequestBBox</a></li><li><a href="RequestGet.html">RequestGet</a></li><li><a href="RequestMulti.html">RequestMulti</a></li><li><a href="RequestTimeline.html">RequestTimeline</a></li></ul><h3>Events</h3><ul><li><a href="OverpassFrontend.html#event:error">error</a></li><li><a href="OverpassFrontend.html#event:load">load</a></li><li><a href="OverpassFrontend.html#event:reject">reject</a></li><li><a href="OverpassFrontend.html#event:start">start</a></li><li><a href="OverpassFrontend.html#event:update">update</a></li><li><a href="Request.html#event:abort">abort</a></li><li><a href="Request.html#event:finish">finish</a></li><li><a href="Request.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="Request.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestBBox.html#event:abort">abort</a></li><li><a href="RequestBBox.html#event:finish">finish</a></li><li><a href="RequestBBox.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestBBox.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestGet.html#event:abort">abort</a></li><li><a href="RequestGet.html#event:finish">finish</a></li><li><a href="RequestGet.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestGet.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestMulti.html#event:abort">abort</a></li><li><a href="RequestMulti.html#event:finish">finish</a></li><li><a href="RequestMulti.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestMulti.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestTimeline.html#event:abort">abort</a></li><li><a href="RequestTimeline.html#event:finish">finish</a></li><li><a href="RequestTimeline.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestTimeline.html#event:subrequest-finished">subrequest-finished</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Thu Dec 30 2021 17:10:11 GMT+0100 (Central European Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.11</a> on Wed Oct 26 2022 16:23:48 GMT+0200 (Mitteleuropäische Sommerzeit)
 </footer>
 
 <script> prettyPrint(); </script>

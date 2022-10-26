@@ -2,11 +2,7 @@ const ee = require('event-emitter')
 const BoundingBox = require('boundingbox')
 const OverpassFrontend = require('./defines')
 const isGeoJSON = require('./isGeoJSON')
-const turf = {
-  booleanIntersects: require('@turf/boolean-intersects').default,
-  difference: require('@turf/difference'),
-  intersect: require('@turf/intersect').default
-}
+const turf = require('./turf')
 
 const booleanWithin = require('./booleanWithin')
 
@@ -415,6 +411,7 @@ class OverpassObject {
     if (this.meta) {
       this.dbData.timestamp = this.meta.timestamp
     }
+    this.dbData.osm_id = this.osm_id
     this.dbData.type = this.type
 
     if (this.bounds && this.bounds.minlat) {
@@ -430,6 +427,18 @@ class OverpassObject {
     }
 
     db.update(this.dbData)
+  }
+
+  dbSet (values) {
+    if (!this.dbData) {
+      this.dbInsert()
+    }
+
+    for (const k in values) {
+      this.dbData[k] = values[k]
+    }
+
+    this.overpass.db.update(this.dbData)
   }
 }
 

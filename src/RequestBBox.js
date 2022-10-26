@@ -1,7 +1,7 @@
 const Request = require('./Request')
 const overpassOutOptions = require('./overpassOutOptions')
 const defines = require('./defines')
-const KnownArea = require('./knownArea')
+const BBoxQueryCache = require('./BBoxQueryCache')
 const RequestBBoxMembers = require('./RequestBBoxMembers')
 const Filter = require('./Filter')
 const boundsToLokiQuery = require('./boundsToLokiQuery')
@@ -38,29 +38,21 @@ class RequestBBox extends Request {
       this.query += ';'
     }
 
-    if ((typeof this.options.filter !== 'undefined') && !(this.options.filter instanceof Filter)) {
-      this.options.filter = new Filter(this.options.filter)
-    }
-
-    let filterId = null
-    if (this.options.filter) {
-      filterId = this.options.filter.toString() + (this.options.date ? '-' + this.options.date : '')
-    }
-
     if (!('noCacheQuery' in this.options) || !this.options.noCacheQuery) {
-      this.filterQuery = new Filter(this.query)
+      try {
+        if (this.options.filter) {
+          this.filterQuery = new Filter({ and: [this.query, this.options.filter] })
+          this.query = this.filterQuery.toQl()
+        } else {
+          this.filterQuery = new Filter(this.query)
+        }
+      } catch (err) {
+        return this.finish(err)
+      }
 
       this.lokiQuery = this.filterQuery.toLokijs()
       this.lokiQueryNeedMatch = !!this.lokiQuery.needMatch
       delete this.lokiQuery.needMatch
-
-      if (this.options.filter) {
-        const filterLokiQuery = this.options.filter.toLokijs()
-        this.lokiQueryFilterNeedMatch = !!filterLokiQuery.needMatch
-        delete filterLokiQuery.needMatch
-
-        this.lokiQuery = { $and: [this.lokiQuery, filterLokiQuery] }
-      }
 
       if (!boundsIsFullWorld(this.bounds)) {
         this.lokiQuery = { $and: [this.lokiQuery, boundsToLokiQuery(this.bbox, this.overpass)] }
@@ -74,44 +66,23 @@ class RequestBBox extends Request {
       // positives (an older version of an object might have matched)
       if (this.overpass.options.attic) {
         this.lokiQueryNeedMatch = true
-        if (this.options.filter) {
-          this.lokiQueryFilterNeedMatch = true
-        }
       }
+
+      const cacheFilter = new Filter({ and: [this.filterQuery, new Filter('nwr(properties:' + this.options.properties + ')')] })
+      this.options.properties = cacheFilter.properties()
+
+      this.cacheDescriptors = cacheFilter.cacheDescriptors().map(cacheDescriptors => {
+        return {
+          cache: BBoxQueryCache.get(this.overpass, cacheDescriptors.id),
+          cacheDescriptors
+        }
+      })
     }
 
     this.loadFinish = false
 
     if ('members' in this.options) {
       RequestBBoxMembers(this)
-    }
-
-    const cacheId = this.query + (this.options.date ? '-' + this.options.date : '')
-    if (cacheId in this.overpass.cacheBBoxQueries) {
-      this.cache = this.overpass.cacheBBoxQueries[cacheId]
-
-      if (filterId) {
-        if (!('filter' in this.cache)) {
-          this.cache.filter = {}
-        }
-
-        if (!(filterId in this.cache.filter)) {
-          this.cache.filter[filterId] = new KnownArea()
-        }
-
-        this.cacheFilter = this.cache.filter[filterId]
-      }
-    } else {
-      // otherwise initialize cache
-      this.overpass.cacheBBoxQueries[cacheId] = {}
-      this.cache = this.overpass.cacheBBoxQueries[cacheId]
-      this.cache.requested = new KnownArea()
-
-      if (filterId) {
-        this.cache.filter = {}
-        this.cache.filter[filterId] = new KnownArea()
-        this.cacheFilter = this.cache.filter[filterId]
-      }
     }
   }
 
@@ -147,10 +118,6 @@ class RequestBBox extends Request {
 
       // maybe we need an additional check
       if (this.lokiQueryNeedMatch && !this.filterQuery.match(ob)) {
-        return
-      }
-
-      if (this.lokiQueryFilterNeedMatch && !this.options.filter.match(ob)) {
         return
       }
 
@@ -231,7 +198,7 @@ class RequestBBox extends Request {
 
     // if the context already has a bbox and it differs from this, we can't add
     // ours
-    let query = '(' + this.query + ')->.result;\n'
+    let query = this.query.substr(0, this.query.length - 1) + '->.result;\n'
 
     let queryRemoveDoneFeatures = ''
     let countRemoveDoneFeatures = 0
@@ -250,13 +217,6 @@ class RequestBBox extends Request {
     if (countRemoveDoneFeatures) {
       query += '(' + queryRemoveDoneFeatures + ')->.done;\n'
       query += '(.result; - .done;)->.result;\n'
-    }
-
-    if (this.options.filter) {
-      query += this.options.filter.toQl({
-        inputSet: '.result',
-        outputSet: '.result'
-      })
     }
 
     if (!('split' in this.options)) {
@@ -313,11 +273,9 @@ class RequestBBox extends Request {
         (this.options.split > subRequest.parts[0].count)) {
       this.loadFinish = true
 
-      if (this.options.filter) {
-        this.cacheFilter.add(this.bbox)
-      } else {
-        this.cache.requested.add(this.bbox)
-      }
+      this.cacheDescriptors && this.cacheDescriptors.forEach(cache => {
+        cache.cache.add(this.bbox, cache.cacheDescriptors)
+      })
     }
   }
 
@@ -330,12 +288,9 @@ class RequestBBox extends Request {
       return false
     }
 
-    // check if we need to call Overpass API (whole area known?)
-    if (this.options.filter && this.cacheFilter.check(this.bbox)) {
-      return false
-    }
-
-    return !this.cache.requested.check(this.bbox)
+    return !this.cacheDescriptors || !this.cacheDescriptors.every(cache => {
+      return cache.cache.check(this.bbox, cache.cacheDescriptors)
+    })
   }
 
   mayFinish () {
