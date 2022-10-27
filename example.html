@@ -64,7 +64,7 @@ function check_update_map () {
   }
 
   // Query all trees in the current view
-  overpass.BBoxQuery(form.elements.query.value, bounds,
+  request = overpass.BBoxQuery(form.elements.query.value, bounds,
     {
       properties: OverpassFrontend.ALL
     },
