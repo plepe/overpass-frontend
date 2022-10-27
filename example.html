@@ -26,6 +26,9 @@
 #form > * {
   display: block;
 }
+#form > input[type=text] {
+  width: 100%;
+}
 #form > textarea {
   width: 100%;
   height: 20em;
@@ -39,6 +42,7 @@ var overpass
 var request
 var current_objects = {}
 var form
+var formValues = {}
 
 function check_update_map () {
   var bounds = new BoundingBox(map.getBounds())
@@ -85,9 +89,15 @@ function check_update_map () {
   )
 }
 
+function clear_map () {
+  for (var k in current_objects) {
+    map.removeLayer(current_objects[k].feature)
+  }
+  current_objects = {}
+}
+
 window.onload = function() {
   map = L.map('map').setView([51.505, -0.09], 18)
-  overpass = new OverpassFrontend('//www.overpass-api.de/api/interpreter')
 
   var osm_mapnik = L.tileLayer('//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     {
@@ -98,14 +108,26 @@ window.onload = function() {
   osm_mapnik.addTo(map)
 
   form = document.getElementById('form')
-  form.onsubmit = () => {
-    clear_map()
-    check_update_map()
-    return false
-  }
+  form.onsubmit = () => update()
+  update()
 
   map.on('moveend', check_update_map)
   check_update_map()
+}
+
+function update () {
+  clear_map()
+
+  if (!overpass || form.elements.url.value !== formValues.url) {
+    overpass = new OverpassFrontend(form.elements.url.value)
+  }
+
+  formValues = {
+    url: form.elements.url.value
+  }
+
+  check_update_map()
+  return false
 }
   </script>
 </head>
@@ -113,6 +135,8 @@ window.onload = function() {
   <div id='map'></div>
   <div id='sidebar'>
     <form id='form'>
+      Overpass API URL:
+      <input type='text' name='url' value='//www.overpass-api.de/api/interpreter'>
       <textarea name="query">node[natural=tree];</textarea>
       <input type='submit' value='Query'>
     </form>
