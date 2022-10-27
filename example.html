@@ -120,6 +120,11 @@ function update () {
 
   if (!overpass || form.elements.url.value !== formValues.url) {
     overpass = new OverpassFrontend(form.elements.url.value)
+    overpass.once('load', (data) => {
+      if (data.bounds) {
+        map.fitBounds(data.bounds.toLeaflet())
+      }
+    })
   }
 
   formValues = {
