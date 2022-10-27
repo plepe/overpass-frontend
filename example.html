@@ -59,7 +59,7 @@ function check_update_map () {
           weight: 1,
           radius: 6
         })
-        ob.feature.bindPopup('<pre>' + escapeHtml(JSON.stringify(ob.GeoJSON(), null, '  ')) + '</pre>')
+        ob.feature.bindPopup('<pre>' + JSON.stringify(ob.GeoJSON(), null, '  ').replace(/\&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</pre>')
       }
       
       ob.feature.addTo(map)
