@@ -12,6 +12,10 @@
 .leaflet-popup-content pre {
   font-size: 8px;
 }
+#map {
+  position: absolute;
+  left: 0; top: 0; bottom: 0; right: 0;
+}
   </style>
   <script src="node_modules/leaflet/dist/leaflet.js"></script>
   <script src="dist/overpass-frontend.js"></script>
@@ -84,6 +88,6 @@ window.onload = function() {
   </script>
 </head>
 <body>
-  <div id='map' style='position: absolute; left: 0; top: 0; bottom: 0; right: 0'></div>
+  <div id='map'></div>
 </body>
 </html>
