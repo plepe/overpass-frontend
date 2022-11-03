@@ -1,3 +1,4 @@
+const turf = require('./turf')
 const strsearch2regexp = require('strsearch2regexp')
 const filterJoin = require('./filterJoin')
 const OverpassFrontend = require('./defines')
@@ -757,6 +758,18 @@ class Filter {
 
     if (b.invalid) {
       r.invalid = true
+    }
+
+    if (b.bounds && a.bounds) {
+      const mergeBounds = turf.intersect(a.bounds, b.bounds)
+      if (mergeBounds) {
+        r.bounds = mergeBounds.geometry
+      } else {
+        r.invalid = true
+        delete r.bounds
+      }
+    } else if (b.bounds) {
+      r.bounds = b.bounds
     }
 
     return r
