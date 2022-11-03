@@ -532,14 +532,16 @@ class Filter {
 
       const r = {
         $and:
-        def.and.map(part => {
-          const r = this.toLokijs(options, part)
-          if (r.needMatch) {
-            needMatch = true
-          }
-          delete r.needMatch
-          return r
-        })
+        def.and
+          .map(part => {
+            const r = this.toLokijs(options, part)
+            if (r.needMatch) {
+              needMatch = true
+            }
+            delete r.needMatch
+            return r
+          })
+          .filter(part => Object.keys(part).length)
       }
 
       if (needMatch) {

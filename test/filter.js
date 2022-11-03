@@ -1526,8 +1526,7 @@ describe('Function "around"', function () {
     assert.equal(f.toString(), 'nwr["amenity"="restaurant"]->.x1;nwr.x1(around:100,47.0791163,15.4644484);')
     assert.equal(f.toQl(), 'nwr["amenity"="restaurant"]->.x2;nwr.x2(around:100,47.0791163,15.4644484);')
     assert.deepEqual(f.toLokijs(), { $and: [
-      { 'tags.amenity': { $eq: 'restaurant' } },
-      {},
+      { 'tags.amenity': { $eq: 'restaurant' } }
     ], needMatch: true})
 
     check(f, [])
@@ -1546,7 +1545,6 @@ describe('Function "around"', function () {
     assert.equal(f.toString(), 'nwr(around:100,47.0791163,15.4644484)->.x1;nwr.x1["amenity"="restaurant"];')
     assert.equal(f.toQl(), 'nwr(around:100,47.0791163,15.4644484)->.x2;nwr.x2["amenity"="restaurant"];')
     assert.deepEqual(f.toLokijs(), { $and: [
-      {},
       { 'tags.amenity': { $eq: 'restaurant' } },
     ], needMatch: true})
 
@@ -1566,8 +1564,6 @@ describe('Function "around"', function () {
     assert.equal(f.toString(), 'nwr(around:100,47.0791263,15.4644484)->.x1;nwr.x1(around:100,47.0791163,15.4644484);')
     assert.equal(f.toQl(), 'nwr(around:100,47.0791263,15.4644484)->.x2;nwr.x2(around:100,47.0791163,15.4644484);')
     assert.deepEqual(f.toLokijs(), { $and: [
-      {},
-      {},
     ], needMatch: true})
 
     check(f, [])
@@ -1585,8 +1581,6 @@ describe('Function "around"', function () {
     assert.equal(f.toString(), 'nwr(around:100,48.0791263,15.4644484)->.x1;nwr.x1(around:100,47.0791163,15.4644484);')
     assert.equal(f.toQl(), 'nwr(around:100,48.0791263,15.4644484)->.x2;nwr.x2(around:100,47.0791163,15.4644484);')
     assert.deepEqual(f.toLokijs(), { $and: [
-      {},
-      {},
     ], needMatch: true})
 
     check(f, [])
