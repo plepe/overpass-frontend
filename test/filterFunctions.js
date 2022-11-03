@@ -769,7 +769,7 @@ var overpassFrontend
             query: 'node[fixme](if: 0)',
             expectedQuery: 'node["fixme"](if:0);',
             expected: [],
-            expectedSubRequestCount: 1, // TODO: 0 - querying not necessary
+            expectedSubRequestCount: 0,
             expectedCacheDescriptors: [{
               id: 'node["fixme"](properties:1)',
               invalid: true

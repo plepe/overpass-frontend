@@ -755,6 +755,10 @@ class Filter {
       }
     }
 
+    if (b.invalid) {
+      r.invalid = true
+    }
+
     return r
   }
 
