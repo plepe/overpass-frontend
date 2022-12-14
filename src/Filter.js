@@ -190,6 +190,7 @@ function parse (def, rek = 0) {
         def = def.slice(m[0].length)
         script.push(current)
         current = []
+        notExists = null
         mode = 1
       } else if (!m && def.match(/^\s*$/)) {
         if (current.length) {
@@ -233,6 +234,7 @@ function parse (def, rek = 0) {
         }
         current.push(entry)
         def = def.slice(m[0].length)
+        notExists = null
         mode = 10
       } else if (m) {
         if (notExists) {

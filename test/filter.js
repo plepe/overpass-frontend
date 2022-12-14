@@ -844,6 +844,54 @@ describe('Filter', function () {
       ])
     })
 
+    it ('(nwr[!cuisine];nwr[amenity=cafe];)', function () {
+      var f = new Filter('(nwr[!cuisine];nwr[amenity=cafe];)')
+      assert.deepEqual(f.def, {or:[
+        [{"key":"cuisine","op":"not_exists"}],
+        [{"key":"amenity","op":"=","value":"cafe"}],
+      ]})
+      assert.equal(f.toString(), '(nwr[!"cuisine"];nwr["amenity"="cafe"];);')
+
+      var r = f.toLokijs()
+      assert.deepEqual(r, { $or: [ { 'tags.cuisine': { $exists: false } }, { 'tags.amenity': { $eq: "cafe" } } ] })
+
+      var r = f.cacheDescriptors()
+      assert.deepEqual(r, [
+        { id: 'nwr[!"cuisine"](properties:1)' },
+        { id: 'nwr["amenity"="cafe"](properties:1)' }
+      ])
+
+      var r = f.match({ tags: { amenity: 'restaurant' } })
+      assert.equal(r, true, 'Object should match')
+      var r = f.match({ tags: { amenity: 'cafe' } })
+      assert.equal(r, true, 'Object should match')
+      var r = f.match({ tags: { shop: 'supermarket' } })
+      assert.equal(r, true, 'Object should match')
+    })
+
+    it ('(nwr[!cuisine][amenity=cafe];)', function () {
+      var f = new Filter('(nwr[!cuisine][amenity=cafe];)')
+      assert.deepEqual(f.def, {or:[
+        [{"key":"cuisine","op":"not_exists"},{"key":"amenity","op":"=","value":"cafe"}],
+      ]})
+      assert.equal(f.toString(), '(nwr[!"cuisine"]["amenity"="cafe"];);')
+
+      var r = f.toLokijs()
+      assert.deepEqual(r, { $or: [ { 'tags.cuisine': { $exists: false }, 'tags.amenity': { $eq: "cafe" } } ] })
+
+      var r = f.cacheDescriptors()
+      assert.deepEqual(r, [
+        { id: 'nwr[!"cuisine"]["amenity"="cafe"](properties:1)' },
+      ])
+
+      var r = f.match({ tags: { amenity: 'restaurant' } })
+      assert.equal(r, false, 'Object should not match')
+      var r = f.match({ tags: { amenity: 'cafe' } })
+      assert.equal(r, true, 'Object should match')
+      var r = f.match({ tags: { shop: 'supermarket' } })
+      assert.equal(r, false, 'Object should not match')
+    })
+
     it ('node[~wikipedia~"."]', function () {
       var f = new Filter('node[~wikipedia]')
       assert.deepEqual(f.def, [
