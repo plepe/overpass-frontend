@@ -1199,6 +1199,17 @@ describe('Filter', function () {
       }
       assert.fail("Expect an Exception")
     })
+
+    it('node[amenity=bench];);', function () {
+      try {
+        var f = new Filter('node[amenity=bench];);')
+      }
+      catch (e) {
+        assert.equal(e.message, "Can't parse query, trailing characters: );")
+        return
+      }
+      assert.fail("Expect an Exception")
+    })
   })
 })
 

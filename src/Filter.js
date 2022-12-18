@@ -173,8 +173,12 @@ function parse (def, rek = 0) {
     } else if (mode === 1) {
       m = def.match(/^\s*\)\s*;?\s*/)
       if (m) {
-        def = def.slice(m[0].length)
-        return [rek === 0 && script.length === 1 ? script[0] : script, def]
+        if (rek === 0) {
+          return [script.length === 1 ? script[0] : script, def]
+        } else {
+          def = def.slice(m[0].length)
+          return [script, def]
+        }
       } else {
         mode = 0
       }
@@ -319,7 +323,11 @@ function parse (def, rek = 0) {
 
 function check (def) {
   if (typeof def === 'string') {
-    return parse(def)[0]
+    const result = parse(def)
+    if (result[1]) {
+      throw new Error("Can't parse query, trailing characters: " + result[1])
+    }
+    return result[0]
   } else if (def === null) {
     return
   } else if (typeof def === 'object' && def.constructor.name === 'Filter') {
