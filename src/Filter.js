@@ -324,7 +324,7 @@ function parse (def, rek = 0) {
 function check (def) {
   if (typeof def === 'string') {
     const result = parse(def)
-    if (result[1]) {
+    if (result[1].trim()) {
       throw new Error("Can't parse query, trailing characters: " + result[1])
     }
     return result[0]

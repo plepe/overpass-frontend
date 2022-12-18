@@ -178,6 +178,25 @@ describe('Filter', function () {
       assert.equal(r, false, 'Object should not match')
     })
 
+    it ('\\n   nwr [ amenity ]  ;\\n  ', function () {
+      var f = new Filter('\n   nwr [ amenity ]  ;\n  ')
+      assert.deepEqual(f.def, [{"key":"amenity","op":"has_key"}])
+      assert.equal(f.toString(), 'nwr["amenity"];')
+
+      var r = f.toLokijs()
+      assert.deepEqual(r, { 'tags.amenity': { $exists: true } })
+
+      var r = f.cacheDescriptors()
+      assert.deepEqual(r, [ { id: 'nwr["amenity"](properties:1)' } ])
+
+      var r = f.match({ tags: { amenity: 'restaurant' } })
+      assert.equal(r, true, 'Object should match')
+      var r = f.match({ tags: { amenity: 'cafe' } })
+      assert.equal(r, true, 'Object should match')
+      var r = f.match({ tags: { shop: 'supermarket' } })
+      assert.equal(r, false, 'Object should not match')
+    })
+
     it ('(node[amenity];way[amenity];)', function () {
       var f = new Filter('(node[amenity];way[amenity];)')
       assert.deepEqual(f.def, {or:[
