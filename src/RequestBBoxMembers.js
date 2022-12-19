@@ -88,8 +88,7 @@ class RequestBBoxMembers extends Request {
         }
 
         if ((this.options.memberProperties & ob.properties) === this.options.memberProperties) {
-          this.doneFeatures[id] = ob
-
+          this.receiveObject(ob)
           this.options.memberCallback(null, ob)
         }
       }
@@ -171,6 +170,7 @@ class RequestBBoxMembers extends Request {
   }
 
   receiveObject (ob) {
+    super.receiveObject(ob)
     this.doneFeatures[ob.id] = ob
   }
 

@@ -101,8 +101,7 @@ class RequestBBox extends Request {
       }
 
       if ((this.options.properties & ob.properties) === this.options.properties) {
-        this.doneFeatures[id] = ob
-
+        this.receiveObject(ob)
         this.featureCallback(null, ob)
       }
     }
@@ -213,6 +212,7 @@ class RequestBBox extends Request {
    * @param {int} partIndex - Which part of the subRequest is being received
    */
   receiveObject (ob) {
+    super.receiveObject(ob)
     this.doneFeatures[ob.id] = ob
   }
 
