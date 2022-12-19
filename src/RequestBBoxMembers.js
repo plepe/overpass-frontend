@@ -6,12 +6,13 @@ const keys = require('lodash/keys')
 const BoundingBox = require('boundingbox')
 const SortedCallbacks = require('./SortedCallbacks')
 const isGeoJSON = require('./isGeoJSON')
+const Request = require('./Request')
 
-class RequestBBoxMembers {
+class RequestBBoxMembers extends Request {
   constructor (request) {
+    super(request.overpass, {})
     this.master = request
     this.options = this.master.options
-    this.overpass = this.master.overpass
 
     this.options.properties |= defines.MEMBERS
     this.options.memberProperties = this.options.memberProperties || defines.DEFAULT
