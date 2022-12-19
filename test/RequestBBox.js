@@ -19,7 +19,7 @@ describe('Overpass BBoxQuery', function() {
     var found = []
     var error = ''
 
-    overpassFrontend.BBoxQuery(
+    var req = overpassFrontend.BBoxQuery(
       "node",
       {
 	"maxlat": 48.19852,
@@ -52,6 +52,8 @@ describe('Overpass BBoxQuery', function() {
                'Found: ' + found.join(', '))
         }
 
+        assert.equal(req.count, expected.length, 'Expected ' + expected.length + ' results')
+
         done()
       }
     )
@@ -63,7 +65,7 @@ describe('Overpass BBoxQuery', function() {
     var found = []
     var error = ''
 
-    overpassFrontend.BBoxQuery(
+    var req = overpassFrontend.BBoxQuery(
       "(node[amenity=restaurant];way[amenity=restaurant];relation[amenity=restaurant];)",
       {
 	"maxlat": 48.200,
@@ -95,6 +97,8 @@ describe('Overpass BBoxQuery', function() {
                'Expected: ' + expected.join(', ') + '\n' +
                'Found: ' + found.join(', '))
         }
+
+        assert.equal(req.count, expected.length, 'Expected ' + expected.length + ' results')
 
         done()
       }
@@ -166,6 +170,7 @@ describe('Overpass BBoxQuery', function() {
         }
 
         assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
+        assert.equal(request.count, expected.length, 'Expected ' + expected.length + ' results')
 
         request.off('subrequest-compile', compileListener)
 
@@ -231,6 +236,7 @@ describe('Overpass BBoxQuery - with filter', function() {
         }
 
         assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
+        assert.equal(request.count, expected.length, 'Expected ' + expected.length + ' results')
 
         request.off('subrequest-compile', compileListener)
 
@@ -292,6 +298,7 @@ describe('Overpass BBoxQuery - with filter', function() {
         }
 
         assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
+        assert.equal(request.count, expected.length, 'Expected ' + expected.length + ' results')
 
         request.off('subrequest-compile', compileListener)
 
@@ -354,6 +361,7 @@ describe('Overpass BBoxQuery - with filter', function() {
         }
 
         assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
+        assert.equal(request.count, expected.length, 'Expected ' + expected.length + ' results')
 
         request.off('subrequest-compile', compileListener)
 
@@ -408,6 +416,7 @@ describe('Overpass BBoxQuery - with filter', function() {
         }
 
         assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
+        assert.equal(request.count, expected.length, 'Expected ' + expected.length + ' results')
 
         request.off('subrequest-compile', compileListener)
 
@@ -469,6 +478,7 @@ describe('Overpass BBoxQuery - with filter', function() {
         }
 
         assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
+        assert.equal(request.count, expected.length, 'Expected ' + expected.length + ' results')
 
         request.off('subrequest-compile', compileListener)
 
@@ -511,6 +521,7 @@ describe('Overpass BBoxQuery - with filter', function() {
         function(err) {
           assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
           assert.equal(expected.length, found.length, 'Wrong count of objects found!')
+          assert.equal(request.count, expected.length, 'Expected ' + expected.length + ' results')
           assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
 
           request.off('subrequest-compile', compileListener)
@@ -554,6 +565,7 @@ describe('Overpass BBoxQuery - with filter', function() {
         function(err) {
           assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
           assert.deepEqual(expected.sort(), found.sort(), 'Wrong count of objects found!')
+          assert.equal(request.count, expected.length, 'Expected ' + expected.length + ' results')
           assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
 
           request.off('subrequest-compile', compileListener)
@@ -595,6 +607,7 @@ describe('Overpass BBoxQuery - with filter', function() {
         function(err) {
           assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
           assert.equal(expected.length, found.length, 'Wrong count of objects found!')
+          assert.equal(request.count, expected.length, 'Expected ' + expected.length + ' results')
           assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
 
           request.off('subrequest-compile', compileListener)
@@ -635,6 +648,7 @@ describe('Overpass BBoxQuery - with filter', function() {
         function(err) {
           assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
           assert.equal(1, request.callCount, 'Server should be called once')
+          assert.equal(request.count, expected.length, 'Expected ' + expected.length + ' results')
           assert.equal(expected.length, found.length, 'Wrong count of objects found!')
 
           done()
@@ -673,6 +687,7 @@ describe('Overpass BBoxQuery - with filter', function() {
         function(err) {
           assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
           assert.equal(1, request.callCount, 'Server should be called once')
+          assert.equal(request.count, expected.length, 'Expected ' + expected.length + ' results')
           assert.equal(expected.length, found.length, 'Wrong count of objects found!')
 
           done()
@@ -709,6 +724,7 @@ describe('Overpass BBoxQuery - with filter', function() {
         function(err) {
           assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
           assert.equal(0, request.callCount, 'Server should be not be called (fully cached)')
+          assert.equal(request.count, expected.length, 'Expected ' + expected.length + ' results')
           if(expectedFound.length != expected.length)
             assert.fail('Wrong count of objects found!')
 
@@ -722,7 +738,7 @@ describe('Overpass BBoxQuery - with filter', function() {
       var found = []
       var expected = [ 'w243704615', 'w125586430', 'w313063294', 'w172236247' ]
 
-      overpassFrontend.BBoxQuery(
+      var request = overpassFrontend.BBoxQuery(
         'way[building];',
         {
           minlon: 16.3375,
@@ -742,6 +758,7 @@ describe('Overpass BBoxQuery - with filter', function() {
         },
         function(err) {
           assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
+          assert.equal(request.count, expected.length, 'Expected ' + expected.length + ' results')
           if (found.length != expected.length)
             assert.fail('Wrong count of objects found!')
 
@@ -783,6 +800,7 @@ describe('Overpass BBoxQuery - with filter', function() {
         function(err) {
           assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
           assert.deepEqual(expected.sort(), found.sort(), 'Wrong count of objects found!')
+          assert.equal(req.count, expected.length, 'Expected ' + expected.length + ' results')
           assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of subrequests')
           assert.equal(loadCount, expectedLoadCount, 'Wrong count of load events')
 
@@ -805,7 +823,7 @@ describe('Overpass BBoxQuery - with filter', function() {
       async.parallel([
         function (callback) {
           var finalCalled = 0
-          overpassFrontend.BBoxQuery(
+          var req = overpassFrontend.BBoxQuery(
             'node[natural=tree];',
             {
               minlon: 16.3380,
@@ -825,6 +843,7 @@ describe('Overpass BBoxQuery - with filter', function() {
             },
             function(err) {
               assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
+              assert.equal(req.count, expected.length, 'Expected ' + expected.length + ' results')
               assert.deepEqual(expected1.sort(), found1.sort(), '(1) Wrong count of objects found!')
 
               callback()
@@ -833,7 +852,7 @@ describe('Overpass BBoxQuery - with filter', function() {
         },
         function (callback) {
           var finalCalled = 0
-          overpassFrontend.BBoxQuery(
+          var req = overpassFrontend.BBoxQuery(
             'node[natural=tree];',
             {
               minlon: 16.3377,
@@ -853,6 +872,7 @@ describe('Overpass BBoxQuery - with filter', function() {
             },
             function(err) {
               assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
+              assert.equal(req.count, expected.length, 'Expected ' + expected.length + ' results')
               assert.deepEqual(expected2.sort(), found2.sort(), '(2) Wrong count of objects found!')
 
               callback()
@@ -897,6 +917,7 @@ describe('Overpass BBoxQuery - with filter', function() {
         function(err) {
           assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
           assert.equal(expected.length, found.length, 'Wrong count of objects found!')
+          assert.equal(request.count, expected.length, 'Expected ' + expected.length + ' results')
           assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
 
           request.off('subrequest-compile', compileListener)
@@ -937,6 +958,7 @@ describe('Overpass BBoxQuery - with filter', function() {
         function(err) {
           assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
           assert.equal(expected.length, found.length, 'Wrong count of objects found!')
+          assert.equal(request.count, expected.length, 'Expected ' + expected.length + ' results')
           assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
 
           request.off('subrequest-compile', compileListener)
@@ -977,6 +999,7 @@ describe('Overpass BBoxQuery - with filter', function() {
         function(err) {
           assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
           assert.equal(expected.length, found.length, 'Wrong count of objects found!')
+          assert.equal(request.count, expected.length, 'Expected ' + expected.length + ' results')
           assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
 
           request.off('subrequest-compile', compileListener)
@@ -1040,6 +1063,7 @@ describe('BBoxQuery - Consecutive queries with different properties', function (
         }
 
         assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
+        assert.equal(request.count, expected.length, 'Expected ' + expected.length + ' results')
 
         request.off('subrequest-compile', compileListener)
 
@@ -1096,6 +1120,7 @@ describe('BBoxQuery - Consecutive queries with different properties', function (
         }
 
         assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
+        assert.equal(request.count, expected.length, 'Expected ' + expected.length + ' results')
 
         request.off('subrequest-compile', compileListener)
 
@@ -1152,6 +1177,7 @@ describe('BBoxQuery - Consecutive queries with different properties', function (
         }
 
         assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
+        assert.equal(request.count, expected.length, 'Expected ' + expected.length + ' results')
 
         request.off('subrequest-compile', compileListener)
 
@@ -1212,6 +1238,7 @@ describe('BBoxQuery - Consecutive queries with different properties', function (
         }
 
         assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
+        assert.equal(request.count, expected.length, 'Expected ' + expected.length + ' results')
 
         request.off('subrequest-compile', compileListener)
 
@@ -1268,6 +1295,7 @@ describe('BBoxQuery - Consecutive queries with different properties', function (
         }
 
         assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
+        assert.equal(request.count, expected.length, 'Expected ' + expected.length + ' results')
 
         request.off('subrequest-compile', compileListener)
 

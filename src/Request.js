@@ -8,6 +8,7 @@ const SortedCallbacks = require('./SortedCallbacks')
  * @property {object[]} parts - An entry for each part (separated by the 'out count' separator)
  * @property {int} parts[].properties - The properties which each returned map feature has set (TAGS, BBOX, ...)
  * @property {int} effort - Supposed "effort" of this query
+ * @property {int} count - Count of discovered items
  * @property {Request} request - The request this compiled query belongs to
  */
 
@@ -34,6 +35,7 @@ class Request {
     this.featureCallback = callbacks.next.bind(callbacks)
     this.finalCallback = callbacks.final.bind(callbacks)
 
+    this.count = 0
     this.callCount = 0
     this.timestampPreprocess = 0
   }
@@ -122,6 +124,7 @@ class Request {
    * @param {int} partIndex - Which part of the subRequest is being received
    */
   receiveObject (ob) {
+    this.count++
   }
 
   /**
