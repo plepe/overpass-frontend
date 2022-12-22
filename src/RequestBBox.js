@@ -145,7 +145,14 @@ class RequestBBox extends Request {
       return { minEffort: 0, maxEffort: 0 }
     }
 
-    return { minEffort: this.options.minEffort, maxEffort: null }
+    let minEffort = this.options.minEffort
+    let maxEffort = null
+    if (this.options.count) {
+      maxEffort = (this.options.count - this.count) * this.overpass.options.effortBBoxFeature
+      minEffort = Math.min(minEffort, maxEffort)
+    }
+
+    return { minEffort, maxEffort }
   }
 
   /**
@@ -246,6 +253,10 @@ class RequestBBox extends Request {
       this.cacheDescriptors && this.cacheDescriptors.forEach(cache => {
         cache.cache.add(this.bbox, cache.cacheDescriptors)
       })
+    }
+
+    if (this.options.count && this.options.count <= this.count) {
+      this.loadFinish = true
     }
   }
 
