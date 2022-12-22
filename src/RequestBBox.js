@@ -80,6 +80,7 @@ class RequestBBox extends Request {
 
     for (let i = 0; i < items.length; i++) {
       if (this.options.count && this.count >= this.options.count) {
+        this.loadFinish = true
         return
       }
 
