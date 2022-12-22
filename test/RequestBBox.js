@@ -1314,8 +1314,14 @@ describe('BBoxQuery({ count })', function () {
     var expected = [ 'n441576820', 'n442066582', 'n442972880', 'n1467109667', 'n355123976', 'n1955278832', 'n441576823', 'n2083468740', 'n2099023017', 'w369989037', 'w370577069' ]
     var found = []
     var error = ''
+    var expectedSubRequestCount = 1
+    var foundSubRequestCount = 0
 
-    var req = overpassFrontend.BBoxQuery(
+    function compileListener (subRequest) {
+      foundSubRequestCount++
+    }
+
+    var request = overpassFrontend.BBoxQuery(
       "(node[amenity=restaurant];way[amenity=restaurant];relation[amenity=restaurant];)",
       {
 	"maxlat": 48.200,
@@ -1348,11 +1354,16 @@ describe('BBoxQuery({ count })', function () {
                'Found: ' + found.join(', '))
         }
 
-        assert.equal(req.count, expected.length, 'Expected ' + expected.length + ' results')
+        assert.equal(request.count, expected.length, 'Expected ' + expected.length + ' results')
+
+        assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
+        request.off('subrequest-compile', compileListener)
 
         done()
       }
     )
+
+    request.on('subrequest-compile', compileListener)
   })
 
   it('Simple queries - all restaurants (fully cached, only 5 items)', function (done) {
@@ -1361,8 +1372,14 @@ describe('BBoxQuery({ count })', function () {
     var expectedCount = 5
     var found = []
     var error = ''
+    var expectedSubRequestCount = 0
+    var foundSubRequestCount = 0
 
-    var req = overpassFrontend.BBoxQuery(
+    function compileListener (subRequest) {
+      foundSubRequestCount++
+    }
+
+    var request = overpassFrontend.BBoxQuery(
       "(node[amenity=restaurant];way[amenity=restaurant];relation[amenity=restaurant];)",
       {
 	"maxlat": 48.200,
@@ -1391,11 +1408,16 @@ describe('BBoxQuery({ count })', function () {
         }
 
         assert.equal(found.length, expectedCount, 'Wrong count of objects returned')
-        assert.equal(req.count, 5, 'Expected 5 results')
+        assert.equal(request.count, 5, 'Expected 5 results')
+
+        assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
+        request.off('subrequest-compile', compileListener)
 
         done()
       }
     )
+
+    request.on('subrequest-compile', compileListener)
   })
 
   it('Simple queries - all restaurants (cache cleared, only 5 items)', function (done) {
@@ -1409,7 +1431,6 @@ describe('BBoxQuery({ count })', function () {
     var foundSubRequestCount = 0
 
     function compileListener (subRequest) {
-      console.log('subreq')
       foundSubRequestCount++
     }
 
@@ -1465,7 +1486,6 @@ describe('BBoxQuery({ count })', function () {
     var foundSubRequestCount = 0
 
     function compileListener (subRequest) {
-      console.log('subreq')
       foundSubRequestCount++
     }
 
