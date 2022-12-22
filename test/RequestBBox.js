@@ -1310,223 +1310,119 @@ describe('BBoxQuery - Consecutive queries with different properties', function (
 describe('BBoxQuery({ count })', function () {
   it('Query all restaurants to fill cache', function (done) {
     overpassFrontend.clearCache()
-    var finalCalled = 0
-    var expected = [ 'n441576820', 'n442066582', 'n442972880', 'n1467109667', 'n355123976', 'n1955278832', 'n441576823', 'n2083468740', 'n2099023017', 'w369989037', 'w370577069' ]
-    var found = []
-    var error = ''
-    var expectedSubRequestCount = 1
-    var foundSubRequestCount = 0
-
-    function compileListener (subRequest) {
-      foundSubRequestCount++
-    }
-
-    var request = overpassFrontend.BBoxQuery(
-      "(node[amenity=restaurant];way[amenity=restaurant];relation[amenity=restaurant];)",
-      {
+    test({
+      query: "(node[amenity=restaurant];way[amenity=restaurant];relation[amenity=restaurant];)",
+      bounds: {
 	"maxlat": 48.200,
 	"maxlon": 16.345,
 	"minlat": 48.195,
 	"minlon": 16.335
       },
-      {
-      },
-      function (err, result) {
-        found.push(result.id)
-
-        if (expected.indexOf(result.id) === -1) {
-          error += 'Unexpected result ' + result.id + '\n'
-        }
-      },
-      function (err) {
-        assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
-        if (err) {
-          return done(err)
-        }
-
-        if (error) {
-          return done(error)
-        }
-
-        if (found.length !== expected.length) {
-          return done('Wrong count of objects returned:\n' +
-               'Expected: ' + expected.join(', ') + '\n' +
-               'Found: ' + found.join(', '))
-        }
-
-        assert.equal(request.count, expected.length, 'Expected ' + expected.length + ' results')
-
-        assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
-        request.off('subrequest-compile', compileListener)
-
-        done()
-      }
-    )
-
-    request.on('subrequest-compile', compileListener)
+      expected: [ 'n441576820', 'n442066582', 'n442972880', 'n1467109667', 'n355123976', 'n1955278832', 'n441576823', 'n2083468740', 'n2099023017', 'w369989037', 'w370577069' ],
+      expectedSubRequestCount: 1
+    }, done)
   })
 
   it('Simple queries - all restaurants (fully cached, only 5 items)', function (done) {
-    var finalCalled = 0
-    var expected = [ 'n441576820', 'n442066582', 'n442972880', 'n1467109667', 'n355123976', 'n1955278832', 'n441576823', 'n2083468740', 'n2099023017', 'w369989037', 'w370577069' ]
-    var expectedCount = 5
-    var found = []
-    var error = ''
-    var expectedSubRequestCount = 0
-    var foundSubRequestCount = 0
-
-    function compileListener (subRequest) {
-      foundSubRequestCount++
-    }
-
-    var request = overpassFrontend.BBoxQuery(
-      "(node[amenity=restaurant];way[amenity=restaurant];relation[amenity=restaurant];)",
-      {
+    test({
+      query: "(node[amenity=restaurant];way[amenity=restaurant];relation[amenity=restaurant];)",
+      bounds: {
 	"maxlat": 48.200,
 	"maxlon": 16.345,
 	"minlat": 48.195,
 	"minlon": 16.335
       },
-      {
+      options: {
         count: 5
       },
-      function (err, result) {
-        found.push(result.id)
-
-        if (expected.indexOf(result.id) === -1) {
-          error += 'Unexpected result ' + result.id + '\n'
-        }
-      },
-      function (err) {
-        assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
-        if (err) {
-          return done(err)
-        }
-
-        if (error) {
-          return done(error)
-        }
-
-        assert.equal(found.length, expectedCount, 'Wrong count of objects returned')
-        assert.equal(request.count, 5, 'Expected 5 results')
-
-        assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
-        request.off('subrequest-compile', compileListener)
-
-        done()
-      }
-    )
-
-    request.on('subrequest-compile', compileListener)
+      expected: [ 'n441576820', 'n442066582', 'n442972880', 'n1467109667', 'n355123976', 'n1955278832', 'n441576823', 'n2083468740', 'n2099023017', 'w369989037', 'w370577069' ],
+      expectedCount: 5,
+      expectedSubRequestCount: 0
+    }, done)
   })
 
   it('Simple queries - all restaurants (cache cleared, only 5 items)', function (done) {
     overpassFrontend.clearCache()
-    var finalCalled = 0
-    var expected = [ 'n441576820', 'n442066582', 'n442972880', 'n1467109667', 'n355123976', 'n1955278832', 'n441576823', 'n2083468740', 'n2099023017', 'w369989037', 'w370577069' ]
-    var expectedCount = 5
-    var found = []
-    var error = ''
-    var expectedSubRequestCount = 1
-    var foundSubRequestCount = 0
-
-    function compileListener (subRequest) {
-      foundSubRequestCount++
-    }
-
-    var request = overpassFrontend.BBoxQuery(
-      "(node[amenity=restaurant];way[amenity=restaurant];relation[amenity=restaurant];)",
-      {
+    test({
+      query: "(node[amenity=restaurant];way[amenity=restaurant];relation[amenity=restaurant];)",
+      bounds: {
 	"maxlat": 48.200,
 	"maxlon": 16.345,
 	"minlat": 48.195,
 	"minlon": 16.335
       },
-      {
+      options: {
         count: 5
       },
-      function (err, result) {
-        found.push(result.id)
-
-        if (expected.indexOf(result.id) === -1) {
-          error += 'Unexpected result ' + result.id + '\n'
-        }
-      },
-      function (err) {
-        assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
-        if (err) {
-          return done(err)
-        }
-
-        if (error) {
-          return done(error)
-        }
-
-        assert.equal(found.length, expectedCount, 'Wrong count of objects returned')
-        assert.equal(request.count, 5, 'Expected 5 results')
-
-        assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
-        request.off('subrequest-compile', compileListener)
-
-        done()
-      }
-    )
-
-    request.on('subrequest-compile', compileListener)
+      expected: [ 'n441576820', 'n442066582', 'n442972880', 'n1467109667', 'n355123976', 'n1955278832', 'n441576823', 'n2083468740', 'n2099023017', 'w369989037', 'w370577069' ],
+      expectedCount: 5,
+      expectedSubRequestCount: 1
+    }, done)
   })
 
   it('Simple queries - all restaurants (partly cached, up to 10 items)', function (done) {
     overpassFrontend.clearCache()
-    var finalCalled = 0
-    var expected = [ 'n441576820', 'n442066582', 'n442972880', 'n1467109667', 'n355123976', 'n1955278832', 'n441576823', 'n2083468740', 'n2099023017', 'w369989037', 'w370577069' ]
-    var expectedCount = 10
-    var found = []
-    var error = ''
-    var expectedSubRequestCount = 1
-    var foundSubRequestCount = 0
-
-    function compileListener (subRequest) {
-      foundSubRequestCount++
-    }
-
-    var request = overpassFrontend.BBoxQuery(
-      "(node[amenity=restaurant];way[amenity=restaurant];relation[amenity=restaurant];)",
-      {
+    test({
+      query: "(node[amenity=restaurant];way[amenity=restaurant];relation[amenity=restaurant];)",
+      bounds: {
 	"maxlat": 48.200,
 	"maxlon": 16.345,
 	"minlat": 48.195,
 	"minlon": 16.335
       },
-      {
+      options: {
         count: 10
       },
-      function (err, result) {
-        found.push(result.id)
-
-        if (expected.indexOf(result.id) === -1) {
-          error += 'Unexpected result ' + result.id + '\n'
-        }
-      },
-      function (err) {
-        assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
-        if (err) {
-          return done(err)
-        }
-
-        if (error) {
-          return done(error)
-        }
-
-        assert.equal(found.length, expectedCount, 'Wrong count of objects returned')
-        assert.equal(request.count, expectedCount, 'Expected ' + expectedCount + ' results')
-
-        assert.equal(foundSubRequestCount, expectedSubRequestCount, 'Wrong count of sub requests!')
-        request.off('subrequest-compile', compileListener)
-
-        done()
-      }
-    )
-
-    request.on('subrequest-compile', compileListener)
+      expected: [ 'n441576820', 'n442066582', 'n442972880', 'n1467109667', 'n355123976', 'n1955278832', 'n441576823', 'n2083468740', 'n2099023017', 'w369989037', 'w370577069' ],
+      expectedCount: 10,
+      expectedSubRequestCount: 1
+    }, done)
   })
 })
+
+function test (options, callback) {
+  var finalCalled = 0
+  var found = []
+  var error = ''
+  var foundSubRequestCount = 0
+
+  function compileListener (subRequest) {
+    foundSubRequestCount++
+  }
+
+  var request = overpassFrontend.BBoxQuery(
+    options.query,
+    options.bounds,
+    options.options,
+    function (err, result) {
+      found.push(result.id)
+
+      if (options.expected.indexOf(result.id) === -1) {
+        error += 'Unexpected result ' + result.id + '\n'
+      }
+    },
+    function (err) {
+      assert.equal(finalCalled++, 0, 'Final function called ' + finalCalled + ' times!')
+      if (err) {
+        return callback(err)
+      }
+
+      if (error) {
+        return callback(error)
+      }
+
+      const expectedCount = 'expectedCount' in options ? options.expectedCount : options.expected.length
+      assert.equal(found.length, expectedCount, 'Wrong count of objects returned')
+      assert.equal(request.count, expectedCount, 'request\'s count should equal ' + expectedCount)
+
+      if ('expectedSubRequestCount' in options) {
+        assert.equal(foundSubRequestCount, options.expectedSubRequestCount, 'Wrong count of sub requests!')
+      }
+      request.off('subrequest-compile', compileListener)
+
+      callback()
+    }
+  )
+
+  request.on('subrequest-compile', compileListener)
+}
