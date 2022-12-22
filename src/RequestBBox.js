@@ -79,6 +79,10 @@ class RequestBBox extends Request {
     }
 
     for (let i = 0; i < items.length; i++) {
+      if (this.options.count && this.count >= this.options.count) {
+        return
+      }
+
       const id = items[i].id
 
       if (!(id in this.overpass.cacheElements)) {
