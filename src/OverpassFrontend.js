@@ -80,6 +80,7 @@ const boundsIsFullWorld = require('./boundsIsFullWorld')
  * @param {number} [options.effortNode=1] The effort for request a node. Default: 1.
  * @param {number} [options.effortWay=4] The effort for request a way.
  * @param {number} [options.effortRelation=64] The effort for request a relation.
+ * @param {number} [options.effortBBoxFeature=4] The effort for requesting an item in a BboxQuery.
  * @param {number} [options.timeGap=10] A short time gap between two requests to the Overpass API (milliseconds).
  * @param {number} [options.timeGap429=500] A longer time gap after a 429 response from Overpass API (milliseconds).
  * @param {number} [options.timeGap429Exp=3] If we keep getting 429 responses, increase the time exponentially with the specified factor (e.g. 2: 500ms, 1000ms, 2000ms, ...; 3: 500ms, 1500ms, 4500ms, ...)
@@ -94,6 +95,7 @@ class OverpassFrontend {
       effortNode: 1,
       effortWay: 4,
       effortRelation: 64,
+      effortBBoxFeature: 4,
       timeGap: 10,
       timeGap429: 500,
       timeGap429Exp: 3,

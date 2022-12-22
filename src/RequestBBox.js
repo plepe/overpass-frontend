@@ -189,7 +189,7 @@ class RequestBBox extends Request {
     }
 
     if (!('split' in this.options)) {
-      this.options.effortSplit = Math.ceil(effortAvailable / 4)
+      this.options.effortSplit = Math.ceil(effortAvailable / this.overpass.options.effortBBoxFeature)
     }
     query += '.result out ' + overpassOutOptions(this.options) + ';'
 
@@ -204,7 +204,7 @@ class RequestBBox extends Request {
           featureCallback: this.featureCallback
         }
       ],
-      effort: this.options.split ? this.options.split * 4 : effortAvailable // TODO: configure bbox effort
+      effort: this.options.split ? this.options.split * this.overpass.options.effortBBoxFeature : effortAvailable
     }
     return subRequest
   }
