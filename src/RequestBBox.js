@@ -163,7 +163,11 @@ class RequestBBox extends Request {
       }
     }
 
-    const effortAvailable = Math.max(context.maxEffort, this.options.minEffort)
+    const efforts = this.minMaxEffort()
+    let effortAvailable = Math.max(context.maxEffort, efforts.minEffort)
+    if (efforts.maxEffort) {
+      effortAvailable = Math.min(effortAvailable, efforts.maxEffort)
+    }
 
     // if the context already has a bbox and it differs from this, we can't add
     // ours
