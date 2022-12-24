@@ -1,3 +1,6 @@
+# Version 3.1.0 - upcoming
+* .BBoxQuery() now accept the option 'limit' - limit count of returned features.
+
 # Version 3.0.0 - release 2022-10-24
 * Improved cache handling - the query checks, if a super-set of that query has successfully been downloaded for the given area, which reduces the need for server requests. Example: if 'nwr[amenity]' for the given area has been downloaded, 'node[amenity=restaurant]' or 'way[amenity][cuisine]' are included.
 * New filters: `(id:...)`, bbox `(lat,lon,lat,lon)`, `(around:...)`, `(user:...)`, `(uid:...)`, `(poly:...)`, `(if:...`), `(newer:...)`.
