@@ -1308,7 +1308,7 @@ describe('BBoxQuery - Consecutive queries with different properties', function (
 })
 
 describe('BBoxQuery({ limit })', function () {
-  it('Query all restaurants to fill cache', function (done) {
+  it('Query all restaurants to fill cache (limit=0)', function (done) {
     overpassFrontend.clearCache()
     test({
       query: "(node[amenity=restaurant];way[amenity=restaurant];relation[amenity=restaurant];)",
@@ -1317,6 +1317,9 @@ describe('BBoxQuery({ limit })', function () {
 	"maxlon": 16.345,
 	"minlat": 48.195,
 	"minlon": 16.335
+      },
+      options: {
+        limit: 0
       },
       expected: [ 'n441576820', 'n442066582', 'n442972880', 'n1467109667', 'n355123976', 'n1955278832', 'n441576823', 'n2083468740', 'n2099023017', 'w369989037', 'w370577069' ],
       expectedSubRequestCount: 1
