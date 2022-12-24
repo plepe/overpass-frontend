@@ -564,6 +564,7 @@ class OverpassFrontend {
    * @param {string} query - Query for requesting objects from Overpass API, e.g. "node[amenity=restaurant]" or "(node[amenity];way[highway~'^(primary|secondary)$];)". See <a href='Filter.html'>Filter</a> for details.
    * @param {BoundingBox|GeoJSON} bounds - Boundaries where to load objects, can be a BoundingBox object, Leaflet Bounds object (e.g. from map.getBounds()) or a GeoJSON Polygon/Multipolygon.
    * @param {object} options
+   * @param {number} [options.limit=0] - Limit count of results. If 0, no limit will be used.
    * @param {number} [options.priority=0] - Priority for loading these objects. The lower the sooner they will be requested.
    * @param {boolean|string} [options.sort=false] - If false, it will be called as soon as the features are availabe (e.g. immediately when cached).
    * @param {bit_array} [options.properties] Which properties of the features should be downloaded: OVERPASS_ID_ONLY, OVERPASS_BBOX, OVERPASS_TAGS, OVERPASS_GEOM, OVERPASS_META. Combine by binary OR: ``OVERPASS_ID | OVERPASS_BBOX``. Default: OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.BBOX

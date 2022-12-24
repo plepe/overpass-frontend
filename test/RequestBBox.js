@@ -1307,7 +1307,7 @@ describe('BBoxQuery - Consecutive queries with different properties', function (
   })
 })
 
-describe('BBoxQuery({ count })', function () {
+describe('BBoxQuery({ limit })', function () {
   it('Query all restaurants to fill cache', function (done) {
     overpassFrontend.clearCache()
     test({
@@ -1323,7 +1323,7 @@ describe('BBoxQuery({ count })', function () {
     }, done)
   })
 
-  it('Simple queries - all restaurants (fully cached, only 5 items)', function (done) {
+  it('Simple queries - all restaurants (fully cached, limit to 5 items)', function (done) {
     test({
       query: "(node[amenity=restaurant];way[amenity=restaurant];relation[amenity=restaurant];)",
       bounds: {
@@ -1333,7 +1333,7 @@ describe('BBoxQuery({ count })', function () {
 	"minlon": 16.335
       },
       options: {
-        count: 5
+        limit: 5
       },
       expected: [ 'n441576820', 'n442066582', 'n442972880', 'n1467109667', 'n355123976', 'n1955278832', 'n441576823', 'n2083468740', 'n2099023017', 'w369989037', 'w370577069' ],
       expectedCount: 5,
@@ -1352,7 +1352,7 @@ describe('BBoxQuery({ count })', function () {
 	"minlon": 16.335
       },
       options: {
-        count: 5
+        limit: 5
       },
       expected: [ 'n441576820', 'n442066582', 'n442972880', 'n1467109667', 'n355123976', 'n1955278832', 'n441576823', 'n2083468740', 'n2099023017', 'w369989037', 'w370577069' ],
       expectedCount: 5,
@@ -1371,7 +1371,7 @@ describe('BBoxQuery({ count })', function () {
 	"minlon": 16.335
       },
       options: {
-        count: 10
+        limit: 10
       },
       expected: [ 'n441576820', 'n442066582', 'n442972880', 'n1467109667', 'n355123976', 'n1955278832', 'n441576823', 'n2083468740', 'n2099023017', 'w369989037', 'w370577069' ],
       expectedCount: 10,
@@ -1379,7 +1379,7 @@ describe('BBoxQuery({ count })', function () {
     }, done)
   })
 
-  it('Simple queries - all restaurants (partly cached, count 15 - only 11 found)', function (done) {
+  it('Simple queries - all restaurants (partly cached, limit 15 - only 11 found)', function (done) {
     overpassFrontend.clearCache()
     test({
       query: "(node[amenity=restaurant];way[amenity=restaurant];relation[amenity=restaurant];)",
@@ -1390,7 +1390,7 @@ describe('BBoxQuery({ count })', function () {
 	"minlon": 16.335
       },
       options: {
-        count: 15
+        limit: 15
       },
       expected: [ 'n441576820', 'n442066582', 'n442972880', 'n1467109667', 'n355123976', 'n1955278832', 'n441576823', 'n2083468740', 'n2099023017', 'w369989037', 'w370577069' ],
       expectedCount: 11,

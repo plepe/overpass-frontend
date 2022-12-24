@@ -79,7 +79,7 @@ class RequestBBox extends Request {
     }
 
     for (let i = 0; i < items.length; i++) {
-      if (this.options.count && this.count >= this.options.count) {
+      if (this.options.limit && this.count >= this.options.limit) {
         this.loadFinish = true
         return
       }
@@ -148,8 +148,8 @@ class RequestBBox extends Request {
 
     let minEffort = this.options.minEffort
     let maxEffort = null
-    if (this.options.count) {
-      maxEffort = (this.options.count - this.count) * this.overpass.options.effortBBoxFeature
+    if (this.options.limit) {
+      maxEffort = (this.options.limit - this.count) * this.overpass.options.effortBBoxFeature
       minEffort = Math.min(minEffort, maxEffort)
     }
 
@@ -256,7 +256,7 @@ class RequestBBox extends Request {
       })
     }
 
-    if (this.options.count && this.options.count <= this.count) {
+    if (this.options.limit && this.options.limit <= this.count) {
       this.loadFinish = true
     }
   }
