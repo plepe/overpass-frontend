@@ -79,6 +79,11 @@ class RequestBBox extends Request {
     }
 
     for (let i = 0; i < items.length; i++) {
+      if (this.options.limit && this.count >= this.options.limit) {
+        this.loadFinish = true
+        return
+      }
+
       const id = items[i].id
 
       if (!(id in this.overpass.cacheElements)) {
@@ -101,8 +106,7 @@ class RequestBBox extends Request {
       }
 
       if ((this.options.properties & ob.properties) === this.options.properties) {
-        this.doneFeatures[id] = ob
-
+        this.receiveObject(ob)
         this.featureCallback(null, ob)
       }
     }
@@ -142,7 +146,14 @@ class RequestBBox extends Request {
       return { minEffort: 0, maxEffort: 0 }
     }
 
-    return { minEffort: this.options.minEffort, maxEffort: null }
+    let minEffort = this.options.minEffort
+    let maxEffort = null
+    if (this.options.limit) {
+      maxEffort = (this.options.limit - this.count) * this.overpass.options.effortBBoxFeature
+      minEffort = Math.min(minEffort, maxEffort)
+    }
+
+    return { minEffort, maxEffort }
   }
 
   /**
@@ -160,7 +171,11 @@ class RequestBBox extends Request {
       }
     }
 
-    const effortAvailable = Math.max(context.maxEffort, this.options.minEffort)
+    const efforts = this.minMaxEffort()
+    let effortAvailable = Math.max(context.maxEffort, efforts.minEffort)
+    if (efforts.maxEffort) {
+      effortAvailable = Math.min(effortAvailable, efforts.maxEffort)
+    }
 
     // if the context already has a bbox and it differs from this, we can't add
     // ours
@@ -186,7 +201,7 @@ class RequestBBox extends Request {
     }
 
     if (!('split' in this.options)) {
-      this.options.effortSplit = Math.ceil(effortAvailable / 4)
+      this.options.effortSplit = Math.ceil(effortAvailable / this.overpass.options.effortBBoxFeature)
     }
     query += '.result out ' + overpassOutOptions(this.options) + ';'
 
@@ -201,7 +216,7 @@ class RequestBBox extends Request {
           featureCallback: this.featureCallback
         }
       ],
-      effort: this.options.split ? this.options.split * 4 : effortAvailable // TODO: configure bbox effort
+      effort: this.options.split ? this.options.split * this.overpass.options.effortBBoxFeature : effortAvailable
     }
     return subRequest
   }
@@ -213,6 +228,7 @@ class RequestBBox extends Request {
    * @param {int} partIndex - Which part of the subRequest is being received
    */
   receiveObject (ob) {
+    super.receiveObject(ob)
     this.doneFeatures[ob.id] = ob
   }
 
@@ -238,6 +254,10 @@ class RequestBBox extends Request {
       this.cacheDescriptors && this.cacheDescriptors.forEach(cache => {
         cache.cache.add(this.bbox, cache.cacheDescriptors)
       })
+    }
+
+    if (this.options.limit && this.options.limit <= this.count) {
+      this.loadFinish = true
     }
   }
 

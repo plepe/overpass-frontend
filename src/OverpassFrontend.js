@@ -75,10 +75,12 @@ const boundsIsFullWorld = require('./boundsIsFullWorld')
  * A connection to an Overpass API Server or an OpenStreetMap file
  * @param {string} url The URL of the API, e.g. 'https://overpass-api.de/api/'. If you omit the protocol, it will use the protocol which is in use for the current page (or https: on nodejs): '//overpass-api.de/api/'. If the url ends in .json, .osm or .osm.bz2 it will load this OpenStreetMap file and use the data from there.
  * @param {object} options Options
+ * @param {number} [options.count=0] Only return a maximum of count items. If count=0, no limit is used (default).
  * @param {number} [options.effortPerRequest=1000] To avoid huge requests to the Overpass API, the request will be split into smaller chunks. This value defines, how many objects will be requested per API call (for get() calls see effortNode, effortWay, effortRelation, e.g. up to 1000 nodes or 250 ways or (500 nodes and 125 ways) at default values; for BBoxQuery() calls the setting will be divided by 4).
  * @param {number} [options.effortNode=1] The effort for request a node. Default: 1.
  * @param {number} [options.effortWay=4] The effort for request a way.
  * @param {number} [options.effortRelation=64] The effort for request a relation.
+ * @param {number} [options.effortBBoxFeature=4] The effort for requesting an item in a BboxQuery.
  * @param {number} [options.timeGap=10] A short time gap between two requests to the Overpass API (milliseconds).
  * @param {number} [options.timeGap429=500] A longer time gap after a 429 response from Overpass API (milliseconds).
  * @param {number} [options.timeGap429Exp=3] If we keep getting 429 responses, increase the time exponentially with the specified factor (e.g. 2: 500ms, 1000ms, 2000ms, ...; 3: 500ms, 1500ms, 4500ms, ...)
@@ -93,6 +95,7 @@ class OverpassFrontend {
       effortNode: 1,
       effortWay: 4,
       effortRelation: 64,
+      effortBBoxFeature: 4,
       timeGap: 10,
       timeGap429: 500,
       timeGap429Exp: 3,
@@ -561,6 +564,7 @@ class OverpassFrontend {
    * @param {string} query - Query for requesting objects from Overpass API, e.g. "node[amenity=restaurant]" or "(node[amenity];way[highway~'^(primary|secondary)$];)". See <a href='Filter.html'>Filter</a> for details.
    * @param {BoundingBox|GeoJSON} bounds - Boundaries where to load objects, can be a BoundingBox object, Leaflet Bounds object (e.g. from map.getBounds()) or a GeoJSON Polygon/Multipolygon.
    * @param {object} options
+   * @param {number} [options.limit=0] - Limit count of results. If 0, no limit will be used.
    * @param {number} [options.priority=0] - Priority for loading these objects. The lower the sooner they will be requested.
    * @param {boolean|string} [options.sort=false] - If false, it will be called as soon as the features are availabe (e.g. immediately when cached).
    * @param {bit_array} [options.properties] Which properties of the features should be downloaded: OVERPASS_ID_ONLY, OVERPASS_BBOX, OVERPASS_TAGS, OVERPASS_GEOM, OVERPASS_META. Combine by binary OR: ``OVERPASS_ID | OVERPASS_BBOX``. Default: OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.BBOX
