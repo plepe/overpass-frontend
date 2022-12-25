@@ -110,6 +110,10 @@ class RequestBBox extends Request {
         this.featureCallback(null, ob)
       }
     }
+
+    if (this.options.limit && this.count >= this.options.limit) {
+      this.loadFinish = true
+    }
   }
 
   /**

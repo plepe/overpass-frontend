@@ -1363,8 +1363,25 @@ describe('BBoxQuery({ limit })', function () {
     }, done)
   })
 
+  it('Simple queries - all restaurants (5 items, which are already cached)', function (done) {
+    test({
+      query: "(node[amenity=restaurant];way[amenity=restaurant];relation[amenity=restaurant];)",
+      bounds: {
+	"maxlat": 48.200,
+	"maxlon": 16.345,
+	"minlat": 48.195,
+	"minlon": 16.335
+      },
+      options: {
+        limit: 5
+      },
+      expected: [ 'n441576820', 'n442066582', 'n442972880', 'n1467109667', 'n355123976', 'n1955278832', 'n441576823', 'n2083468740', 'n2099023017', 'w369989037', 'w370577069' ],
+      expectedCount: 5,
+      expectedSubRequestCount: 0
+    }, done)
+  })
+
   it('Simple queries - all restaurants (partly cached, up to 10 items)', function (done) {
-    overpassFrontend.clearCache()
     test({
       query: "(node[amenity=restaurant];way[amenity=restaurant];relation[amenity=restaurant];)",
       bounds: {
