@@ -62,7 +62,9 @@ function check_update_map () {
         __BBOXQUERY_PARAMS__:
         JSON.stringify(form.elements.query.value) + ',\n' +
         indent(JSON.stringify(bounds, null, '  ')) + ',\n' +
-        indent(JSON.stringify(options, null, '  ')) + ','
+        indent(JSON.stringify(options, null, '  ')) + ',',
+        __BBOX_LEAFLET__:
+          JSON.stringify([[bounds.minlat, bounds.minlon], [bounds.maxlat, bounds.maxlon]])
       },
       (err, code) => codeDisplay.value = code
     )
