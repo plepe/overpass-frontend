@@ -51,21 +51,21 @@ function check_update_map () {
 
   const codeDisplay = document.getElementById('result')
   if (codeDisplay) {
-    let code = 'const OverpassFrontend = require(\'overpass-frontend\')\n'
-    code += 'const overpassFrontend = new OverpassFrontend(' + JSON.stringify(form.elements.url.value) + ')\n\n'
-
     const options = {
       properties: OverpassFrontend.ALL
     }
-    code += 'const request = overpassFrontend.BBoxQuery(\n' +
-      indent(JSON.stringify(form.elements.query.value)) + ',\n' +
-      indent(JSON.stringify(bounds, null, '  ')) + ',\n' +
-      indent(JSON.stringify(options, null, '  ')) + ',\n' +
-      '  (err, feature) => console.log(feature.id, feature.tags),\n' +
-      '  (err) => console.error(err)\n)'
 
-
-    codeDisplay.value = code
+    compileTemplate(
+      'nodejs',
+      {
+        __URL__: JSON.stringify(form.elements.url.value),
+        __BBOXQUERY_PARAMS__:
+        JSON.stringify(form.elements.query.value) + ',\n' +
+        indent(JSON.stringify(bounds, null, '  ')) + ',\n' +
+        indent(JSON.stringify(options, null, '  ')) + ','
+      },
+      (err, code) => codeDisplay.value = code
+    )
   }
 }
 
@@ -119,3 +119,22 @@ function indent (str) {
   return '  ' + str.split(/\n/g).join('\n  ')
 }
 
+const templates = {}
+function compileTemplate (template, replacements, callback) {
+  if (!(template in templates)) {
+    return fetch('code-templates/' + template)
+      .then(req => req.text())
+      .then(body => {
+        templates[template] = body
+        compileTemplate(template, replacements, callback)
+      })
+  }
+
+  let result = templates[template]
+
+  for (const k in replacements) {
+    result = result.replace(k, replacements[k])
+  }
+
+  callback(null, result)
+}

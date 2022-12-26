@@ -1,0 +1,8 @@
+const OverpassFrontend = require('overpass-frontend')
+const overpassFrontend = new OverpassFrontend(__URL__)
+
+const request = overpassFrontend.BBoxQuery(
+  __BBOXQUERY_PARAMS__
+  (err, feature) => console.log(feature.id, feature.tags),
+  (err) => console.error(err)
+)
