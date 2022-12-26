@@ -49,6 +49,7 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.3.1",
     "eslint-plugin-standard": "^5.0.0",
+    "http-server": "^14.1.1",
     "jsdoc": "^3.6.11",
     "jsdom": "^17.0.0",
     "leaflet": "^1.9.2",
@@ -70,6 +71,7 @@
     "version": "rm -r doc/ && npm run doc && npm run build && npm run build-test && git add -A doc/ dist/",
     "prepare": "require-self",
     "lint": "eslint --fix src/*.js src/qlFunctions/*.js src/evaluator/* index.js",
+    "start": "http-server ./ -p 8000",
     "doc": "jsdoc -d doc/ src/*.js"
   },
   "repository": {
