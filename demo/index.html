@@ -1,9 +1,9 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>OverpassFrontendFrontend example</title>
+  <title>OverpassFrontendFrontend DEMO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="node_modules/leaflet/dist/leaflet.css" />
+  <link rel="stylesheet" href="../node_modules/leaflet/dist/leaflet.css" />
   <style>
 .leaflet-popup-content {
   max-height: 250px;
@@ -34,8 +34,8 @@
   height: 20em;
 }
   </style>
-  <script src="node_modules/leaflet/dist/leaflet.js"></script>
-  <script src="dist/overpass-frontend.js"></script>
+  <script src="../node_modules/leaflet/dist/leaflet.js"></script>
+  <script src="../dist/overpass-frontend.js"></script>
   <script type='text/javascript'>
 var map
 var overpass
@@ -75,7 +75,7 @@ function check_update_map () {
           color: 'red',
           fillColor: 'red',
           fillOpacity: 0.1,
-          weight: 1,
+          weight: 2,
           radius: 6
         })
         ob.feature.bindPopup('<pre>' + JSON.stringify(ob.GeoJSON(), null, '  ').replace(/\&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</pre>')
