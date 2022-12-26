@@ -56,7 +56,7 @@ function check_update_map () {
     }
 
     compileTemplate(
-      'nodejs',
+      document.getElementById('template').value,
       {
         __URL__: JSON.stringify(form.elements.url.value),
         __BBOXQUERY_PARAMS__:
@@ -93,6 +93,8 @@ window.onload = function() {
 
   map.on('moveend', check_update_map)
   check_update_map()
+
+  document.getElementById('template').onchange = check_update_map
 }
 
 function update () {
