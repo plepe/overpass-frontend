@@ -3,7 +3,9 @@ var overpass
 var request
 var current_objects = {}
 var form
-var formValues = {}
+var formValues = {
+  file: ''
+}
 
 function check_update_map () {
   var bounds = new BoundingBox(map.getBounds())
@@ -94,7 +96,9 @@ window.onload = function() {
   update()
 
   map.on('moveend', check_update_map)
-  check_update_map()
+  if (overpass) {
+    check_update_map()
+  }
 
   document.getElementById('template').onchange = check_update_map
 }
@@ -102,7 +106,20 @@ window.onload = function() {
 function update () {
   clear_map()
 
-  if (!overpass || form.elements.url.value !== formValues.url) {
+  if (form.elements.file.value !== formValues.file) {
+    var reader = new FileReader()
+    reader.onload = (e) => {
+      overpass = new OverpassFrontend(e.target.result)
+
+      overpass.once('load', (data) => {
+        if (data.bounds) {
+          map.fitBounds(data.bounds.toLeaflet())
+          check_update_map()
+        }
+      })
+    }
+    reader.readAsDataURL(form.elements.file.files[0])
+  } else if (!overpass || form.elements.url.value !== formValues.url) {
     overpass = new OverpassFrontend(form.elements.url.value)
     overpass.once('load', (data) => {
       if (data.bounds) {
@@ -112,10 +129,14 @@ function update () {
   }
 
   formValues = {
-    url: form.elements.url.value
+    url: form.elements.url.value,
+    file: form.elements.file.value
   }
 
-  check_update_map()
+  if (overpass) {
+    check_update_map()
+  }
+
   return false
 }
 
