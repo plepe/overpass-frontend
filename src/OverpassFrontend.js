@@ -117,7 +117,7 @@ class OverpassFrontend {
     this.pendingNotifyMemberUpdate = {}
     this.pendingUpdateEmit = {}
 
-    if (this.url.match(/\.(json|osm\.bz2|osm)$/)) {
+    if (this.url.match(/^data:/) || this.url.match(/\.(json|osm\.bz2|osm)$/)) {
       this.localOnly = true
       this.ready = false
       this._loadFile()
