@@ -1,10 +1,21 @@
 const fs = require('fs')
 const DOMParser = require('@xmldom/xmldom').DOMParser
 const bzip2 = require('bzip2')
+const parseDataUrl = require('parse-data-url')
 
 const convertFromXML = require('./convertFromXML')
 
 module.exports = function loadOsmFile (url, callback) {
+  if (url.match(/^data:/)) {
+    const parsed = parseDataUrl(url)
+    console.log(parsed)
+    url = parsed.contentType === 'application/json' ? 'file.json' :
+      parsed.contentType === 'application/x-bzip' ? 'file.osm.bz2' :
+      'file.osm'
+
+    return callback(null, convertData(url, parsed.toBuffer()))
+  }
+
   if (typeof location === 'undefined' && !url.match(/^(http:|https:|)\/\//)) {
     fs.readFile(url,
       (err, content) => {
