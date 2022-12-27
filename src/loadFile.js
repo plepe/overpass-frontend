@@ -1,10 +1,30 @@
 const fs = require('fs')
 const bzip2 = require('bzip2')
+const parseDataUrl = require('parse-data-url')
 
 module.exports = function loadFile (url, options, callback) {
   let filename = url
   if ('filename' in options) {
     filename = options.filename
+  }
+
+  if (url.match(/^data:/)) {
+    const parsed = parseDataUrl(url)
+
+    console.log(parsed)
+    if (parsed.contentType === 'application/x-bzip') {
+      parsed = bzip2decode(parsed.toBuffer())
+    }
+
+    if (filename === url) {
+      filename = parsed.contentType === 'application/json'
+        ? 'file.json'
+        : parsed.contentType
+          ? 'file.osm.bz2'
+          : 'file.osm'
+    }
+
+    return callback(null, parsed.toBuffer(), filename)
   }
 
   if (typeof location === 'undefined' && !url.match(/^(http:|https:|)\/\//)) {
