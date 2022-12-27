@@ -14,21 +14,7 @@ module.exports = function loadOsmFile (url, callback) {
           return callback(err)
         }
 
-        if (url.match(/\.osm(\.bz2)?$/)) {
-          if (url.match(/\.osm\.bz2$/)) {
-            data = bzip2.simple(bzip2.array(content))
-            content = ''
-            for (let i = 0; i < data.byteLength; i++) {
-              content += String.fromCharCode(data[i])
-            }
-            content = decodeURIComponent(escape(content))
-          }
-
-          data = new DOMParser().parseFromString(content.toString(), 'text/xml')
-          data = convertFromXML(data.getElementsByTagName('osm')[0])
-        } else {
-          data = JSON.parse(content)
-        }
+        data = convertData(url, content)
 
         callback(null, data)
       }
@@ -83,4 +69,22 @@ module.exports = function loadOsmFile (url, callback) {
   req.overrideMimeType('text/xml')
   req.open('GET', url)
   req.send()
+}
+
+function convertData (url, content) {
+  if (url.match(/\.osm(\.bz2)?$/)) {
+    if (url.match(/\.osm\.bz2$/)) {
+      data = bzip2.simple(bzip2.array(content))
+      content = ''
+      for (let i = 0; i < data.byteLength; i++) {
+        content += String.fromCharCode(data[i])
+      }
+      content = decodeURIComponent(escape(content))
+    }
+
+    data = new DOMParser().parseFromString(content.toString(), 'text/xml')
+    return convertFromXML(data.getElementsByTagName('osm')[0])
+  } else {
+    return JSON.parse(content)
+  }
 }
