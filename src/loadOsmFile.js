@@ -8,9 +8,11 @@ const convertFromXML = require('./convertFromXML')
 module.exports = function loadOsmFile (url, callback) {
   if (url.match(/^data:/)) {
     const parsed = parseDataUrl(url)
-    url = parsed.contentType === 'application/json' ? 'file.json' :
-      parsed.contentType.match(/^application\/x-bzip/) ? 'file.osm.bz2' :
-      'file.osm'
+    url = parsed.contentType === 'application/json'
+      ? 'file.json'
+      : parsed.contentType.match(/^application\/x-bzip/)
+        ? 'file.osm.bz2'
+        : 'file.osm'
 
     return callback(null, convertData(url, parsed.toBuffer()))
   }
@@ -18,14 +20,9 @@ module.exports = function loadOsmFile (url, callback) {
   if (typeof location === 'undefined' && !url.match(/^(http:|https:|)\/\//)) {
     fs.readFile(url,
       (err, content) => {
-        let data
+        if (err) { return callback(err) }
 
-        if (err) {
-          return callback(err)
-        }
-
-        data = convertData(url, content)
-
+        const data = convertData(url, content)
         callback(null, data)
       }
     )
