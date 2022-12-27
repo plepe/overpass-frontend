@@ -23,6 +23,11 @@ const files = [
     filename: 'small.osm.json',
     contentType: 'application/json',
     base64: true
+  },
+  {
+    filename: 'small.osm.json',
+    contentType: 'application/json',
+    base64: false
   }
 ]
 
@@ -45,9 +50,15 @@ function loadFile (fileDef, callback) {
         var reader = new FileReader()
         reader.readAsDataURL(content)
         reader.onloadend = function() {
-          console.log(reader.result.substr(0, 80))
           callback(null, reader.result)
         }
+      })
+  } else {
+    fetch('test/' + fileDef.filename)
+      .then(req => req.text())
+      .then(content => {
+        const dataURL = 'data:' + fileDef.contentType + ';charset=UTF-8,' + encodeURIComponent(content)
+        callback(null, dataURL)
       })
   }
 }
