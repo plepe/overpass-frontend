@@ -113,11 +113,23 @@ describe('Test loading OSM data from Data URL', function() {
             }
           },
           function (err) {
-            console.log(actual)
             assert.deepEqual(actual, expected)
             done()
           }
         )
+      })
+    })
+  })
+
+  describe('invalid Data URL', function () {
+    it('load file', function (done) {
+      overpassFrontend = new OverpassFrontend('data:invalid')
+      overpassFrontend.once('load', () => {
+        assert.fail('Should not call load')
+      })
+      overpassFrontend.once('error', (e) => {
+        assert.equal(e.message, 'Error parsing data URL')
+        done()
       })
     })
   })

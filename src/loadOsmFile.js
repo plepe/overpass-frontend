@@ -8,6 +8,11 @@ const convertFromXML = require('./convertFromXML')
 module.exports = function loadOsmFile (url, callback) {
   if (url.match(/^data:/)) {
     const parsed = parseDataUrl(url)
+    if (!parsed) {
+      const e = new Error('Error parsing data URL')
+      return global.setTimeout(() => callback(e), 0)
+    }
+
     url = parsed.contentType === 'application/json'
       ? 'file.json'
       : parsed.contentType.match(/^application\/x-bzip/)
