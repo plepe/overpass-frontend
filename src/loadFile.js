@@ -10,6 +10,11 @@ module.exports = function loadFile (url, options, callback) {
 
   if (url.match(/^data:/)) {
     const parsed = parseDataUrl(url)
+    if (!parsed) {
+      const e = new Error('Error parsing data URL')
+      return global.setTimeout(() => callback(e), 0)
+    }
+
     let content = parsed.toBuffer()
 
     if (parsed.contentType === 'application/x-bzip') {
