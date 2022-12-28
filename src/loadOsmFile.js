@@ -48,40 +48,25 @@ module.exports = function loadOsmFile (url, callback) {
     return
   }
 
-  const req = new global.XMLHttpRequest()
-
-  req.onreadystatechange = function () {
-    if (req.readyState === 4) {
-      if (req.status === 200) {
-        let data = url.match(/\.osm\.bz2$/) ? new Uint8Array(req.response) : req.responseText
-        try {
-          data = convertData(url, data)
-        } catch (err) {
-          return callback(err)
-        }
-
-        callback(null, data)
-      } else {
-        callback(new Error('Received error ' + req.status + ' (' + req.statusText + ')'))
+  fetch(url)
+    .then(req => {
+      if (!req.ok) {
+        const e = new Error('Received error ' + req.status + ' (' + req.statusText + ')')
+        return callback(e)
       }
-    }
-  }
 
-  if (url.substr(0, 2) === '//') {
-    if (typeof location === 'undefined') {
-      url = 'https:' + url
-    } else {
-      url = global.location.protocol + url
-    }
-  }
+      return url.match(/\.osm\.bz2$/) ? req.arrayBuffer() : req.text()
+    })
+    .then(content => {
+      let data = url.match(/\.osm\.bz2$/) ? new Uint8Array(content) : content
+      try {
+        data = convertData(url, data)
+      } catch (err) {
+        return callback(err)
+      }
 
-  if (url.match(/\.osm\.bz2$/)) {
-    req.responseType = 'arraybuffer'
-  }
-
-  req.overrideMimeType('text/xml')
-  req.open('GET', url)
-  req.send()
+      callback(null, data)
+    })
 }
 
 function convertData (url, content) {
