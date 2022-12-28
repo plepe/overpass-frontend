@@ -103,6 +103,12 @@ window.onload = function() {
   document.getElementById('template').onchange = check_update_map
 }
 
+function createHandlers () {
+  overpass.on('error', (err) => {
+    alert(err)
+  })
+}
+
 function update () {
   clear_map()
 
@@ -117,6 +123,7 @@ function update () {
           check_update_map()
         }
       })
+      createHandlers()
     }
     reader.readAsDataURL(form.elements.file.files[0])
   } else if (!overpass || form.elements.url.value !== formValues.url) {
@@ -126,6 +133,7 @@ function update () {
         map.fitBounds(data.bounds.toLeaflet())
       }
     })
+    createHandlers()
   }
 
   formValues = {
