@@ -40,25 +40,8 @@ module.exports = function loadOsmFile (url, callback) {
   req.onreadystatechange = function () {
     if (req.readyState === 4) {
       if (req.status === 200) {
-        let data
-
-        if (url.match(/\.osm\.bz2$/)) {
-          let content = new Uint8Array(req.response)
-          data = bzip2.simple(bzip2.array(content))
-          content = ''
-          for (let i = 0; i < data.byteLength; i++) {
-            content += String.fromCharCode(data[i])
-          }
-
-          content = decodeURIComponent(escape(content))
-          data = new DOMParser().parseFromString(content.toString(), 'text/xml')
-          data = convertFromXML(data.getElementsByTagName('osm')[0])
-        } else if (req.responseXML) {
-          data = convertFromXML(req.responseXML.firstChild)
-        } else {
-          data = JSON.parse(req.responseText)
-        }
-
+        let data = url.match(/\.osm\.bz2$/) ? new Uint8Array(req.response) : req.responseText
+        data = convertData(url, data)
         callback(null, data)
       } else {
         callback(req)
