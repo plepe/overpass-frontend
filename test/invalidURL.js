@@ -10,6 +10,14 @@ var overpassFrontend
 
 const files = [
   {
+    filename: 'https://url.invalid/file.osm',
+    error: [
+      'NetworkError when attempting to fetch resource.',
+      'fetch failed',
+      'Failed to fetch'
+    ]
+  },
+  {
     filename: 'data:invalid',
     error: 'Error parsing data URL'
   },

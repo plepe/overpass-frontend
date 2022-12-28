@@ -67,6 +67,9 @@ module.exports = function loadOsmFile (url, callback) {
 
       callback(null, data)
     })
+    .catch(err => {
+      global.setTimeout(() => callback(err), 0)
+    })
 }
 
 function convertData (url, content) {
