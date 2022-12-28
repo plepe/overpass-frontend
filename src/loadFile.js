@@ -12,14 +12,18 @@ module.exports = function loadFile (url, options, callback) {
     const parsed = parseDataUrl(url)
     if (!parsed) {
       const e = new Error('Error parsing data URL')
-      return global.setTimeout(() => callback(e), 0)
+      return callback(e)
     }
 
     let content = parsed.toBuffer()
 
     const m = filename.match(/^(.*)\.bz2$/)
     if (m || parsed.contentType === 'application/x-bzip') {
-      content = bzip2decode(content)
+      try {
+        content = bzip2decode(content)
+      } catch (err) {
+        return callback(err)
+      }
       filename = m ? m[1] : filename
     }
 
@@ -41,7 +45,11 @@ module.exports = function loadFile (url, options, callback) {
 
         const m = filename.match(/^(.*)\.bz2$/)
         if (m) {
-          content = bzip2decode(content)
+          try {
+            content = bzip2decode(content)
+          } catch (err) {
+            return callback(err)
+          }
           filename = m[1]
         }
 
@@ -61,7 +69,11 @@ module.exports = function loadFile (url, options, callback) {
 
         const m = filename.match(/^(.*)\.bz2$/)
         if (m) {
-          content = bzip2decode(new Uint8Array(req.response))
+          try {
+            content = bzip2decode(new Uint8Array(req.response))
+          } catch (err) {
+            return callback(err)
+          }
           filename = m[1]
         } else {
           content = req.response
@@ -69,7 +81,7 @@ module.exports = function loadFile (url, options, callback) {
 
         callback(null, content, filename)
       } else {
-        callback(req)
+        callback(new Error('Received error ' + req.status + ' (' + req.statusText + ')'))
       }
     }
   }
@@ -91,7 +103,14 @@ module.exports = function loadFile (url, options, callback) {
 }
 
 function bzip2decode (file) {
-  const data = bzip2.simple(bzip2.array(file))
+  let data
+
+  try {
+    data = bzip2.simple(bzip2.array(file))
+  } catch (err) {
+    throw new Error('Error decoding bzip2 stream')
+  }
+
   let content = ''
 
   for (let i = 0; i < data.byteLength; i++) {

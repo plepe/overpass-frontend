@@ -6,6 +6,14 @@ module.exports = {
   },
 
   load (content, options, callback) {
-    callback(null, JSON.parse(content))
+    let result
+
+    try {
+      result = JSON.parse(content)
+    } catch (err) {
+      return callback(new Error('Error parsing JSON file: ' + err.message))
+    }
+
+    callback(null, result)
   }
 }

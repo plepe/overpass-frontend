@@ -9,7 +9,19 @@ module.exports = {
   },
 
   load (content, options, callback) {
-    const data = new DOMParser().parseFromString(content.toString(), 'text/xml')
+    let data
+    const parser = new DOMParser({
+      errorHandler: {
+        error: (err) => { throw new Error('Error parsing XML file: ' + err) },
+        fatalError: (err) => { throw new Error('Error parsing XML file: ' + err) }
+      }
+    })
+    try {
+      data = parser.parseFromString(content.toString(), 'text/xml')
+    } catch (err) {
+      return callback(err)
+    }
+
     const result = convertFromXML(data.getElementsByTagName('osm')[0])
 
     callback(null, result)
