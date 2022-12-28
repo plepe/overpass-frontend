@@ -120,7 +120,7 @@ class OverpassFrontend {
     if (this.url.match(/^data:/) || this.url.match(/\.(json|osm\.bz2|osm)$/)) {
       this.localOnly = true
       this.ready = false
-      this._loadFile()
+      global.setTimeout(() => this._loadFile(), 0)
     } else {
       this.remote = true
       this.ready = true

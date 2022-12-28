@@ -10,7 +10,7 @@ module.exports = function loadOsmFile (url, callback) {
     const parsed = parseDataUrl(url)
     if (!parsed) {
       const e = new Error('Error parsing data URL')
-      return global.setTimeout(() => callback(e), 0)
+      return callback(e)
     }
 
     url = parsed.contentType === 'application/json'
