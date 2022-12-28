@@ -125,7 +125,7 @@ class OverpassFrontend {
     if (this.options.isFile ?? isFileURL(this.url)) {
       this.options.isFile = true
       this.ready = false
-      this._loadFile()
+      global.setTimeout(() => this._loadFile(), 0)
     } else {
       this.options.isFile = false
       this.ready = true
