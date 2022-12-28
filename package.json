@@ -71,7 +71,7 @@
   "scripts": {
     "test": "mocha --bail",
     "build": "browserify index.js -o dist/overpass-frontend.js",
-    "build-test": "browserify -t brfs --debug test/evaluators.js test/parseString.js test/parseParentheses.js test/BBoxQueryCache.js test/loadOsmFile.js test/test.js test/RequestBBox.js test/frontendFile.js test/filter.js test/FilterIsSuperset.js test/filterFunctions.js test/lon180.js test/leaflet.js test/bodyGeomJSON.js test/bodyGeomXML.js test/data-url.js test/429.js test/isFileURL.js test/fileFormats.js -o dist/test.js",
+    "build-test": "browserify -t brfs --debug test/evaluators.js test/parseString.js test/parseParentheses.js test/BBoxQueryCache.js test/loadOsmFile.js test/test.js test/RequestBBox.js test/frontendFile.js test/filter.js test/FilterIsSuperset.js test/filterFunctions.js test/lon180.js test/leaflet.js test/bodyGeomJSON.js test/bodyGeomXML.js test/data-url.js test/invalidURL.js test/429.js test/isFileURL.js test/fileFormats.js -o dist/test.js",
     "build-test-minify": "browserify -t brfs test/*.js -o dist/test.src.js && minify dist/test.src.js > dist/test.js",
     "watch": "watchify -t browserify-shim --debug index.js -o dist/overpass-frontend.js -v",
     "watch-test": "watchify -t brfs --debug test/*.js -o dist/test.js -v",
