@@ -19,7 +19,14 @@ module.exports = function loadOsmFile (url, callback) {
         ? 'file.osm.bz2'
         : 'file.osm'
 
-    return callback(null, convertData(url, parsed.toBuffer()))
+    let data
+    try {
+      data = convertData(url, parsed.toBuffer())
+    } catch (err) {
+      return callback(err)
+    }
+
+    return callback(null, data)
   }
 
   if (typeof location === 'undefined' && !url.match(/^(http:|https:|)\/\//)) {
@@ -27,7 +34,13 @@ module.exports = function loadOsmFile (url, callback) {
       (err, content) => {
         if (err) { return callback(err) }
 
-        const data = convertData(url, content)
+        let data
+        try {
+          data = convertData(url, content)
+        } catch (err) {
+          return global.setTimeout(() => callback(err), 0)
+        }
+
         callback(null, data)
       }
     )
@@ -41,7 +54,13 @@ module.exports = function loadOsmFile (url, callback) {
     if (req.readyState === 4) {
       if (req.status === 200) {
         let data = url.match(/\.osm\.bz2$/) ? new Uint8Array(req.response) : req.responseText
-        data = convertData(url, data)
+        try {
+          data = convertData(url, data)
+        }
+        catch (err) {
+          return callback(err)
+        }
+
         callback(null, data)
       } else {
         callback(req)
@@ -78,9 +97,20 @@ function convertData (url, content) {
       content = decodeURIComponent(escape(content))
     }
 
-    data = new DOMParser().parseFromString(content.toString(), 'text/xml')
+    try {
+      data = new DOMParser().parseFromString(content.toString(), 'text/xml')
+    }
+    catch (err) {
+      throw new Error("Error parsing XML file: " + err)
+    }
+
     return convertFromXML(data.getElementsByTagName('osm')[0])
   } else {
-    return JSON.parse(content)
+    try {
+      return JSON.parse(content)
+    }
+    catch (err) {
+      throw new Error("Error parsing JSON file: " + err)
+    }
   }
 }
