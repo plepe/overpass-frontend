@@ -49,7 +49,7 @@ describe('Test errors when loading invalid files', function() {
         overpassFrontend.once('error', (e) => {
           if (Array.isArray(fileDef.error)) {
             if (!fileDef.error.includes(e.message)) {
-              assert.fail('Unexpected error message: ' + e.message)
+              return done('Unexpected error message: ' + e.message)
             }
           } else {
             assert.equal(e.message, fileDef.error)
