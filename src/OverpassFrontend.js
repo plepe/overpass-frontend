@@ -151,7 +151,6 @@ class OverpassFrontend {
     loadOsmFile(this.url,
       (err, result) => {
         if (err) {
-          console.log('Error loading file', err)
           return this.emit('error', err)
         }
 

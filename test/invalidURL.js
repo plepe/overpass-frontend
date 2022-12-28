@@ -10,33 +10,51 @@ var overpassFrontend
 
 const files = [
   {
-    filename: 'invalid.osm',
-    error: 'Error: SyntaxError: JSON.parse: unexpected character at line 1 column 1 of the JSON data'
-  },
-  {
-    filename: 'invalid.osm.bz2',
-    error: ''
-  },
-  {
-    filename: 'invalid.json',
-    error: ''
+    filename: 'data:invalid',
+    error: 'Error parsing data URL'
   },
   {
     filename: 'notexist.json',
-    error: ''
+    error: [
+      'ENOENT: no such file or directory, open \'test/notexist.json\'',
+      'Received error 404 (Not Found)'
+    ]
+  },
+  {
+    filename: 'invalid.osm',
+    error: 'Error parsing XML file: [xmldom error]	element parse error: Error: invalid attribute:</osm\n@#[line:undefined,col:undefined]'
+  },
+  {
+    filename: 'invalid.osm.bz2',
+    error: 'Error decoding bzip2 stream'
+  },
+  {
+    filename: 'invalid.json',
+    error: [
+      'Error parsing JSON file: SyntaxError: Unexpected token } in JSON at position 275',
+      'Error parsing JSON file: SyntaxError: JSON.parse: unexpected character at line 9 column 1 of the JSON data',
+      'Error parsing JSON file: SyntaxError: Unexpected token \'}\', ..."lements":\n}\n" is not valid JSON'
+    ]
   }
 ]
 
 describe('Test errors when loading invalid files', function() {
   files.forEach(fileDef => {
     describe(fileDef.filename, function () {
-      it('try to load file', function (done) {
-        overpassFrontend = new OverpassFrontend('test/' + fileDef.filename)
+      it('expect error when trying to load file', function (done) {
+        overpassFrontend = new OverpassFrontend(fileDef.filename.match(/:/) ? fileDef.filename : 'test/' + fileDef.filename)
         overpassFrontend.once('load', () => {
           assert.fail('Should not call load')
         })
         overpassFrontend.once('error', (e) => {
-          assert.equal(e.message, fileDef.error)
+          if (Array.isArray(fileDef.error)) {
+            if (!fileDef.error.includes(e.message)) {
+              assert.fail('Unexpected error message: ' + e.message)
+            }
+          } else {
+            assert.equal(e.message, fileDef.error)
+          }
+
           done()
         })
       })

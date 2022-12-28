@@ -38,7 +38,7 @@ module.exports = function loadOsmFile (url, callback) {
         try {
           data = convertData(url, content)
         } catch (err) {
-          return global.setTimeout(() => callback(err), 0)
+          return callback(err)
         }
 
         callback(null, data)
@@ -56,14 +56,13 @@ module.exports = function loadOsmFile (url, callback) {
         let data = url.match(/\.osm\.bz2$/) ? new Uint8Array(req.response) : req.responseText
         try {
           data = convertData(url, data)
-        }
-        catch (err) {
+        } catch (err) {
           return callback(err)
         }
 
         callback(null, data)
       } else {
-        callback(req)
+        callback(new Error('Received error ' + req.status + ' (' + req.statusText + ')'))
       }
     }
   }
@@ -89,7 +88,12 @@ function convertData (url, content) {
   let data
   if (url.match(/\.osm(\.bz2)?$/)) {
     if (url.match(/\.osm\.bz2$/)) {
-      data = bzip2.simple(bzip2.array(content))
+      try {
+        data = bzip2.simple(bzip2.array(content))
+      } catch (err) {
+        throw new Error('Error decoding bzip2 stream')
+      }
+
       content = ''
       for (let i = 0; i < data.byteLength; i++) {
         content += String.fromCharCode(data[i])
@@ -97,20 +101,20 @@ function convertData (url, content) {
       content = decodeURIComponent(escape(content))
     }
 
-    try {
-      data = new DOMParser().parseFromString(content.toString(), 'text/xml')
-    }
-    catch (err) {
-      throw new Error("Error parsing XML file: " + err)
-    }
+    const parser = new DOMParser({
+      errorHandler: {
+        error: (err) => { throw new Error('Error parsing XML file: ' + err) },
+        fatalError: (err) => { throw new Error('Error parsing XML file: ' + err) }
+      }
+    })
+    data = parser.parseFromString(content.toString(), 'text/xml')
 
     return convertFromXML(data.getElementsByTagName('osm')[0])
   } else {
     try {
       return JSON.parse(content)
-    }
-    catch (err) {
-      throw new Error("Error parsing JSON file: " + err)
+    } catch (err) {
+      throw new Error('Error parsing JSON file: ' + err)
     }
   }
 }
