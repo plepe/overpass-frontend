@@ -10,6 +10,7 @@ var assert = require('assert')
 var async = require('async')
 
 var OverpassFrontend = require('../src/OverpassFrontend')
+var RequestGet = require('../src/RequestGet')
 var BoundingBox = require('boundingbox')
 var overpassFrontend = new OverpassFrontend(conf.url)
 var removeNullEntries = require('../src/removeNullEntries')
@@ -1521,7 +1522,9 @@ describe('Overpass objects structure', function() {
         }
       )
 
-      assert.equal('RequestGet', req.constructor.name)
+      if (!(req instanceof RequestGet)) {
+        assert.fail('request should be instance of RequestGet')
+      }
     })
 
     it('abort() should abort a "get" request', function (done) {
