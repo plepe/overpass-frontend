@@ -6,6 +6,7 @@ const qlFunction = require('./qlFunction')
 module.exports = class bbox extends qlFunction {
   constructor (str) {
     super()
+    this.fun = 'bbox'
 
     let s = str.split(/,/g)
 

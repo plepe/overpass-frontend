@@ -3,6 +3,8 @@ const qlFunction = require('./qlFunction')
 module.exports = class properties extends qlFunction {
   constructor (str) {
     super()
+    this.fun = 'properties'
+
     this.value = parseInt(str)
   }
 
