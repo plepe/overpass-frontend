@@ -54,6 +54,7 @@
     "jsdoc": "^3.6.11",
     "jsdom": "^17.0.0",
     "leaflet": "^1.9.2",
+    "minify": "^9.1.0",
     "mocha": "^9.2.2",
     "require-self": "^0.2.3",
     "watchify": "^4.0.0"
@@ -65,6 +66,7 @@
     "test": "mocha --bail",
     "build": "browserify index.js -o dist/overpass-frontend.js",
     "build-test": "browserify -t brfs --debug test/evaluators.js test/parseString.js test/parseParentheses.js test/BBoxQueryCache.js test/loadOsmFile.js test/test.js test/RequestBBox.js test/frontendFile.js test/filter.js test/FilterIsSuperset.js test/filterFunctions.js test/lon180.js test/leaflet.js test/bodyGeomJSON.js test/bodyGeomXML.js test/data-url.js test/invalidURL.js test/429.js -o dist/test.js",
+    "build-test-minify": "browserify -t brfs test/*.js -o dist/test.src.js && minify dist/test.src.js > dist/test.js",
     "watch": "watchify -t browserify-shim --debug index.js -o dist/overpass-frontend.js -v",
     "watch-test": "watchify -t brfs --debug test/*.js -o dist/test.js -v",
     "prepublish": "npm run lint && npm run build && npm run doc",
