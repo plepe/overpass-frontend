@@ -5,6 +5,7 @@ const parseString = require('../parseString')
 module.exports = class user extends qlFunction {
   constructor (str) {
     super()
+    this.fun = 'user'
 
     this.requestProperties = OverpassFrontend.META
     this.value = []

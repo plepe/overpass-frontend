@@ -6,6 +6,7 @@ const qlFunction = require('./qlFunction')
 module.exports = class around extends qlFunction {
   constructor (str) {
     super()
+    this.fun = 'around'
     const s = str.split(/,/g)
 
     if (s.length < 3) {

@@ -4,6 +4,8 @@ const qlFunction = require('./qlFunction')
 module.exports = class uid extends qlFunction {
   constructor (str) {
     super()
+    this.fun = 'uid'
+
     this.requestProperties = OverpassFrontend.META
     this.value = str.split(/,/g).map(v => {
       if (!v.match(/^\s*\d+\s*/)) {

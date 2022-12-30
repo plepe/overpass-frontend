@@ -330,7 +330,7 @@ function check (def) {
     return result[0]
   } else if (def === null) {
     return
-  } else if (typeof def === 'object' && def.constructor.name === 'Filter') {
+  } else if (typeof def === 'object' && def instanceof Filter) {
     def = def.def
   } else if (Array.isArray(def)) {
     def = def.map(d => check(d))

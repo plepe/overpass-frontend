@@ -4,6 +4,8 @@ const qlFunction = require('./qlFunction')
 module.exports = class id extends qlFunction {
   constructor (str) {
     super()
+    this.fun = 'id'
+
     if (Array.isArray(str)) {
       this.value = str
     } else {
