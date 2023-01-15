@@ -1,6 +1,7 @@
 var map
 var overpass
 var downloadResult
+var templateSelector
 var request
 var current_objects = {}
 var form
@@ -59,7 +60,7 @@ function check_update_map () {
     }
 
     compileTemplate(
-      document.getElementById('template').value,
+      templateSelector.value,
       {
         __URL__: JSON.stringify(form.elements.url.value),
         __BBOXQUERY_PARAMS__:
@@ -72,7 +73,7 @@ function check_update_map () {
       (err, code) => {
         codeDisplay.value = code
 
-        downloadResult.download = 'test.js'
+        downloadResult.download = templateSelector.selectedOptions[0].getAttribute('data-filename')
         downloadResult.title = "Download Code Example"
         downloadResult.href = "data:text/plain;charset=UTF-8," + encodeURIComponent(code)
       }
@@ -114,6 +115,7 @@ window.onload = function() {
   form.onsubmit = () => update()
 
   downloadResult = document.getElementById('download-result')
+  templateSelector = document.getElementById('template')
 
   update()
 
@@ -129,7 +131,7 @@ window.onload = function() {
     check_update_map()
   }
 
-  document.getElementById('template').onchange = check_update_map
+  templateSelector.onchange = check_update_map
 }
 
 function update () {
