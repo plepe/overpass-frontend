@@ -1,5 +1,6 @@
 var map
 var overpass
+var downloadResult
 var request
 var current_objects = {}
 var form
@@ -68,7 +69,13 @@ function check_update_map () {
         __BBOX_LEAFLET__:
           JSON.stringify([[bounds.minlat, bounds.minlon], [bounds.maxlat, bounds.maxlon]])
       },
-      (err, code) => codeDisplay.value = code
+      (err, code) => {
+        codeDisplay.value = code
+
+        downloadResult.download = 'test.js'
+        downloadResult.title = "Download Code Example"
+        downloadResult.href = "data:text/plain;charset=UTF-8," + encodeURIComponent(code)
+      }
     )
   }
 }
@@ -105,6 +112,9 @@ window.onload = function() {
   }
 
   form.onsubmit = () => update()
+
+  downloadResult = document.getElementById('download-result')
+
   update()
 
   map.on('moveend', () => {
