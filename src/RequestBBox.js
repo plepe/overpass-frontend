@@ -286,8 +286,9 @@ class RequestBBox extends Request {
 
   _exportOSMXML (options, parentNode, callback) {
     const bounds = parentNode.ownerDocument.createElement('bounds')
+    parentNode.appendChild(bounds)
     ;['minlat', 'minlon', 'maxlat', 'maxlon'].forEach(k => {
-      bounds[k] = this.bounds[k]
+      bounds.setAttribute(k, this.bounds[k])
     })
 
     async.each(
