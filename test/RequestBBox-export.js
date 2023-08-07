@@ -294,4 +294,39 @@ describe('RequestBBox exportOSMXML', function() {
       done()
     })
   })
+
+  it('Query with EMBED_GEOM', function (done) {
+    overpassFrontend.clearCache()
+    const file = 'test/files/RequestBBox-export-9.xml'
+    var expected = fs.readFileSync(file).toString()
+
+    var req = overpassFrontend.BBoxQuery(
+      "(node[level=0];nwr[building];way[highway];relation[level='-1'];)",
+      {
+	"minlat": 48.19616,
+	"minlon": 16.33801,
+	"maxlat": 48.19617,
+	"maxlon": 16.33802
+      }
+    )
+
+    const osm = document.ownerDocument.createElement('osm')
+    osm.setAttribute('version', '0.6')
+
+    req.exportOSMXML({
+        properties: OverpassFrontend.EMBED_GEOM
+      }, osm, (err) => {
+      if (err) {
+        return done(err)
+      }
+
+      let serializer = new XMLSerializer()
+      let text = serializer.serializeToString(osm)
+      fs.writeFileSync(file, text)
+
+      assert.deepEqual(text, expected)
+
+      done()
+    })
+  })
 })

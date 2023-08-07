@@ -192,7 +192,7 @@ class OverpassObject {
   /**
    * Export object (and members) as OpenStreetMap XML
    * @param object options Options
-   * @param {bit_array} [options.properties=OverpassFrontend.DEFAULT_EXPORT] Which properties of the features should be exported: OverpassFrontend.ID_ONLY, OverpassFrontend.BBOX, OverpassFrontend.TAGS, OverpassFrontend.GEOM, OverpassFrontend.META. Combine by binary OR: ``OverpassFrontend.ID | OverpassFrontend.BBOX``. Default: OverpassFrontend.TAGS | OverpassFrontend.META | OverpassFrontend.MEMBERS | OverpassFrontend.GEOM
+   * @param {bit_array} [options.properties=OverpassFrontend.DEFAULT_EXPORT] Which properties of the features should be exported: OverpassFrontend.ID_ONLY, OverpassFrontend.BBOX, OverpassFrontend.TAGS, OverpassFrontend.GEOM, OverpassFrontend.META, OverpassFrontend.EMBED_GEOM. Combine by binary OR: ``OverpassFrontend.ID | OverpassFrontend.BBOX``. Default: OverpassFrontend.TAGS | OverpassFrontend.META | OverpassFrontend.MEMBERS | OverpassFrontend.GEOM
    * @param DOMNode parentNode a DOM Node where the object will be appended as child. Depending on object type and options, member objects will also be appended on the same level.
    * @param function callback Function which will be called with (err, dom node)
    */

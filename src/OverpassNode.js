@@ -52,7 +52,7 @@ class OverpassNode extends OverpassObject {
           return callback(null)
         }
 
-        if (options.properties & (OverpassFrontend.GEOM | options.properties & OverpassFrontend.BBOX | OverpassFrontend.CENTER)) {
+        if (options.properties & (OverpassFrontend.GEOM | options.properties & OverpassFrontend.BBOX | OverpassFrontend.CENTER | OverpassFrontend.EMBED_GEOM)) {
           result.setAttribute('lat', this.geometry.lat)
           result.setAttribute('lon', this.geometry.lon)
         }

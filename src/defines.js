@@ -6,6 +6,7 @@ module.exports = {
   BBOX: 8,
   GEOM: 16,
   CENTER: 32,
+  EMBED_GEOM: 64,
   ALL: 63,
   DEFAULT: 13,
   DEFAULT_EXPORT: 23

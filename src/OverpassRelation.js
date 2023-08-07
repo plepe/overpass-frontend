@@ -380,18 +380,44 @@ class OverpassRelation extends OverpassObject {
           })
         }
 
-        if (this.members && (options.properties & (OverpassFrontend.MEMBERS | OverpassFrontend.GEOM))) {
+        if (this.members && (options.properties & (OverpassFrontend.MEMBERS | OverpassFrontend.GEOM | OverpassFrontend.EMBED_GEOM))) {
           async.each(this.members,
             (member, done) => {
               const memberOb = this.overpass.cacheElements[member.id]
 
-              const nd = parentNode.ownerDocument.createElement('member')
-              nd.setAttribute('ref', memberOb.osm_id)
-              nd.setAttribute('type', memberOb.type)
-              nd.setAttribute('role', member.role)
-              result.appendChild(nd)
+              const m = parentNode.ownerDocument.createElement('member')
+              m.setAttribute('ref', memberOb.osm_id)
+              m.setAttribute('type', memberOb.type)
+              m.setAttribute('role', member.role)
+              result.appendChild(m)
 
-              memberOb.exportOSMXML(options, parentNode, done)
+              if (options.properties & OverpassFrontend.EMBED_GEOM &&
+                  (memberOb.type === 'node' || memberOb.type === 'way')) {
+                this.overpass.get(
+                  memberOb.id,
+                  { properties: OverpassFrontend.GEOM },
+                  () => {},
+                  (err) => {
+                    if (err) { return done(err) }
+
+                    if (memberOb.type === 'node') {
+                      m.setAttribute('lat', memberOb.geometry.lat)
+                      m.setAttribute('lon', memberOb.geometry.lon)
+                    } else {
+                      memberOb.geometry.forEach(mnd => {
+                        const nd = parentNode.ownerDocument.createElement('nd')
+                        nd.setAttribute('lat', mnd.lat)
+                        nd.setAttribute('lon', mnd.lon)
+                        m.appendChild(nd)
+                      })
+                    }
+
+                    done()
+                  }
+                )
+              } else {
+                memberOb.exportOSMXML(options, parentNode, done)
+              }
             },
             (err) => {
               callback(err, result)

@@ -193,7 +193,7 @@ class OverpassWay extends OverpassObject {
           })
         }
 
-        if (this.members && (options.properties & (OverpassFrontend.MEMBERS | OverpassFrontend.GEOM))) {
+        if (this.members && (options.properties & (OverpassFrontend.MEMBERS | OverpassFrontend.GEOM | OverpassFrontend.EMBED_GEOM))) {
           async.each(this.members,
             (member, done) => {
               const memberOb = this.overpass.cacheElements[member.id]
@@ -202,7 +202,23 @@ class OverpassWay extends OverpassObject {
               nd.setAttribute('ref', memberOb.osm_id)
               result.appendChild(nd)
 
-              memberOb.exportOSMXML(options, parentNode, done)
+              if (options.properties & OverpassFrontend.EMBED_GEOM) {
+                this.overpass.get(
+                  memberOb.id,
+                  { properties: OverpassFrontend.GEOM },
+                  () => {},
+                  (err) => {
+                    if (err) { return done(err) }
+
+                    nd.setAttribute('lat', memberOb.geometry.lat)
+                    nd.setAttribute('lon', memberOb.geometry.lon)
+
+                    done()
+                  }
+                )
+              } else {
+                memberOb.exportOSMXML(options, parentNode, done)
+              }
             },
             (err) => {
               callback(err, result)
