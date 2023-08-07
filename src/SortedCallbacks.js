@@ -6,8 +6,8 @@ class SortedCallbacks {
   constructor (options, featureCallback, finalCallback) {
     this.list = []
     this.lastIndex = -1
-    this.featureCallback = featureCallback
-    this.finalCallback = finalCallback
+    this.featureCallback = featureCallback || (() => {})
+    this.finalCallback = finalCallback || (() => {})
     this.options = options
 
     if (!('sort' in this.options) || this.options.sort === false) {
