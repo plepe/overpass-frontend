@@ -177,6 +177,22 @@ class OverpassWay extends OverpassObject {
           return callback(null)
         }
 
+        if (this.bounds && (options.properties & OverpassFrontend.BBOX)) {
+          const bounds = parentNode.ownerDocument.createElement('bounds')
+          result.appendChild(bounds)
+          ;['minlat', 'minlon', 'maxlat', 'maxlon'].forEach(k => {
+            bounds.setAttribute(k, this.bounds[k])
+          })
+        }
+
+        if (this.center && (options.properties & OverpassFrontend.CENTER)) {
+          const center = parentNode.ownerDocument.createElement('center')
+          result.appendChild(center)
+          ;['lat', 'lon'].forEach(k => {
+            center.setAttribute(k, this.center[k])
+          })
+        }
+
         if (this.members && (options.properties & (OverpassFrontend.MEMBERS | OverpassFrontend.GEOM))) {
           async.each(this.members,
             (member, done) => {
