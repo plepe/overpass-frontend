@@ -52,8 +52,10 @@ class OverpassNode extends OverpassObject {
           return callback(null)
         }
 
-        result.setAttribute('lat', this.geometry.lat)
-        result.setAttribute('lon', this.geometry.lon)
+        if (options.properties & (OverpassFrontend.GEOM | options.properties & OverpassFrontend.BBOX | OverpassFrontend.CENTER)) {
+          result.setAttribute('lat', this.geometry.lat)
+          result.setAttribute('lon', this.geometry.lon)
+        }
 
         callback(null, result)
       }

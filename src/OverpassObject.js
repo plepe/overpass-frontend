@@ -192,7 +192,7 @@ class OverpassObject {
   /**
    * Export object (and members) as OpenStreetMap XML
    * @param object options Options
-   * @param {bit_array} [options.properties=OverpassFrontend.DEFAULT_EXPORT] Which properties of the features should be exported: OVERPASS_ID_ONLY, OVERPASS_BBOX, OVERPASS_TAGS, OVERPASS_GEOM, OVERPASS_META. Combine by binary OR: ``OVERPASS_ID | OVERPASS_BBOX``. Default: OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.BBOX
+   * @param {bit_array} [options.properties=OverpassFrontend.DEFAULT_EXPORT] Which properties of the features should be exported: OverpassFrontend.ID_ONLY, OverpassFrontend.BBOX, OverpassFrontend.TAGS, OverpassFrontend.GEOM, OverpassFrontend.META. Combine by binary OR: ``OverpassFrontend.ID | OverpassFrontend.BBOX``. Default: OverpassFrontend.TAGS | OverpassFrontend.META | OverpassFrontend.MEMBERS | OverpassFrontend.GEOM
    * @param DOMNode parentNode a DOM Node where the object will be appended as child. Depending on object type and options, member objects will also be appended on the same level.
    * @param function callback Function which will be called with (err, dom node)
    */
@@ -233,7 +233,7 @@ class OverpassObject {
     const result = parentNode.ownerDocument.createElement(this.type)
     result.setAttribute('id', this.osm_id)
 
-    if (this.meta) {
+    if (this.meta && (options.properties & OverpassFrontend.META)) {
       result.setAttribute('version', this.meta.version)
       result.setAttribute('timestamp', this.meta.timestamp)
       result.setAttribute('changeset', this.meta.changeset)
@@ -241,7 +241,7 @@ class OverpassObject {
       result.setAttribute('user', this.meta.user)
     }
 
-    if (this.tags) {
+    if (this.tags && (options.properties & OverpassFrontend.TAGS)) {
       for (const k in this.tags) {
         const tag = parentNode.ownerDocument.createElement('tag')
         tag.setAttribute('k', k)

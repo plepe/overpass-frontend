@@ -364,7 +364,7 @@ class OverpassRelation extends OverpassObject {
           return callback(null)
         }
 
-        if (this.members) {
+        if (this.members && (options.properties & (OverpassFrontend.MEMBERS | OverpassFrontend.GEOM))) {
           async.each(this.members,
             (member, done) => {
               const memberOb = this.overpass.cacheElements[member.id]
