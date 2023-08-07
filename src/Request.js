@@ -140,6 +140,24 @@ class Request {
   finishSubRequest (subRequest) {
     this.emit('subrequest-finish', subRequest)
   }
+
+  /**
+   * Export objects (and members) as OpenStreetMap XML
+   * @param object options Options
+   * @param DOMNode parentNode a DOM Node where the object will be appended as child. Depending on object type and options, member objects will also be appended on the same level.
+   * @param function callback Function which will be called with (err)
+   */
+  exportOSMXML (options, parentNode, callback) {
+    if (this.finished) {
+      this._exportOSMXML(options, parentNode, callback)
+    } else {
+      this.once('finish', () => this._exportOSMXML(options, parentNode, callback))
+    }
+  }
+
+  _exportOSMXML (options, parentNode, callback) {
+    callback(null)
+  }
 }
 
 ee(Request.prototype)

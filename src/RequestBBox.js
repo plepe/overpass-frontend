@@ -1,3 +1,4 @@
+const async = require('async')
 const Request = require('./Request')
 const overpassOutOptions = require('./overpassOutOptions')
 const defines = require('./defines')
@@ -281,6 +282,19 @@ class RequestBBox extends Request {
 
   mayFinish () {
     return !this.needLoad()
+  }
+
+  _exportOSMXML (options, parentNode, callback) {
+    const bounds = parentNode.ownerDocument.createElement('bounds')
+    ;['minlat', 'minlon', 'maxlat', 'maxlon'].forEach(k => {
+      bounds[k] = this.bounds[k]
+    })
+
+    async.each(
+      this.doneFeatures,
+      (o, done) => o.exportOSMXML(options, parentNode, done),
+      callback
+    )
   }
 }
 
