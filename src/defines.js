@@ -7,5 +7,6 @@ module.exports = {
   GEOM: 16,
   CENTER: 32,
   ALL: 63,
-  DEFAULT: 13
+  DEFAULT: 13,
+  DEFAULT_EXPORT: 23
 }

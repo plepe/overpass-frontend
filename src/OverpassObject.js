@@ -192,10 +192,15 @@ class OverpassObject {
   /**
    * Export object (and members) as OpenStreetMap XML
    * @param object options Options
+   * @param {bit_array} [options.properties=OverpassFrontend.DEFAULT_EXPORT] Which properties of the features should be exported: OVERPASS_ID_ONLY, OVERPASS_BBOX, OVERPASS_TAGS, OVERPASS_GEOM, OVERPASS_META. Combine by binary OR: ``OVERPASS_ID | OVERPASS_BBOX``. Default: OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.BBOX
    * @param DOMNode parentNode a DOM Node where the object will be appended as child. Depending on object type and options, member objects will also be appended on the same level.
    * @param function callback Function which will be called with (err, dom node)
    */
   exportOSMXML (options, parentNode, callback) {
+    if (!('properties' in options)) {
+      options.properties = OverpassFrontend.DEFAULT_EXPORT
+    }
+
     if (!parentNode._alreadyIncluded) {
       parentNode._alreadyIncluded = {}
     }
@@ -204,11 +209,11 @@ class OverpassObject {
     }
     parentNode._alreadyIncluded[this.id] = true
 
-    if ((this.properties & (OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.META)) !== (OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.META)) {
+    if ((this.properties & options.properties) !== options.properties) {
       return this.overpass.get(
         this.id,
         {
-          properties: OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.META
+          properties: options.properties
         },
         () => {},
         (err) => {

@@ -23,12 +23,12 @@ describe('RequestBBox exportOSMXML', function() {
     var expected = fs.readFileSync(file).toString()
 
     var req = overpassFrontend.BBoxQuery(
-      "(nwr[building];way[highway];relation[level='-1'];)",
+      "(node[level=0];nwr[building];way[highway];relation[level='-1'];)",
       {
-	"minlat": 48.19616,
-	"minlon": 16.33801,
-	"maxlat": 48.19617,
-	"maxlon": 16.33802
+	"minlat": 48.19610,
+	"minlon": 16.33800,
+	"maxlat": 48.19620,
+	"maxlon": 16.33810
       }
     )
 
