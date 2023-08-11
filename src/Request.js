@@ -158,6 +158,24 @@ class Request {
   _exportOSMXML (options, parentNode, callback) {
     callback(null)
   }
+
+  /**
+   * Export objects (and members) as OpenStreetMap JSON
+   * @param object options Options
+   * @param DOMNode parentNode a DOM Node where the object will be appended as child. Depending on object type and options, member objects will also be appended on the same level.
+   * @param function callback Function which will be called with (err)
+   */
+  exportOSMJSON (options, result, callback) {
+    if (this.finished) {
+      this._exportOSMJSON(options, result, callback)
+    } else {
+      this.once('finish', () => this._exportOSMJSON(options, result, callback))
+    }
+  }
+
+  _exportOSMJSON (options, result, callback) {
+    callback(null)
+  }
 }
 
 ee(Request.prototype)

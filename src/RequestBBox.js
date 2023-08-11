@@ -297,6 +297,24 @@ class RequestBBox extends Request {
       callback
     )
   }
+
+  _exportOSMJSON (options, result, callback) {
+//    const bounds = parentNode.ownerDocument.createElement('bounds')
+//    parentNode.appendChild(bounds)
+//    ;['minlat', 'minlon', 'maxlat', 'maxlon'].forEach(k => {
+//      bounds.setAttribute(k, this.bounds[k])
+//    })
+//
+    if (!('elements' in result)) {
+      result.elements = {}
+    }
+
+    async.each(
+      this.doneFeatures,
+      (o, done) => o.exportOSMJSON(options, result.elements, done),
+      callback
+    )
+  }
 }
 
 module.exports = RequestBBox

@@ -330,3 +330,37 @@ describe('RequestBBox exportOSMXML', function() {
     })
   })
 })
+
+describe('RequestBBox exportOSMJSON', function() {
+  it('Query with default options', function (done) {
+    overpassFrontend.clearCache()
+    const file = 'test/files/RequestBBox-export-1.json'
+    var expected = fs.readFileSync(file).toString()
+
+    var req = overpassFrontend.BBoxQuery(
+      "(node[level=0];nwr[building];way[highway];relation[level='-1'];)",
+      {
+	"minlat": 48.19610,
+	"minlon": 16.33800,
+	"maxlat": 48.19620,
+	"maxlon": 16.33810
+      }
+    )
+
+    const osm = { version: 0.6, elements: {} }
+
+    req.exportOSMJSON({}, osm, (err) => {
+      if (err) {
+        return done(err)
+      }
+
+      osm.elements = Object.values(osm.elements)
+      const text = JSON.stringify(osm, null, '  ')
+      fs.writeFileSync(file, text)
+
+      assert.deepEqual(text, expected)
+
+      done()
+    })
+  })
+})
