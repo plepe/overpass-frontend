@@ -1,5 +1,7 @@
 const ee = require('event-emitter')
 const SortedCallbacks = require('./SortedCallbacks')
+const DOMParser = require('@xmldom/xmldom').DOMParser
+const XMLSerializer = require('@xmldom/xmldom').XMLSerializer
 
 /**
  * A compiled query
@@ -177,6 +179,40 @@ class Request {
 
   _exportOSMJSON (options, result, callback) {
     callback(null)
+  }
+
+  /**
+   * Export objects in various formats
+   * @param object options Options
+   * @param {string} [options.format=osmxml] Which format to use for exporting. Available formats: 'osmxml', 'osmjson'.
+   * @param {bit_array} [options.properties=OverpassFrontend.DEFAULT_EXPORT] Which properties of the features should be exported: OverpassFrontend.ID_ONLY, OverpassFrontend.BBOX, OverpassFrontend.TAGS, OverpassFrontend.GEOM, OverpassFrontend.META, OverpassFrontend.EMBED_GEOM. Combine by binary OR: ``OverpassFrontend.ID | OverpassFrontend.BBOX``. Default: OverpassFrontend.TAGS | OverpassFrontend.META | OverpassFrontend.MEMBERS | OverpassFrontend.GEOM
+   * @param function callback Function which will be called with (err, result)
+   */
+  export (options, callback) {
+    if (!options.format || options.format === 'osmxml') {
+      const osm = new DOMParser().parseFromString('<osm></osm>', 'text/xml').documentElement
+      osm.setAttribute('version', '0.6')
+      this.exportOSMXML(options, osm, (err) => {
+        if (err) { return callback(err) }
+
+        const serializer = new XMLSerializer()
+        const text = "<?xml version='1.0' encoding='UTF-8'?>\n" + serializer.serializeToString(osm)
+        callback(null, text)
+      })
+    } else if (options.format === 'osmjson') {
+      const osm = { version: 0.6, elements: {} }
+
+      this.exportOSMJSON(options, osm, (err) => {
+        if (err) { return callback(err) }
+
+        osm.elements = Object.values(osm.elements)
+
+        const text = JSON.stringify(osm, null, '  ')
+        callback(null, text)
+      })
+    } else {
+      callback(new Error('Invalid format: ' + options.format))
+    }
   }
 }
 

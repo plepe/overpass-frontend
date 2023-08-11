@@ -9,10 +9,6 @@ if (!conf.generator) {
 var assert = require('assert')
 var async = require('async')
 
-var DOMParser = require('@xmldom/xmldom').DOMParser
-var XMLSerializer = require('@xmldom/xmldom').XMLSerializer
-var document = new DOMParser().parseFromString('<xml></xml>', 'text/xml').documentElement
-
 var OverpassFrontend = require('../src/OverpassFrontend')
 var overpassFrontend = new OverpassFrontend(conf.url)
 
@@ -32,18 +28,14 @@ describe('RequestBBox exportOSMXML', function() {
       }
     )
 
-    const osm = document.ownerDocument.createElement('osm')
-    osm.setAttribute('version', '0.6')
-
-    req.exportOSMXML({}, osm, (err) => {
+    req.export({
+      format: 'osmxml'
+    }, (err, text) => {
       if (err) {
         return done(err)
       }
 
-      let serializer = new XMLSerializer()
-      let text = serializer.serializeToString(osm)
-      //fs.writeFileSync(file, text)
-
+      fs.writeFileSync(file, text)
       assert.deepEqual(text, expected)
 
       done()
@@ -65,20 +57,15 @@ describe('RequestBBox exportOSMXML', function() {
       }
     )
 
-    const osm = document.ownerDocument.createElement('osm')
-    osm.setAttribute('version', '0.6')
-
-    req.exportOSMXML({
-        properties: OverpassFrontend.ID_ONLY
-      }, osm, (err) => {
+    req.export({
+      format: 'osmxml',
+      properties: OverpassFrontend.ID_ONLY
+    }, (err, text) => {
       if (err) {
         return done(err)
       }
 
-      let serializer = new XMLSerializer()
-      let text = serializer.serializeToString(osm)
       fs.writeFileSync(file, text)
-
       assert.deepEqual(text, expected)
 
       done()
@@ -100,20 +87,15 @@ describe('RequestBBox exportOSMXML', function() {
       }
     )
 
-    const osm = document.ownerDocument.createElement('osm')
-    osm.setAttribute('version', '0.6')
-
-    req.exportOSMXML({
-        properties: OverpassFrontend.TAGS
-      }, osm, (err) => {
+    req.export({
+      format: 'osmxml',
+      properties: OverpassFrontend.TAGS
+    }, (err, text) => {
       if (err) {
         return done(err)
       }
 
-      let serializer = new XMLSerializer()
-      let text = serializer.serializeToString(osm)
       fs.writeFileSync(file, text)
-
       assert.deepEqual(text, expected)
 
       done()
@@ -135,20 +117,15 @@ describe('RequestBBox exportOSMXML', function() {
       }
     )
 
-    const osm = document.ownerDocument.createElement('osm')
-    osm.setAttribute('version', '0.6')
-
-    req.exportOSMXML({
-        properties: OverpassFrontend.META
-      }, osm, (err) => {
+    req.export({
+      format: 'osmxml',
+      properties: OverpassFrontend.META
+    }, (err, text) => {
       if (err) {
         return done(err)
       }
 
-      let serializer = new XMLSerializer()
-      let text = serializer.serializeToString(osm)
       fs.writeFileSync(file, text)
-
       assert.deepEqual(text, expected)
 
       done()
@@ -170,20 +147,15 @@ describe('RequestBBox exportOSMXML', function() {
       }
     )
 
-    const osm = document.ownerDocument.createElement('osm')
-    osm.setAttribute('version', '0.6')
-
-    req.exportOSMXML({
-        properties: OverpassFrontend.MEMBERS
-      }, osm, (err) => {
+    req.export({
+      format: 'osmxml',
+      properties: OverpassFrontend.MEMBERS
+    }, (err, text) => {
       if (err) {
         return done(err)
       }
 
-      let serializer = new XMLSerializer()
-      let text = serializer.serializeToString(osm)
       fs.writeFileSync(file, text)
-
       assert.deepEqual(text, expected)
 
       done()
@@ -205,20 +177,15 @@ describe('RequestBBox exportOSMXML', function() {
       }
     )
 
-    const osm = document.ownerDocument.createElement('osm')
-    osm.setAttribute('version', '0.6')
-
-    req.exportOSMXML({
-        properties: OverpassFrontend.BBOX
-      }, osm, (err) => {
+    req.export({
+      format: 'osmxml',
+      properties: OverpassFrontend.BBOX
+    }, (err, text) => {
       if (err) {
         return done(err)
       }
 
-      let serializer = new XMLSerializer()
-      let text = serializer.serializeToString(osm)
       fs.writeFileSync(file, text)
-
       assert.deepEqual(text, expected)
 
       done()
@@ -240,20 +207,15 @@ describe('RequestBBox exportOSMXML', function() {
       }
     )
 
-    const osm = document.ownerDocument.createElement('osm')
-    osm.setAttribute('version', '0.6')
-
-    req.exportOSMXML({
-        properties: OverpassFrontend.GEOM
-      }, osm, (err) => {
+    req.export({
+      format: 'osmxml',
+      properties: OverpassFrontend.GEOM
+    }, (err, text) => {
       if (err) {
         return done(err)
       }
 
-      let serializer = new XMLSerializer()
-      let text = serializer.serializeToString(osm)
       fs.writeFileSync(file, text)
-
       assert.deepEqual(text, expected)
 
       done()
@@ -275,20 +237,15 @@ describe('RequestBBox exportOSMXML', function() {
       }
     )
 
-    const osm = document.ownerDocument.createElement('osm')
-    osm.setAttribute('version', '0.6')
-
-    req.exportOSMXML({
-        properties: OverpassFrontend.CENTER
-      }, osm, (err) => {
+    req.export({
+      format: 'osmxml',
+      properties: OverpassFrontend.CENTER
+    }, (err, text) => {
       if (err) {
         return done(err)
       }
 
-      let serializer = new XMLSerializer()
-      let text = serializer.serializeToString(osm)
       fs.writeFileSync(file, text)
-
       assert.deepEqual(text, expected)
 
       done()
@@ -310,20 +267,15 @@ describe('RequestBBox exportOSMXML', function() {
       }
     )
 
-    const osm = document.ownerDocument.createElement('osm')
-    osm.setAttribute('version', '0.6')
-
-    req.exportOSMXML({
-        properties: OverpassFrontend.EMBED_GEOM
-      }, osm, (err) => {
+    req.export({
+      format: 'osmxml',
+      properties: OverpassFrontend.EMBED_GEOM
+    }, (err, text) => {
       if (err) {
         return done(err)
       }
 
-      let serializer = new XMLSerializer()
-      let text = serializer.serializeToString(osm)
       fs.writeFileSync(file, text)
-
       assert.deepEqual(text, expected)
 
       done()
@@ -345,20 +297,15 @@ describe('RequestBBox exportOSMXML', function() {
       }
     )
 
-    const osm = document.ownerDocument.createElement('osm')
-    osm.setAttribute('version', '0.6')
-
-    req.exportOSMXML({
-        properties: OverpassFrontend.BODY
-      }, osm, (err) => {
+    req.export({
+      format: 'osmxml',
+      properties: OverpassFrontend.BODY
+    }, (err, text) => {
       if (err) {
         return done(err)
       }
 
-      let serializer = new XMLSerializer()
-      let text = serializer.serializeToString(osm)
       fs.writeFileSync(file, text)
-
       assert.deepEqual(text, expected)
 
       done()
@@ -382,17 +329,14 @@ describe('RequestBBox exportOSMJSON', function() {
       }
     )
 
-    const osm = { version: 0.6, elements: {} }
-
-    req.exportOSMJSON({}, osm, (err) => {
+    req.export({
+      format: 'osmjson'
+    }, (err, text) => {
       if (err) {
         return done(err)
       }
 
-      osm.elements = Object.values(osm.elements)
-      const text = JSON.stringify(osm, null, '  ')
       fs.writeFileSync(file, text)
-
       assert.deepEqual(text, expected)
 
       done()
@@ -414,19 +358,15 @@ describe('RequestBBox exportOSMJSON', function() {
       }
     )
 
-    const osm = { version: 0.6, elements: {} }
-
-    req.exportOSMJSON({
-        properties: OverpassFrontend.ID_ONLY
-      }, osm, (err) => {
+    req.export({
+      format: 'osmjson',
+      properties: OverpassFrontend.ID_ONLY
+    }, (err, text) => {
       if (err) {
         return done(err)
       }
 
-      osm.elements = Object.values(osm.elements)
-      const text = JSON.stringify(osm, null, '  ')
       fs.writeFileSync(file, text)
-
       assert.deepEqual(text, expected)
 
       done()
@@ -448,17 +388,14 @@ describe('RequestBBox exportOSMJSON', function() {
       }
     )
 
-    const osm = { version: 0.6, elements: {} }
-
-    req.exportOSMJSON({
-        properties: OverpassFrontend.TAGS
-      }, osm, (err) => {
+    req.export({
+      format: 'osmjson',
+      properties: OverpassFrontend.TAGS
+    }, (err, text) => {
       if (err) {
         return done(err)
       }
 
-      osm.elements = Object.values(osm.elements)
-      const text = JSON.stringify(osm, null, '  ')
       fs.writeFileSync(file, text)
 
       assert.deepEqual(text, expected)
@@ -482,19 +419,15 @@ describe('RequestBBox exportOSMJSON', function() {
       }
     )
 
-    const osm = { version: 0.6, elements: {} }
-
-    req.exportOSMJSON({
-        properties: OverpassFrontend.META
-      }, osm, (err) => {
+    req.export({
+      format: 'osmjson',
+      properties: OverpassFrontend.META
+    }, (err, text) => {
       if (err) {
         return done(err)
       }
 
-      osm.elements = Object.values(osm.elements)
-      const text = JSON.stringify(osm, null, '  ')
       fs.writeFileSync(file, text)
-
       assert.deepEqual(text, expected)
 
       done()
@@ -516,19 +449,15 @@ describe('RequestBBox exportOSMJSON', function() {
       }
     )
 
-    const osm = { version: 0.6, elements: {} }
-
-    req.exportOSMJSON({
-        properties: OverpassFrontend.MEMBERS
-      }, osm, (err) => {
+    req.export({
+      format: 'osmjson',
+      properties: OverpassFrontend.MEMBERS
+    }, (err, text) => {
       if (err) {
         return done(err)
       }
 
-      osm.elements = Object.values(osm.elements)
-      const text = JSON.stringify(osm, null, '  ')
       fs.writeFileSync(file, text)
-
       assert.deepEqual(text, expected)
 
       done()
@@ -550,19 +479,15 @@ describe('RequestBBox exportOSMJSON', function() {
       }
     )
 
-    const osm = { version: 0.6, elements: {} }
-
-    req.exportOSMJSON({
-        properties: OverpassFrontend.BBOX
-      }, osm, (err) => {
+    req.export({
+      format: 'osmjson',
+      properties: OverpassFrontend.BBOX
+    }, (err, text) => {
       if (err) {
         return done(err)
       }
 
-      osm.elements = Object.values(osm.elements)
-      const text = JSON.stringify(osm, null, '  ')
       fs.writeFileSync(file, text)
-
       assert.deepEqual(text, expected)
 
       done()
@@ -584,19 +509,15 @@ describe('RequestBBox exportOSMJSON', function() {
       }
     )
 
-    const osm = { version: 0.6, elements: {} }
-
-    req.exportOSMJSON({
-        properties: OverpassFrontend.GEOM
-      }, osm, (err) => {
+    req.export({
+      format: 'osmjson',
+      properties: OverpassFrontend.GEOM
+    }, (err, text) => {
       if (err) {
         return done(err)
       }
 
-      osm.elements = Object.values(osm.elements)
-      const text = JSON.stringify(osm, null, '  ')
       fs.writeFileSync(file, text)
-
       assert.deepEqual(text, expected)
 
       done()
@@ -618,19 +539,15 @@ describe('RequestBBox exportOSMJSON', function() {
       }
     )
 
-    const osm = { version: 0.6, elements: {} }
-
-    req.exportOSMJSON({
-        properties: OverpassFrontend.CENTER
-      }, osm, (err) => {
+    req.export({
+      format: 'osmjson',
+      properties: OverpassFrontend.CENTER
+    }, (err, text) => {
       if (err) {
         return done(err)
       }
 
-      osm.elements = Object.values(osm.elements)
-      const text = JSON.stringify(osm, null, '  ')
       fs.writeFileSync(file, text)
-
       assert.deepEqual(text, expected)
 
       done()
@@ -652,19 +569,15 @@ describe('RequestBBox exportOSMJSON', function() {
       }
     )
 
-    const osm = { version: 0.6, elements: {} }
-
-    req.exportOSMJSON({
-        properties: OverpassFrontend.EMBED_GEOM
-      }, osm, (err) => {
+    req.export({
+      format: 'osmjson',
+      properties: OverpassFrontend.EMBED_GEOM
+    }, (err, text) => {
       if (err) {
         return done(err)
       }
 
-      osm.elements = Object.values(osm.elements)
-      const text = JSON.stringify(osm, null, '  ')
       fs.writeFileSync(file, text)
-
       assert.deepEqual(text, expected)
 
       done()
@@ -686,19 +599,15 @@ describe('RequestBBox exportOSMJSON', function() {
       }
     )
 
-    const osm = { version: 0.6, elements: {} }
-
-    req.exportOSMJSON({
-        properties: OverpassFrontend.BODY
-      }, osm, (err) => {
+    req.export({
+      format: 'osmjson',
+      properties: OverpassFrontend.BODY
+    }, (err, text) => {
       if (err) {
         return done(err)
       }
 
-      osm.elements = Object.values(osm.elements)
-      const text = JSON.stringify(osm, null, '  ')
       fs.writeFileSync(file, text)
-
       assert.deepEqual(text, expected)
 
       done()
