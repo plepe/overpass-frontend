@@ -193,7 +193,7 @@ class OverpassWay extends OverpassObject {
           })
         }
 
-        if (this.members && (options.properties & (OverpassFrontend.MEMBERS | OverpassFrontend.GEOM | OverpassFrontend.EMBED_GEOM))) {
+        if (this.members && (options.properties & (OverpassFrontend.MEMBERS | OverpassFrontend.GEOM | OverpassFrontend.EMBED_GEOM | OverpassFrontend.BODY))) {
           async.each(this.members,
             (member, done) => {
               const memberOb = this.overpass.cacheElements[member.id]
@@ -216,8 +216,10 @@ class OverpassWay extends OverpassObject {
                     done()
                   }
                 )
-              } else {
+              } else if (options.properties & (OverpassFrontend.MEMBERS | OverpassFrontend.GEOM)) {
                 memberOb.exportOSMXML(options, parentNode, done)
+              } else {
+                done()
               }
             },
             (err) => {
@@ -250,7 +252,7 @@ class OverpassWay extends OverpassObject {
           result.center = this.center
         }
 
-        if (this.members && (options.properties & (OverpassFrontend.MEMBERS | OverpassFrontend.GEOM | OverpassFrontend.EMBED_GEOM))) {
+        if (this.members && (options.properties & (OverpassFrontend.MEMBERS | OverpassFrontend.GEOM | OverpassFrontend.EMBED_GEOM | OverpassFrontend.BODY))) {
           result.nodes = []
           if (options.properties & OverpassFrontend.EMBED_GEOM) {
             result.geometry = []
@@ -278,8 +280,10 @@ class OverpassWay extends OverpassObject {
                     done()
                   }
                 )
-              } else {
+              } else if (options.properties & (OverpassFrontend.MEMBERS | OverpassFrontend.GEOM)) {
                 memberOb.exportOSMJSON(options, elements, done)
+              } else {
+                done()
               }
             },
             (err) => {
