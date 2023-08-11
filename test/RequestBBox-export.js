@@ -363,4 +363,276 @@ describe('RequestBBox exportOSMJSON', function() {
       done()
     })
   })
+
+  it('Query with only ID_ONLY', function (done) {
+    overpassFrontend.clearCache()
+    const file = 'test/files/RequestBBox-export-2.json'
+    var expected = fs.readFileSync(file).toString()
+
+    var req = overpassFrontend.BBoxQuery(
+      "(node[level=0];nwr[building];way[highway];relation[level='-1'];)",
+      {
+	"minlat": 48.19616,
+	"minlon": 16.33801,
+	"maxlat": 48.19617,
+	"maxlon": 16.33802
+      }
+    )
+
+    const osm = { version: 0.6, elements: {} }
+
+    req.exportOSMJSON({
+        properties: OverpassFrontend.ID_ONLY
+      }, osm, (err) => {
+      if (err) {
+        return done(err)
+      }
+
+      osm.elements = Object.values(osm.elements)
+      const text = JSON.stringify(osm, null, '  ')
+      fs.writeFileSync(file, text)
+
+      assert.deepEqual(text, expected)
+
+      done()
+    })
+  })
+
+  it('Query with only TAGS', function (done) {
+    overpassFrontend.clearCache()
+    const file = 'test/files/RequestBBox-export-3.json'
+    var expected = fs.readFileSync(file).toString()
+
+    var req = overpassFrontend.BBoxQuery(
+      "(node[level=0];nwr[building];way[highway];relation[level='-1'];)",
+      {
+	"minlat": 48.19616,
+	"minlon": 16.33801,
+	"maxlat": 48.19617,
+	"maxlon": 16.33802
+      }
+    )
+
+    const osm = { version: 0.6, elements: {} }
+
+    req.exportOSMJSON({
+        properties: OverpassFrontend.TAGS
+      }, osm, (err) => {
+      if (err) {
+        return done(err)
+      }
+
+      osm.elements = Object.values(osm.elements)
+      const text = JSON.stringify(osm, null, '  ')
+      fs.writeFileSync(file, text)
+
+      assert.deepEqual(text, expected)
+
+      done()
+    })
+  })
+
+  it('Query with only META', function (done) {
+    overpassFrontend.clearCache()
+    const file = 'test/files/RequestBBox-export-4.json'
+    var expected = fs.readFileSync(file).toString()
+
+    var req = overpassFrontend.BBoxQuery(
+      "(node[level=0];nwr[building];way[highway];relation[level='-1'];)",
+      {
+	"minlat": 48.19616,
+	"minlon": 16.33801,
+	"maxlat": 48.19617,
+	"maxlon": 16.33802
+      }
+    )
+
+    const osm = { version: 0.6, elements: {} }
+
+    req.exportOSMJSON({
+        properties: OverpassFrontend.META
+      }, osm, (err) => {
+      if (err) {
+        return done(err)
+      }
+
+      osm.elements = Object.values(osm.elements)
+      const text = JSON.stringify(osm, null, '  ')
+      fs.writeFileSync(file, text)
+
+      assert.deepEqual(text, expected)
+
+      done()
+    })
+  })
+
+  it('Query with only MEMBERS', function (done) {
+    overpassFrontend.clearCache()
+    const file = 'test/files/RequestBBox-export-5.json'
+    var expected = fs.readFileSync(file).toString()
+
+    var req = overpassFrontend.BBoxQuery(
+      "(node[level=0];nwr[building];way[highway];relation[level='-1'];)",
+      {
+	"minlat": 48.19616,
+	"minlon": 16.33801,
+	"maxlat": 48.19617,
+	"maxlon": 16.33802
+      }
+    )
+
+    const osm = { version: 0.6, elements: {} }
+
+    req.exportOSMJSON({
+        properties: OverpassFrontend.MEMBERS
+      }, osm, (err) => {
+      if (err) {
+        return done(err)
+      }
+
+      osm.elements = Object.values(osm.elements)
+      const text = JSON.stringify(osm, null, '  ')
+      fs.writeFileSync(file, text)
+
+      assert.deepEqual(text, expected)
+
+      done()
+    })
+  })
+
+  it('Query with only BBOX', function (done) {
+    overpassFrontend.clearCache()
+    const file = 'test/files/RequestBBox-export-6.json'
+    var expected = fs.readFileSync(file).toString()
+
+    var req = overpassFrontend.BBoxQuery(
+      "(node[level=0];nwr[building];way[highway];relation[level='-1'];)",
+      {
+	"minlat": 48.19616,
+	"minlon": 16.33801,
+	"maxlat": 48.19617,
+	"maxlon": 16.33802
+      }
+    )
+
+    const osm = { version: 0.6, elements: {} }
+
+    req.exportOSMJSON({
+        properties: OverpassFrontend.BBOX
+      }, osm, (err) => {
+      if (err) {
+        return done(err)
+      }
+
+      osm.elements = Object.values(osm.elements)
+      const text = JSON.stringify(osm, null, '  ')
+      fs.writeFileSync(file, text)
+
+      assert.deepEqual(text, expected)
+
+      done()
+    })
+  })
+
+  it('Query with only GEOM', function (done) {
+    overpassFrontend.clearCache()
+    const file = 'test/files/RequestBBox-export-7.json'
+    var expected = fs.readFileSync(file).toString()
+
+    var req = overpassFrontend.BBoxQuery(
+      "(node[level=0];nwr[building];way[highway];relation[level='-1'];)",
+      {
+	"minlat": 48.19616,
+	"minlon": 16.33801,
+	"maxlat": 48.19617,
+	"maxlon": 16.33802
+      }
+    )
+
+    const osm = { version: 0.6, elements: {} }
+
+    req.exportOSMJSON({
+        properties: OverpassFrontend.GEOM
+      }, osm, (err) => {
+      if (err) {
+        return done(err)
+      }
+
+      osm.elements = Object.values(osm.elements)
+      const text = JSON.stringify(osm, null, '  ')
+      fs.writeFileSync(file, text)
+
+      assert.deepEqual(text, expected)
+
+      done()
+    })
+  })
+
+  it('Query with only CENTER', function (done) {
+    overpassFrontend.clearCache()
+    const file = 'test/files/RequestBBox-export-8.json'
+    var expected = fs.readFileSync(file).toString()
+
+    var req = overpassFrontend.BBoxQuery(
+      "(node[level=0];nwr[building];way[highway];relation[level='-1'];)",
+      {
+	"minlat": 48.19616,
+	"minlon": 16.33801,
+	"maxlat": 48.19617,
+	"maxlon": 16.33802
+      }
+    )
+
+    const osm = { version: 0.6, elements: {} }
+
+    req.exportOSMJSON({
+        properties: OverpassFrontend.CENTER
+      }, osm, (err) => {
+      if (err) {
+        return done(err)
+      }
+
+      osm.elements = Object.values(osm.elements)
+      const text = JSON.stringify(osm, null, '  ')
+      fs.writeFileSync(file, text)
+
+      assert.deepEqual(text, expected)
+
+      done()
+    })
+  })
+
+  it('Query with EMBED_GEOM', function (done) {
+    overpassFrontend.clearCache()
+    const file = 'test/files/RequestBBox-export-9.json'
+    var expected = fs.readFileSync(file).toString()
+
+    var req = overpassFrontend.BBoxQuery(
+      "(node[level=0];nwr[building];way[highway];relation[level='-1'];)",
+      {
+	"minlat": 48.19616,
+	"minlon": 16.33801,
+	"maxlat": 48.19617,
+	"maxlon": 16.33802
+      }
+    )
+
+    const osm = { version: 0.6, elements: {} }
+
+    req.exportOSMJSON({
+        properties: OverpassFrontend.EMBED_GEOM
+      }, osm, (err) => {
+      if (err) {
+        return done(err)
+      }
+
+      osm.elements = Object.values(osm.elements)
+      const text = JSON.stringify(osm, null, '  ')
+      fs.writeFileSync(file, text)
+
+      assert.deepEqual(text, expected)
+
+      done()
+    })
+  })
 })

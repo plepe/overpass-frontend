@@ -62,8 +62,8 @@ class OverpassNode extends OverpassObject {
     )
   }
 
-  exportOSMJSON (conf, elements, callback) {
-    super.exportOSMJSON(conf, elements,
+  exportOSMJSON (options, elements, callback) {
+    super.exportOSMJSON(options, elements,
       (err, result) => {
         if (err) {
           return callback(err)
@@ -73,8 +73,10 @@ class OverpassNode extends OverpassObject {
           return callback(null)
         }
 
-        result.lat = this.geometry.lat
-        result.lon = this.geometry.lon
+        if (options.properties & (OverpassFrontend.GEOM | options.properties & OverpassFrontend.BBOX | OverpassFrontend.CENTER | OverpassFrontend.EMBED_GEOM)) {
+          result.lat = this.geometry.lat
+          result.lon = this.geometry.lon
+        }
 
         callback(null, result)
       }

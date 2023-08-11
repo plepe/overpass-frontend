@@ -430,8 +430,8 @@ class OverpassRelation extends OverpassObject {
     )
   }
 
-  exportOSMJSON (conf, elements, callback) {
-    super.exportOSMJSON(conf, elements,
+  exportOSMJSON (options, elements, callback) {
+    super.exportOSMJSON(options, elements,
       (err, result) => {
         if (err) {
           return callback(err)
@@ -441,20 +441,50 @@ class OverpassRelation extends OverpassObject {
           return callback(null)
         }
 
-        if (this.members) {
+        if (this.bounds && (options.properties & OverpassFrontend.BBOX)) {
+          result.bounds = this.bounds
+        }
+
+        if (this.center && (options.properties & OverpassFrontend.CENTER)) {
+          result.center = this.center
+        }
+
+        if (this.members && (options.properties & (OverpassFrontend.MEMBERS | OverpassFrontend.GEOM | OverpassFrontend.EMBED_GEOM))) {
           result.members = []
 
           async.each(this.members,
             (member, done) => {
               const memberOb = this.overpass.cacheElements[member.id]
 
-              result.members.push({
+              const m = {
                 ref: memberOb.osm_id,
                 type: memberOb.type,
                 role: member.role
-              })
+              }
+              result.members.push(m)
 
-              memberOb.exportOSMJSON(conf, elements, done)
+              if (options.properties & OverpassFrontend.EMBED_GEOM &&
+                  (memberOb.type === 'node' || memberOb.type === 'way')) {
+                this.overpass.get(
+                  memberOb.id,
+                  { properties: OverpassFrontend.GEOM },
+                  () => {},
+                  (err) => {
+                    if (err) { return done(err) }
+
+                    if (memberOb.type === 'node') {
+                      m.lat = memberOb.geometry.lat
+                      m.lon = memberOb.geometry.lon
+                    } else {
+                      m.geometry = memberOb.geometry
+                    }
+
+                    done()
+                  }
+                )
+              } else {
+                memberOb.exportOSMJSON(options, elements, done)
+              }
             },
             (err) => {
               callback(err, result)

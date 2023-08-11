@@ -231,8 +231,8 @@ class OverpassWay extends OverpassObject {
     )
   }
 
-  exportOSMJSON (conf, elements, callback) {
-    super.exportOSMJSON(conf, elements,
+  exportOSMJSON (options, elements, callback) {
+    super.exportOSMJSON(options, elements,
       (err, result) => {
         if (err) {
           return callback(err)
@@ -242,8 +242,19 @@ class OverpassWay extends OverpassObject {
           return callback(null)
         }
 
-        if (this.members) {
+        if (this.bounds && (options.properties & OverpassFrontend.BBOX)) {
+          result.bounds = this.bounds
+        }
+
+        if (this.center && (options.properties & OverpassFrontend.CENTER)) {
+          result.center = this.center
+        }
+
+        if (this.members && (options.properties & (OverpassFrontend.MEMBERS | OverpassFrontend.GEOM | OverpassFrontend.EMBED_GEOM))) {
           result.nodes = []
+          if (options.properties & OverpassFrontend.EMBED_GEOM) {
+            result.geometry = []
+          }
 
           async.each(this.members,
             (member, done) => {
@@ -251,7 +262,25 @@ class OverpassWay extends OverpassObject {
 
               result.nodes.push(memberOb.osm_id)
 
-              memberOb.exportOSMJSON(conf, elements, done)
+              if (options.properties & OverpassFrontend.EMBED_GEOM) {
+                this.overpass.get(
+                  memberOb.id,
+                  { properties: OverpassFrontend.GEOM },
+                  () => {},
+                  (err) => {
+                    if (err) { return done(err) }
+
+                    result.geometry.push({
+                      lat: memberOb.geometry.lat,
+                      lon: memberOb.geometry.lon
+                    })
+
+                    done()
+                  }
+                )
+              } else {
+                memberOb.exportOSMJSON(options, elements, done)
+              }
             },
             (err) => {
               callback(err, result)

@@ -262,17 +262,21 @@ class OverpassObject {
    * @param object elements All exported elements, include member objects. Pass an empty object. If a member element would be exported multiple times it will appear only once. For the final export, to be compatible to Overpass API, you should convert the object to an array via Object.values().
    * @param function callback Function which will be called with (err, result)
    */
-  exportOSMJSON (conf, elements, callback) {
+  exportOSMJSON (options, elements, callback) {
+    if (!('properties' in options)) {
+      options.properties = OverpassFrontend.DEFAULT_EXPORT
+    }
+
     if (this.id in elements) {
       return callback(null)
     }
     elements[this.id] = {}
 
-    if ((this.properties & (OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.META)) !== (OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.META)) {
+    if ((this.properties & options.properties) !== options.properties) {
       return this.overpass.get(
         this.id,
         {
-          properties: OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.META
+          properties: options.properties
         },
         () => {},
         (err) => {
@@ -280,20 +284,20 @@ class OverpassObject {
             return callback(err)
           }
 
-          this._exportOSMJSON(conf, elements, callback)
+          this._exportOSMJSON(options, elements, callback)
         }
       )
     }
 
-    this._exportOSMJSON(conf, elements, callback)
+    this._exportOSMJSON(options, elements, callback)
   }
 
-  _exportOSMJSON (conf, elements, callback) {
+  _exportOSMJSON (options, elements, callback) {
     const result = elements[this.id]
     result.type = this.type
     result.id = this.osm_id
 
-    if (this.meta) {
+    if (this.meta && (options.properties & OverpassFrontend.META)) {
       result.version = this.meta.version
       result.timestamp = this.meta.timestamp
       result.changeset = this.meta.changeset
@@ -301,7 +305,7 @@ class OverpassObject {
       result.user = this.meta.user
     }
 
-    if (this.tags && Object.keys(this.tags).length) {
+    if (this.tags && Object.keys(this.tags).length && (options.properties & OverpassFrontend.TAGS)) {
       result.tags = this.tags
     }
 
