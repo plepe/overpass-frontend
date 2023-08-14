@@ -454,12 +454,25 @@ class Filter {
     }
 
     if (def.or) {
-      return '(' + def.or.map(part => {
+      let outputSet = '_'
+
+      let result = '(' + def.or.map(part => {
+        if (part.outputSet) {
+          outputSet = part.outputSet
+          return
+        }
+
         const subOptions = JSON.parse(JSON.stringify(options))
         subOptions.inputSet = options.inputSet
         subOptions.outputSet = ''
         return this.toQl(subOptions, part)
-      }).join('') + ')' + (options.outputSet ? '->' + options.outputSet : '') + ';'
+      }).filter(v => v).join('') + ')' + (outputSet !== '_' ? '->.' + outputSet : '') + ';'
+
+      if (options.outputSet) {
+        result = '(' + result + ')->.' + outputSet + ';'
+      }
+
+      return result
     }
 
     if (def.and) {
@@ -702,6 +715,10 @@ class Filter {
     if (def.or) {
       let result = []
       def.or.forEach(e => {
+        if (e.outputSet) {
+          return
+        }
+
         const r = this._caches(e)
         if (Array.isArray(r)) {
           result = result.concat(r)
@@ -741,6 +758,10 @@ class Filter {
           const r = this._caches(e)
 
           options.forEach(o => {
+            if (o.outputSet) {
+              return
+            }
+
             r.forEach(r1 => {
               result.push(this._cacheMerge(o, r1))
             })
