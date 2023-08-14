@@ -466,9 +466,9 @@ class Filter {
         subOptions.inputSet = options.inputSet
         subOptions.outputSet = ''
         return this.toQl(subOptions, part)
-      }).filter(v => v).join('') + ')' + (outputSet !== '_' ? '->.' + outputSet : '') + ';'
+      }).filter(v => v).join('') + ')' + (options.outputSet ? '->' + options.outputSet : '') + ';'
 
-      if (options.outputSet) {
+      if (outputSet !== '_') {
         result = '(' + result + ')->.' + outputSet + ';'
       }
 
