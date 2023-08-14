@@ -30,6 +30,10 @@ function compile (part, options = {}) {
     return part.type
   }
 
+  if (part.outputSet) {
+    return '->.' + part.outputSet
+  }
+
   switch (part.op) {
     case 'has_key':
       if (part.keyRegexp === 'i') {
@@ -171,8 +175,12 @@ function parse (def, rek = 0) {
         throw new Error("Can't parse query, expected type of object (e.g. 'node'): " + def)
       }
     } else if (mode === 1) {
-      m = def.match(/^\s*\)\s*;?\s*/)
+      m = def.match(/^\s*\)\s*(->\.([A-Za-z_][A-Za-z0-9_]*))?;?\s*/)
       if (m) {
+        if (m[1]) {
+          script.push({ outputSet: m[2] })
+        }
+
         if (rek === 0) {
           return [script.length === 1 ? script[0] : script, def]
         } else {
@@ -183,13 +191,16 @@ function parse (def, rek = 0) {
         mode = 0
       }
     } else if (mode === 10) {
-      const m = def.match(/^\s*(\[|\(|;)/)
+      const m = def.match(/^\s*(\[|\(|;|->)/)
       if (m && m[1] === '[') {
         def = def.slice(m[0].length)
         mode = 11
       } else if (m && m[1] === '(') {
         def = def.slice(m[0].length - 1)
         mode = 20
+      } else if (m && m[1] === '->') {
+        def = def.slice(m[0].length)
+        mode = 15
       } else if (m && m[1] === ';') {
         def = def.slice(m[0].length)
         script.push(current)
@@ -202,7 +213,7 @@ function parse (def, rek = 0) {
         }
         return [rek === 0 && script.length === 1 ? script[0] : script, '']
       } else {
-        throw new Error("Can't parse query, expected '[' or ';': " + def)
+        throw new Error("Can't parse query, expected '[' or '->' or ';': " + def)
       }
     } else if (mode === 11) {
       m = def.match(/^(\s*)(([~!])\s*)?([a-zA-Z0-9_]+|"|')/)
@@ -292,6 +303,19 @@ function parse (def, rek = 0) {
         def = def.slice(m[0].length)
       } else {
         throw new Error("Can't parse query, expected ']': " + def)
+      }
+    } else if (mode === 15) {
+      const m = def.match(/^\s*\.([A-Za-z_][A-Za-z0-9_]*)\s*;/)
+      if (m) {
+        current.push({ outputSet: m[1] })
+        def = def.slice(m[0].length)
+        script.push(current)
+        current = []
+        notExists = null
+        mode = 1
+      }
+      else {
+        throw new Error("Can't parse query, expected output set and ';': " + def)
       }
     } else if (mode === 20) {
       const r = parseParentheses(def)
@@ -693,7 +717,8 @@ class Filter {
     }
 
     def.forEach(part => {
-      if (part.type) {
+      if (part.outputSet) {
+      } else if (part.type) {
         options = options.map(o => {
           if (o.type && o.type !== part.type) {
             o.type = '-'
