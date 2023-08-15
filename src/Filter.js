@@ -17,7 +17,15 @@ function compile (part, options = {}) {
   }
 
   if (part.or) {
-    return { or: part.or.map(compile) }
+    const result = { or: [], outputSet: '_' }
+    part.or.forEach(p => {
+      if (p.outputSet) {
+        result.outputSet = p.outputSet
+      } else {
+        result.or.push(compile(p))
+      }
+    })
+    return result
   }
 
   const keyRegexp = (part.keyRegexp ? '~' : '')
@@ -28,6 +36,10 @@ function compile (part, options = {}) {
 
   if (part.type) {
     return part.type
+  }
+
+  if (part.inputSet) {
+    return '.' + part.inputSet
   }
 
   if (part.outputSet) {
@@ -169,7 +181,7 @@ function parse (def, rek = 0) {
         } else {
           current.push({ type: m[1] })
         }
-        mode = 10
+        mode = 9
         def = def.slice(m[0].length)
       } else {
         throw new Error("Can't parse query, expected type of object (e.g. 'node'): " + def)
@@ -189,6 +201,14 @@ function parse (def, rek = 0) {
         }
       } else {
         mode = 0
+      }
+    } else if (mode === 9) {
+      const m = def.match(/^\s*\.([A-Za-z_][A-Za-z0-9_]*)/)
+      if (m) {
+        def = def.slice(m[0].length)
+        current.push({ inputSet: m[1] })
+      } else {
+        mode = 10
       }
     } else if (mode === 10) {
       const m = def.match(/^\s*(\[|\(|;|->)/)
@@ -690,13 +710,15 @@ class Filter {
 
   cacheDescriptors () {
     let result
+    const sets = {}
 
     if (Array.isArray(this.def) && Array.isArray(this.def[0])) {
       // script with several statements detected. only compile the last one, as previous statements
       // can't have an effect on the last statement yet.
-      result = this._caches(this.def[this.def.length - 1])
+      const script = this.def.map(d => this._caches(d, sets))
+      result = script[script.length - 1]
     } else {
-      result = this._caches(this.def)
+      result = this._caches(this.def, sets)
     }
 
     result.forEach(entry => {
@@ -709,7 +731,7 @@ class Filter {
     return result
   }
 
-  _caches (def) {
+  _caches (def, sets) {
     let options = [{ filters: '', properties: 0 }]
 
     if (def.or) {
@@ -719,7 +741,7 @@ class Filter {
           return
         }
 
-        const r = this._caches(e)
+        const r = this._caches(e, sets)
         if (Array.isArray(r)) {
           result = result.concat(r)
         } else {
@@ -733,8 +755,16 @@ class Filter {
       def = [def]
     }
 
+    const inputSets = []
+    let outputSet = '_'
     def.forEach(part => {
-      if (part.outputSet) {
+      if (Array.isArray(part)) {
+        options = this._caches(part, sets)
+      }
+      else if (part.inputSet) {
+        inputSets.push(part.inputSet)
+      } else if (part.outputSet) {
+        outputSet = part.outputSet
       } else if (part.type) {
         options = options.map(o => {
           if (o.type && o.type !== part.type) {
@@ -755,7 +785,7 @@ class Filter {
       } else if (part.or) {
         const result = []
         part.or.forEach(e => {
-          const r = this._caches(e)
+          const r = this._caches(e, sets)
 
           options.forEach(o => {
             if (o.outputSet) {
@@ -774,7 +804,7 @@ class Filter {
         part.and.forEach(e => {
           const current = result
           result = []
-          const r = this._caches(e)
+          const r = this._caches(e, sets)
           r.forEach(r1 => {
             current.forEach(c => {
               result.push(this._cacheMerge(c, r1))
@@ -787,6 +817,24 @@ class Filter {
         throw new Error('caches(): invalid entry')
       }
     })
+
+    sets[outputSet] = options
+
+    if (inputSets.length) {
+      inputSets.reverse().forEach(set => {
+        if (set in sets) {
+          const result = []
+          sets[set].forEach(a => {
+            options.forEach(b => {
+              result.push(this._cacheMerge(a, b))
+            })
+          })
+          options = result
+        } else {
+          options = []
+        }
+      })
+    }
 
     return options
   }
@@ -892,12 +940,14 @@ class Filter {
   properties () {
     let result
 
+    const sets = {}
     if (Array.isArray(this.def) && Array.isArray(this.def[0])) {
       // script with several statements detected. only compile the last one, as previous statements
       // can't have an effect on the last statement yet.
-      result = this._caches(this.def[this.def.length - 1])
+      const script = this.def.map(d => this._caches(d, sets))
+      result = script[script.length - 1]
     } else {
-      result = this._caches(this.def)
+      result = this._caches(this.def, sets)
     }
 
     return result.reduce((current, entry) => current | entry.properties, 0)
