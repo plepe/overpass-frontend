@@ -420,6 +420,7 @@ class Filter {
     }
 
     this.def = check(def)
+    this.script = convertToFilterScript(this.def)
   }
 
   /**
@@ -952,6 +953,10 @@ class Filter {
 
     return result.reduce((current, entry) => current | entry.properties, 0)
   }
+}
+
+function convertToFilterScript (def) {
+  console.log(def)
 }
 
 module.exports = Filter
