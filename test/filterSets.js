@@ -44,10 +44,113 @@ describe("Filter sets, compile", function () {
         {"outputSet":"a"}
       ]
     })
-    assert.equal(f.toString(), '(nwr["amenity"];)->.a;')
-    assert.equal(f.toQl(), '(nwr["amenity"];)->.a;')
+    assert.equal(f.toString(), '((nwr["amenity"];);)->.a;')
+    assert.equal(f.toQl(), '((nwr["amenity"];);)->.a;')
     var r = f.cacheDescriptors()
     assert.deepEqual(r, [ { id: 'nwr["amenity"](properties:1)' } ])
+  })
+  it ('(nwr[amenity]->.a;);', function () {
+    var f = new Filter('(nwr[amenity]->.a;);')
+
+    assert.deepEqual(f.def, {
+      or: [
+        [ {"op":"has_key","key":"amenity"},
+          {"outputSet":"a"}
+        ]
+      ]
+    })
+    assert.equal(f.toString(), '(nwr["amenity"]->.a;);')
+    assert.equal(f.toQl(), '(nwr["amenity"]->.a;);')
+    var r = f.cacheDescriptors()
+    assert.deepEqual(r, [ { id: 'nwr["amenity"](properties:1)' } ])
+  })
+  it ('nwr.a[amenity];', function () {
+    var f = new Filter('nwr.a[amenity];')
+
+    assert.deepEqual(f.def,
+      [
+        {"inputSet":"a"},
+        {"op":"has_key","key":"amenity"}
+      ]
+    )
+    assert.equal(f.toString(), 'nwr.a["amenity"];')
+    assert.equal(f.toQl(), 'nwr.a["amenity"];')
+    var r = f.cacheDescriptors()
+    assert.deepEqual(r, [])
+  })
+  it ('nwr.a.b[amenity]', function () {
+    var f = new Filter('nwr.a.b[amenity]')
+
+    assert.deepEqual(f.def,
+      [
+        {"inputSet":"a"},
+        {"inputSet":"b"},
+        {"op":"has_key","key":"amenity"}
+      ]
+    )
+    assert.equal(f.toString(), 'nwr.a.b["amenity"];')
+    assert.equal(f.toQl(), 'nwr.a.b["amenity"];')
+    var r = f.cacheDescriptors()
+    assert.deepEqual(r, [])
+  })
+  it ('nwr[amenity]->.a;nwr.a[cuisine];', function () {
+    var f = new Filter('nwr[amenity]->.a;nwr.a[cuisine];')
+
+    assert.deepEqual(f.def, [
+      [
+        {"op":"has_key","key":"amenity"},
+        {"outputSet":"a"}
+      ],
+      [
+        {"inputSet":"a"},
+        {"op":"has_key","key":"cuisine"}
+      ]
+    ])
+    assert.equal(f.toString(), 'nwr["amenity"]->.a;nwr.a["cuisine"];')
+    assert.equal(f.toQl(), 'nwr["amenity"]->.a;nwr.a["cuisine"];')
+    var r = f.cacheDescriptors()
+    assert.deepEqual(r, [ { id: 'nwr["amenity"]["cuisine"](properties:1)' }])
+  })
+  it ('nwr[amenity]->.a;nwr[xxx]->.b;nwr.a.b[cuisine];', function () {
+    var f = new Filter('nwr[amenity]->.a;nwr[xxx]->.b;nwr.a.b[cuisine];')
+
+    assert.deepEqual(f.def, [
+      [
+        {"op":"has_key","key":"amenity"},
+        {"outputSet":"a"}
+      ],
+      [
+        {"op":"has_key","key":"xxx"},
+        {"outputSet":"b"}
+      ],
+      [
+        {"inputSet":"a"},
+        {"inputSet":"b"},
+        {"op":"has_key","key":"cuisine"}
+      ]
+    ])
+    assert.equal(f.toString(), 'nwr["amenity"]->.a;nwr["xxx"]->.b;nwr.a.b["cuisine"];')
+    assert.equal(f.toQl(), 'nwr["amenity"]->.a;nwr["xxx"]->.b;nwr.a.b["cuisine"];')
+    var r = f.cacheDescriptors()
+    assert.deepEqual(r, [ { id: 'nwr["amenity"]["xxx"]["cuisine"](properties:1)' }])
+  })
+})
+
+;['via-server', 'via-file'].forEach(mode => {
+  describe('Test filter sets ' + mode, function () {
+    describe('initalize', function () {
+      if (mode === 'via-server') {
+        it('load', function () {
+          overpassFrontend = new OverpassFrontend(conf.url)
+        })
+      } else {
+        it('load', function (done) {
+          this.timeout(20000)
+          overpassFrontend = new OverpassFrontend('test/data.osm.bz2')
+          overpassFrontend.once('load', () => done())
+        })
+      }
+    })
   })
 })
 
