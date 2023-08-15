@@ -1192,7 +1192,7 @@ describe('Filter', function () {
         var f = new Filter('nodes')
       }
       catch (e) {
-        return assert.equal(e.message, "Can't parse query, expected '[' or ';': s")
+        return assert.equal(e.message, "Can't parse query, expected '[' or '->' or ';': s")
       }
       assert.fail("Expect an Exception")
     })
