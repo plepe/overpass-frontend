@@ -64,6 +64,28 @@ describe("Filter sets, compile", function () {
     var r = f.cacheDescriptors()
     assert.deepEqual(r, [ { id: 'nwr["amenity"](properties:1)' } ])
   })
+  it ('(nwr[a]->a;(nwr[b]->b;nwr.a[b]);)->.a;', function () {
+    var f = new Filter('(nwr[a]->.a;(nwr[b]->.b;nwr.a[b];);)->.a;')
+
+    assert.deepEqual(f.def, {
+      or: [
+        [ {"op":"has_key","key":"a"}, {"outputSet":"a"} ],
+        { or: [
+          [ {"op":"has_key","key":"b"}, {"outputSet":"b"} ],
+          [ { inputSet: "a" }, {"op":"has_key","key":"b"} ],
+        ]},
+        {"outputSet":"a"}
+      ]
+    })
+    assert.equal(f.toString(), '((nwr["a"]->.a;(nwr["b"]->.b;nwr.a["b"];););)->.a;')
+    assert.equal(f.toQl(), '((nwr["a"]->.a;(nwr["b"]->.b;nwr.a["b"];););)->.a;')
+    var r = f.cacheDescriptors()
+    assert.deepEqual(r, [
+      { id: 'nwr["a"](properties:1)' },
+      { id: 'nwr["b"](properties:1)' },
+      { id: 'nwr["a"]["b"](properties:1)' }
+    ])
+  })
   it ('nwr.a[amenity];', function () {
     var f = new Filter('nwr.a[amenity];')
 

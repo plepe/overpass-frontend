@@ -1022,8 +1022,8 @@ describe('Filter', function () {
         { or: [ { key: 'operator', op: '=', value: 'ÖBB' }, { key: 'operator', op: '=', value: 'WL' } ] }
       ])
 
-      assert.equal(f.toString(), '(nwr["name"~"49"]["route"="bus"]["operator"="ÖBB"];nwr["name"~"49"]["route"="bus"]["operator"="WL"];nwr["ref"="49"]["route"="bus"]["operator"="ÖBB"];nwr["ref"="49"]["route"="bus"]["operator"="WL"];);')
-      assert.equal(f.toQl(), '(nwr["name"~"49"]["route"="bus"]["operator"="ÖBB"];nwr["name"~"49"]["route"="bus"]["operator"="WL"];nwr["ref"="49"]["route"="bus"]["operator"="ÖBB"];nwr["ref"="49"]["route"="bus"]["operator"="WL"];);')
+      assert.equal(f.toString(), '(nwr["name"~"49"]["operator"="ÖBB"]["route"="bus"];nwr["ref"="49"]["operator"="ÖBB"]["route"="bus"];nwr["name"~"49"]["operator"="WL"]["route"="bus"];nwr["ref"="49"]["operator"="WL"]["route"="bus"];);')
+      assert.equal(f.toQl(), '(nwr["name"~"49"]["operator"="ÖBB"]["route"="bus"];nwr["ref"="49"]["operator"="ÖBB"]["route"="bus"];nwr["name"~"49"]["operator"="WL"]["route"="bus"];nwr["ref"="49"]["operator"="WL"]["route"="bus"];);')
       assert.deepEqual(f.toLokijs(), {"tags.route":{"$eq":"bus"},"$and":[{"$or":[{"tags.name":{"$regex":/49/}},{"tags.ref":{"$eq":"49"}}]},{"$or":[{"tags.operator":{"$eq":"ÖBB"}},{"tags.operator":{"$eq":"WL"}}]}]})
 
       var r = f.cacheDescriptors()
@@ -1551,8 +1551,8 @@ describe('Filter by id', function () {
       {"fun":"id", "value":[1, 3, 5]}
     ])
 
-    assert.equal(f.toString(), 'nwr(id:1,2,4,5)(id:1,3,5);')
-    assert.equal(f.toQl(), 'nwr(id:1,2,4,5)(id:1,3,5);')
+    assert.equal(f.toString(), '(nwr(id:1,2,4,5)(id:1,3,5););')
+    assert.equal(f.toQl(), '(nwr(id:1,2,4,5)(id:1,3,5););')
     assert.deepEqual(f.toLokijs(),
       {
         $and: [ {"osm_id": { $in: [ 1, 3, 5 ] }} ],

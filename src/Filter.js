@@ -7,6 +7,10 @@ const parseString = require('./parseString')
 const parseParentheses = require('./parseParentheses')
 const qlFunction = require('./qlFunctions/qlFunction')
 const compile = require('./compileFilter')
+const filterPart = require('./filterPart')
+require('./FilterQuery')
+require('./FilterAnd')
+require('./FilterOr')
 
 function test (ob, part) {
   if (Array.isArray(part)) {
@@ -354,7 +358,7 @@ class Filter {
     }
 
     this.def = check(def)
-    this.script = convertToFilterScript(this.def)
+    this.script = this.convertToFilterScript(this.def)
   }
 
   /**
@@ -400,90 +404,7 @@ class Filter {
    * @return {string}
    */
   toQl (options = {}, def) {
-    if (!def) {
-      def = this.def
-    }
-
-    if (Array.isArray(def) && Array.isArray(def[0])) {
-      return def.map(d => this.toQl(options, d)).join('')
-    }
-
-    if (def.or) {
-      let outputSet = '_'
-
-      let result = '(' + def.or.map(part => {
-        if (part.outputSet) {
-          outputSet = part.outputSet
-          return
-        }
-
-        const subOptions = JSON.parse(JSON.stringify(options))
-        subOptions.inputSet = options.inputSet
-        subOptions.outputSet = ''
-        return this.toQl(subOptions, part)
-      }).filter(v => v).join('') + ')' + (options.outputSet ? '->' + options.outputSet : '') + ';'
-
-      if (outputSet !== '_') {
-        result = '(' + result + ')->.' + outputSet + ';'
-      }
-
-      return result
-    }
-
-    if (def.and) {
-      const first = def.and[0]
-      const last = def.and[def.and.length - 1]
-      const others = def.and.concat().slice(1, def.and.length - 1)
-      const set = '.x' + this.uniqId()
-      const subOptions1 = JSON.parse(JSON.stringify(options))
-      const subOptions2 = JSON.parse(JSON.stringify(options))
-      const subOptions3 = JSON.parse(JSON.stringify(options))
-      subOptions1.outputSet = set
-      subOptions2.inputSet = set
-      subOptions2.outputSet = set
-      subOptions3.inputSet = set
-
-      return this.toQl(subOptions1, first) +
-        others.map(part => this.toQl(subOptions2, part)).join('') +
-        this.toQl(subOptions3, last)
-    }
-
-    if (!options.inputSet) {
-      options.inputSet = ''
-    }
-
-    if (!options.outputSet) {
-      options.outputSet = ''
-    }
-
-    const parts = def.filter(part => part.type)
-    let types
-
-    switch (parts.length) {
-      case 0:
-        types = ['nwr']
-        break
-      case 1:
-        types = [parts[0].type]
-        break
-      default:
-        throw new Error('Filter: only one type query allowed!')
-    }
-
-    const queries = filterJoin(def
-      .filter(part => !part.type)
-      .map(part => compile(part, options)))
-
-    let result
-    if (queries.length > 1) {
-      result = '(' + queries.map(q => types.map(type => type + options.inputSet + q).join(';')).join(';') + ';)'
-    } else if (types.length === 1) {
-      result = types[0] + options.inputSet + queries[0]
-    } else {
-      result = '(' + types.map(type => type + options.inputSet + queries[0]).join(';') + ';)'
-    }
-
-    return result + (options.outputSet ? '->' + options.outputSet : '') + ';'
+    return this.script.map(s => s.toQl(options)).join('')
   }
 
   /**
@@ -887,10 +808,66 @@ class Filter {
 
     return result.reduce((current, entry) => current | entry.properties, 0)
   }
-}
 
-function convertToFilterScript (def) {
-  console.log(def)
+  expandOr (def) {
+    def.forEach((part, index) => {
+      if (Array.isArray(part)) {
+        let or = []
+        let other = []
+
+        part.forEach(q => {
+          if (q.or) {
+            or.push(q)
+          } else {
+            other.push(q)
+          }
+        })
+
+        if (or.length) {
+          def = def.concat()
+          def[index] = { or: or.shift().or.concat() }
+
+          or.forEach(q => {
+            const current = def[index].or
+            def[index].or = []
+
+            q.or.forEach(q1 => {
+              current.forEach(orp => {
+                def[index].or.push(orp.concat(q1))
+              })
+            })
+          })
+
+          other.forEach(q => {
+            def[index].or.forEach((orp, i) => {
+              def[index].or[i] = def[index].or[i].concat([q])
+            })
+          })
+        }
+      }
+    })
+
+    return def
+  }
+
+  convertToFilterScript (def) {
+    if (!Array.isArray(def)) {
+      if (!def.or && !def.and) {
+        def = [[def]]
+      } else {
+        def = [def]
+      }
+    } else if (!Array.isArray(def[0])) {
+      def = [def]
+    }
+
+    def = this.expandOr(def)
+
+    this.sets = {}
+    let r = def.map(d => filterPart.get(d, this))
+
+    return r
+  }
 }
 
 module.exports = Filter

@@ -1,0 +1,63 @@
+const filterPart = require('./filterPart')
+
+class FilterAnd {
+  constructor (def, filter) {
+    this.outputSet = '_'
+    this.filter = filter
+    this.parts = []
+
+    let hasType = false
+    let hasOutputSet = false
+    def.and.forEach(part => {
+      if (part.outputSet) {
+        if (hasOutputSet) {
+          throw new Error('Filter: only one output set allowed!')
+        }
+
+        this.outputSet = part.outputSet
+        hasOutputSet = true
+      } else {
+        this.parts.push(filterPart.get(part, filter))
+      }
+    })
+
+    filter.sets[this.outputSet] = this
+  }
+
+  properties () {
+  }
+
+  toLokijs (options = {}) {
+  }
+
+  toQl (options = {}) {
+    const first = this.parts[0]
+    const last = this.parts[this.parts.length - 1]
+    const others = this.parts.concat().slice(1, this.parts.length - 1)
+    const set = '.x' + this.filter.uniqId()
+    const subOptions1 = JSON.parse(JSON.stringify(options))
+    const subOptions2 = JSON.parse(JSON.stringify(options))
+    const subOptions3 = JSON.parse(JSON.stringify(options))
+    subOptions1.outputSet = set
+    subOptions2.inputSet = set
+    subOptions2.outputSet = set
+    subOptions3.inputSet = set
+
+    let result = first.toQl(subOptions1) +
+      others.map(part => part.toQl(subOptions2)).join('') +
+      last.toQl(subOptions3) +
+      (options.outputSet ? '->' + options.outputSet : '')
+
+    if (this.outputSet !== '_') {
+      result = '(' + result + ')->.' + this.outputSet + ';'
+    }
+
+    return result
+  }
+
+  toString (options = {}) {
+    return this.toQl(options)
+  }
+}
+
+filterPart.register('and', FilterAnd)
