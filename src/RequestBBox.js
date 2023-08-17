@@ -75,7 +75,7 @@ class RequestBBox extends Request {
   preprocess () {
     let items = []
     if (this.lokiQuery) {
-      items = this.overpass.db.find(this.lokiQuery)
+      items = this.overpass.queryLokiDB(this.lokiQuery)
     }
 
     for (let i = 0; i < items.length; i++) {

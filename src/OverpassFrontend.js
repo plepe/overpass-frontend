@@ -792,6 +792,14 @@ class OverpassFrontend {
       .replace('^', '\\^')
       .replace('$', '\\$')
   }
+
+  queryLokiDB (query, db = null) {
+    if (!db) {
+      db = this.db
+    }
+
+    return db.find(query)
+  }
 }
 
 for (const k in defines) {
