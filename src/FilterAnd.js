@@ -99,6 +99,10 @@ class FilterAnd {
 
     return result
   }
+
+  match (ob) {
+    return this.parts.every(part => part.match(ob))
+  }
 }
 
 filterPart.register('and', FilterAnd)

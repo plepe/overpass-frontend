@@ -11,76 +11,6 @@ require('./FilterQuery')
 require('./FilterAnd')
 require('./FilterOr')
 
-function test (ob, part) {
-  if (Array.isArray(part)) {
-    return part.every(part => test(ob, part))
-  }
-
-  if (part.type) {
-    return ob.type === part.type
-  }
-
-  if (part.or) {
-    return part.or.some(part => test(ob, part))
-  }
-
-  if (part.and) {
-    return part.and.every(part => test(ob, part))
-  }
-
-  if (part.keyRegexp) {
-    let regex
-    if (part.value) {
-      regex = new RegExp(part.value, part.op.match(/i$/) ? 'i' : '')
-    }
-
-    const keyRegex = new RegExp(part.key, part.keyRegexp === 'i' ? 'i' : '')
-
-    for (const k in ob.tags) {
-      if (k.match(keyRegex)) {
-        if (regex) {
-          if (ob.tags[k].match(regex)) {
-            return true
-          }
-        } else {
-          return true
-        }
-      }
-    }
-    return false
-  }
-
-  if (part instanceof qlFunction) {
-    return part.test(ob)
-  }
-
-  switch (part.op) {
-    case 'has_key':
-      return ob.tags && (part.key in ob.tags)
-    case 'not_exists':
-      return ob.tags && (!(part.key in ob.tags))
-    case '=':
-      return ob.tags && (part.key in ob.tags) && (ob.tags[part.key] === part.value)
-    case '!=':
-      return ob.tags && (!(part.key in ob.tags) || (ob.tags[part.key] !== part.value))
-    case '~':
-      return ob.tags && (part.key in ob.tags) && (ob.tags[part.key].match(part.value))
-    case '!~':
-      return ob.tags && (!(part.key in ob.tags) || (!ob.tags[part.key].match(part.value)))
-    case '~i':
-      return ob.tags && (part.key in ob.tags) && (ob.tags[part.key].match(new RegExp(part.value, 'i')))
-    case '!~i':
-      return ob.tags && (!(part.key in ob.tags) || !ob.tags[part.key].match(new RegExp(part.value, 'i')))
-    case 'has':
-      return ob.tags && (part.key in ob.tags) && (ob.tags[part.key].split(/;/).indexOf(part.value) !== -1)
-    case 'strsearch':
-      return ob.tags && (part.key in ob.tags) && (ob.tags[part.key].match(new RegExp(strsearch2regexp(part.value), 'i')))
-    default:
-      console.log('match: unknown operator in filter', part)
-      return false
-  }
-}
-
 function parse (def, rek = 0) {
   const script = []
   let current = []
@@ -365,26 +295,8 @@ class Filter {
    * @param {OverpassNode|OverpassWay|OverpassRelation} ob an object from Overpass API
    * @return {boolean}
    */
-  match (ob, def) {
-    if (!def) {
-      def = this.def
-    }
-
-    if (Array.isArray(def) && Array.isArray(def[0])) {
-      // script with several statements detected. only use the last one, as previous statements
-      // can't have an effect on the last statement yet.
-      def = def[def.length - 1]
-    }
-
-    if (def.or) {
-      return def.or.some(part => this.match(ob, part))
-    }
-
-    if (def.and) {
-      return def.and.every(test.bind(this, ob))
-    }
-
-    return def.filter(test.bind(this, ob)).length === def.length
+  match (ob) {
+    return this.script[this.script.length - 1].match(ob)
   }
 
   /**

@@ -75,6 +75,10 @@ class FilterOr {
       .map(part => part._caches())
       .flat()
   }
+
+  match (ob) {
+    return this.parts.some(part => part.match(ob))
+  }
 }
 
 filterPart.register('or', FilterOr)
