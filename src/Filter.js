@@ -1,4 +1,3 @@
-const turf = require('./turf')
 const strsearch2regexp = require('strsearch2regexp')
 const filterJoin = require('./filterJoin')
 const OverpassFrontend = require('./defines')
@@ -412,25 +411,12 @@ class Filter {
    * @param {object} [options] Additional options
    * @return {object}
    */
-  toLokijs (options = {}, def) {
+  toLokijs (options = {}) {
     return this.script[this.script.length - 1].toLokijs(options)
-    if (!def) {
-      def = this.def
-    }
   }
 
   cacheDescriptors () {
-    let result
-    const sets = {}
-
-    if (Array.isArray(this.def) && Array.isArray(this.def[0])) {
-      // script with several statements detected. only compile the last one, as previous statements
-      // can't have an effect on the last statement yet.
-      const script = this.def.map(d => this._caches(d, sets))
-      result = script[script.length - 1]
-    } else {
-      result = this._caches(this.def, sets)
-    }
+    const result = this._caches()
 
     result.forEach(entry => {
       entry.id = (entry.type || 'nwr') + entry.filters + '(properties:' + entry.properties + ')'
@@ -442,154 +428,8 @@ class Filter {
     return result
   }
 
-  _caches (def, sets) {
-    let options = [{ filters: '', properties: 0 }]
-
-    if (def.or) {
-      let result = []
-      def.or.forEach(e => {
-        if (e.outputSet) {
-          return
-        }
-
-        const r = this._caches(e, sets)
-        if (Array.isArray(r)) {
-          result = result.concat(r)
-        } else {
-          result.push(r)
-        }
-      })
-      return result
-    }
-
-    if (!Array.isArray(def)) {
-      def = [def]
-    }
-
-    const inputSets = []
-    let outputSet = '_'
-    def.forEach(part => {
-      if (Array.isArray(part)) {
-        options = this._caches(part, sets)
-      }
-      else if (part.inputSet) {
-        inputSets.push(part.inputSet)
-      } else if (part.outputSet) {
-        outputSet = part.outputSet
-      } else if (part.type) {
-        options = options.map(o => {
-          if (o.type && o.type !== part.type) {
-            o.type = '-'
-          } else {
-            o.type = part.type
-          }
-          return o
-        })
-      } else if (part.op) {
-        options = options.map(o => {
-          o.filters += compile(part)
-          o.properties |= OverpassFrontend.TAGS
-          return o
-        })
-      } else if (part instanceof qlFunction) {
-        part.cacheDescriptors(options)
-      } else if (part.or) {
-        const result = []
-        part.or.forEach(e => {
-          const r = this._caches(e, sets)
-
-          options.forEach(o => {
-            if (o.outputSet) {
-              return
-            }
-
-            r.forEach(r1 => {
-              result.push(this._cacheMerge(o, r1))
-            })
-          })
-        })
-
-        options = result
-      } else if (part.and) {
-        let result = options
-        part.and.forEach(e => {
-          const current = result
-          result = []
-          const r = this._caches(e, sets)
-          r.forEach(r1 => {
-            current.forEach(c => {
-              result.push(this._cacheMerge(c, r1))
-            })
-          })
-        })
-
-        options = result
-      } else {
-        throw new Error('caches(): invalid entry')
-      }
-    })
-
-    sets[outputSet] = options
-
-    if (inputSets.length) {
-      inputSets.reverse().forEach(set => {
-        if (set in sets) {
-          const result = []
-          sets[set].forEach(a => {
-            options.forEach(b => {
-              result.push(this._cacheMerge(a, b))
-            })
-          })
-          options = result
-        } else {
-          options = []
-        }
-      })
-    }
-
-    return options
-  }
-
-  _cacheMerge (a, b) {
-    const r = {}
-    for (const k in a) {
-      r[k] = a[k]
-    }
-    r.filters += b.filters
-    r.properties |= b.properties
-
-    if (b.type) {
-      if (a.type && a.type !== b.type) {
-        r.type = '-'
-      } else {
-        r.type = b.type
-      }
-    }
-
-    if (b.ids) {
-      r.ids = b.ids
-      if (a.ids) {
-        r.ids = b.ids.filter(n => a.ids.includes(n))
-      }
-    }
-
-    if (b.invalid) {
-      r.invalid = true
-    }
-
-    if (b.bounds && a.bounds) {
-      const mergeBounds = turf.intersect(a.bounds, b.bounds)
-      if (mergeBounds) {
-        r.bounds = mergeBounds.geometry
-      } else {
-        r.invalid = true
-        delete r.bounds
-      }
-    } else if (b.bounds) {
-      r.bounds = b.bounds
-    }
-
-    return r
+  _caches () {
+    return this.script[this.script.length - 1]._caches()
   }
 
   /**
@@ -658,7 +498,7 @@ class Filter {
       const script = this.def.map(d => this._caches(d, sets))
       result = script[script.length - 1]
     } else {
-      result = this._caches(this.def, sets)
+      result = this._caches()
     }
 
     return result.reduce((current, entry) => current | entry.properties, 0)

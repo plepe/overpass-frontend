@@ -70,6 +70,14 @@ class FilterOr {
   toString (options = {}) {
     return this.toQl(options)
   }
+
+  _caches () {
+    const result = []
+
+    return this.parts
+      .map(part => part._caches())
+      .flat()
+  }
 }
 
 filterPart.register('or', FilterOr)

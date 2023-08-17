@@ -1033,10 +1033,10 @@ describe('Filter', function () {
 
       var r = f.cacheDescriptors()
       assert.deepEqual(r, [
-        { id: 'nwr["name"~"49"]["route"="bus"]["operator"="ÖBB"](properties:1)' },
-        { id: 'nwr["ref"="49"]["route"="bus"]["operator"="ÖBB"](properties:1)' },
-        { id: 'nwr["name"~"49"]["route"="bus"]["operator"="WL"](properties:1)' },
-        { id: 'nwr["ref"="49"]["route"="bus"]["operator"="WL"](properties:1)' }
+        { id: 'nwr["name"~"49"]["operator"="ÖBB"]["route"="bus"](properties:1)' },
+        { id: 'nwr["ref"="49"]["operator"="ÖBB"]["route"="bus"](properties:1)' },
+        { id: 'nwr["name"~"49"]["operator"="WL"]["route"="bus"](properties:1)' },
+        { id: 'nwr["ref"="49"]["operator"="WL"]["route"="bus"](properties:1)' }
       ])
     })
   })

@@ -1,4 +1,5 @@
 const filterPart = require('./filterPart')
+const cacheMerge = require('./cacheMerge')
 
 class FilterAnd {
   constructor (def, filter) {
@@ -78,6 +79,28 @@ class FilterAnd {
 
   toString (options = {}) {
     return this.toQl(options)
+  }
+
+  _caches () {
+    let result = []
+
+    const list = this.parts.concat()
+    const first = list.shift()
+
+    let current = first._caches()
+    list.forEach(part => {
+      const r = part._caches()
+
+      r.forEach(r1 => {
+        current.forEach(c => {
+          result.push(cacheMerge(c, r1))
+        })
+      })
+
+      current = result
+    })
+
+    return result
   }
 }
 

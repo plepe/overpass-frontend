@@ -1,10 +1,14 @@
 const filterPart = require('./filterPart')
 const compileFilter = require('./compileFilter')
 const qlFunction = require('./qlFunctions/qlFunction')
+const OverpassFrontend = require('./defines')
+const cacheMerge = require('./cacheMerge')
 const strsearch2regexp = require('strsearch2regexp')
 
 class FilterQuery {
   constructor (def, filter) {
+    this.filters = []
+
     if (!Array.isArray(def)) {
       def = [def]
     }
@@ -172,6 +176,53 @@ class FilterQuery {
 
   toString (options = {}) {
     return this.toQl(options)
+  }
+
+  _caches () {
+    let options = [{ filters: '', properties: 0 }]
+
+    const inputSets = []
+    let outputSet = '_'
+
+    if (this.type !== 'nwr') {
+      options.forEach(o => {
+        o.type = this.type
+      })
+    }
+
+    this.filters.forEach(part => {
+      if (part.op) {
+        options = options.map(o => {
+          o.filters += compileFilter(part)
+          o.properties |= OverpassFrontend.TAGS
+          return o
+        })
+      } else if (part instanceof qlFunction) {
+        part.cacheDescriptors(options)
+      } else {
+        throw new Error('caches(): invalid entry')
+      }
+    })
+
+    if (this.inputSets) {
+      Object.values(this.inputSets).reverse().forEach(set => {
+        if (!set) {
+          options = []
+          return
+        }
+
+        const result = []
+        set._caches().forEach(a => {
+          options.forEach(b => {
+            result.push(cacheMerge(a, b))
+          })
+        })
+
+        options = result
+      })
+    }
+
+    return options
   }
 }
 
