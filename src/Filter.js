@@ -293,10 +293,16 @@ class Filter {
   /**
    * Check if an object matches this filter
    * @param {OverpassNode|OverpassWay|OverpassRelation} ob an object from Overpass API
+   * @param {object} [options] Options
+   * @param {string} [options.set=_] Which set should the object be matched against.
    * @return {boolean}
    */
-  match (ob) {
-    return this.script[this.script.length - 1].match(ob)
+  match (ob, options = {}) {
+    if ((options.set ?? '_') in this.sets) {
+      return this.sets[options.set ?? '_'].match(ob)
+    }
+
+    return false
   }
 
   /**
@@ -321,14 +327,25 @@ class Filter {
   /**
    * Convert query to LokiJS query for local database. If the property 'needMatch' is set on the returned object, an additional match() should be executed for each returned object, as the query can't be fully compiled (and the 'needMatch' property removed).
    * @param {object} [options] Additional options
+   * @param {string} [options.set=_] For which set should the query be compiled.
    * @return {object}
    */
   toLokijs (options = {}) {
-    return this.script[this.script.length - 1].toLokijs(options)
+    if ((options.set ?? '_') in this.sets) {
+      return this.sets[options.set ?? '_'].toLokijs(options)
+    }
+
+    return { $not: true }
   }
 
-  cacheDescriptors () {
-    const result = this._caches()
+  /**
+   * Get the cache descriptors for this query
+   * @param {object} [options] Options
+   * @param {string} [options.set=_] Which set should the object be matched against.
+   * @return [string]
+   */
+  cacheDescriptors (options = {}) {
+    const result = this._caches(options)
 
     result.forEach(entry => {
       entry.id = (entry.type || 'nwr') + entry.filters + '(properties:' + entry.properties + ')'
@@ -340,8 +357,12 @@ class Filter {
     return result
   }
 
-  _caches () {
-    return this.script[this.script.length - 1]._caches()
+  _caches (options) {
+    if ((options.set ?? '_') in this.sets) {
+      return this.sets[options.set ?? '_']._caches(options)
+    }
+
+    return []
   }
 
   /**
@@ -398,10 +419,12 @@ class Filter {
   }
 
   /**
+   * @param {object} [options] Options
+   * @param {string} [options.set=_] Which set should the object be matched against.
    * @returns {number} properties which are required for this filter
    */
-  properties () {
-    const result = this._caches()
+  properties (options = {}) {
+    const result = this._caches(options)
 
     return result.reduce((current, entry) => current | entry.properties, 0)
   }
