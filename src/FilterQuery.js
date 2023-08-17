@@ -1,5 +1,7 @@
 const filterPart = require('./filterPart')
 const compileFilter = require('./compileFilter')
+const qlFunction = require('./qlFunctions/qlFunction')
+const strsearch2regexp = require('strsearch2regexp')
 
 class FilterQuery {
   constructor (def, filter) {
@@ -53,6 +55,82 @@ class FilterQuery {
   }
 
   toLokijs (options = {}) {
+    const query = {}
+    let orQueries = []
+
+    if (this.type !== 'nwr') {
+      query.type = { $eq: this.type }
+    }
+
+    this.filters.forEach(filter => {
+      let k, v
+      if (filter.keyRegexp) {
+        k = 'needMatch'
+        v = true
+        // can't query for key regexp, skip
+      } else if (filter instanceof qlFunction) {
+        const d = filter.compileLokiJS()
+        if (d.needMatch) {
+          query.needMatch = true
+        }
+        delete d.needMatch
+        if (Object.keys(d).length) {
+          if (query.$and) {
+            query.$and.push(d)
+          } else {
+            query.$and = [d]
+          }
+        }
+      } else if (filter.op === '=') {
+        k = 'tags.' + filter.key
+        v = { $eq: filter.value }
+      } else if (filter.op === '!=') {
+        k = 'tags.' + filter.key
+        v = { $ne: filter.value }
+      } else if (filter.op === 'has_key') {
+        k = 'tags.' + filter.key
+        v = { $exists: true }
+      } else if (filter.op === 'not_exists') {
+        k = 'tags.' + filter.key
+        v = { $exists: false }
+      } else if (filter.op === 'has') {
+        k = 'tags.' + filter.key
+        v = { $regex: '^(.*;|)' + filter.value + '(|;.*)$' }
+      } else if ((filter.op === '~') || (filter.op === '~i')) {
+        k = 'tags.' + filter.key
+        v = { $regex: new RegExp(filter.value, (filter.op === '~i' ? 'i' : '')) }
+      } else if ((filter.op === '!~') || (filter.op === '!~i')) {
+        k = 'tags.' + filter.key
+        v = { $not: { $regex: new RegExp(filter.value, (filter.op === '!~i' ? 'i' : '')) } }
+      } else if (filter.op === 'strsearch') {
+        k = 'tags.' + filter.key
+        v = { $regex: new RegExp(strsearch2regexp(filter.value), 'i') }
+      } else {
+        console.log('unknown filter', filter)
+      }
+
+      if (k && v) {
+        if (k === 'needMatch') {
+          query.needMatch = true
+        } else if (k in query) {
+          if (!('$and' in query[k])) {
+            query[k] = { $and: [query[k]] }
+          }
+          query[k].$and.push(v)
+        } else {
+          query[k] = v
+        }
+      }
+    })
+
+    orQueries = orQueries.filter(q => Object.keys(q).length)
+    if (orQueries.length === 1) {
+      query.$or = orQueries[0]
+    } else if (orQueries.length > 1) {
+      query.$and = orQueries.map(q => { return { $or: q } })
+    }
+
+    return query
   }
 
   toQl (options = {}) {

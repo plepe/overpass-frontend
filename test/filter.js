@@ -1006,7 +1006,7 @@ describe('Filter', function () {
 
       assert.equal(f.toString(), '(nwr["name"~"49"]["route"="bus"];nwr["ref"="49"]["route"="bus"];);')
       assert.equal(f.toQl(), '(nwr["name"~"49"]["route"="bus"];nwr["ref"="49"]["route"="bus"];);')
-      assert.deepEqual(f.toLokijs(), {"tags.route":{"$eq":"bus"},"$or":[{"tags.name":{"$regex":/49/}},{"tags.ref":{"$eq":"49"}}]})
+      assert.deepEqual(f.toLokijs(), {"$or":[{"tags.route":{"$eq":"bus"},"tags.name":{"$regex":/49/}},{"tags.route":{"$eq":"bus"},"tags.ref":{"$eq":"49"}}]})
 
       var r = f.cacheDescriptors()
       assert.deepEqual(r, [
@@ -1024,7 +1024,12 @@ describe('Filter', function () {
 
       assert.equal(f.toString(), '(nwr["name"~"49"]["operator"="ÖBB"]["route"="bus"];nwr["ref"="49"]["operator"="ÖBB"]["route"="bus"];nwr["name"~"49"]["operator"="WL"]["route"="bus"];nwr["ref"="49"]["operator"="WL"]["route"="bus"];);')
       assert.equal(f.toQl(), '(nwr["name"~"49"]["operator"="ÖBB"]["route"="bus"];nwr["ref"="49"]["operator"="ÖBB"]["route"="bus"];nwr["name"~"49"]["operator"="WL"]["route"="bus"];nwr["ref"="49"]["operator"="WL"]["route"="bus"];);')
-      assert.deepEqual(f.toLokijs(), {"tags.route":{"$eq":"bus"},"$and":[{"$or":[{"tags.name":{"$regex":/49/}},{"tags.ref":{"$eq":"49"}}]},{"$or":[{"tags.operator":{"$eq":"ÖBB"}},{"tags.operator":{"$eq":"WL"}}]}]})
+      assert.deepEqual(f.toLokijs(), {"$or":[
+        {"tags.operator":{"$eq":"ÖBB"},"tags.route":{"$eq":"bus"},"tags.name":{"$regex":/49/}},
+        {"tags.operator":{"$eq":"ÖBB"},"tags.route":{"$eq":"bus"},"tags.ref":{"$eq":"49"}},
+        {"tags.operator":{"$eq":"WL"},"tags.route":{"$eq":"bus"},"tags.name":{"$regex":/49/}},
+        {"tags.operator":{"$eq":"WL"},"tags.route":{"$eq":"bus"},"tags.ref":{"$eq":"49"}},
+      ]})
 
       var r = f.cacheDescriptors()
       assert.deepEqual(r, [
@@ -1513,9 +1518,9 @@ describe('Filter by id', function () {
     assert.equal(f.toString(), '(nwr(id:3,4,5)["amenity"];nwr(id:3,4)["amenity"];);')
     assert.equal(f.toQl(), '(nwr(id:3,4,5)["amenity"];nwr(id:3,4)["amenity"];);')
     assert.deepEqual(f.toLokijs(), { $or: [
-      {$and: [{ "osm_id": { "$in": [ 3, 4, 5 ] } }]},
-      {$and: [{ "osm_id": { "$in": [ 3, 4 ] } }]}
-    ], "tags.amenity": { $exists: true }})
+      {$and: [{ "osm_id": { "$in": [ 3, 4, 5 ] }}],"tags.amenity": { $exists: true }},
+      {$and: [{ "osm_id": { "$in": [ 3, 4 ] }}],"tags.amenity": { $exists: true }}
+    ]})
 
     check(f, [ 3, 4, 5 ])
 
@@ -1555,8 +1560,12 @@ describe('Filter by id', function () {
     assert.equal(f.toQl(), '(nwr(id:1,2,4,5)(id:1,3,5););')
     assert.deepEqual(f.toLokijs(),
       {
-        $and: [ {"osm_id": { $in: [ 1, 3, 5 ] }} ],
-        $or: [{ $and: [{"osm_id": { "$in": [ 1, 2, 4, 5 ] } }]}],
+        $or: [{
+          $and: [
+            {"osm_id": { "$in": [ 1, 2, 4, 5 ] } },
+            {"osm_id": { $in: [ 1, 3, 5 ] }}
+          ]
+        }],
       })
 
     check(f, [ 1, 5 ])

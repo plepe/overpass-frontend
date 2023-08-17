@@ -27,6 +27,30 @@ class FilterOr {
   }
 
   toLokijs (options = {}) {
+    let needMatch = false
+
+    const r = {
+      $or:
+      this.parts.map(part => {
+        const r = part.toLokijs(options)
+        if (r.needMatch) {
+          needMatch = true
+        }
+        delete r.needMatch
+        return r
+      })
+    }
+
+    // if the $or has elements that are always true, remove whole $or
+    if (r.$or.filter(p => Object.keys(p).length === 0).length > 0) {
+      delete r.$or
+    }
+
+    if (needMatch) {
+      r.needMatch = true
+    }
+
+    return r
   }
 
   toQl (options = {}) {

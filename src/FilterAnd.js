@@ -28,6 +28,27 @@ class FilterAnd {
   }
 
   toLokijs (options = {}) {
+    let needMatch = false
+
+    const r = {
+      $and:
+      this.parts
+        .map(part => {
+          const r = part.toLokijs(options)
+          if (r.needMatch) {
+            needMatch = true
+          }
+          delete r.needMatch
+          return r
+        })
+        .filter(part => Object.keys(part).length)
+    }
+
+    if (needMatch) {
+      r.needMatch = true
+    }
+
+    return r
   }
 
   toQl (options = {}) {
