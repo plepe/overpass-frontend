@@ -489,17 +489,7 @@ class Filter {
    * @returns {number} properties which are required for this filter
    */
   properties () {
-    let result
-
-    const sets = {}
-    if (Array.isArray(this.def) && Array.isArray(this.def[0])) {
-      // script with several statements detected. only compile the last one, as previous statements
-      // can't have an effect on the last statement yet.
-      const script = this.def.map(d => this._caches(d, sets))
-      result = script[script.length - 1]
-    } else {
-      result = this._caches()
-    }
+    const result = this._caches()
 
     return result.reduce((current, entry) => current | entry.properties, 0)
   }

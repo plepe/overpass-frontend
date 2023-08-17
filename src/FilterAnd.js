@@ -25,9 +25,6 @@ class FilterAnd {
     filter.sets[this.outputSet] = this
   }
 
-  properties () {
-  }
-
   toLokijs (options = {}) {
     let needMatch = false
 

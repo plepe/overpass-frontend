@@ -7,8 +7,6 @@ const strsearch2regexp = require('strsearch2regexp')
 
 class FilterQuery {
   constructor (def, filter) {
-    this.filters = []
-
     if (!Array.isArray(def)) {
       def = [def]
     }
@@ -53,9 +51,6 @@ class FilterQuery {
     }
 
     filter.sets[this.outputSet] = this
-  }
-
-  properties () {
   }
 
   toLokijs (options = {}) {
