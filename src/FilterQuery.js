@@ -55,7 +55,7 @@ class FilterQuery {
   }
 
   toLokijs (options = {}) {
-    const query = {}
+    let query = {}
     let orQueries = []
 
     if (this.type !== 'nwr') {
@@ -128,6 +128,14 @@ class FilterQuery {
       query.$or = orQueries[0]
     } else if (orQueries.length > 1) {
       query.$and = orQueries.map(q => { return { $or: q } })
+    }
+
+    if (this.inputSets) {
+      query = {
+        $and: Object.values(this.inputSets)
+          .map(inputSet => inputSet ? inputSet.toLokijs() : {$not: true})
+          .concat(query)
+      }
     }
 
     return query

@@ -18,6 +18,9 @@ describe("Filter sets, compile", function () {
     ])
     assert.equal(f.toString(), 'nwr["amenity"];')
     assert.equal(f.toQl(), 'nwr["amenity"];')
+    assert.deepEqual(f.toLokijs(), {
+      "tags.amenity": { $exists: true }
+    })
     var r = f.cacheDescriptors()
     assert.deepEqual(r, [ { id: 'nwr["amenity"](properties:1)' }])
   })
@@ -32,6 +35,9 @@ describe("Filter sets, compile", function () {
     )
     assert.equal(f.toString(), 'nwr["amenity"]->.a;')
     assert.equal(f.toQl(), 'nwr["amenity"]->.a;')
+    assert.deepEqual(f.toLokijs(), {
+      "tags.amenity": { $exists: true }
+    })
     var r = f.cacheDescriptors()
     assert.deepEqual(r, [ { id: 'nwr["amenity"](properties:1)' }])
   })
@@ -46,6 +52,11 @@ describe("Filter sets, compile", function () {
     })
     assert.equal(f.toString(), '((nwr["amenity"];);)->.a;')
     assert.equal(f.toQl(), '((nwr["amenity"];);)->.a;')
+    assert.deepEqual(f.toLokijs(), {
+      $or: [{
+        "tags.amenity": { $exists: true }
+      }]
+    })
     var r = f.cacheDescriptors()
     assert.deepEqual(r, [ { id: 'nwr["amenity"](properties:1)' } ])
   })
@@ -61,8 +72,37 @@ describe("Filter sets, compile", function () {
     })
     assert.equal(f.toString(), '(nwr["amenity"]->.a;);')
     assert.equal(f.toQl(), '(nwr["amenity"]->.a;);')
+    assert.deepEqual(f.toLokijs(), {
+      $or: [{
+        "tags.amenity": { $exists: true }
+      }]
+    })
     var r = f.cacheDescriptors()
     assert.deepEqual(r, [ { id: 'nwr["amenity"](properties:1)' } ])
+  })
+  it ('nwr[amenity]->.a;nwr.a[cuisine];', function () {
+    var f = new Filter('nwr[amenity]->.a;nwr.a[cuisine];')
+
+    assert.deepEqual(f.def, [
+      [
+        {"op":"has_key","key":"amenity"},
+        {"outputSet":"a"}
+      ],
+      [
+        {"inputSet":"a"},
+        {"op":"has_key","key":"cuisine"}
+      ]
+    ])
+    assert.equal(f.toString(), 'nwr["amenity"]->.a;nwr.a["cuisine"];')
+    assert.equal(f.toQl(), 'nwr["amenity"]->.a;nwr.a["cuisine"];')
+    assert.deepEqual(f.toLokijs(), {
+      $and: [
+        {"tags.amenity": {$exists: true}},
+        {"tags.cuisine": {$exists: true}}
+      ]
+    })
+    var r = f.cacheDescriptors()
+    assert.deepEqual(r, [ { id: 'nwr["amenity"]["cuisine"](properties:1)' }])
   })
   it ('(nwr[a]->a;(nwr[b]->b;nwr.a[b]);)->.a;', function () {
     var f = new Filter('(nwr[a]->.a;(nwr[b]->.b;nwr.a[b];);)->.a;')
@@ -79,6 +119,18 @@ describe("Filter sets, compile", function () {
     })
     assert.equal(f.toString(), '((nwr["a"]->.a;(nwr["b"]->.b;nwr.a["b"];););)->.a;')
     assert.equal(f.toQl(), '((nwr["a"]->.a;(nwr["b"]->.b;nwr.a["b"];););)->.a;')
+    assert.deepEqual(f.toLokijs(), {
+      $or: [
+        { 'tags.a': { '$exists': true } },
+        { '$or': [
+            { 'tags.b': { '$exists': true } },
+            { '$and': [
+                { 'tags.a': { '$exists': true } },
+                { 'tags.b': { '$exists': true } }
+            ]}
+          ]}
+        ]
+    })
     var r = f.cacheDescriptors()
     assert.deepEqual(r, [
       { id: 'nwr["a"](properties:1)' },
@@ -97,6 +149,12 @@ describe("Filter sets, compile", function () {
     )
     assert.equal(f.toString(), 'nwr.a["amenity"];')
     assert.equal(f.toQl(), 'nwr.a["amenity"];')
+    assert.deepEqual(f.toLokijs(), {
+      $and: [
+        {$not: true},
+        {'tags.amenity': {$exists: true}}
+      ]
+    })
     var r = f.cacheDescriptors()
     assert.deepEqual(r, [])
   })
@@ -112,26 +170,15 @@ describe("Filter sets, compile", function () {
     )
     assert.equal(f.toString(), 'nwr.a.b["amenity"];')
     assert.equal(f.toQl(), 'nwr.a.b["amenity"];')
+    assert.deepEqual(f.toLokijs(), {
+      $and: [
+        {$not: true},
+        {$not: true},
+        {'tags.amenity': {$exists: true}}
+      ]
+    })
     var r = f.cacheDescriptors()
     assert.deepEqual(r, [])
-  })
-  it ('nwr[amenity]->.a;nwr.a[cuisine];', function () {
-    var f = new Filter('nwr[amenity]->.a;nwr.a[cuisine];')
-
-    assert.deepEqual(f.def, [
-      [
-        {"op":"has_key","key":"amenity"},
-        {"outputSet":"a"}
-      ],
-      [
-        {"inputSet":"a"},
-        {"op":"has_key","key":"cuisine"}
-      ]
-    ])
-    assert.equal(f.toString(), 'nwr["amenity"]->.a;nwr.a["cuisine"];')
-    assert.equal(f.toQl(), 'nwr["amenity"]->.a;nwr.a["cuisine"];')
-    var r = f.cacheDescriptors()
-    assert.deepEqual(r, [ { id: 'nwr["amenity"]["cuisine"](properties:1)' }])
   })
   it ('nwr[amenity]->.a;nwr[xxx]->.b;nwr.a.b[cuisine];', function () {
     var f = new Filter('nwr[amenity]->.a;nwr[xxx]->.b;nwr.a.b[cuisine];')
@@ -153,6 +200,13 @@ describe("Filter sets, compile", function () {
     ])
     assert.equal(f.toString(), 'nwr["amenity"]->.a;nwr["xxx"]->.b;nwr.a.b["cuisine"];')
     assert.equal(f.toQl(), 'nwr["amenity"]->.a;nwr["xxx"]->.b;nwr.a.b["cuisine"];')
+    assert.deepEqual(f.toLokijs(), {
+      $and: [
+        {'tags.amenity': {$exists: true}},
+        {'tags.xxx': {$exists: true}},
+        {'tags.cuisine': {$exists: true}}
+      ]
+    })
     var r = f.cacheDescriptors()
     assert.deepEqual(r, [ { id: 'nwr["amenity"]["xxx"]["cuisine"](properties:1)' }])
   })
