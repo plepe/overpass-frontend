@@ -10,6 +10,7 @@ const filterPart = require('./filterPart')
 require('./FilterQuery')
 require('./FilterAnd')
 require('./FilterOr')
+require('./FilterRecurse')
 
 function parse (def, rek = 0) {
   const script = []
@@ -31,6 +32,7 @@ function parse (def, rek = 0) {
 
       keyRegexp = false
       m = def.match(/^\s*(node|way|relation|rel|nwr|\()/)
+      let m1 = def.match(/^\s*(?:\.([A-Za-z_][A-Za-z0-9_]*))?\s*(>)\s*(?:->\s*.([A-Za-z_][A-Za-z0-9_]*))?/)
       if (m && m[1] === '(') {
         def = def.slice(m[0].length)
 
@@ -50,6 +52,17 @@ function parse (def, rek = 0) {
         }
         mode = 9
         def = def.slice(m[0].length)
+      } else if (m1) {
+        def = def.slice(m1[0].length)
+        current = { recurse: m1[2] }
+        if (m1[1]) {
+          current.inputSet = m1[1]
+        }
+        if (m1[3]) {
+          current.outputSet = m1[3]
+        }
+        script.push(current)
+        current = []
       } else {
         throw new Error("Can't parse query, expected type of object (e.g. 'node'): " + def)
       }
