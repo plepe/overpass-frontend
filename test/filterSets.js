@@ -125,11 +125,11 @@ describe("Filter sets, compile", function () {
     assert.equal(f.toString(), '(nwr["amenity"](1,1,2,2)->.a;);node._["cuisine"];')
     assert.equal(f.toQl(), '(nwr["amenity"](1,1,2,2)->.a;);node._["cuisine"];')
     assert.deepEqual(f.toLokijs(), {
+      needMatch: true,
       $and: [{
         $or: [{
           "tags.amenity": { $exists: true },
-          }],
-          needMatch: true
+          }]
         },
         {
           "tags.cuisine": { $exists: true },
@@ -138,7 +138,7 @@ describe("Filter sets, compile", function () {
       ]
     })
     var r = f.cacheDescriptors()
-    assert.deepEqual(r, [ { id: 'node["amenity"](properties:17)', bounds: { type: 'Polygon', coordinates: [[[1,1],[2,1],[2,2],[1,2],[1,1]]] } } ])
+    assert.deepEqual(r, [ { id: 'node["amenity"]["cuisine"](properties:17)', bounds: { type: 'Polygon', coordinates: [[[1,1],[2,1],[2,2],[1,2],[1,1]]] } } ])
   })
   it ('nwr[amenity]->.a;nwr.a[cuisine];', function () {
     var f = new Filter('nwr[amenity]->.a;nwr.a[cuisine];')
