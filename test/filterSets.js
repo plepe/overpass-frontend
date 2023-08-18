@@ -396,14 +396,13 @@ describe("Filter sets with relations, apply base filter", function () {
       "query": {
         $or: [
           { $and: [
-            { needMatch: true },
             { "tags.a": {$exists: true} }
           ]},
           { $and: [
-            { needMatch: true },
             { "tags.b": {$exists: true} }
           ]}
-        ]
+        ],
+        needMatch: true,
       },
       "recurse": ">"
     })

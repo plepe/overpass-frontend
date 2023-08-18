@@ -1727,6 +1727,19 @@ describe('Function "around"', function () {
 })
 
 describe('Function "bbox"', function () {
+  it('nwr', function () {
+    var f = new Filter('nwr(10.2,40.0,11,45)')
+
+    assert.deepEqual(f.def, [[{"fun":"bbox","value":{"minlon":40,"minlat":10.2,"maxlon":45,"maxlat":11}}]])
+    assert.equal(f.toString(), 'nwr(10.2,40,11,45);')
+    assert.equal(f.toQl(), 'nwr(10.2,40,11,45);')
+    assert.deepEqual(f.toLokijs(), { needMatch: true })
+
+    check(f, [])
+
+    var r = f.cacheDescriptors()
+    assert.deepEqual(r, [ { id:"nwr(properties:16)",bounds:{"type":"Polygon","coordinates":[[[40,10.2],[45,10.2],[45,11],[40,11],[40,10.2]]]} }])
+  })
   it('simple', function () {
     var f = new Filter('node(10.2,40.0,11,45)')
 

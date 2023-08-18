@@ -133,10 +133,25 @@ class FilterQuery {
 
     const inputSets = this.inputSets ?? (this.filter.baseFilter ? {_base: this.filter.baseFilter} : null)
     if (inputSets) {
+      let needMatch = query.needMatch
+      delete query.needMatch
+
       query = {
         $and: Object.values(inputSets)
-          .map(inputSet => inputSet ? inputSet.toLokijs() : {$not: true})
+          .map(inputSet => {
+            const r = inputSet ? inputSet.toLokijs() : {$not: true}
+            if (r.needMatch) {
+              needMatch = true
+              delete r.needMatch
+            }
+            return r
+          })
+          .filter(v => Object.values(v).length)
           .concat(query)
+      }
+
+      if (needMatch) {
+        query.needMatch = true
       }
     }
 
