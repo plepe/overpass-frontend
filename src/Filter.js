@@ -303,6 +303,7 @@ class Filter {
       return
     }
 
+    this.baseFilter = null
     this.def = check(def)
 
     if (typeof def === 'string') {
@@ -321,6 +322,14 @@ class Filter {
 
       this.script = this.convertToFilterScript(def)
     }
+  }
+
+  /**
+   * set a filter which is applied to all queries which do not have a specified input set.
+   * @param {string|Filter} filter a filter, e.g. 'nwr[x=y](1,1,2,2)'
+   */
+  setBaseFilter (filter) {
+    this.baseFilter = new Filter(filter)
   }
 
   /**
@@ -354,7 +363,13 @@ class Filter {
    * @return {string}
    */
   toQl (options = {}, def) {
-    return this.script.map(s => s.toQl(options)).join('')
+    let result = ''
+
+    if (this.baseFilter) {
+      result += this.baseFilter.toQl({ outputSet: '._base' })
+    }
+
+    return result + this.script.map(s => s.toQl(options)).join('')
   }
 
   /**
@@ -390,7 +405,7 @@ class Filter {
     return result
   }
 
-  _caches (options) {
+  _caches (options = {}) {
     if ((options.set ?? '_') in this.sets) {
       return this.sets[options.set ?? '_']._caches(options)
     }

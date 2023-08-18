@@ -7,6 +7,8 @@ const strsearch2regexp = require('strsearch2regexp')
 
 class FilterQuery {
   constructor (def, filter) {
+    this.filter = filter
+
     if (!Array.isArray(def)) {
       def = [def]
     }
@@ -135,6 +137,13 @@ class FilterQuery {
           .map(inputSet => inputSet ? inputSet.toLokijs() : {$not: true})
           .concat(query)
       }
+    } else if (this.filter.baseFilter) {
+      query = {
+        $and: [
+          this.filter.baseFilter.toLokijs(),
+          query
+        ]
+      }
     }
 
     return query
@@ -147,6 +156,8 @@ class FilterQuery {
 
     if (this.inputSets) {
       result += Object.keys(this.inputSets).map(s => '.' + s).join('')
+    } else if (this.filter.baseFilter) {
+      result += '._base'
     }
     if (options.inputSet) {
       result += options.inputSet
@@ -215,6 +226,15 @@ class FilterQuery {
 
         options = result
       })
+    } else if (this.filter.baseFilter) {
+      const result = []
+      this.filter.baseFilter._caches().forEach(a => {
+        options.forEach(b => {
+          result.push(cacheMerge(a, b))
+        })
+      })
+
+      options = result
     }
 
     return options

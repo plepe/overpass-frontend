@@ -319,6 +319,45 @@ describe("Filter sets with relations, compile", function () {
   })
 })
 
+describe("Filter sets with relations, apply base filter", function () {
+  it ('(nwr[a];nwr[b];);>; - additional filter: nwr(46,16,47,17)', function () {
+    var f = new Filter('(nwr[a];nwr[b];);>;')
+    f.setBaseFilter('nwr(46,16,47,17)')
+
+    assert.deepEqual(f.def, [
+      {
+        or: [
+          [ {"op":"has_key","key":"a"} ],
+          [ {"op":"has_key","key":"b"} ],
+        ]
+      },
+      {"recurse":">"}
+    ])
+    assert.equal(f.toString(), 'nwr(46,16,47,17)->._base;(nwr._base["a"];nwr._base["b"];);>;')
+    assert.equal(f.toQl(), 'nwr(46,16,47,17)->._base;(nwr._base["a"];nwr._base["b"];);>;')
+    assert.deepEqual(f.toLokijs(), {
+      "query": {
+        $or: [
+          { $and: [
+            { needMatch: true },
+            { "tags.a": {$exists: true} }
+          ]},
+          { $and: [
+            { needMatch: true },
+            { "tags.b": {$exists: true} }
+          ]}
+        ]
+      },
+      "recurse": ">"
+    })
+    var r = f.cacheDescriptors()
+    assert.deepEqual(r, [
+      { id: 'nwr["a"];>;(properties:21)', bounds: { type: 'Polygon', coordinates: [[[16,46],[17,46],[17,47],[16,47],[16,46]]] } },
+      { id: 'nwr["b"];>;(properties:21)', bounds: { type: 'Polygon', coordinates: [[[16,46],[17,46],[17,47],[16,47],[16,46]]] } }
+    ])
+  })
+})
+
 ;['via-server', 'via-file'].forEach(mode => {
   describe('Test filter sets ' + mode, function () {
     describe('initalize', function () {
