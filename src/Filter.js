@@ -304,7 +304,23 @@ class Filter {
     }
 
     this.def = check(def)
-    this.script = this.convertToFilterScript(this.def)
+
+    if (typeof def === 'string') {
+      this.script = this.convertToFilterScript(this.def)
+    } else {
+      def = this.def
+      if (!Array.isArray(def)) {
+        if (!def.or && !def.and) {
+          def = [[def]]
+        } else {
+          def = [def]
+        }
+      }
+
+      def = this.expandOr(def)
+
+      this.script = this.convertToFilterScript(def)
+    }
   }
 
   /**
@@ -489,16 +505,6 @@ class Filter {
   }
 
   convertToFilterScript (def) {
-    if (!Array.isArray(def)) {
-      if (!def.or && !def.and) {
-        def = [[def]]
-      } else {
-        def = [def]
-      }
-    }
-
-    def = this.expandOr(def)
-
     this.sets = {}
     let r = def.map(d => filterPart.get(d, this))
 
