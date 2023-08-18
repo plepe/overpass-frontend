@@ -32,7 +32,7 @@ function parse (def, rek = 0) {
 
       keyRegexp = false
       m = def.match(/^\s*(node|way|relation|rel|nwr|\()/)
-      let m1 = def.match(/^\s*(?:\.([A-Za-z_][A-Za-z0-9_]*))?\s*(>)\s*(?:->\s*.([A-Za-z_][A-Za-z0-9_]*))?/)
+      let m1 = def.match(/^\s*(?:\.([A-Za-z_][A-Za-z0-9_]*))?\s*(>)\s*(?:->\s*.([A-Za-z_][A-Za-z0-9_]*))?;?/)
       if (m && m[1] === '(') {
         def = def.slice(m[0].length)
 

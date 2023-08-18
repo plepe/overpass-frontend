@@ -270,6 +270,26 @@ describe("Filter sets with relations, compile", function () {
     //var r = f.cacheDescriptors()
     //assert.deepEqual(r, [ { id: 'nwr["amenity"](properties:5)' }])
   })
+  it ('nwr[amenity];>;', function () {
+    var f = new Filter('nwr[amenity];>;')
+
+    assert.deepEqual(f.def, [
+      [
+        {"op":"has_key","key":"amenity"}
+      ],
+      {"recurse":">"}
+    ])
+    assert.equal(f.toString(), 'nwr["amenity"];>;')
+    assert.equal(f.toQl(), 'nwr["amenity"];>;')
+    assert.deepEqual(f.toLokijs(), {
+      recurse: '>',
+      query: {
+        "tags.amenity": { $exists: true }
+      }
+    })
+    //var r = f.cacheDescriptors()
+    //assert.deepEqual(r, [ { id: 'nwr["amenity"](properties:5)' }])
+  })
   it ('nwr[amenity]->.a;.a > ->.b', function () {
     var f = new Filter('nwr[amenity]->.a;.a > ->.b')
 
