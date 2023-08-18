@@ -83,6 +83,63 @@ describe("Filter sets, compile", function () {
     var r = f.cacheDescriptors()
     assert.deepEqual(r, [ { id: 'nwr["amenity"](properties:1)' } ])
   })
+  it ('(nwr[amenity](1,1,2,2)->.a;);', function () {
+    var f = new Filter('(nwr[amenity](1,1,2,2)->.a;);')
+
+    assert.deepEqual(f.def, [{
+      or: [
+        [ {"op":"has_key","key":"amenity"},
+          {"fun":"bbox","value":{minlat:1,minlon:1,maxlat:2,maxlon:2}},
+          {"outputSet":"a"}
+        ]
+      ]
+    }])
+    assert.equal(f.toString(), '(nwr["amenity"](1,1,2,2)->.a;);')
+    assert.equal(f.toQl(), '(nwr["amenity"](1,1,2,2)->.a;);')
+    assert.deepEqual(f.toLokijs(), {
+      $or: [{
+        "tags.amenity": { $exists: true }
+      }],
+      needMatch: true
+    })
+    var r = f.cacheDescriptors()
+    assert.deepEqual(r, [ { id: 'nwr["amenity"](properties:17)', bounds: { type: 'Polygon', coordinates: [[[1,1],[2,1],[2,2],[1,2],[1,1]]] } } ])
+  })
+  it ('nwr[amenity](1,1,2,2)->.a;node._[cuisine];', function () {
+    var f = new Filter('(nwr[amenity](1,1,2,2)->.a;);node._[cuisine];')
+
+    assert.deepEqual(f.def, [{
+      or: [
+        [ {"op":"has_key","key":"amenity"},
+          {"fun":"bbox","value":{minlat:1,minlon:1,maxlat:2,maxlon:2}},
+          {"outputSet":"a"}
+        ]
+      ]
+    },
+    [
+      {type:'node'},
+      {inputSet:'_'},
+      {"op":"has_key","key":"cuisine"}
+    ]
+    ])
+    assert.equal(f.toString(), '(nwr["amenity"](1,1,2,2)->.a;);node._["cuisine"];')
+    assert.equal(f.toQl(), '(nwr["amenity"](1,1,2,2)->.a;);node._["cuisine"];')
+    assert.deepEqual(f.toLokijs(), {
+      $and: [{
+        $or: [{
+          "tags.amenity": { $exists: true },
+          }],
+          needMatch: true
+        },
+        {
+          "tags.cuisine": { $exists: true },
+          type: { $eq: 'node' }
+        },
+      ]
+    })
+    var r = f.cacheDescriptors()
+    assert.deepEqual(r, [ { id: 'node["amenity"](properties:17)', bounds: { type: 'Polygon', coordinates: [[[1,1],[2,1],[2,2],[1,2],[1,1]]] } } ])
+  })
   it ('nwr[amenity]->.a;nwr.a[cuisine];', function () {
     var f = new Filter('nwr[amenity]->.a;nwr.a[cuisine];')
 
