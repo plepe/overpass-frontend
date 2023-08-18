@@ -131,18 +131,12 @@ class FilterQuery {
       query.$and = orQueries.map(q => { return { $or: q } })
     }
 
-    if (this.inputSets) {
+    const inputSets = this.inputSets ?? (this.filter.baseFilter ? {_base: this.filter.baseFilter} : null)
+    if (inputSets) {
       query = {
-        $and: Object.values(this.inputSets)
+        $and: Object.values(inputSets)
           .map(inputSet => inputSet ? inputSet.toLokijs() : {$not: true})
           .concat(query)
-      }
-    } else if (this.filter.baseFilter) {
-      query = {
-        $and: [
-          this.filter.baseFilter.toLokijs(),
-          query
-        ]
       }
     }
 
