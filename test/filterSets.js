@@ -13,9 +13,9 @@ describe("Filter sets, compile", function () {
   it ('nwr[amenity]', function () {
     var f = new Filter('nwr[amenity]')
 
-    assert.deepEqual(f.def, [
+    assert.deepEqual(f.def, [[
       {"op":"has_key","key":"amenity"},
-    ])
+    ]])
     assert.equal(f.toString(), 'nwr["amenity"];')
     assert.equal(f.toQl(), 'nwr["amenity"];')
     assert.deepEqual(f.toLokijs(), {
@@ -27,12 +27,12 @@ describe("Filter sets, compile", function () {
   it ('nwr[amenity]->.a;', function () {
     var f = new Filter('nwr[amenity]->.a;')
 
-    assert.deepEqual(f.def,
+    assert.deepEqual(f.def, [
       [
         {"op":"has_key","key":"amenity"},
         {"outputSet":"a"}
       ]
-    )
+    ])
     assert.equal(f.toString(), 'nwr["amenity"]->.a;')
     assert.equal(f.toQl(), 'nwr["amenity"]->.a;')
     assert.deepEqual(f.toLokijs(), {
@@ -49,12 +49,12 @@ describe("Filter sets, compile", function () {
   it ('(nwr[amenity];)->.a;', function () {
     var f = new Filter('(nwr[amenity];)->.a;')
 
-    assert.deepEqual(f.def, {
+    assert.deepEqual(f.def, [{
       or: [
         [ {"op":"has_key","key":"amenity"} ],
         {"outputSet":"a"}
       ]
-    })
+    }])
     assert.equal(f.toString(), '((nwr["amenity"];);)->.a;')
     assert.equal(f.toQl(), '((nwr["amenity"];);)->.a;')
     assert.deepEqual(f.toLokijs(), {
@@ -66,13 +66,13 @@ describe("Filter sets, compile", function () {
   it ('(nwr[amenity]->.a;);', function () {
     var f = new Filter('(nwr[amenity]->.a;);')
 
-    assert.deepEqual(f.def, {
+    assert.deepEqual(f.def, [{
       or: [
         [ {"op":"has_key","key":"amenity"},
           {"outputSet":"a"}
         ]
       ]
-    })
+    }])
     assert.equal(f.toString(), '(nwr["amenity"]->.a;);')
     assert.equal(f.toQl(), '(nwr["amenity"]->.a;);')
     assert.deepEqual(f.toLokijs(), {
@@ -115,7 +115,7 @@ describe("Filter sets, compile", function () {
   it ('(nwr[a]->a;(nwr[b]->b;nwr.a[b]););', function () {
     var f = new Filter('(nwr[a]->.a;(nwr[b]->.b;nwr.a[b];););')
 
-    assert.deepEqual(f.def, {
+    assert.deepEqual(f.def, [{
       or: [
         [ {"op":"has_key","key":"a"}, {"outputSet":"a"} ],
         { or: [
@@ -123,7 +123,7 @@ describe("Filter sets, compile", function () {
           [ { inputSet: "a" }, {"op":"has_key","key":"b"} ],
         ]}
       ]
-    })
+    }])
     assert.equal(f.toString(), '(nwr["a"]->.a;(nwr["b"]->.b;nwr.a["b"];););')
     assert.equal(f.toQl(), '(nwr["a"]->.a;(nwr["b"]->.b;nwr.a["b"];););')
     assert.deepEqual(f.toLokijs(), {
@@ -148,7 +148,7 @@ describe("Filter sets, compile", function () {
   it ('(nwr[a]->.a;(nwr[b]->.b;nwr.a[b]);)->.a;', function () {
     var f = new Filter('(nwr[a]->.a;(nwr[b]->.b;nwr.a[b];);)->.a;')
 
-    assert.deepEqual(f.def, {
+    assert.deepEqual(f.def, [{
       or: [
         [ {"op":"has_key","key":"a"}, {"outputSet":"a"} ],
         { or: [
@@ -157,7 +157,7 @@ describe("Filter sets, compile", function () {
         ]},
         {"outputSet":"a"}
       ]
-    })
+    }])
     assert.equal(f.toString(), '((nwr["a"]->.a;(nwr["b"]->.b;nwr.a["b"];););)->.a;')
     assert.equal(f.toQl(), '((nwr["a"]->.a;(nwr["b"]->.b;nwr.a["b"];););)->.a;')
     assert.deepEqual(f.toLokijs(), {
@@ -178,12 +178,12 @@ describe("Filter sets, compile", function () {
   it ('nwr.a[amenity];', function () {
     var f = new Filter('nwr.a[amenity];')
 
-    assert.deepEqual(f.def,
+    assert.deepEqual(f.def, [
       [
         {"inputSet":"a"},
         {"op":"has_key","key":"amenity"}
       ]
-    )
+    ])
     assert.equal(f.toString(), 'nwr.a["amenity"];')
     assert.equal(f.toQl(), 'nwr.a["amenity"];')
     assert.deepEqual(f.toLokijs(), {
@@ -198,13 +198,13 @@ describe("Filter sets, compile", function () {
   it ('nwr.a.b[amenity]', function () {
     var f = new Filter('nwr.a.b[amenity]')
 
-    assert.deepEqual(f.def,
+    assert.deepEqual(f.def, [
       [
         {"inputSet":"a"},
         {"inputSet":"b"},
         {"op":"has_key","key":"amenity"}
       ]
-    )
+    ])
     assert.equal(f.toString(), 'nwr.a.b["amenity"];')
     assert.equal(f.toQl(), 'nwr.a.b["amenity"];')
     assert.deepEqual(f.toLokijs(), {

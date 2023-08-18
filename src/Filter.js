@@ -27,7 +27,7 @@ function parse (def, rek = 0) {
     // console.log('rek' + rek, 'mode' + mode + '|', def.substr(0, 20), '->', script, 'next:', current)
     if (mode === 0) {
       if (def.match(/^\s*$/)) {
-        return [rek === 0 && script.length === 1 ? script[0] : script, def]
+        return [script, def]
       }
 
       keyRegexp = false
@@ -74,7 +74,7 @@ function parse (def, rek = 0) {
         }
 
         if (rek === 0) {
-          return [script.length === 1 ? script[0] : script, def]
+          return [script, def]
         } else {
           def = def.slice(m[0].length)
           return [script, def]
@@ -108,10 +108,8 @@ function parse (def, rek = 0) {
         notExists = null
         mode = 1
       } else if (!m && def.match(/^\s*$/)) {
-        if (current.length) {
-          script.push(current)
-        }
-        return [rek === 0 && script.length === 1 ? script[0] : script, '']
+        script.push(current)
+        return [script, '']
       } else {
         throw new Error("Can't parse query, expected '[' or '->' or ';': " + def)
       }
@@ -260,10 +258,16 @@ function check (def) {
     def = def.map(d => check(d))
   }
   if (def.and) {
-    def.and = def.and.map(p => check(p))
+    def = [{and: def.and.map(p => {
+      const d = check(p)
+      return Array.isArray(d[0]) || (Array.isArray(d) && (d[0].or || d[0].and)) ? d[0] : d
+    })}]
   }
   if (def.or) {
-    def.or = def.or.map(p => check(p))
+    def = [{or: def.or.map(p => {
+      const d = check(p)
+      return Array.isArray(d[0]) || (Array.isArray(d) && (d[0].or || d[0].and)) ? d[0] : d
+    })}]
   } else if (def.fun && !(def instanceof qlFunction)) {
     def = new qlFunctions[def.fun](def.value)
   }
@@ -384,7 +388,8 @@ class Filter {
    * @return boolean true, if the current filter is equal other or a super-set of other.
    */
   isSupersetOf (other) {
-    return this._isSupersetOf(this.def, other.def)
+    return this.def.every(entry =>
+      other.def.every(otherEntry => this._isSupersetOf(entry, otherEntry)))
   }
 
   _isSupersetOf (def, otherDef) {
@@ -490,8 +495,6 @@ class Filter {
       } else {
         def = [def]
       }
-    } else if (!Array.isArray(def[0])) {
-      def = [def]
     }
 
     def = this.expandOr(def)
