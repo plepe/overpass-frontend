@@ -793,12 +793,25 @@ class OverpassFrontend {
       .replace('$', '\\$')
   }
 
-  queryLokiDB (query, db = null) {
+  queryLokiDB (filter, db = null) {
     if (!db) {
       db = this.db
     }
 
-    return db.find(query)
+    const query = filter.toLokijs()
+    const needMatch = !!query.needMatch
+    delete query.needMatch
+
+    let list = db.find(query)
+
+    if (needMatch) {
+      list = list.filter(ob => {
+        const item = this.cacheElements[ob.id]
+        return filter.match(item)
+      })
+    }
+
+    return list
   }
 }
 

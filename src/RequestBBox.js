@@ -43,12 +43,10 @@ class RequestBBox extends Request {
         return this.finish(err)
       }
 
-      this.lokiQuery = this.filterQuery.toLokijs()
-      this.lokiQueryNeedMatch = !!this.lokiQuery.needMatch
-      delete this.lokiQuery.needMatch
+      this.lokiQuery = new Filter(this.filterQuery)
 
       if (!boundsIsFullWorld(this.bounds)) {
-        this.lokiQuery = { $and: [this.lokiQuery, boundsToLokiQuery(this.bbox, this.overpass)] }
+        this.lokiQuery.setBaseFilter('nwr(' + this.bbox.toLatLonString() + ')')
       }
 
       const cacheFilter = new Filter({ and: [this.filterQuery, new Filter('nwr(properties:' + this.options.properties + ')')] })
@@ -96,9 +94,6 @@ class RequestBBox extends Request {
       }
 
       // maybe we need an additional check
-      if (this.lokiQueryNeedMatch && !this.filterQuery.match(ob)) {
-        continue
-      }
 
       // also check the object directly if it intersects the bbox - if possible
       if (ob.intersects(this.bounds) < 2) {

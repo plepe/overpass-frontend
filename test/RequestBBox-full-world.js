@@ -54,8 +54,6 @@ describe('BBoxQuery with GeoJSON bounds', function () {
       }
     )
 
-    assert.deepEqual(request.lokiQuery, {"type":{"$eq":"relation"},"tags.ref:at:gkz":{"$eq":"91501"}})
-
     request.on('subrequest-compile', compileListener)
   })
 
