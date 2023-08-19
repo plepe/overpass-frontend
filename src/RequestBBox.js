@@ -1,3 +1,4 @@
+const BoundingBox = require('boundingbox')
 const Request = require('./Request')
 const overpassOutOptions = require('./overpassOutOptions')
 const defines = require('./defines')
@@ -47,7 +48,16 @@ class RequestBBox extends Request {
       this.lokiQuery = new Filter(this.filterQuery)
 
       if (!boundsIsFullWorld(this.bounds)) {
-        this.lokiQuery.setBaseFilter('nwr(' + this.bbox.toLatLonString() + ')')
+        if (this.bounds instanceof BoundingBox) {
+          this.lokiQuery.setBaseFilter('nwr(' + this.bbox.toLatLonString() + ')')
+        } else {
+          // this does not support polygons with holes
+          let coords = this.bounds.geometry.coordinates[0]
+            .slice(0, -1)
+            .map(c => c[1] + ' ' + c[0])
+            .join(' ')
+          this.lokiQuery.setBaseFilter('nwr(poly:"' + coords + '")')
+        }
       }
 
       const cacheFilter = new Filter({ and: [this.filterQuery, new Filter('nwr(properties:' + this.options.properties + ')')] })
@@ -91,13 +101,6 @@ class RequestBBox extends Request {
       const ob = this.overpass.cacheElements[id]
 
       if (id in this.doneFeatures) {
-        continue
-      }
-
-      // maybe we need an additional check
-
-      // also check the object directly if it intersects the bbox - if possible
-      if (ob.intersects(this.bounds) < 2) {
         continue
       }
 
