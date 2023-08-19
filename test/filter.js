@@ -1753,4 +1753,17 @@ describe('Function "bbox"', function () {
     var r = f.cacheDescriptors()
     assert.deepEqual(r, [ { id:"node(properties:16)",bounds:{"type":"Polygon","coordinates":[[[40,10.2],[45,10.2],[45,11],[40,11],[40,10.2]]]} }])
   })
+  it('south/west', function () {
+    var f = new Filter('node(-10.2,-40.0,11,45)')
+
+    assert.deepEqual(f.def, [[{"type":"node"},{"fun":"bbox","value":{"minlon":-40,"minlat":-10.2,"maxlon":45,"maxlat":11}}]])
+    assert.equal(f.toString(), 'node(-10.2,-40,11,45);')
+    assert.equal(f.toQl(), 'node(-10.2,-40,11,45);')
+    assert.deepEqual(f.toLokijs(), { type: { '$eq': 'node' }, needMatch: true })
+
+    check(f, [])
+
+    var r = f.cacheDescriptors()
+    assert.deepEqual(r, [ { id:"node(properties:16)",bounds:{"type":"Polygon","coordinates":[[[-40,-10.2],[45,-10.2],[45,11],[-40,11],[-40,-10.2]]]} }])
+  })
 })

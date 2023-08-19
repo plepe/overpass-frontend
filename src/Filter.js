@@ -219,7 +219,7 @@ function parse (def, rek = 0) {
       const r = parseParentheses(def)
       def = r[1]
       const mId = r[0].match(/^\s*(\d+)\s*$/)
-      const mBbox = r[0].match(/^((\s*\d+(.\d+)?\s*,){3}\s*\d+(.\d+)?\s*)$/)
+      const mBbox = r[0].match(/^((\s*-?\d+(.\d+)?\s*,){3}\s*-?\d+(.\d+)?\s*)$/)
       const m = r[0].match(/^\s*(\w+)\s*:\s*(.*)\s*$/)
       /* eslint-disable new-cap */
       if (mId) {
