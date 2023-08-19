@@ -1767,3 +1767,38 @@ describe('Function "bbox"', function () {
     assert.deepEqual(r, [ { id:"node(properties:16)",bounds:{"type":"Polygon","coordinates":[[[-40,-10.2],[45,-10.2],[45,11],[-40,11],[-40,-10.2]]]} }])
   })
 })
+
+describe("Filter with setBaseFilter", function () {
+  it ('node[amenity]; + node[cuisine];', function () {
+    var f = new Filter('node[amenity];')
+    f.setBaseFilter('node[cuisine]')
+
+    assert.deepEqual(f.def, [
+      [
+        { type: 'node' },
+        { key: 'amenity', op: 'has_key' }
+      ]
+    ])
+    assert.equal(f.toString(), 'node["cuisine"]->._base;node._base["amenity"];')
+    assert.equal(f.toQl(), 'node["cuisine"]->._base;node._base["amenity"];')
+    assert.deepEqual(f.toLokijs(),
+      { $and: [
+        {
+          'tags.cuisine': { $exists: true },
+          'type': { $eq: 'node' }
+        },
+        {
+          'tags.amenity': { $exists: true },
+          'type': { $eq: 'node' }
+        }
+      ]}
+    )
+    var r = f.cacheDescriptors()
+    assert.deepEqual(r, [
+      { id: 'node["cuisine"]["amenity"](properties:1)' }
+    ])
+
+    const derived = new Filter(f)
+    assert.equal(derived.toString(), 'node["cuisine"]->._base;node._base["amenity"];')
+  })
+})
