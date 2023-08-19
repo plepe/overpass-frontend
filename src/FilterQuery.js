@@ -146,8 +146,12 @@ class FilterQuery {
             }
             return r
           })
-          .filter(v => Object.values(v).length)
           .concat(query)
+          .filter(v => Object.values(v).length)
+      }
+
+      if (query.$and.length === 0) {
+        delete query.$and
       }
 
       if (needMatch) {
