@@ -253,7 +253,11 @@ function check (def) {
   } else if (def === null) {
     return
   } else if (typeof def === 'object' && def instanceof Filter) {
-    def = def.def
+    const result = parse(def.toString())
+    if (result[1].trim()) {
+      throw new Error("Can't parse query, trailing characters: " + result[1])
+    }
+    return result[0]
   } else if (Array.isArray(def)) {
     def = def.map(d => check(d))
   }
