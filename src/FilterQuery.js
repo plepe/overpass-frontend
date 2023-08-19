@@ -254,6 +254,14 @@ class FilterQuery {
   }
 
   match (ob) {
+    if (this.inputSets) {
+      return Object.values(this.inputSets).every(s => s.match(ob))
+    } else if (this.filter.baseFilter) {
+      if (!this.filter.baseFilter.match(ob)) {
+        return false
+      }
+    }
+
     if (this.type !== 'nwr' && ob.type !== this.type) {
       return false
     }
