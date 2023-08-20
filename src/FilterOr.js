@@ -68,6 +68,14 @@ class FilterOr {
     return this.toQl(options)
   }
 
+  /**
+   * return query and queries this depends upon as string.
+   * @return {string}
+   */
+  fullString () {
+    return this.toString()
+  }
+
   _caches () {
     const result = []
 

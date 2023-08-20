@@ -36,6 +36,24 @@ class FilterRecurse {
     return this.toQl(options)
   }
 
+  /**
+   * return query and queries this depends upon as string.
+   * @return {string}
+   */
+  fullString () {
+    let result = ''
+
+    if (this.inputSets) {
+      result += Object.values(this.inputSets).map(s => s.fullString()).join('')
+    } else if (this.filter.baseFilter) {
+      result += this.filter.baseFilter.toQl({outputSet: '._base'})
+    }
+
+    result += this.toQl()
+
+    return result
+  }
+
   _caches () {
     if (!this.inputSet) {
       return []
