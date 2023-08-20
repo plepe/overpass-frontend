@@ -795,16 +795,16 @@ class OverpassFrontend {
 
   queryLokiDB (filter, db = null) {
     if (!db) {
-      db = this.db
+      db = this.db.chain()
     }
 
     const query = filter.toLokijs()
 
     if (query.recurse) {
-      const ids = {}
+      let ids = {}
 
       query.recurse.forEach(query => {
-        const list = this.queryLokiDB(new Filter(query.query))
+        const list = this.queryLokiDB(new Filter(query.query), db.branch())
         list.forEach(ob => {
           const item = this.cacheElements[ob.id]
           item.memberIds().forEach(id => {
@@ -814,9 +814,11 @@ class OverpassFrontend {
       })
 
       const count = query.recurse.length
-      return Object.entries(ids)
+      ids = Object.entries(ids)
         .filter(e => e[1] === count)
-        .map(e => this.cacheElements[e[0]])
+        .map(e => e[0])
+
+      db.find({ 'id': { '$in': ids } })
 
       delete query.recurse
     }
@@ -824,7 +826,7 @@ class OverpassFrontend {
     const needMatch = !!query.needMatch
     delete query.needMatch
 
-    let list = db.find(query)
+    let list = db.find(query).data()
 
     if (needMatch) {
       list = list.filter(ob => {
