@@ -14,7 +14,7 @@ class FilterRecurse {
   toLokijs (options = {}) {
     return {
       recurse: this.recurse,
-      query: this.inputSetRef.toLokijs()
+      query: this.inputSetRef.fullString()
     }
   }
 
