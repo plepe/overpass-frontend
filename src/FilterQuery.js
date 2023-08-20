@@ -28,7 +28,11 @@ class FilterQuery {
 
         this.type = part.type === 'rel' ? 'relation' : part.type
         hasType = true
-      } else if (part.inputSet) {
+      } else if (part.inputSet || part.recurse) {
+        if (!part.inputSet && part.recurse) {
+          part.inputSet = '_'
+        }
+
         if (part.inputSet in filter.sets) {
         } else {
           console.log('input set ' + part.inputSet + ' not defined')
@@ -37,6 +41,10 @@ class FilterQuery {
 
         this.inputSets[part.inputSet] = {
           set: filter.sets[part.inputSet]
+        }
+
+        if (part.recurse) {
+          this.inputSets[part.inputSet].recurse = part.recurse
         }
       } else if (part.outputSet) {
         if (hasOutputSet) {
@@ -170,7 +178,13 @@ class FilterQuery {
     result += this.type
 
     if (this.inputSets) {
-      result += Object.keys(this.inputSets).map(s => '.' + s).join('')
+      result += Object.entries(this.inputSets).map(([s, inputSet]) => {
+        if (inputSet.recurse) {
+          return '(' + inputSet.recurse + (s === '_' ? '' : '.' + s) + ')'
+        } else {
+          return '.' + s
+        }
+      }).join('')
     } else if (this.filter.baseFilter) {
       result += '._base'
     }

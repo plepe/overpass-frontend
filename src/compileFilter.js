@@ -28,6 +28,10 @@ module.exports = function compileFilter (part, options = {}) {
     return part.type
   }
 
+  if (part.recurse) {
+    return '(' + part.recurse + (part.inputSet ? '.' + part.inputSet : '') + ')'
+  }
+
   if (part.inputSet) {
     return '.' + part.inputSet
   }

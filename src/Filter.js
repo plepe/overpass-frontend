@@ -219,6 +219,7 @@ function parse (def, rek = 0) {
       const r = parseParentheses(def)
       const mId = r[0].match(/^\s*(\d+)\s*$/)
       const mBbox = r[0].match(/^((\s*-?\d+(.\d+)?\s*,){3}\s*-?\d+(.\d+)?\s*)$/)
+      const mRecurse = r[0].match(/\s*(w|r|bn|bw|br)\s*(?:\.([A-Za-z_][A-Za-z0-9_]*)\s*)?$/)
       const m = r[0].match(/^\s*(\w+)\s*:\s*(.*)\s*$/)
       /* eslint-disable new-cap */
       if (mId) {
@@ -236,6 +237,14 @@ function parse (def, rek = 0) {
           throw new Error('Unsupported filter function: ' + fun)
         }
         current.push(new qlFunctions[fun](m[2]))
+        mode = 10
+      } else if (mRecurse) {
+        def = r[1]
+        let c = { recurse: mRecurse[1] }
+        if (mRecurse[2]) {
+          c.inputSet = mRecurse[2]
+        }
+        current.push(c)
         mode = 10
       } else {
         throw new Error("Can't parse query, expected id, bbox or function: " + def)

@@ -368,6 +368,55 @@ describe("Filter sets with relations, compile", function () {
     var r = f.cacheDescriptors()
     assert.deepEqual(r, [ ])
   })
+  it ('nwr[amenity];node(w);', function () {
+    var f = new Filter('nwr[amenity];node(w);')
+
+    assert.deepEqual(f.def, [
+      [
+        {"op":"has_key","key":"amenity"}
+      ],
+      [
+        {"type": "node"},
+        {"recurse":"w", "inputSet":"_"}
+      ]
+    ])
+    assert.equal(f.toString(), 'nwr["amenity"];node(w);')
+    assert.equal(f.toQl(), 'nwr["amenity"];node(w);')
+//    assert.deepEqual(f.toLokijs(), {
+//      recurse: 'w',
+//      query: 'nwr["amenity"];',
+//      type: { $eq: 'node' }
+//    })
+    //var r = f.cacheDescriptors()
+    //assert.deepEqual(r, [ { id: 'nwr["amenity"](properties:5)' }])
+  })
+  it ('way[highway]->.a;way[railway]->.b;node(w.a)(w.b);', function () {
+    var f = new Filter('way[highway]->.a;way[railway]->.b;node(w.a)(w.b);')
+
+    assert.deepEqual(f.def, [
+      [
+        {"type":"way"},
+        {"op":"has_key","key":"highway"},
+        {"outputSet":"a"}
+      ],
+      [
+        {"type":"way"},
+        {"op":"has_key","key":"railway"},
+        {"outputSet":"b"}
+      ],
+      [
+        {"type": "node"},
+        {"recurse":"w","inputSet":"a"},
+        {"recurse":"w","inputSet":"b"}
+      ]
+    ])
+    assert.equal(f.toString(), 'way["highway"]->.a;way["railway"]->.b;node(w.a)(w.b);')
+    assert.equal(f.toQl(), 'way["highway"]->.a;way["railway"]->.b;node(w.a)(w.b);')
+//    assert.deepEqual(f.toLokijs(), {
+//    })
+    //var r = f.cacheDescriptors()
+    //assert.deepEqual(r, [ { id: 'nwr["amenity"](properties:5)' }])
+  })
 })
 
 describe("Filter sets with relations, apply base filter", function () {
