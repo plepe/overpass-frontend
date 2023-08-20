@@ -799,6 +799,26 @@ class OverpassFrontend {
     }
 
     const query = filter.toLokijs()
+
+    if (query.recurse) {
+      const list = this.queryLokiDB(new Filter(query.query))
+      const ids = {}
+      list.forEach(ob => {
+        const item = this.cacheElements[ob.id]
+        item.memberIds().forEach(id => {
+          ids[id] = true
+        })
+      })
+
+      switch (query.recurse) {
+        case '>':
+          return Object.keys(ids).map(id => this.cacheElements[id])
+      }
+
+      delete query.recurse
+      delete query.query
+    }
+
     const needMatch = !!query.needMatch
     delete query.needMatch
 

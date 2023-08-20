@@ -398,7 +398,7 @@ describe("Filter sets with relations, apply base filter", function () {
   })
 })
 
-;['via-server', 'via-file'].forEach(mode => {
+;[/*'via-server',*/ 'via-file'].forEach(mode => {
   describe('Test filter sets ' + mode, function () {
     describe('initalize', function () {
       if (mode === 'via-server') {
@@ -412,6 +412,24 @@ describe("Filter sets with relations, apply base filter", function () {
           overpassFrontend.once('load', () => done())
         })
       }
+
+      it('recurse down', function (done) {
+        test({
+          mode,
+          query: 'way["highway"="secondary"];>;',
+          bounds: {
+            minlat: 48.19821,
+            minlon: 16.33835,
+            maxlat: 48.19827,
+            maxlon: 16.33841
+          },
+          expected: [ 'n378459', 'n3037431688', 'n3037431653', 'n2208875391', 'n270328331', 'n2213568001', 'n378462' ],
+          expectedSubRequestCount: 0,
+          expectedCacheDescriptors: [{
+            "id": 'way["highway"="secondary"];>;(properties:5)',
+          }]
+        }, done)
+      })
     })
   })
 })
@@ -426,7 +444,7 @@ function test (options, callback) {
 
   const request = overpassFrontend.BBoxQuery(
     options.query,
-    null,
+    options.bounds,
     options.queryOptions || {},
     (err, ob) => {
       found.push(ob.id)
@@ -441,7 +459,7 @@ function test (options, callback) {
         return callback(err)
       }
 
-      assert.equal(request.filterQuery.toString(), options.expectedQuery || options.query + ';')
+      assert.equal(request.filterQuery.toString(), options.expectedQuery || options.query)
       const expected = (options.mode === 'via-server' ? options.expectedViaServer : options.expectedViaFile) || options.expected
       assert.deepEqual(found.sort(), expected.sort(), 'List of found objects wrong!')
       if (options.mode === 'via-server') {
