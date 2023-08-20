@@ -217,18 +217,20 @@ function parse (def, rek = 0) {
       }
     } else if (mode === 20) {
       const r = parseParentheses(def)
-      def = r[1]
       const mId = r[0].match(/^\s*(\d+)\s*$/)
       const mBbox = r[0].match(/^((\s*-?\d+(.\d+)?\s*,){3}\s*-?\d+(.\d+)?\s*)$/)
       const m = r[0].match(/^\s*(\w+)\s*:\s*(.*)\s*$/)
       /* eslint-disable new-cap */
       if (mId) {
+        def = r[1]
         current.push(new qlFunctions.id(mId[1]))
         mode = 10
       } else if (mBbox) {
+        def = r[1]
         current.push(new qlFunctions.bbox(mBbox[1]))
         mode = 10
       } else if (m) {
+        def = r[1]
         const fun = m[1]
         if (!qlFunctions[fun]) {
           throw new Error('Unsupported filter function: ' + fun)
