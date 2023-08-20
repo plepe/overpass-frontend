@@ -13,8 +13,11 @@ class FilterRecurse {
 
   toLokijs (options = {}) {
     return {
-      recurse: this.recurse,
-      query: this.inputSetRef.fullString()
+      recurse: [{
+        inputSet: this.inputSet,
+        recurse: this.recurse,
+        query: this.inputSetRef.fullString()
+      }]
     }
   }
 

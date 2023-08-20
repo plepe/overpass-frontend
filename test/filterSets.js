@@ -319,8 +319,11 @@ describe("Filter sets with relations, compile", function () {
     assert.equal(f.toString(), 'nwr["amenity"];>;')
     assert.equal(f.toQl(), 'nwr["amenity"];>;')
     assert.deepEqual(f.toLokijs(), {
-      recurse: '>',
-      query: 'nwr["amenity"];'
+      recurse: [{
+        recurse: '>',
+        inputSet: '_',
+        query: 'nwr["amenity"];'
+      }]
     })
     //var r = f.cacheDescriptors()
     //assert.deepEqual(r, [ { id: 'nwr["amenity"](properties:5)' }])
@@ -337,8 +340,11 @@ describe("Filter sets with relations, compile", function () {
     assert.equal(f.toString(), 'nwr["amenity"];>;')
     assert.equal(f.toQl(), 'nwr["amenity"];>;')
     assert.deepEqual(f.toLokijs(), {
-      recurse: '>',
-      query: 'nwr["amenity"];'
+      recurse: [{
+        recurse: '>',
+        inputSet: '_',
+        query: 'nwr["amenity"];'
+      }]
     })
     //var r = f.cacheDescriptors()
     //assert.deepEqual(r, [ { id: 'nwr["amenity"](properties:5)' }])
@@ -362,8 +368,11 @@ describe("Filter sets with relations, compile", function () {
       "tags.amenity": { $exists: true }
     })
     assert.deepEqual(f.toLokijs({set: 'b'}), {
-      recurse: '>',
-      query: 'nwr["amenity"]->.a;'
+      recurse: [{
+        recurse: '>',
+        inputSet: 'a',
+        query: 'nwr["amenity"]->.a;'
+      }]
     })
     var r = f.cacheDescriptors()
     assert.deepEqual(r, [ ])
@@ -436,8 +445,11 @@ describe("Filter sets with relations, apply base filter", function () {
     assert.equal(f.toString(), 'nwr(46,16,47,17)->._base;(nwr._base["a"];nwr._base["b"];);>;')
     assert.equal(f.toQl(), 'nwr(46,16,47,17)->._base;(nwr._base["a"];nwr._base["b"];);>;')
     assert.deepEqual(f.toLokijs(), {
-      "query": '(nwr._base["a"];nwr._base["b"];);',
-      "recurse": ">"
+      "recurse": [{
+        "inputSet": "_",
+        "recurse": ">",
+        "query": '(nwr._base["a"];nwr._base["b"];);'
+      }]
     })
     var r = f.cacheDescriptors()
     assert.deepEqual(r, [
