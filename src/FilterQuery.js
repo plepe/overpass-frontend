@@ -35,7 +35,9 @@ class FilterQuery {
           this.noResult = true
         }
 
-        this.inputSets[part.inputSet] = filter.sets[part.inputSet]
+        this.inputSets[part.inputSet] = {
+          set: filter.sets[part.inputSet]
+        }
       } else if (part.outputSet) {
         if (hasOutputSet) {
           throw new Error('Filter: only one output set allowed!')
@@ -131,7 +133,7 @@ class FilterQuery {
       query.$and = orQueries.map(q => { return { $or: q } })
     }
 
-    const inputSets = this.inputSets ?? (this.filter.baseFilter ? {_base: this.filter.baseFilter} : null)
+    const inputSets = this.inputSets ?? (this.filter.baseFilter ? {_base: {set: this.filter.baseFilter}} : null)
     if (inputSets) {
       let needMatch = query.needMatch
       delete query.needMatch
@@ -139,7 +141,7 @@ class FilterQuery {
       query = {
         $and: Object.values(inputSets)
           .map(inputSet => {
-            const r = inputSet ? inputSet.toLokijs() : {$not: true}
+            const r = inputSet && inputSet.set ? inputSet.set.toLokijs() : {$not: true}
             if (r.needMatch) {
               needMatch = true
               delete r.needMatch
@@ -205,7 +207,7 @@ class FilterQuery {
     let result = ''
 
     if (this.inputSets) {
-      result += Object.values(this.inputSets).map(s => s.fullString()).join('')
+      result += Object.values(this.inputSets).map(s => s.set.fullString()).join('')
     } else if (this.filter.baseFilter) {
       result += this.filter.baseFilter.toQl({outputSet: '._base'})
     }
@@ -242,12 +244,13 @@ class FilterQuery {
     })
 
     if (this.inputSets) {
-      Object.values(this.inputSets).reverse().forEach(set => {
-        if (!set) {
+      Object.values(this.inputSets).reverse().forEach(inputSet => {
+        if (!inputSet || !inputSet.set) {
           options = []
           return
         }
 
+        const set = inputSet.set
         const result = []
         set._caches().forEach(a => {
           options.forEach(b => {
@@ -273,7 +276,7 @@ class FilterQuery {
 
   match (ob) {
     if (this.inputSets) {
-      return Object.values(this.inputSets).every(s => s.match(ob))
+      return Object.values(this.inputSets).every(s => s.set.match(ob))
     } else if (this.filter.baseFilter) {
       if (!this.filter.baseFilter.match(ob)) {
         return false
