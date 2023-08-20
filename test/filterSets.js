@@ -514,7 +514,24 @@ describe("Filter sets with relations, apply base filter", function () {
             maxlat: 48.19830,
             maxlon: 16.33854
           },
-          expected: [ 'n378459', 'n3037431688', 'n3037431653', 'n2208875391', 'n270328331', 'n2213568001', 'n378462' ],
+          expected: [ 'n2208875391', 'n270328331', 'n2213568001' ],
+          expectedSubRequestCount: 0,
+//          expectedCacheDescriptors: [{
+//            "id": 'way["highway"="secondary"];>;(properties:5)',
+//          }]
+        }, done)
+      })
+      it('recurse up', function (done) {
+        test({
+          mode,
+          query: 'node["highway"];<;',
+          bounds: {
+            minlat: 48.19839,
+            minlon: 16.33901,
+            maxlat: 48.19840,
+            maxlon: 16.33902
+          },
+          expected: [ 'r3636229', 'w146678747', 'w170141442', 'w366446524' ],
           expectedSubRequestCount: 0,
 //          expectedCacheDescriptors: [{
 //            "id": 'way["highway"="secondary"];>;(properties:5)',

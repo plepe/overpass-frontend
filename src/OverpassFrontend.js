@@ -807,7 +807,35 @@ class OverpassFrontend {
         const list = this.queryLokiDB(new Filter(query.query), { set: query.inputSet }, db.branch())
         list.forEach(ob => {
           const item = this.cacheElements[ob.id]
-          item.memberIds().forEach(id => {
+          let other
+
+          switch (query.recurse) {
+            case '>':
+              other = item.memberIds()
+              break
+            case '<':
+              other = item.memberOf.map(m => m.id)
+              break
+            case 'w':
+              other = item.type === 'way' ? item.memberIds() : []
+              break
+            case 'r':
+              other = item.type === 'relation' ? item.memberIds() : []
+              break
+            case 'bn':
+              other = item.type === 'node' ? item.memberOf.map(m => m.id) : []
+              break
+            case 'bw':
+              other = item.type === 'way' ? item.memberOf.map(m => m.id) : []
+              break
+            case 'br':
+              other = item.type === 'relation' ? item.memberOf.map(m => m.id) : []
+              break
+            default:
+              throw new Error('invalid recurse type', query)
+          }
+
+          other.forEach(id => {
             ids[id] = id in ids ? ids[id] + 1 : 1
           })
         })
