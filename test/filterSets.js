@@ -391,11 +391,14 @@ describe("Filter sets with relations, compile", function () {
     ])
     assert.equal(f.toString(), 'nwr["amenity"];node(w);')
     assert.equal(f.toQl(), 'nwr["amenity"];node(w);')
-//    assert.deepEqual(f.toLokijs(), {
-//      recurse: 'w',
-//      query: 'nwr["amenity"];',
-//      type: { $eq: 'node' }
-//    })
+    assert.deepEqual(f.toLokijs(), {
+      recurse: [{
+        recurse: 'w',
+        query: 'nwr["amenity"];',
+        inputSet: '_'
+      }],
+      type: { $eq: 'node' }
+    })
     //var r = f.cacheDescriptors()
     //assert.deepEqual(r, [ { id: 'nwr["amenity"](properties:5)' }])
   })
@@ -421,8 +424,18 @@ describe("Filter sets with relations, compile", function () {
     ])
     assert.equal(f.toString(), 'way["highway"]->.a;way["railway"]->.b;node(w.a)(w.b);')
     assert.equal(f.toQl(), 'way["highway"]->.a;way["railway"]->.b;node(w.a)(w.b);')
-//    assert.deepEqual(f.toLokijs(), {
-//    })
+    assert.deepEqual(f.toLokijs(), {
+      recurse: [{
+        recurse: 'w',
+        query: 'way["highway"]->.a;',
+        inputSet: 'a'
+      }, {
+        recurse: 'w',
+        query: 'way["railway"]->.b;',
+        inputSet: 'b'
+      }],
+      type: { $eq: 'node' }
+    })
     //var r = f.cacheDescriptors()
     //assert.deepEqual(r, [ { id: 'nwr["amenity"](properties:5)' }])
   })
@@ -489,6 +502,23 @@ describe("Filter sets with relations, apply base filter", function () {
           expectedCacheDescriptors: [{
             "id": 'way["highway"="secondary"];>;(properties:5)',
           }]
+        }, done)
+      })
+      it('nodes of highway and railway ways', function (done) {
+        test({
+          mode,
+          query: 'way["highway"]->.a;way["railway"]->.b;node(w.a)(w.b);',
+          bounds: {
+            minlat: 48.19821,
+            minlon: 16.33833,
+            maxlat: 48.19830,
+            maxlon: 16.33854
+          },
+          expected: [ 'n378459', 'n3037431688', 'n3037431653', 'n2208875391', 'n270328331', 'n2213568001', 'n378462' ],
+          expectedSubRequestCount: 0,
+//          expectedCacheDescriptors: [{
+//            "id": 'way["highway"="secondary"];>;(properties:5)',
+//          }]
         }, done)
       })
     })

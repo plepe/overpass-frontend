@@ -143,29 +143,46 @@ class FilterQuery {
 
     const inputSets = this.inputSets ?? (this.filter.baseFilter ? {_base: {set: this.filter.baseFilter}} : null)
     if (inputSets) {
-      let needMatch = query.needMatch
-      delete query.needMatch
+      const recursingInputSets = Object.entries(inputSets)
+        .filter(s => s[1].recurse)
+      const normalInputSets = Object.entries(inputSets)
+        .filter(s => !s[1].recurse)
 
-      query = {
-        $and: Object.values(inputSets)
-          .map(inputSet => {
-            const r = inputSet && inputSet.set ? inputSet.set.toLokijs() : {$not: true}
-            if (r.needMatch) {
-              needMatch = true
-              delete r.needMatch
-            }
-            return r
-          })
-          .concat(query)
-          .filter(v => Object.values(v).length)
+      if (recursingInputSets.length) {
+        query.recurse = recursingInputSets.map(s => {
+          return {
+            inputSet: s[0],
+            recurse: s[1].recurse,
+            query: s[1].set.fullString()
+          }
+        })
       }
 
-      if (query.$and.length === 0) {
-        delete query.$and
-      }
+      if (normalInputSets.length) {
+        let needMatch = query.needMatch
+        delete query.needMatch
 
-      if (needMatch) {
-        query.needMatch = true
+        query = {
+          $and: Object.values(inputSets)
+            .map(inputSet => {
+              const r = inputSet && inputSet.set ? inputSet.set.toLokijs() : {$not: true}
+              if (r.needMatch) {
+                needMatch = true
+                delete r.needMatch
+              }
+              return r
+            })
+            .concat(query)
+            .filter(v => Object.values(v).length)
+        }
+
+        if (query.$and.length === 0) {
+          delete query.$and
+        }
+
+        if (needMatch) {
+          query.needMatch = true
+        }
       }
     }
 
