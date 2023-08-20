@@ -793,18 +793,18 @@ class OverpassFrontend {
       .replace('$', '\\$')
   }
 
-  queryLokiDB (filter, db = null) {
+  queryLokiDB (filter, options = {}, db = null) {
     if (!db) {
       db = this.db.chain()
     }
 
-    const query = filter.toLokijs()
+    const query = filter.toLokijs({ set: options.set || '_' })
 
     if (query.recurse) {
       let ids = {}
 
       query.recurse.forEach(query => {
-        const list = this.queryLokiDB(new Filter(query.query), db.branch())
+        const list = this.queryLokiDB(new Filter(query.query), { set: query.inputSet }, db.branch())
         list.forEach(ob => {
           const item = this.cacheElements[ob.id]
           item.memberIds().forEach(id => {
@@ -831,7 +831,7 @@ class OverpassFrontend {
     if (needMatch) {
       list = list.filter(ob => {
         const item = this.cacheElements[ob.id]
-        return filter.match(item)
+        return filter.match(item, { set: options.set ?? '_' })
       })
     }
 
