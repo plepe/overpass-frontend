@@ -402,6 +402,86 @@ describe("Filter sets with relations, compile", function () {
     //var r = f.cacheDescriptors()
     //assert.deepEqual(r, [ { id: 'nwr["amenity"](properties:5)' }])
   })
+  it ('way[highway];node(w);node._[highway];', function () {
+    var f = new Filter('way[highway];node(w);node._[highway];')
+
+    assert.deepEqual(f.def, [
+      [
+        {"type":"way"},
+        {"op":"has_key","key":"highway"}
+      ],
+      [
+        {"type": "node"},
+        {"recurse":"w","inputSet":"_"},
+      ],
+      [
+        {"type": "node"},
+        {"inputSet":"_"},
+        {"op":"has_key","key":"highway"}
+      ]
+    ])
+    assert.equal(f.toString(), 'way["highway"];node(w);node._["highway"];')
+    assert.equal(f.toQl(), 'way["highway"];node(w);node._["highway"];')
+    assert.deepEqual(f.toLokijs(), {
+      recurse: [{
+        recurse: 'w',
+        query: 'way["highway"];',
+        inputSet: '_'
+      }],
+      $and: [
+        {type: { $eq: 'node' }},
+        {
+          "tags.highway": { $exists: true },
+          "type": { $eq: 'node' },
+        }
+      ]
+    })
+    //var r = f.cacheDescriptors()
+    //assert.deepEqual(r, [ { id: 'nwr["amenity"](properties:5)' }])
+  })
+  it ('way["highway"];node(w)->.a;way["railway"];node.a(w);', function () {
+    var f = new Filter('way["highway"];node(w)->.a;way["railway"];node.a(w);')
+
+    assert.deepEqual(f.def, [
+      [
+        {"type":"way"},
+        {"op":"has_key","key":"highway"}
+      ],
+      [
+        {"type": "node"},
+        {"recurse":"w","inputSet":"_"},
+        {"outputSet":"a"}
+      ],
+      [
+        {"type": "way"},
+        {"op":"has_key","key":"railway"}
+      ],
+      [
+        {"type": "node"},
+        {"inputSet":"a"},
+        {"recurse":"w", "inputSet":"_"}
+      ]
+    ])
+    assert.equal(f.toString(), 'way["highway"];node(w)->.a;way["railway"];node.a(w);')
+    assert.equal(f.toQl(), 'way["highway"];node(w)->.a;way["railway"];node.a(w);')
+    assert.deepEqual(f.toLokijs(), {
+      recurse: [{
+        recurse: 'w',
+        query: 'way["railway"];',
+        inputSet: '_'
+      }, {
+        recurse: 'w',
+        query: 'way["highway"];',
+        inputSet: '_'
+      }],
+      $and: [
+        {type: { $eq: 'node' }},
+        {type: { $eq: 'node' }}
+      ]
+    })
+    //var r = f.cacheDescriptors()
+    //assert.deepEqual(r, [ { id: 'nwr["amenity"](properties:5)' }])
+  })
   it ('way[highway]->.a;way[railway]->.b;node(w.a)(w.b);', function () {
     var f = new Filter('way[highway]->.a;way[railway]->.b;node(w.a)(w.b);')
 
@@ -504,10 +584,61 @@ describe("Filter sets with relations, apply base filter", function () {
           }]
         }, done)
       })
+      it('nodes of way', function (done) {
+        test({
+          mode,
+          query: 'way["highway"];node(w);',
+          bounds: {
+            minlat: 48.19821,
+            minlon: 16.33833,
+            maxlat: 48.19830,
+            maxlon: 16.33854
+          },
+          expected: [ "n2208875391", "n2213567988", "n2213567992", "n2213567995", "n2213567996", "n2213568000", "n2213568003", "n270328331" , "n3037431653", "n3037431688", "n378459", "n378462", "n683894778" ],
+          expectedSubRequestCount: 0,
+//          expectedCacheDescriptors: [{
+//            "id": 'way["highway"="secondary"];>;(properties:5)',
+//          }]
+        }, done)
+      })
+      it('nodes of way, chain query', function (done) {
+        test({
+          mode,
+          query: 'way["highway"];node(w);node._["highway"];',
+          bounds: {
+            minlat: 48.19821,
+            minlon: 16.33833,
+            maxlat: 48.19830,
+            maxlon: 16.33854
+          },
+          expected: [ "n378459", "n378462" ],
+          expectedSubRequestCount: 0,
+//          expectedCacheDescriptors: [{
+//            "id": 'way["highway"="secondary"];>;(properties:5)',
+//          }]
+        }, done)
+      })
       it('nodes of highway and railway ways', function (done) {
         test({
           mode,
           query: 'way["highway"]->.a;way["railway"]->.b;node(w.a)(w.b);',
+          bounds: {
+            minlat: 48.19821,
+            minlon: 16.33833,
+            maxlat: 48.19830,
+            maxlon: 16.33854
+          },
+          expected: [ 'n2208875391', 'n270328331', 'n2213568001' ],
+          expectedSubRequestCount: 0,
+//          expectedCacheDescriptors: [{
+//            "id": 'way["highway"="secondary"];>;(properties:5)',
+//          }]
+        }, done)
+      })
+      it('nodes of highway and railway ways 2', function (done) {
+        test({
+          mode,
+          query: 'way["highway"];node(w)->.a;way["railway"];node.a(w);',
           bounds: {
             minlat: 48.19821,
             minlon: 16.33833,
@@ -532,6 +663,23 @@ describe("Filter sets with relations, apply base filter", function () {
             maxlon: 16.33902
           },
           expected: [ 'r3636229', 'w146678747', 'w170141442', 'w366446524' ],
+          expectedSubRequestCount: 0,
+//          expectedCacheDescriptors: [{
+//            "id": 'way["highway"="secondary"];>;(properties:5)',
+//          }]
+        }, done)
+      })
+      it('recurse up, relation only', function (done) {
+        test({
+          mode,
+          query: 'node["highway"];<;relation._;',
+          bounds: {
+            minlat: 48.19839,
+            minlon: 16.33901,
+            maxlat: 48.19840,
+            maxlon: 16.33902
+          },
+          expected: [ 'r3636229' ],
           expectedSubRequestCount: 0,
 //          expectedCacheDescriptors: [{
 //            "id": 'way["highway"="secondary"];>;(properties:5)',

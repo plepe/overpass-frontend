@@ -160,16 +160,23 @@ class FilterQuery {
 
       if (normalInputSets.length) {
         let needMatch = query.needMatch
+        let recurse = query.recurse ?? []
+        delete query.recurse
         delete query.needMatch
 
         query = {
-          $and: Object.values(inputSets)
-            .map(inputSet => {
+          $and: normalInputSets
+            .map(([inputsSetKey, inputSet]) => {
               const r = inputSet && inputSet.set ? inputSet.set.toLokijs() : {$not: true}
               if (r.needMatch) {
                 needMatch = true
                 delete r.needMatch
               }
+              if (r.recurse) {
+                recurse = recurse.concat(r.recurse)
+                delete r.recurse
+              }
+
               return r
             })
             .concat(query)
@@ -182,6 +189,9 @@ class FilterQuery {
 
         if (needMatch) {
           query.needMatch = true
+        }
+        if (recurse.length) {
+          query.recurse = recurse
         }
       }
     }
