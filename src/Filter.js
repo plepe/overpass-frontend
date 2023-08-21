@@ -388,6 +388,14 @@ class Filter {
   }
 
   /**
+   * Compile all (recursing) parts of a query
+   */
+  toQlParts (options = {}) {
+    const set = options.set ?? '_'
+    return set in this.sets ? this.sets[set].toQlParts() : { query: null }
+  }
+
+  /**
    * Convert query to LokiJS query for local database. If the property 'needMatch' is set on the returned object, an additional match() should be executed for each returned object, as the query can't be fully compiled (and the 'needMatch' property removed).
    * @param {object} [options] Additional options
    * @param {string} [options.set=_] For which set should the query be compiled.

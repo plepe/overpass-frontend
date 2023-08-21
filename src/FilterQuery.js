@@ -236,6 +236,64 @@ class FilterQuery {
     return result + ';'
   }
 
+  /**
+   * Compile all (recursing) parts of a query
+   */
+  toQlParts (options = {}) {
+    let result = {
+      query: ''
+    }
+
+    if (this.inputSets) {
+      const recursingInputSets = Object.entries(this.inputSets)
+        .filter(s => s[1].recurse)
+      const normalInputSets = Object.entries(this.inputSets)
+        .filter(s => !s[1].recurse)
+
+      if (recursingInputSets.length) {
+        result.recurse = recursingInputSets.map(s => {
+          const r = s[1].set.toQlParts({ set: s[0] })
+
+          return {
+            inputSet: s[0],
+            recurse: s[1].recurse,
+            query: r.query
+          }
+        })
+      }
+
+      if (normalInputSets.length) {
+        normalInputSets.forEach(s => {
+          if (s[1].set) {
+            const q = s[1].set.toQlParts()
+            result.query += q.query
+
+            if (q.recurse) {
+              result.recurse = (result.recurse ?? []).concat(q.recurse)
+            }
+          } else {
+            result.query = null
+          }
+        })
+      }
+    } else if (this.filter.baseFilter) {
+      const q = this.filter.baseFilter.toQlParts({ outputSet: '._base' })
+      result.query += q.query
+
+      if (q.recurse) {
+        result.recurse = (result.recurse ?? []).concat(q.recurse)
+      }
+    }
+
+    if (result.query === null) {
+      return result
+    }
+
+    result.query += this.toQl(options)
+
+    return result
+  }
+
   toString (options = {}) {
     return this.toQl(options)
   }

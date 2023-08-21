@@ -68,6 +68,12 @@ class FilterOr {
     return this.toQl(options)
   }
 
+  toQlParts (options = {}) {
+    return {
+      query: this.toQl()
+    }
+  }
+
   /**
    * return query and queries this depends upon as string.
    * @return {string}

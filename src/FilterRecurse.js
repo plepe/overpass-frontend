@@ -35,6 +35,19 @@ class FilterRecurse {
     return result + ';'
   }
 
+  toQlParts (options = {}) {
+    const r = this.inputSetRef.toQlParts()
+
+    return {
+      query: this.toQl(options),
+      recurse: [{
+        recurse: this.recurse,
+        inputSet: this.inputSet,
+        query: r.query
+      }]
+    }
+  }
+
   toString (options = {}) {
     return this.toQl(options)
   }
