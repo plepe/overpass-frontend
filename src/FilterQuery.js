@@ -152,7 +152,7 @@ class FilterQuery {
         query.recurse = recursingInputSets.map(s => {
           return {
             inputSet: s[0],
-            recurse: s[1].recurse,
+            type: s[1].recurse,
             query: s[1].set.fullString()
           }
         })
@@ -254,11 +254,10 @@ class FilterQuery {
         result.recurse = recursingInputSets.map(s => {
           const r = s[1].set.toQlParts({ set: s[0] })
 
-          return {
-            inputSet: s[0],
-            recurse: s[1].recurse,
-            query: r.query
-          }
+          r.inputSet = s[0]
+          r.type = s[1].recurse
+
+          return r
         })
       }
 

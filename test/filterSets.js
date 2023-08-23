@@ -368,12 +368,12 @@ describe("Filter sets with relations, compile", function () {
       recurse: [{
         inputSet: '_',
         query: 'nwr["amenity"];',
-        recurse: '>'
+        type: '>'
       }]
     })
     assert.deepEqual(f.toLokijs(), {
       recurse: [{
-        recurse: '>',
+        type: '>',
         inputSet: '_',
         query: 'nwr["amenity"];'
       }]
@@ -397,12 +397,12 @@ describe("Filter sets with relations, compile", function () {
       recurse: [{
         inputSet: '_',
         query: 'nwr["amenity"];',
-        recurse: '>'
+        type: '>'
       }]
     })
     assert.deepEqual(f.toLokijs(), {
       recurse: [{
-        recurse: '>',
+        type: '>',
         inputSet: '_',
         query: 'nwr["amenity"];'
       }]
@@ -433,7 +433,7 @@ describe("Filter sets with relations, compile", function () {
       recurse: [{
         inputSet: 'a',
         query: 'nwr["amenity"]->.a;',
-        recurse: '>'
+        type: '>'
       }]
     })
     assert.deepEqual(f.toLokijs(), {
@@ -444,7 +444,7 @@ describe("Filter sets with relations, compile", function () {
     })
     assert.deepEqual(f.toLokijs({set: 'b'}), {
       recurse: [{
-        recurse: '>',
+        type: '>',
         inputSet: 'a',
         query: 'nwr["amenity"]->.a;'
       }]
@@ -471,12 +471,12 @@ describe("Filter sets with relations, compile", function () {
       recurse: [{
         inputSet: '_',
         query: 'nwr["amenity"];',
-        recurse: 'w'
+        type: 'w'
       }]
     })
     assert.deepEqual(f.toLokijs(), {
       recurse: [{
-        recurse: 'w',
+        type: 'w',
         query: 'nwr["amenity"];',
         inputSet: '_'
       }],
@@ -509,13 +509,13 @@ describe("Filter sets with relations, compile", function () {
       recurse: [{
         inputSet: '_',
         query: 'way["highway"];',
-        recurse: 'w'
+        type: 'w'
       }],
       query: 'node(w);node._["highway"];'
     })
     assert.deepEqual(f.toLokijs(), {
       recurse: [{
-        recurse: 'w',
+        type: 'w',
         query: 'way["highway"];',
         inputSet: '_'
       }],
@@ -561,22 +561,22 @@ describe("Filter sets with relations, compile", function () {
         {
           inputSet: '_',
           query: 'way["railway"];',
-          recurse: 'w'
+          type: 'w'
         },
         {
           inputSet: '_',
           query: 'way["highway"];',
-          recurse: 'w'
+          type: 'w'
         }
       ]
     })
     assert.deepEqual(f.toLokijs(), {
       recurse: [{
-        recurse: 'w',
+        type: 'w',
         query: 'way["railway"];',
         inputSet: '_'
       }, {
-        recurse: 'w',
+        type: 'w',
         query: 'way["highway"];',
         inputSet: '_'
       }],
@@ -616,24 +616,69 @@ describe("Filter sets with relations, compile", function () {
         {
           inputSet: 'a',
           query: 'way["highway"]->.a;',
-          recurse: 'w'
+          type: 'w'
         },
         {
           inputSet: 'b',
           query: 'way["railway"]->.b;',
-          recurse: 'w'
+          type: 'w'
         }
       ]
     })
     assert.deepEqual(f.toLokijs(), {
       recurse: [{
-        recurse: 'w',
+        type: 'w',
         query: 'way["highway"]->.a;',
         inputSet: 'a'
       }, {
-        recurse: 'w',
+        type: 'w',
         query: 'way["railway"]->.b;',
         inputSet: 'b'
+      }],
+      type: { $eq: 'node' }
+    })
+    //var r = f.cacheDescriptors()
+    //assert.deepEqual(r, [ { id: 'nwr["amenity"](properties:5)' }])
+  })
+  it ('relation[route=tram];way(r);node(w);', function () {
+    var f = new Filter('relation[route=tram];way(r);node(w);')
+
+    assert.deepEqual(f.def, [
+      [
+        {"type":"relation"},
+        {"key":"route","op":"=","value":"tram"}
+      ],
+      [
+        {"type":"way"},
+        {"recurse":"r","inputSet": "_"}
+      ],
+      [
+        {"type": "node"},
+        {"recurse":"w","inputSet":"_"},
+      ]
+    ])
+    assert.equal(f.toString(), 'relation["route"="tram"];way(r);node(w);')
+    assert.equal(f.toQl(), 'relation["route"="tram"];way(r);node(w);')
+    assert.deepEqual(f.toQlParts(), {
+      query: 'node(w);',
+      recurse: [
+        {
+          inputSet: '_',
+          query: 'way(r);',
+          type: 'w',
+          recurse: [{
+            inputSet: '_',
+            query: 'relation["route"="tram"];',
+            type: 'r'
+          }]
+        }
+      ]
+    })
+    assert.deepEqual(f.toLokijs(), {
+      recurse: [{
+        type: 'w',
+        query: 'relation["route"="tram"];way(r);',
+        inputSet: '_'
       }],
       type: { $eq: 'node' }
     })
@@ -690,13 +735,13 @@ describe("Filter sets with relations, apply base filter", function () {
         inputSet: '_',
         // TODO: query: 'nwr(46,16,47,17)->._base;(nwr._base["a"];nwr._base["b"];);',
         query: '(nwr._base["a"];nwr._base["b"];);',
-        recurse: '>'
+        type: '>'
       }]
     })
     assert.deepEqual(f.toLokijs(), {
       "recurse": [{
         "inputSet": "_",
-        "recurse": ">",
+        "type": ">",
         "query": '(nwr._base["a"];nwr._base["b"];);'
       }]
     })

@@ -15,7 +15,7 @@ class FilterRecurse {
     return {
       recurse: [{
         inputSet: this.inputSet,
-        recurse: this.recurse,
+        type: this.recurse,
         query: this.inputSetRef.fullString()
       }]
     }
@@ -41,7 +41,7 @@ class FilterRecurse {
     return {
       query: this.toQl(options),
       recurse: [{
-        recurse: this.recurse,
+        type: this.recurse,
         inputSet: this.inputSet,
         query: r.query
       }]

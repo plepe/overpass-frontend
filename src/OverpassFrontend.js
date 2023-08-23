@@ -809,7 +809,7 @@ class OverpassFrontend {
           const item = this.cacheElements[ob.id]
           let other
 
-          switch (query.recurse) {
+          switch (query.type) {
             case '>':
               other = item.memberIds()
               break
