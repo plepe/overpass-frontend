@@ -390,9 +390,9 @@ class Filter {
   /**
    * Compile all (recursing) parts of a query
    */
-  toQlParts (options = {}) {
+  compileQuery (options = {}) {
     const set = options.set ?? '_'
-    return set in this.sets ? this.sets[set].toQlParts() : { query: null }
+    return set in this.sets ? this.sets[set].compileQuery() : { query: null }
   }
 
   /**

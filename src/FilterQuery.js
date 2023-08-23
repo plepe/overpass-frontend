@@ -239,7 +239,7 @@ class FilterQuery {
   /**
    * Compile all (recursing) parts of a query
    */
-  toQlParts (options = {}) {
+  compileQuery (options = {}) {
     let result = {
       query: ''
     }
@@ -252,7 +252,7 @@ class FilterQuery {
 
       if (recursingInputSets.length) {
         result.recurse = recursingInputSets.map(s => {
-          const r = s[1].set.toQlParts({ set: s[0] })
+          const r = s[1].set.compileQuery({ set: s[0] })
 
           r.inputSet = s[0]
           r.type = s[1].recurse
@@ -264,7 +264,7 @@ class FilterQuery {
       if (normalInputSets.length) {
         normalInputSets.forEach(s => {
           if (s[1].set) {
-            const q = s[1].set.toQlParts()
+            const q = s[1].set.compileQuery()
             result.query += q.query
 
             if (q.recurse) {
@@ -276,7 +276,7 @@ class FilterQuery {
         })
       }
     } else if (this.filter.baseFilter) {
-      const q = this.filter.baseFilter.toQlParts({ outputSet: '._base' })
+      const q = this.filter.baseFilter.compileQuery({ outputSet: '._base' })
       result.query += q.query
 
       if (q.recurse) {

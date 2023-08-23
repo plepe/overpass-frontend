@@ -35,8 +35,8 @@ class FilterRecurse {
     return result + ';'
   }
 
-  toQlParts (options = {}) {
-    const r = this.inputSetRef.toQlParts()
+  compileQuery (options = {}) {
+    const r = this.inputSetRef.compileQuery()
 
     return {
       query: this.toQl(options),

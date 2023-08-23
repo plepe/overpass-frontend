@@ -68,7 +68,7 @@ class FilterOr {
     return this.toQl(options)
   }
 
-  toQlParts (options = {}) {
+  compileQuery (options = {}) {
     return {
       query: this.toQl()
     }
