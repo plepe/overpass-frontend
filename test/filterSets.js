@@ -19,7 +19,10 @@ describe("Filter sets, compile", function () {
     assert.equal(f.toString(), 'nwr["amenity"];')
     assert.equal(f.toQl(), 'nwr["amenity"];')
     assert.deepEqual(f.compileQuery(), {
-      query: 'nwr["amenity"];'
+      query: 'nwr["amenity"];',
+      loki: {
+        "tags.amenity": { $exists: true }
+      }
     })
     assert.deepEqual(f.toLokijs(), {
       "tags.amenity": { $exists: true }
@@ -42,7 +45,10 @@ describe("Filter sets, compile", function () {
       query: null
     })
     assert.deepEqual(f.compileQuery({set: 'a'}), {
-      query: 'nwr["amenity"]->.a;'
+      query: 'nwr["amenity"]->.a;',
+      loki: {
+        "tags.amenity": { $exists: true }
+      }
     })
     assert.deepEqual(f.toLokijs(), {
       $not: true
@@ -67,7 +73,10 @@ describe("Filter sets, compile", function () {
     assert.equal(f.toString(), '((nwr["amenity"];);)->.a;')
     assert.equal(f.toQl(), '((nwr["amenity"];);)->.a;')
     assert.deepEqual(f.compileQuery(), {
-      query: 'nwr["amenity"];'
+      query: 'nwr["amenity"];',
+      loki: {
+        "tags.amenity": { $exists: true }
+      }
     })
     assert.deepEqual(f.toLokijs(), {
       "tags.amenity": { $exists: true }
@@ -88,7 +97,12 @@ describe("Filter sets, compile", function () {
     assert.equal(f.toString(), '(nwr["amenity"]->.a;);')
     assert.equal(f.toQl(), '(nwr["amenity"]->.a;);')
     assert.deepEqual(f.compileQuery(), {
-      query: '(nwr["amenity"]->.a;);'
+      query: '(nwr["amenity"]->.a;);',
+      loki: {
+        $or: [{
+          "tags.amenity": { $exists: true }
+        }]
+      }
     })
     assert.deepEqual(f.toLokijs(), {
       $or: [{
@@ -112,7 +126,13 @@ describe("Filter sets, compile", function () {
     assert.equal(f.toString(), '(nwr["amenity"](1,1,2,2)->.a;);')
     assert.equal(f.toQl(), '(nwr["amenity"](1,1,2,2)->.a;);')
     assert.deepEqual(f.compileQuery(), {
-      query: '(nwr["amenity"](1,1,2,2)->.a;);'
+      query: '(nwr["amenity"](1,1,2,2)->.a;);',
+      loki: {
+        $or: [{
+          "tags.amenity": { $exists: true }
+        }],
+        needMatch: true
+      }
     })
     assert.deepEqual(f.toLokijs(), {
       $or: [{
@@ -144,6 +164,19 @@ describe("Filter sets, compile", function () {
     assert.equal(f.toQl(), '(nwr["amenity"](1,1,2,2)->.a;);node._["cuisine"];')
     assert.deepEqual(f.compileQuery(), {
       query: '(nwr["amenity"](1,1,2,2)->.a;);node._["cuisine"];',
+      loki: {
+        needMatch: true,
+        $and: [{
+          $or: [{
+            "tags.amenity": { $exists: true },
+            }]
+          },
+          {
+            "tags.cuisine": { $exists: true },
+            type: { $eq: 'node' }
+          },
+        ]
+      }
     })
     assert.deepEqual(f.toLokijs(), {
       needMatch: true,
@@ -177,7 +210,13 @@ describe("Filter sets, compile", function () {
     assert.equal(f.toString(), 'nwr["amenity"]->.a;nwr.a["cuisine"];')
     assert.equal(f.toQl(), 'nwr["amenity"]->.a;nwr.a["cuisine"];')
     assert.deepEqual(f.compileQuery(), {
-      query: 'nwr["amenity"]->.a;nwr.a["cuisine"];'
+      query: 'nwr["amenity"]->.a;nwr.a["cuisine"];',
+      loki: {
+        $and: [
+          {"tags.amenity": {$exists: true}},
+          {"tags.cuisine": {$exists: true}}
+        ]
+      }
     })
     assert.deepEqual(f.toLokijs(), {
       $and: [
@@ -208,7 +247,19 @@ describe("Filter sets, compile", function () {
     assert.equal(f.toString(), '(nwr["a"]->.a;(nwr["b"]->.b;nwr.a["b"];););')
     assert.equal(f.toQl(), '(nwr["a"]->.a;(nwr["b"]->.b;nwr.a["b"];););')
     assert.deepEqual(f.compileQuery(), {
-      query: '(nwr["a"]->.a;(nwr["b"]->.b;nwr.a["b"];););'
+      query: '(nwr["a"]->.a;(nwr["b"]->.b;nwr.a["b"];););',
+      loki: {
+        $or: [
+          { 'tags.a': { '$exists': true } },
+          { '$or': [
+              { 'tags.b': { '$exists': true } },
+              { '$and': [
+                  { 'tags.a': { '$exists': true } },
+                  { 'tags.b': { '$exists': true } }
+              ]}
+            ]}
+          ]
+      }
     })
     assert.deepEqual(f.toLokijs(), {
       $or: [
@@ -245,13 +296,37 @@ describe("Filter sets, compile", function () {
     assert.equal(f.toString(), '((nwr["a"]->.a;(nwr["b"]->.b;nwr.a["b"];););)->.a;')
     assert.equal(f.toQl(), '((nwr["a"]->.a;(nwr["b"]->.b;nwr.a["b"];););)->.a;')
     assert.deepEqual(f.compileQuery(), {
-      query: '(nwr["b"]->.b;nwr.a["b"];);'
+      query: '(nwr["b"]->.b;nwr.a["b"];);',
+      loki: {
+        $or: [
+          { 'tags.b': { '$exists': true } },
+          { '$and': [
+              { 'tags.a': { '$exists': true } },
+              { 'tags.b': { '$exists': true } }
+            ]}
+          ]
+      }
     })
     assert.deepEqual(f.compileQuery({set: 'a'}), {
-      query: '((nwr["a"]->.a;(nwr["b"]->.b;nwr.a["b"];););)->.a;'
+      query: '((nwr["a"]->.a;(nwr["b"]->.b;nwr.a["b"];););)->.a;',
+      loki: {
+        '$or': [
+          { 'tags.a': { '$exists': true } },
+          { '$or': [
+            { 'tags.b': { '$exists': true } },
+            { '$and': [
+              { 'tags.a': { '$exists': true } },
+              { 'tags.b': { '$exists': true } }
+            ]}
+          ]}
+        ]
+      }
     })
     assert.deepEqual(f.compileQuery({set: 'b'}), {
-      query: 'nwr["b"]->.b;'
+      query: 'nwr["b"]->.b;',
+      loki: {
+        "tags.b": { $exists: true }
+      }
     })
     assert.deepEqual(f.toLokijs(), {
       $or: [
@@ -337,7 +412,14 @@ describe("Filter sets, compile", function () {
     assert.equal(f.toString(), 'nwr["amenity"]->.a;nwr["xxx"]->.b;nwr.a.b["cuisine"];')
     assert.equal(f.toQl(), 'nwr["amenity"]->.a;nwr["xxx"]->.b;nwr.a.b["cuisine"];')
     assert.deepEqual(f.compileQuery(), {
-      query: 'nwr["amenity"]->.a;nwr["xxx"]->.b;nwr.a.b["cuisine"];'
+      query: 'nwr["amenity"]->.a;nwr["xxx"]->.b;nwr.a.b["cuisine"];',
+      loki: {
+        $and: [
+          {'tags.amenity': {$exists: true}},
+          {'tags.xxx': {$exists: true}},
+          {'tags.cuisine': {$exists: true}}
+        ]
+      }
     })
     assert.deepEqual(f.toLokijs(), {
       $and: [
@@ -365,9 +447,13 @@ describe("Filter sets with relations, compile", function () {
     assert.equal(f.toQl(), 'nwr["amenity"];>;')
     assert.deepEqual(f.compileQuery(), {
       query: '>;',
+      loki: {},
       recurse: [{
         inputSet: '_',
         query: 'nwr["amenity"];',
+        loki: {
+          "tags.amenity": { $exists: true }
+        },
         type: '>'
       }]
     })
@@ -394,10 +480,14 @@ describe("Filter sets with relations, compile", function () {
     assert.equal(f.toQl(), 'nwr["amenity"];>;')
     assert.deepEqual(f.compileQuery(), {
       query: '>;',
+      loki: {},
       recurse: [{
+        type: '>',
         inputSet: '_',
         query: 'nwr["amenity"];',
-        type: '>'
+        loki: {
+          "tags.amenity": { $exists: true }
+        }
       }]
     })
     assert.deepEqual(f.toLokijs(), {
@@ -426,14 +516,21 @@ describe("Filter sets with relations, compile", function () {
       query: null
     })
     assert.deepEqual(f.compileQuery({ set: 'a' }), {
-      query: 'nwr["amenity"]->.a;'
+      query: 'nwr["amenity"]->.a;',
+      loki: {
+        "tags.amenity": { $exists: true }
+      }
     })
     assert.deepEqual(f.compileQuery({ set: 'b' }), {
       query: '.a > ->.b;',
+      loki: {},
       recurse: [{
+        type: '>',
         inputSet: 'a',
         query: 'nwr["amenity"]->.a;',
-        type: '>'
+        loki: {
+          "tags.amenity": { $exists: true }
+        }
       }]
     })
     assert.deepEqual(f.toLokijs(), {
@@ -468,10 +565,16 @@ describe("Filter sets with relations, compile", function () {
     assert.equal(f.toQl(), 'nwr["amenity"];node(w);')
     assert.deepEqual(f.compileQuery(), {
       query: 'node(w);',
+      loki: {
+        "type": { $eq: 'node' }
+      },
       recurse: [{
+        type: 'w',
         inputSet: '_',
         query: 'nwr["amenity"];',
-        type: 'w'
+        loki: {
+          "tags.amenity": { $exists: true }
+        }
       }]
     })
     assert.deepEqual(f.toLokijs(), {
@@ -507,11 +610,23 @@ describe("Filter sets with relations, compile", function () {
     assert.equal(f.toQl(), 'way["highway"];node(w);node._["highway"];')
     assert.deepEqual(f.compileQuery(), {
       recurse: [{
+        type: 'w',
         inputSet: '_',
         query: 'way["highway"];',
-        type: 'w'
+        loki: {
+          "tags.highway": { $exists: true },
+          "type": { $eq: 'way' }
+        }
       }],
-      query: 'node(w);node._["highway"];'
+      query: 'node(w);node._["highway"];',
+      loki: {
+        $and: [{
+          "type": { $eq: 'node' },
+        }, {
+          "tags.highway": { $exists: true },
+          "type": { $eq: 'node' },
+        }]
+      }
     })
     assert.deepEqual(f.toLokijs(), {
       recurse: [{
@@ -556,17 +671,33 @@ describe("Filter sets with relations, compile", function () {
     assert.equal(f.toString(), 'way["highway"];node(w)->.a;way["railway"];node.a(w);')
     assert.equal(f.toQl(), 'way["highway"];node(w)->.a;way["railway"];node.a(w);')
     assert.deepEqual(f.compileQuery(), {
+      // TODO: assign input sets
       query: 'node(w)->.a;node.a(w);',
+      loki: {
+        $and: [{
+          type: { $eq: 'node' }
+        }, {
+          type: { $eq: 'node' }
+        }]
+      },
       recurse: [
         {
+          type: 'w',
           inputSet: '_',
           query: 'way["railway"];',
-          type: 'w'
+          loki: {
+            type: { $eq: 'way' },
+            "tags.railway": { $exists: true }
+          }
         },
         {
+          type: 'w',
           inputSet: '_',
           query: 'way["highway"];',
-          type: 'w'
+          loki: {
+            type: { $eq: 'way' },
+            "tags.highway": { $exists: true }
+          }
         }
       ]
     })
@@ -612,15 +743,26 @@ describe("Filter sets with relations, compile", function () {
     assert.equal(f.toQl(), 'way["highway"]->.a;way["railway"]->.b;node(w.a)(w.b);')
     assert.deepEqual(f.compileQuery(), {
       query: 'node(w.a)(w.b);',
+      loki: {
+        type: { $eq: 'node' }
+      },
       recurse: [
         {
           inputSet: 'a',
           query: 'way["highway"]->.a;',
+          loki: {
+            "tags.highway": { $exists: true },
+            "type": { $eq: 'way' }
+          },
           type: 'w'
         },
         {
           inputSet: 'b',
           query: 'way["railway"]->.b;',
+          loki: {
+            "tags.railway": { $exists: true },
+            "type": { $eq: 'way' }
+          },
           type: 'w'
         }
       ]
@@ -661,15 +803,25 @@ describe("Filter sets with relations, compile", function () {
     assert.equal(f.toQl(), 'relation["route"="tram"];way(r);node(w);')
     assert.deepEqual(f.compileQuery(), {
       query: 'node(w);',
+      loki: {
+        type: { $eq: 'node' }
+      },
       recurse: [
         {
+          type: 'w',
           inputSet: '_',
           query: 'way(r);',
-          type: 'w',
+          loki: {
+            type: { $eq: 'way' }
+          },
           recurse: [{
+            type: 'r',
             inputSet: '_',
             query: 'relation["route"="tram"];',
-            type: 'r'
+            loki: {
+              type: { $eq: 'relation' },
+              "tags.route": { $eq: 'tram' }
+            }
           }]
         }
       ]
@@ -701,7 +853,13 @@ describe("Filter sets with relations, apply base filter", function () {
     assert.equal(f.toQl(), 'nwr(46,16,47,17)->._base;nwr._base["amenity"];')
     assert.deepEqual(f.compileQuery(), {
       // TODO: '->._base' missing
-      query: 'nwr(46,16,47,17);nwr._base["amenity"];'
+      query: 'nwr(46,16,47,17);nwr._base["amenity"];',
+      loki: {
+        $and: [{
+          "tags.amenity": { $exists: true }
+        }],
+        needMatch: true
+      }
     })
     assert.deepEqual(f.toLokijs(), {
       $and: [{
@@ -731,11 +889,24 @@ describe("Filter sets with relations, apply base filter", function () {
     assert.equal(f.toQl(), 'nwr(46,16,47,17)->._base;(nwr._base["a"];nwr._base["b"];);>;')
     assert.deepEqual(f.compileQuery(), {
       query: '>;',
+      loki: {},
       recurse: [{
+        type: '>',
         inputSet: '_',
         // TODO: query: 'nwr(46,16,47,17)->._base;(nwr._base["a"];nwr._base["b"];);',
         query: '(nwr._base["a"];nwr._base["b"];);',
-        type: '>'
+        loki: {
+          $or: [{
+            $and: [{
+              "tags.a": { $exists: true }
+            }],
+          }, {
+            $and: [{
+              "tags.b": { $exists: true }
+            }]
+          }],
+          needMatch: true
+        }
       }]
     })
     assert.deepEqual(f.toLokijs(), {

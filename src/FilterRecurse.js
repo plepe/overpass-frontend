@@ -38,13 +38,14 @@ class FilterRecurse {
   compileQuery (options = {}) {
     const r = this.inputSetRef.compileQuery()
 
+    console.log(r)
+    r.type = this.recurse
+    r.inputSet = this.inputSet
+
     return {
       query: this.toQl(options),
-      recurse: [{
-        type: this.recurse,
-        inputSet: this.inputSet,
-        query: r.query
-      }]
+      loki: {},
+      recurse: [ r ]
     }
   }
 

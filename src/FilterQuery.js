@@ -289,6 +289,8 @@ class FilterQuery {
     }
 
     result.query += this.toQl(options)
+    result.loki = this.toLokijs(options)
+    delete result.loki.recurse
 
     return result
   }

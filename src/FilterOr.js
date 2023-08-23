@@ -69,9 +69,14 @@ class FilterOr {
   }
 
   compileQuery (options = {}) {
-    return {
+    const result = {
       query: this.toQl()
     }
+
+    result.loki = this.toLokijs()
+    delete result.loki.recurse
+
+    return result
   }
 
   /**
