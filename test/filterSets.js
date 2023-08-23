@@ -852,8 +852,7 @@ describe("Filter sets with relations, apply base filter", function () {
     assert.equal(f.toString(), 'nwr(46,16,47,17)->._base;nwr._base["amenity"];')
     assert.equal(f.toQl(), 'nwr(46,16,47,17)->._base;nwr._base["amenity"];')
     assert.deepEqual(f.compileQuery(), {
-      // TODO: '->._base' missing
-      query: 'nwr(46,16,47,17);nwr._base["amenity"];',
+      query: 'nwr(46,16,47,17)->._base;nwr._base["amenity"];',
       loki: {
         $and: [{
           "tags.amenity": { $exists: true }
