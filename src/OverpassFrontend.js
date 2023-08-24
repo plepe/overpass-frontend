@@ -859,8 +859,6 @@ class OverpassFrontend {
     }
 
     const query = statement.toLokijs()
-    // TODO: remove next line after this info has been removed from toLokijs()
-    delete query.recurse
     const needMatch = !!query.needMatch
     delete query.needMatch
 

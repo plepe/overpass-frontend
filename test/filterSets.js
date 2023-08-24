@@ -457,13 +457,7 @@ describe("Filter sets with relations, compile", function () {
         type: '>'
       }]
     })
-    assert.deepEqual(f.toLokijs(), {
-      recurse: [{
-        type: '>',
-        inputSet: '_',
-        query: 'nwr["amenity"];'
-      }]
-    })
+    assert.deepEqual(f.toLokijs(), {})
     //var r = f.cacheDescriptors()
     //assert.deepEqual(r, [ { id: 'nwr["amenity"](properties:5)' }])
   })
@@ -490,13 +484,7 @@ describe("Filter sets with relations, compile", function () {
         }
       }]
     })
-    assert.deepEqual(f.toLokijs(), {
-      recurse: [{
-        type: '>',
-        inputSet: '_',
-        query: 'nwr["amenity"];'
-      }]
-    })
+    assert.deepEqual(f.toLokijs(), {})
     //var r = f.cacheDescriptors()
     //assert.deepEqual(r, [ { id: 'nwr["amenity"](properties:5)' }])
   })
@@ -539,13 +527,7 @@ describe("Filter sets with relations, compile", function () {
     assert.deepEqual(f.toLokijs({set: 'a'}), {
       "tags.amenity": { $exists: true }
     })
-    assert.deepEqual(f.toLokijs({set: 'b'}), {
-      recurse: [{
-        type: '>',
-        inputSet: 'a',
-        query: 'nwr["amenity"]->.a;'
-      }]
-    })
+    assert.deepEqual(f.toLokijs({set: 'b'}), {})
     var r = f.cacheDescriptors()
     assert.deepEqual(r, [ ])
   })
@@ -578,11 +560,6 @@ describe("Filter sets with relations, compile", function () {
       }]
     })
     assert.deepEqual(f.toLokijs(), {
-      recurse: [{
-        type: 'w',
-        query: 'nwr["amenity"];',
-        inputSet: '_'
-      }],
       type: { $eq: 'node' }
     })
     //var r = f.cacheDescriptors()
@@ -629,11 +606,6 @@ describe("Filter sets with relations, compile", function () {
       }
     })
     assert.deepEqual(f.toLokijs(), {
-      recurse: [{
-        type: 'w',
-        query: 'way["highway"];',
-        inputSet: '_'
-      }],
       $and: [
         {type: { $eq: 'node' }},
         {
@@ -702,15 +674,6 @@ describe("Filter sets with relations, compile", function () {
       ]
     })
     assert.deepEqual(f.toLokijs(), {
-      recurse: [{
-        type: 'w',
-        query: 'way["railway"];',
-        inputSet: '_'
-      }, {
-        type: 'w',
-        query: 'way["highway"];',
-        inputSet: '_'
-      }],
       $and: [
         {type: { $eq: 'node' }},
         {type: { $eq: 'node' }}
@@ -768,15 +731,6 @@ describe("Filter sets with relations, compile", function () {
       ]
     })
     assert.deepEqual(f.toLokijs(), {
-      recurse: [{
-        type: 'w',
-        query: 'way["highway"]->.a;',
-        inputSet: 'a'
-      }, {
-        type: 'w',
-        query: 'way["railway"]->.b;',
-        inputSet: 'b'
-      }],
       type: { $eq: 'node' }
     })
     //var r = f.cacheDescriptors()
@@ -827,11 +781,6 @@ describe("Filter sets with relations, compile", function () {
       ]
     })
     assert.deepEqual(f.toLokijs(), {
-      recurse: [{
-        type: 'w',
-        query: 'relation["route"="tram"];way(r);',
-        inputSet: '_'
-      }],
       type: { $eq: 'node' }
     })
     //var r = f.cacheDescriptors()
@@ -908,13 +857,7 @@ describe("Filter sets with relations, apply base filter", function () {
         }
       }]
     })
-    assert.deepEqual(f.toLokijs(), {
-      "recurse": [{
-        "inputSet": "_",
-        "type": ">",
-        "query": '(nwr._base["a"];nwr._base["b"];);'
-      }]
-    })
+    assert.deepEqual(f.toLokijs(), {})
     var r = f.cacheDescriptors()
     assert.deepEqual(r, [
       { id: 'nwr["a"];>;(properties:21)', bounds: { type: 'Polygon', coordinates: [[[16,46],[17,46],[17,47],[16,47],[16,46]]] } },

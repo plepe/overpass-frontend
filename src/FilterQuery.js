@@ -145,25 +145,11 @@ class FilterQuery {
 
     const inputSets = this.inputSets ?? (this.filter.baseFilter ? {_base: {set: this.filter.baseFilter}} : null)
     if (inputSets) {
-      const recursingInputSets = Object.entries(inputSets)
-        .filter(s => s[1].recurse)
       const normalInputSets = Object.entries(inputSets)
         .filter(s => !s[1].recurse)
 
-      if (recursingInputSets.length) {
-        query.recurse = recursingInputSets.map(s => {
-          return {
-            inputSet: s[0],
-            type: s[1].recurse,
-            query: s[1].set.fullString()
-          }
-        })
-      }
-
       if (normalInputSets.length) {
         let needMatch = query.needMatch
-        let recurse = query.recurse ?? []
-        delete query.recurse
         delete query.needMatch
 
         query = {
@@ -173,10 +159,6 @@ class FilterQuery {
               if (r.needMatch) {
                 needMatch = true
                 delete r.needMatch
-              }
-              if (r.recurse) {
-                recurse = recurse.concat(r.recurse)
-                delete r.recurse
               }
 
               return r
@@ -191,9 +173,6 @@ class FilterQuery {
 
         if (needMatch) {
           query.needMatch = true
-        }
-        if (recurse.length) {
-          query.recurse = recurse
         }
       }
     }

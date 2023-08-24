@@ -14,13 +14,7 @@ class FilterRecurse {
   }
 
   toLokijs (options = {}) {
-    return {
-      recurse: [{
-        inputSet: this.inputSet,
-        type: this.type,
-        query: this.inputSetRef.fullString()
-      }]
-    }
+    return {}
   }
 
   toQl (options = {}) {
