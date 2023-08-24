@@ -1055,6 +1055,19 @@ describe('Filter', function () {
 //        { id: 'nwr["ref"="49"]["operator"="WL"]["route"="bus"](properties:1)' }
 //      ])
 //    })
+
+    it('empty or', function () {
+      let f = new Filter('();')
+
+      assert.equal(f.toString(), '();')
+      assert.equal(f.toQl(), '();')
+      assert.deepEqual(f.toLokijs(), {$or: []})
+
+      var r = f.cacheDescriptors()
+      assert.deepEqual(r, [
+      ])
+    })
+
   })
 
   it('case-sensitive regexp', function () {
