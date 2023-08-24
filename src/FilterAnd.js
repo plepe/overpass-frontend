@@ -80,6 +80,9 @@ class FilterAnd {
     return this.toQl(options)
   }
 
+  recurse () {
+  }
+
   /**
    * return query and queries this depends upon as string.
    * @return {string}

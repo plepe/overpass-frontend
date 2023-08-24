@@ -238,6 +238,41 @@ class FilterQuery {
     return result + ';'
   }
 
+  recurse () {
+    let result = []
+
+    if (this.inputSets) {
+      const recursingInputSets = Object.entries(this.inputSets)
+        .filter(s => s[1].recurse)
+      const normalInputSets = Object.entries(this.inputSets)
+        .filter(s => !s[1].recurse)
+
+      if (recursingInputSets.length) {
+        result = recursingInputSets.map(s => {
+          return {
+            type: s[1].recurse,
+            inputSet: s[0],
+            statement: s[1].set
+          }
+        })
+      }
+
+      if (normalInputSets.length) {
+        normalInputSets.forEach(s => {
+          if (s[1].set) {
+            const q = s[1].set.recurse()
+            result = result.concat(q)
+          }
+        })
+      }
+    } else if (this.filter.baseFilter) {
+      const q = this.filter.baseFilter.recurse()
+      result = result.concat(q)
+    }
+
+    return result
+  }
+
   /**
    * Compile all (recursing) parts of a query
    */

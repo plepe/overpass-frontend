@@ -411,6 +411,13 @@ class Filter {
     return set in this.sets ? this.sets[set].compileQuery(options) : { query: null }
   }
 
+  recurse (options = {}) {
+    const set = options.set ?? '_'
+    const statement = set in this.sets ? this.sets[set] : null
+
+    return statement ? statement.recurse() : []
+  }
+
   /**
    * Convert query to LokiJS query for local database. If the property 'needMatch' is set on the returned object, an additional match() should be executed for each returned object, as the query can't be fully compiled (and the 'needMatch' property removed).
    * @param {object} [options] Additional options

@@ -70,6 +70,10 @@ class FilterOr {
     return this.toQl(options)
   }
 
+  recurse () {
+    return []
+  }
+
   compileQuery (options = {}) {
     const result = {
       query: this.toQl()

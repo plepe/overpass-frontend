@@ -37,6 +37,14 @@ class FilterRecurse {
     return result + ';'
   }
 
+  recurse (options = {}) {
+    return [{
+      type: this.type,
+      inputSet: this.inputSet,
+      statement: this.inputSetRef
+    }]
+  }
+
   compileQuery (options = {}) {
     const r = this.inputSetRef.compileQuery()
 
