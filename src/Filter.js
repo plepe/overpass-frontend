@@ -346,6 +346,16 @@ class Filter {
   }
 
   /**
+   * return the filter statement for the specified output set (or '_')
+   * @param {object} [options] Options
+   * @param {string} [options.set=_] Which set should the object be matched against.
+   * @return {FilterStatement}
+   */
+  getStatement (options = {}) {
+    return this.sets[options.set || '_']
+  }
+
+  /**
    * set a filter which is applied to all queries which do not have a specified input set.
    * @param {string|Filter} filter a filter, e.g. 'nwr[x=y](1,1,2,2)'
    */
