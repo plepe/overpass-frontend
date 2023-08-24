@@ -798,13 +798,22 @@ class OverpassFrontend {
       db = this.db.chain()
     }
 
-    const query = filter.toLokijs({ set: options.set || '_' })
+    const statement = filter.getStatement({ set: options.set || '_' })
+    return this._queryStatement(statement, options, db)
+  }
 
-    if (query.recurse) {
+  _queryStatement (statement, options, db = null) {
+    if (!statement) {
+      return []
+    }
+
+    const recurse = statement.recurse()
+
+    if (recurse.length) {
       let ids = {}
 
-      query.recurse.forEach(query => {
-        const list = this.queryLokiDB(new Filter(query.query), { set: query.inputSet }, db.branch())
+      recurse.forEach(query => {
+        const list = this._queryStatement(query.statement, { set: query.inputSet }, db.branch())
         list.forEach(ob => {
           const item = this.cacheElements[ob.id]
           let other
@@ -841,16 +850,17 @@ class OverpassFrontend {
         })
       })
 
-      const count = query.recurse.length
+      const count = recurse.length
       ids = Object.entries(ids)
         .filter(e => e[1] === count)
         .map(e => e[0])
 
       db.find({ 'id': { '$in': ids } })
-
-      delete query.recurse
     }
 
+    const query = statement.toLokijs()
+    // TODO: remove next line after this info has been removed from toLokijs()
+    delete query.recurse
     const needMatch = !!query.needMatch
     delete query.needMatch
 
@@ -859,7 +869,7 @@ class OverpassFrontend {
     if (needMatch) {
       list = list.filter(ob => {
         const item = this.cacheElements[ob.id]
-        return filter.match(item, { set: options.set ?? '_' })
+        return statement.match(item, { set: options.set ?? '_' })
       })
     }
 
