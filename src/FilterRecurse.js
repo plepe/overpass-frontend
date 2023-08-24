@@ -8,7 +8,7 @@ class FilterRecurse {
     this.inputSet = def.inputSet ?? '_'
     this.inputSetRef = filter.sets[this.inputSet]
     this.outputSet = def.outputSet ?? '_'
-    this.recurse = def.recurse
+    this.type = def.recurse
 
     filter.sets[this.outputSet] = this
   }
@@ -17,7 +17,7 @@ class FilterRecurse {
     return {
       recurse: [{
         inputSet: this.inputSet,
-        type: this.recurse,
+        type: this.type,
         query: this.inputSetRef.fullString()
       }]
     }
@@ -29,7 +29,7 @@ class FilterRecurse {
     if (this.inputSet !== '_') {
       result += '.' + this.inputSet + ' '
     }
-    result += this.recurse
+    result += this.type
     if (this.outputSet !== '_') {
       result += ' ->.' + this.outputSet
     }
@@ -40,8 +40,7 @@ class FilterRecurse {
   compileQuery (options = {}) {
     const r = this.inputSetRef.compileQuery()
 
-    console.log(r)
-    r.type = this.recurse
+    r.type = this.type
     r.inputSet = this.inputSet
 
     return {
@@ -80,8 +79,8 @@ class FilterRecurse {
 
     const result = this.inputSetRef._caches()
     result.forEach(c => {
-      c.filters += ';' + this.recurse + ';'
-      if (this.recurse === '>') {
+      c.filters += ';' + this.type + ';'
+      if (this.type === '>') {
         c.properties |= OverpassFrontend.MEMBERS
       }
     })
