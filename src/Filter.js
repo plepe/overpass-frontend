@@ -312,6 +312,11 @@ class Filter {
     return this._uniqId
   }
 
+  createStatementId () {
+    this._statementId = (this._statementId || 0) + 1
+    return this._statementId
+  }
+
   constructor (def) {
     if (!def) {
       this.def = []

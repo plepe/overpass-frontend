@@ -3,6 +3,7 @@ const OverpassFrontend = require('./defines')
 
 class FilterRecurse {
   constructor (def, filter) {
+    this.id = filter.createStatementId()
     this.inputSet = def.inputSet ?? '_'
     this.inputSetRef = filter.sets[this.inputSet]
     this.outputSet = def.outputSet ?? '_'
