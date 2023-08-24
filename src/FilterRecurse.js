@@ -37,6 +37,10 @@ class FilterRecurse {
     return result + ';'
   }
 
+  toQuery (options = {}) {
+    return this.toQl(options)
+  }
+
   recurse (options = {}) {
     return [{
       type: this.type,

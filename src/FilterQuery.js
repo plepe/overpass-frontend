@@ -276,6 +276,39 @@ class FilterQuery {
   /**
    * Compile all (recursing) parts of a query
    */
+  toQuery (options = {}) {
+    let result = ''
+
+    if (this.inputSets) {
+      const normalInputSets = Object.entries(this.inputSets)
+        .filter(s => !s[1].recurse)
+
+      if (normalInputSets.length) {
+        normalInputSets.forEach(s => {
+          if (s[1].set) {
+            const q = s[1].set.toQuery()
+            result += q
+          } else {
+            result = null
+          }
+        })
+      }
+    } else if (this.filter.baseFilter) {
+      const q = this.filter.baseFilter.toQuery({ outputSet: '._base' })
+      result += q
+    }
+
+    if (result === null) {
+      return result
+    }
+
+    result += this.toQl(options)
+    return result
+  }
+
+  /**
+   * Compile all (recursing) parts of a query
+   */
   compileQuery (options = {}) {
     let result = {
       query: ''

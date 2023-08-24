@@ -80,6 +80,10 @@ class FilterAnd {
     return this.toQl(options)
   }
 
+  toQuery (options = {}) {
+    return this.toQl(options)
+  }
+
   recurse () {
   }
 

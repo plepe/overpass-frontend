@@ -74,6 +74,10 @@ class FilterOr {
     return []
   }
 
+  toQuery (options = {}) {
+    return this.toQl(options)
+  }
+
   compileQuery (options = {}) {
     const result = {
       query: this.toQl()
