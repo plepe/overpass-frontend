@@ -325,6 +325,7 @@ class Filter {
 
     this.baseFilter = null
     this.def = check(def)
+    this.statements = {}
 
     if (typeof def === 'string') {
       this.script = this.convertToFilterScript(this.def)

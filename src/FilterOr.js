@@ -3,6 +3,7 @@ const filterPart = require('./filterPart')
 class FilterOr {
   constructor (def, filter) {
     this.id = filter.createStatementId()
+    filter.statements[this.id] = this
     this.outputSet = '_'
     this.parts = []
 

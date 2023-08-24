@@ -4,6 +4,7 @@ const cacheMerge = require('./cacheMerge')
 class FilterAnd {
   constructor (def, filter) {
     this.id = filter.createStatementId()
+    filter.statements[this.id] = this
     this.outputSet = '_'
     this.filter = filter
     this.parts = []

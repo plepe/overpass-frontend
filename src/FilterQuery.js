@@ -8,6 +8,7 @@ const strsearch2regexp = require('strsearch2regexp')
 class FilterQuery {
   constructor (def, filter) {
     this.id = filter.createStatementId()
+    filter.statements[this.id] = this
     this.filter = filter
 
     if (!Array.isArray(def)) {
