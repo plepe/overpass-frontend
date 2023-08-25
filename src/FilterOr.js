@@ -75,7 +75,10 @@ class FilterOr {
   }
 
   toQuery (options = {}) {
-    return this.toQl(options)
+    let result = this.requiredInputSets()
+      .map(s => s.toQuery()).join('')
+    result += this.toQl(options)
+    return result
   }
 
   /**

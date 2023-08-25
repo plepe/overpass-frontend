@@ -232,7 +232,61 @@ describe("Filter sets, compile", function () {
     var r = f.cacheDescriptors({set: 'a'})
     assert.deepEqual(r, [ { id: 'nwr["amenity"](properties:1)' }])
   })
-  it ('(nwr[a]->a;(nwr[b]->b;nwr.a[b]););', function () {
+  it ('nwr[a]->.a;(nwr[b]->b;nwr.a[b]);', function () {
+    var f = new Filter('nwr[a]->.a;(nwr[b]->.b;nwr.a[b];);')
+
+    assert.deepEqual(f.def, [
+        [ {"op":"has_key","key":"a"}, {"outputSet":"a"} ],
+        { or: [
+          [ {"op":"has_key","key":"b"}, {"outputSet":"b"} ],
+          [ { inputSet: "a" }, {"op":"has_key","key":"b"} ],
+        ]}
+      ]
+    )
+    assert.equal(f.toString(), 'nwr["a"]->.a;(nwr["b"]->.b;nwr.a["b"];);')
+    assert.equal(f.toQl(), 'nwr["a"]->.a;(nwr["b"]->.b;nwr.a["b"];);')
+    assert.equal(f.getStatement().toQuery(), 'nwr["a"]->.a;(nwr["b"]->.b;nwr.a["b"];);')
+    assert.deepEqual(f.toLokijs(),
+        { '$or': [
+            { 'tags.b': { '$exists': true } },
+            { '$and': [
+                { 'tags.a': { '$exists': true } },
+                { 'tags.b': { '$exists': true } }
+            ]}
+          ]}
+    )
+    var r = f.cacheDescriptors()
+    assert.deepEqual(r, [
+      { id: 'nwr["b"](properties:1)' },
+      { id: 'nwr["a"]["b"](properties:1)' }
+    ])
+  })
+  it ('nwr[a]->.a;(nwr[b]; >;(.a >;););', function () {
+    var f = new Filter('nwr[a]->.a;(nwr[b]; >;(.a >;););')
+
+    assert.deepEqual(f.def, [
+        [ {"op":"has_key","key":"a"}, {"outputSet":"a"} ],
+        { or: [
+          [ {"op":"has_key","key":"b"} ],
+          { recurse: '>' },
+          { or: [
+            { recurse: '>', inputSet: "a" }
+          ]}
+        ]}
+      ]
+    )
+    assert.equal(f.toString(), 'nwr["a"]->.a;(nwr["b"];>;(.a >;););')
+    assert.equal(f.toQl(), 'nwr["a"]->.a;(nwr["b"];>;(.a >;););')
+    assert.equal(f.getStatement().toQuery(), 'nwr["a"]->.a;(nwr["b"];>;(.a >;););')
+    assert.deepEqual(f.toLokijs(), {}) // TODO: wrong (should include nwr[b])
+    var r = f.cacheDescriptors()
+    assert.deepEqual(r, [
+      { id: 'nwr["b"](properties:1)' },
+      { id: 'nwr["b"];>;(properties:5)' },
+      { id: 'nwr["a"];>;(properties:5)' }
+    ])
+  })
+  it ('(nwr[a]->.a;(nwr[b]->b;nwr.a[b]););', function () {
     var f = new Filter('(nwr[a]->.a;(nwr[b]->.b;nwr.a[b];););')
 
     assert.deepEqual(f.def, [{
@@ -246,6 +300,7 @@ describe("Filter sets, compile", function () {
     }])
     assert.equal(f.toString(), '(nwr["a"]->.a;(nwr["b"]->.b;nwr.a["b"];););')
     assert.equal(f.toQl(), '(nwr["a"]->.a;(nwr["b"]->.b;nwr.a["b"];););')
+    assert.equal(f.getStatement().toQuery(), '(nwr["a"]->.a;(nwr["b"]->.b;nwr.a["b"];););')
     assert.deepEqual(f.compileQuery(), {
       query: '(nwr["a"]->.a;(nwr["b"]->.b;nwr.a["b"];););',
       loki: {
@@ -785,6 +840,26 @@ describe("Filter sets with relations, compile", function () {
     })
     //var r = f.cacheDescriptors()
     //assert.deepEqual(r, [ { id: 'nwr["amenity"](properties:5)' }])
+  })
+  it ('(nwr[b];>;);', function () {
+    var f = new Filter('(nwr[b];>;)')
+
+    assert.deepEqual(f.def, [
+      { or: [
+        [ { key: 'b', op: 'has_key' } ],
+        { recurse: '>' }
+      ]}
+    ])
+    assert.equal(f.toString(), '(nwr["b"];>;);')
+    assert.equal(f.toQl(), '(nwr["b"];>;);')
+    assert.equal(f.getStatement().toQuery(), '(nwr["b"];>;);')
+    assert.deepEqual(f.recurse(), []) // TODO: this is wrong
+    assert.deepEqual(f.toLokijs(), {})
+    var r = f.cacheDescriptors()
+    assert.deepEqual(r, [
+      { id: 'nwr["b"](properties:1)' },
+      { id: 'nwr["b"];>;(properties:5)' },
+    ])
   })
 })
 
