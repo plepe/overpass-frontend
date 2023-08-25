@@ -388,6 +388,14 @@ class Filter {
     return this.toQl({ toString: true }, def)
   }
 
+  toQuery (options = {}) {
+    const statement = this.getStatement(options)
+
+    if (statement) {
+      return statement.toQuery(options)
+    }
+  }
+
   /**
    * Convert query to Overpass QL
    * @param {object} [options] Additional options

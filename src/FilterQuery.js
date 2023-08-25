@@ -301,57 +301,29 @@ class FilterQuery {
    * Compile all (recursing) parts of a query
    */
   compileQuery (options = {}) {
-    let result = {
-      query: ''
-    }
+    const result = {}
+    let query = this.toQuery({ outputSet: '._' + this.id }) + '\n'
 
-    if (this.inputSets) {
-      const recursingInputSets = Object.entries(this.inputSets)
-        .filter(s => s[1].recurse)
-      const normalInputSets = Object.entries(this.inputSets)
-        .filter(s => !s[1].recurse)
+    if (this.list) {
+      const types = {}
+      this.list.forEach(item => {
+        if (!(item.type in types)) {
+          types[item.type] = []
+        }
 
-      if (recursingInputSets.length) {
-        result.recurse = recursingInputSets.map(s => {
-          const r = s[1].set.compileQuery({ set: s[0] })
+        types[item.type].push(item.osm_id)
+      })
 
-          r.inputSet = s[0]
-          r.type = s[1].recurse
-
-          return r
+      query += '(' + Object.entries(types)
+        .map(([ type, ids]) => {
+          return type + '  (id:' + ids.join(',') + ');\n'
         })
-      }
+        .join('') + ')->._done' + this.id + ';\n'
 
-      if (normalInputSets.length) {
-        normalInputSets.forEach(s => {
-          if (s[1].set) {
-            const q = s[1].set.compileQuery()
-            result.query += q.query
-
-            if (q.recurse) {
-              result.recurse = (result.recurse ?? []).concat(q.recurse)
-            }
-          } else {
-            result.query = null
-          }
-        })
-      }
-    } else if (this.filter.baseFilter) {
-      const q = this.filter.baseFilter.compileQuery({ outputSet: '._base' })
-      result.query += q.query
-
-      if (q.recurse) {
-        result.recurse = (result.recurse ?? []).concat(q.recurse)
-      }
+      query += '(._' + this.id + '; - ._done' + this.id + ';)->._' + this.id + ';\n'
     }
 
-    if (result.query === null) {
-      return result
-    }
-
-    result.query += this.toQl(options)
-    result.loki = this.toLokijs(options)
-    delete result.loki.recurse
+    result[this.id] = query
 
     return result
   }

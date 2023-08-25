@@ -871,6 +871,8 @@ class OverpassFrontend {
       })
     }
 
+    statement.list = list.map(ob => this.cacheElements[ob.id])
+
     return list
   }
 }

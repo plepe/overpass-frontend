@@ -18,12 +18,18 @@ describe("Filter sets, compile", function () {
     ]])
     assert.equal(f.toString(), 'nwr["amenity"];')
     assert.equal(f.toQl(), 'nwr["amenity"];')
-    assert.deepEqual(f.compileQuery(), {
-      query: 'nwr["amenity"];',
-      loki: {
-        "tags.amenity": { $exists: true }
-      }
-    })
+    assert.deepEqual(f.compileQuery(),
+      'nwr["amenity"]->._1;\n' +
+      '._1 out;\n'
+    )
+    f.getStatement().list = []
+    assert.deepEqual(f.compileQuery(),
+      'nwr["amenity"]->._1;\n' +
+      '()->._done1;\n' +
+      '(._1; - ._done1;)->._1;\n' +
+      '._1 out;\n'
+    )
+
     assert.deepEqual(f.toLokijs(), {
       "tags.amenity": { $exists: true }
     })

@@ -180,33 +180,22 @@ class RequestBBox extends Request {
       effortAvailable = Math.min(effortAvailable, efforts.maxEffort)
     }
 
+    let query = ''
+    if (this.lokiQuery.baseFilter) {
+      query += this.lokiQuery.baseFilter.toQuery({ outputSet: '._base' }) + '\n'
+    }
+
+    const queries = compileQuery(this.lokiQuery.getStatement())
+    const id = Object.keys(queries).pop()
+
+    query += Object.values(queries).join('')
+
     // if the context already has a bbox and it differs from this, we can't add
     // ours
-    let query = this.query.substr(0, this.query.length - 1) + '->.result;\n'
-
-    let queryRemoveDoneFeatures = ''
-    let countRemoveDoneFeatures = 0
-    for (const id in this.doneFeatures) {
-      const ob = this.doneFeatures[id]
-
-      if (countRemoveDoneFeatures % 1000 === 999) {
-        query += '(' + queryRemoveDoneFeatures + ')->.done;\n'
-        queryRemoveDoneFeatures = '.done;'
-      }
-
-      queryRemoveDoneFeatures += ob.type + '(' + ob.osm_id + ');'
-      countRemoveDoneFeatures++
-    }
-
-    if (countRemoveDoneFeatures) {
-      query += '(' + queryRemoveDoneFeatures + ')->.done;\n'
-      query += '(.result; - .done;)->.result;\n'
-    }
-
     if (!('split' in this.options)) {
       this.options.effortSplit = Math.ceil(effortAvailable / this.overpass.options.effortBBoxFeature)
     }
-    query += '.result out ' + overpassOutOptions(this.options) + ';'
+    query += '._' + id + ' out ' + overpassOutOptions(this.options) + ';'
 
     const subRequest = {
       query,
@@ -284,3 +273,31 @@ class RequestBBox extends Request {
 }
 
 module.exports = RequestBBox
+
+function compileQuery (statement, options = {}) {
+  const result = {}
+  let query = statement.toQuery({ outputSet: '._' + statement.id }) + '\n'
+
+  if (statement.list) {
+    const types = {}
+    statement.list.forEach(item => {
+      if (!(item.type in types)) {
+        types[item.type] = []
+      }
+
+      types[item.type].push(item.osm_id)
+    })
+
+    query += '(' + Object.entries(types)
+      .map(([ type, ids]) => {
+        return type + '  (id:' + ids.join(',') + ');\n'
+      })
+      .join('') + ')->._done' + statement.id + ';\n'
+
+    query += '(._' + statement.id + '; - ._done' + statement.id + ';)->._' + statement.id + ';\n'
+  }
+
+  result[statement.id] = query
+
+  return result
+}
