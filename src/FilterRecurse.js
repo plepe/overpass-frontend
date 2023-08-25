@@ -1,10 +1,10 @@
 const filterPart = require('./filterPart')
 const OverpassFrontend = require('./defines')
+const FilterStatement = require('./FilterStatement')
 
-class FilterRecurse {
+class FilterRecurse extends FilterStatement {
   constructor (def, filter) {
-    this.id = filter.createStatementId()
-    filter.statements[this.id] = this
+    super(def, filter)
     this.inputSet = def.inputSet ?? '_'
     this.inputSetRef = filter.sets[this.inputSet]
     this.outputSet = def.outputSet ?? '_'
