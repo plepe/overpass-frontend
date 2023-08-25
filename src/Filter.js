@@ -418,7 +418,7 @@ class Filter {
    */
   compileQuery (options = {}) {
     const set = options.set ?? '_'
-    return set in this.sets ? this.sets[set].compileQuery(options) : { query: null }
+    return set in this.sets ? this.sets[set].compileQuery(options) : {}
   }
 
   recurse (options = {}) {
