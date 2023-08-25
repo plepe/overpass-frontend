@@ -1,9 +1,9 @@
+const FilterStatement = require('./FilterStatement')
 const filterPart = require('./filterPart')
 
-class FilterOr {
+class FilterOr extends FilterStatement {
   constructor (def, filter) {
-    this.id = filter.createStatementId()
-    filter.statements[this.id] = this
+    super(def, filter)
     this.outputSet = '_'
     this.parts = []
 

@@ -1,10 +1,10 @@
 const filterPart = require('./filterPart')
 const cacheMerge = require('./cacheMerge')
+const FilterStatement = require('./FilterStatement')
 
-class FilterAnd {
+class FilterAnd extends FilterStatement {
   constructor (def, filter) {
-    this.id = filter.createStatementId()
-    filter.statements[this.id] = this
+    super(def, filter)
     this.outputSet = '_'
     this.filter = filter
     this.parts = []
