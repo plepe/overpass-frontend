@@ -286,6 +286,18 @@ class FilterQuery {
   }
 
   /**
+   * return a list of all input sets which are needed before this statement
+   * @returns {FilterStatement}
+   */
+  requiredInputSets () {
+    if (!this.inputSets) {
+      return []
+    }
+
+    return Object.values(this.inputSets).map(s => s.set)
+  }
+
+  /**
    * Compile all (recursing) parts of a query
    */
   compileQuery (options = {}) {

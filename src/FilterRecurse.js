@@ -35,6 +35,14 @@ class FilterRecurse {
     return this.toQl(options)
   }
 
+  /**
+   * return a list of all input sets which are needed before this statement
+   * @returns {FilterStatement}
+   */
+  requiredInputSets () {
+    return [ this.inputSetRef ]
+  }
+
   recurse (options = {}) {
     return [{
       type: this.type,

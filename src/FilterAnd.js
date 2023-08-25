@@ -84,6 +84,24 @@ class FilterAnd {
     return this.toQl(options)
   }
 
+  /**
+   * return a list of all input sets which are needed before this statement
+   * @returns {FilterStatement}
+   */
+  requiredInputSets () {
+    const statements = []
+
+    this.parts.forEach(p => {
+      p.requiredInputSets().forEach(s => {
+        if (!statements.includes(s) && !this.parts.includes(s)) {
+          statements.push(s)
+        }
+      })
+    })
+
+    return statements
+  }
+
   recurse () {
   }
 
