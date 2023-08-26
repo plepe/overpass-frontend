@@ -99,17 +99,6 @@ class FilterOr extends FilterStatement {
     return statements
   }
 
-  compileQuery (options = {}) {
-    const result = {
-      query: this.toQl()
-    }
-
-    result.loki = this.toLokijs()
-    delete result.loki.recurse
-
-    return result
-  }
-
   /**
    * return query and queries this depends upon as string.
    * @return {string}
