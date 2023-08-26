@@ -878,6 +878,10 @@ class OverpassFrontend {
       })
     }
 
+    list = list
+      .map(ob => this.cacheElements[ob.id])
+      .filter(item => !('properties' in options) || (options.properties & item.properties) === options.properties)
+
     result[statement.id] = { list }
 
     return list
