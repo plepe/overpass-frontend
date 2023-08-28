@@ -53,14 +53,20 @@ class FilterOr extends FilterStatement {
   }
 
   toQl (options = {}) {
+    let hasOutputSet = false
     const subOptions = JSON.parse(JSON.stringify(options))
     subOptions.inputSet = options.inputSet
     subOptions.outputSet = ''
 
-    let result = '(' + this.parts.map(p => p.toQl(subOptions)).join('') + ')' + (options.outputSet ? '->' + options.outputSet : '')
+    let result = '(' + this.parts.map(p => p.toQl(subOptions)).join('') + ')'
+
+    if (options.outputSet) {
+      hasOutputSet = true
+      result += (options.outputSet ? '->' + options.outputSet : '')
+    }
 
     if (this.outputSet !== '_') {
-      result = '(' + result + ';)->.' + this.outputSet
+      result = (hasOutputSet ? '(' + result + ';)' : result) + '->.' + this.outputSet;
     }
 
     return result + ';'
