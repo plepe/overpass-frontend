@@ -26,6 +26,11 @@ class FilterOr extends FilterStatement {
   }
 
   toLokijs (options = {}) {
+    const allRecurse = this.parts.filter(p => p.recurse().length)
+    if (allRecurse.length) {
+      return {}
+    }
+
     let needMatch = false
 
     const r = {
@@ -79,10 +84,22 @@ class FilterOr extends FilterStatement {
   }
 
   recurse () {
-    return []
+    const allRecurse = this.parts.filter(p => p.recurse().length)
+    if (!allRecurse.length) {
+      return []
+    }
+
+    return this.parts.map(p => {
+      return { id: p.id, type: 'or' }
+    })
   }
 
   toQuery (options = {}) {
+    const allRecurse = this.parts.filter(p => p.recurse().length)
+    if (allRecurse.length) {
+      return '(' + this.parts.map(p => 'nwr._' + p.id + ';').join('') + ')->._' + this.id + ';'
+    }
+
     let result = this.requiredInputSets()
       .map(s => s.toQuery()).join('')
     result += this.toQl({ ...options, setsUseStatementIds: true })

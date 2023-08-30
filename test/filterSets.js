@@ -305,8 +305,28 @@ describe("Filter sets, compile", function () {
     )
     assert.equal(f.toString(), 'nwr["a"]->.a;(nwr["b"];>;(.a >;););')
     assert.equal(f.toQl(), 'nwr["a"]->.a;(nwr["b"];>;(.a >;););')
-    assert.equal(f.toQuery(), 'nwr["a"]->._1;(nwr["b"]->._3;._3 > ->._4;(._1 > ->._6;)->._5;)->._2;')
-    assert.deepEqual(f.recurse(), []) // TODO: wrong
+    assert.equal(f.toQuery(), '(nwr._3;nwr._4;nwr._5;)->._2;')
+    assert.equal(f.toQuery({ statement: 3 }), 'nwr["b"]->._3;')
+    assert.equal(f.toQuery({ statement: 4 }), '._3 > ->._4;')
+    assert.equal(f.toQuery({ statement: 5 }), '(nwr._6;)->._5;')
+    assert.equal(f.toQuery({ statement: 6 }), '._1 > ->._6;')
+    assert.equal(f.toQuery({ statement: 1 }), 'nwr["a"]->._1;')
+    assert.deepEqual(f.recurse(), [
+      { id: 3, type: 'or' },
+      { id: 4, type: 'or' },
+      { id: 5, type: 'or' }
+    ])
+    assert.deepEqual(f.recurse({ statement: 1 }), [])
+    assert.deepEqual(f.recurse({ statement: 3 }), [])
+    assert.deepEqual(f.recurse({ statement: 4 }), [
+      { id: 3, type: '>' }
+    ])
+    assert.deepEqual(f.recurse({ statement: 5 }), [
+      { id: 6, type: 'or' }
+    ])
+    assert.deepEqual(f.recurse({ statement: 6 }), [
+      { id: 1, type: '>' }
+    ])
     assert.deepEqual(f.recurse({ set: 'a' }), [])
     assert.deepEqual(f.toLokijs(), {}) // TODO: wrong (should include nwr[b])
     var r = f.cacheDescriptors()
@@ -947,6 +967,46 @@ describe("Filter sets with relations, compile", function () {
     //var r = f.cacheDescriptors()
     //assert.deepEqual(r, [ { id: 'nwr["amenity"](properties:5)' }])
   })
+  it ('way[highway];(node(w)[highway];);', function () {
+    var f = new Filter('way[highway];(node(w)[highway];);')
+
+    assert.deepEqual(f.def, [
+      [
+        { type: 'way' },
+        { op: 'has_key', key: 'highway' }
+      ],
+      { or: [
+        [
+          { type: 'node' },
+          { inputSet: '_', recurse: 'w' },
+          { key: 'highway', op: 'has_key' }
+        ]
+      ]}
+    ])
+    assert.equal(f.toString(), 'way["highway"];(node(w)["highway"];);')
+    assert.equal(f.toQl(), 'way["highway"];(node(w)["highway"];);')
+    assert.deepEqual(f.recurse(), [
+      { id: 3, type: 'or' }
+    ])
+    assert.deepEqual(f.recurse({ statement: 3 }), [
+      { id: 1, type: 'w' }
+    ])
+    assert.deepEqual(f.recurse({ statement: 1 }), [])
+    assert.equal(f.toQuery(), '(nwr._3;)->._2;')
+    assert.deepEqual(f.toLokijs(), {})
+    assert.deepEqual(f.toLokijs({ statement: 3 }), {
+      'tags.highway': { $exists: true },
+      'type': { $eq: 'node' }
+    })
+    assert.deepEqual(f.toLokijs({ statement: 1 }), {
+      'tags.highway': { $exists: true },
+      'type': { $eq: 'way' }
+    })
+    var r = f.cacheDescriptors()
+    assert.deepEqual(r, [
+      { id: '-["highway"]["highway"](properties:1)' }, // TODO: wrong!
+    ])
+  })
   it ('(nwr[b];>;);', function () {
     var f = new Filter('(nwr[b];>;)')
 
@@ -958,8 +1018,15 @@ describe("Filter sets with relations, compile", function () {
     ])
     assert.equal(f.toString(), '(nwr["b"];>;);')
     assert.equal(f.toQl(), '(nwr["b"];>;);')
-    assert.equal(f.toQuery(), '(nwr["b"]->._2;._2 > ->._3;)->._1;')
-    assert.deepEqual(f.recurse(), []) // TODO: this is wrong
+    assert.deepEqual(f.recurse(), [
+      { id: 2, type: 'or' },
+      { id: 3, type: 'or' }
+    ])
+    assert.deepEqual(f.recurse({ statement: 2 }), [])
+    assert.deepEqual(f.recurse({ statement: 3 }), [
+      { id: 2, type: '>' }
+    ])
+    assert.equal(f.toQuery(), '(nwr._2;nwr._3;)->._1;')
     assert.deepEqual(f.toLokijs(), {})
     var r = f.cacheDescriptors()
     assert.deepEqual(r, [
@@ -1190,6 +1257,26 @@ describe("Filter sets with relations, apply base filter", function () {
 //          }]
         }, done)
       })
+/*    TODO: cache descriptors creates bug
+      it('or1', function (done) {
+        test({
+          mode,
+          query: '(way["highway"="secondary"];node(w););',
+          bounds: {
+            minlat: 48.19821,
+            minlon: 16.33835,
+            maxlat: 48.19827,
+            maxlon: 16.33841
+          },
+          expected: [ 'w4583442', 'n378459', 'n378462', 'n270328331', 'n2208875391', 'n2213568001', 'n3037431653', 'n3037431688' ],
+          expectedSubRequestCount: 0,
+          expectedCacheDescriptors: [{
+            "id": 'way["highway"="secondary"](properties:1)',
+          }, {
+            "id": '-["highway"="secondary"](properties:1)', // TODO: WRONG!
+          }]
+        }, done)
+      }) */
     })
   })
 })
