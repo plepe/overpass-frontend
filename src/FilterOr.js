@@ -65,7 +65,9 @@ class FilterOr extends FilterStatement {
       result += (options.outputSet ? '->' + options.outputSet : '')
     }
 
-    if (this.outputSet !== '_') {
+    if (options.setsUseStatementIds) {
+      result = (hasOutputSet ? '(' + result + ';)' : result) + '->._' + this.id;
+    } else if (this.outputSet !== '_') {
       result = (hasOutputSet ? '(' + result + ';)' : result) + '->.' + this.outputSet;
     }
 
@@ -83,7 +85,7 @@ class FilterOr extends FilterStatement {
   toQuery (options = {}) {
     let result = this.requiredInputSets()
       .map(s => s.toQuery()).join('')
-    result += this.toQl(options)
+    result += this.toQl({ ...options, setsUseStatementIds: true })
     return result
   }
 

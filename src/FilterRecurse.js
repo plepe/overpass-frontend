@@ -20,11 +20,15 @@ class FilterRecurse extends FilterStatement {
   toQl (options = {}) {
     let result = ''
 
-    if (this.inputSet !== '_') {
+    if (options.setsUseStatementIds) {
+      result += '._' + this.inputSetRef.id + ' '
+    } else if (this.inputSet !== '_') {
       result += '.' + this.inputSet + ' '
     }
     result += this.type
-    if (this.outputSet !== '_') {
+    if (options.setsUseStatementIds) {
+      result += ' ->._' + this.id
+    } else if (this.outputSet !== '_') {
       result += ' ->.' + this.outputSet
     }
 
@@ -32,7 +36,7 @@ class FilterRecurse extends FilterStatement {
   }
 
   toQuery (options = {}) {
-    return this.toQl(options)
+    return this.toQl({ ...options, setsUseStatementIds: true })
   }
 
   /**

@@ -83,7 +83,7 @@ class FilterAnd extends FilterStatement {
   toQuery (options = {}) {
     let result = this.requiredInputSets()
       .map(s => s.toQuery()).join('')
-    result += this.toQl(options)
+    result += this.toQl({ ...options, setsUseStatementIds: true })
     return result
   }
 

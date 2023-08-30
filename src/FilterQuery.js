@@ -187,6 +187,10 @@ class FilterQuery extends FilterStatement {
 
     if (this.inputSets) {
       result += Object.entries(this.inputSets).map(([s, inputSet]) => {
+        if (options.setsUseStatementIds) {
+          s = '_' + inputSet.set.id
+        }
+
         if (inputSet.recurse) {
           return '(' + inputSet.recurse + (s === '_' ? '' : '.' + s) + ')'
         } else {
@@ -202,12 +206,14 @@ class FilterQuery extends FilterStatement {
 
     result += this.filters.map(part => compileFilter(part, options)).join('')
 
-    if (this.outputSet !== '_') {
+    if (options.setsUseStatementIds) {
+      result += '->._' + this.id
+    } else if (this.outputSet !== '_') {
       result += '->.' + this.outputSet
     }
 
     if (options.outputSet) {
-      if (this.outputSet !== '_') {
+      if (options.setsUseStatementIds || this.outputSet !== '_') {
         result = '(' + result + ';)->' + options.outputSet
       } else {
         result += '->' + options.outputSet
@@ -281,7 +287,7 @@ class FilterQuery extends FilterStatement {
       return result
     }
 
-    result += this.toQl(options)
+    result += this.toQl({ ...options, setsUseStatementIds: true })
     return result
   }
 
