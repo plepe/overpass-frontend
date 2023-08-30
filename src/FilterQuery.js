@@ -236,8 +236,7 @@ class FilterQuery extends FilterStatement {
         result = recursingInputSets.map(s => {
           return {
             type: s[1].recurse,
-            inputSet: s[0],
-            statement: s[1].set
+            id: s[1].set.id
           }
         })
       }

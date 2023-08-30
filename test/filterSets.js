@@ -19,6 +19,7 @@ describe("Filter sets, compile", function () {
     assert.equal(f.toString(), 'nwr["amenity"];')
     assert.equal(f.toQl(), 'nwr["amenity"];')
     assert.equal(f.toQuery(), 'nwr["amenity"]->._1;')
+    assert.deepEqual(f.recurse(), [])
     assert.deepEqual(f.compileQuery(), {
       query: 'nwr["amenity"];',
       loki: {
@@ -44,6 +45,8 @@ describe("Filter sets, compile", function () {
     assert.equal(f.toQl(), 'nwr["amenity"]->.a;')
     assert.equal(f.toQuery(), null)
     assert.equal(f.toQuery({ set: 'a' }), 'nwr["amenity"]->._1;')
+    assert.deepEqual(f.recurse(), [])
+    assert.deepEqual(f.recurse({ set: 'a' }), [])
     assert.deepEqual(f.compileQuery(), {
       query: null
     })
@@ -77,6 +80,8 @@ describe("Filter sets, compile", function () {
     assert.equal(f.toQl(), '(nwr["amenity"];)->.a;')
     assert.equal(f.toQuery(), 'nwr["amenity"]->._2;')
     assert.equal(f.toQuery({ set: 'a' }), '(nwr["amenity"]->._2;)->._1;')
+    assert.deepEqual(f.recurse(), [])
+    assert.deepEqual(f.recurse({ set: 'a' }), [])
     assert.deepEqual(f.compileQuery(), {
       query: 'nwr["amenity"];',
       loki: {
@@ -103,6 +108,8 @@ describe("Filter sets, compile", function () {
     assert.equal(f.toQl(), '(nwr["amenity"]->.a;);')
     assert.equal(f.toQuery(), '(nwr["amenity"]->._2;)->._1;')
     assert.equal(f.toQuery({ set: 'a' }), 'nwr["amenity"]->._2;')
+    assert.deepEqual(f.recurse(), [])
+    assert.deepEqual(f.recurse({ set: 'a' }), [])
     assert.deepEqual(f.compileQuery(), {
       query: '(nwr["amenity"]->.a;);',
       loki: {
@@ -134,6 +141,8 @@ describe("Filter sets, compile", function () {
     assert.equal(f.toQl(), '(nwr["amenity"](1,1,2,2)->.a;);')
     assert.equal(f.toQuery(), '(nwr["amenity"](1,1,2,2)->._2;)->._1;')
     assert.equal(f.toQuery({ set: 'a' }), 'nwr["amenity"](1,1,2,2)->._2;')
+    assert.deepEqual(f.recurse(), [])
+    assert.deepEqual(f.recurse({ set: 'a' }), [])
     assert.deepEqual(f.compileQuery(), {
       query: '(nwr["amenity"](1,1,2,2)->.a;);',
       loki: {
@@ -173,6 +182,8 @@ describe("Filter sets, compile", function () {
     assert.equal(f.toQl(), '(nwr["amenity"](1,1,2,2)->.a;);node._["cuisine"];')
     assert.equal(f.toQuery(), '(nwr["amenity"](1,1,2,2)->._2;)->._1;node._1["cuisine"]->._3;')
     assert.equal(f.toQuery({ set: 'a' }), 'nwr["amenity"](1,1,2,2)->._2;')
+    assert.deepEqual(f.recurse(), [])
+    assert.deepEqual(f.recurse({ set: 'a' }), [])
     assert.deepEqual(f.compileQuery(), {
       query: '(nwr["amenity"](1,1,2,2)->.a;);node._["cuisine"];',
       loki: {
@@ -222,6 +233,8 @@ describe("Filter sets, compile", function () {
     assert.equal(f.toQl(), 'nwr["amenity"]->.a;nwr.a["cuisine"];')
     assert.equal(f.toQuery(), 'nwr["amenity"]->._1;nwr._1["cuisine"]->._2;')
     assert.equal(f.toQuery({ set: 'a' }), 'nwr["amenity"]->._1;')
+    assert.deepEqual(f.recurse(), [])
+    assert.deepEqual(f.recurse({ set: 'a' }), [])
     assert.deepEqual(f.compileQuery(), {
       query: 'nwr["amenity"]->.a;nwr.a["cuisine"];',
       loki: {
@@ -259,6 +272,8 @@ describe("Filter sets, compile", function () {
     assert.equal(f.toString(), 'nwr["a"]->.a;(nwr["b"]->.b;nwr.a["b"];);')
     assert.equal(f.toQl(), 'nwr["a"]->.a;(nwr["b"]->.b;nwr.a["b"];);')
     assert.equal(f.toQuery(), 'nwr["a"]->._1;(nwr["b"]->._3;nwr._1["b"]->._4;)->._2;')
+    assert.deepEqual(f.recurse(), [])
+    assert.deepEqual(f.recurse({ set: 'a' }), [])
     assert.deepEqual(f.toLokijs(),
         { '$or': [
             { 'tags.b': { '$exists': true } },
@@ -291,6 +306,8 @@ describe("Filter sets, compile", function () {
     assert.equal(f.toString(), 'nwr["a"]->.a;(nwr["b"];>;(.a >;););')
     assert.equal(f.toQl(), 'nwr["a"]->.a;(nwr["b"];>;(.a >;););')
     assert.equal(f.toQuery(), 'nwr["a"]->._1;(nwr["b"]->._3;._3 > ->._4;(._1 > ->._6;)->._5;)->._2;')
+    assert.deepEqual(f.recurse(), []) // TODO: wrong
+    assert.deepEqual(f.recurse({ set: 'a' }), [])
     assert.deepEqual(f.toLokijs(), {}) // TODO: wrong (should include nwr[b])
     var r = f.cacheDescriptors()
     assert.deepEqual(r, [
@@ -299,7 +316,7 @@ describe("Filter sets, compile", function () {
       { id: 'nwr["a"];>;(properties:5)' }
     ])
   })
-  it ('(nwr[a]->.a;(nwr[b]->b;nwr.a[b]););', function () {
+  it ('(nwr[a]->.a;(nwr[b]->.b;nwr.a[b]););', function () {
     var f = new Filter('(nwr[a]->.a;(nwr[b]->.b;nwr.a[b];););')
 
     assert.deepEqual(f.def, [{
@@ -314,6 +331,8 @@ describe("Filter sets, compile", function () {
     assert.equal(f.toString(), '(nwr["a"]->.a;(nwr["b"]->.b;nwr.a["b"];););')
     assert.equal(f.toQl(), '(nwr["a"]->.a;(nwr["b"]->.b;nwr.a["b"];););')
     assert.equal(f.toQuery(), '(nwr["a"]->._2;(nwr["b"]->._4;nwr._2["b"]->._5;)->._3;)->._1;')
+    assert.deepEqual(f.recurse(), [])
+    assert.deepEqual(f.recurse({ set: 'a' }), [])
 
     assert.deepEqual(f.compileQuery(), {
       query: '(nwr["a"]->.a;(nwr["b"]->.b;nwr.a["b"];););',
@@ -365,6 +384,8 @@ describe("Filter sets, compile", function () {
     assert.equal(f.toString(), '(nwr["a"]->.a;(nwr["b"]->.b;nwr.a["b"];);)->.a;')
     assert.equal(f.toQl(), '(nwr["a"]->.a;(nwr["b"]->.b;nwr.a["b"];);)->.a;')
     assert.equal(f.toQuery(), 'nwr["a"]->._2;(nwr["b"]->._4;nwr._2["b"]->._5;)->._3;')
+    assert.deepEqual(f.recurse(), [])
+    assert.deepEqual(f.recurse({ set: 'a' }), [])
     assert.deepEqual(f.compileQuery(), {
       query: '(nwr["b"]->.b;nwr.a["b"];);',
       loki: {
@@ -425,6 +446,8 @@ describe("Filter sets, compile", function () {
     assert.equal(f.toString(), 'nwr.a["amenity"];')
     assert.equal(f.toQl(), 'nwr.a["amenity"];')
     assert.equal(f.toQuery(), null)
+    assert.deepEqual(f.recurse(), [])
+    assert.deepEqual(f.recurse({ set: 'a' }), [])
     assert.deepEqual(f.compileQuery(), {
       query: null
     })
@@ -450,6 +473,8 @@ describe("Filter sets, compile", function () {
     assert.equal(f.toString(), 'nwr.a.b["amenity"];')
     assert.equal(f.toQl(), 'nwr.a.b["amenity"];')
     assert.equal(f.toQuery(), null)
+    assert.deepEqual(f.recurse(), [])
+    assert.deepEqual(f.recurse({ set: 'a' }), [])
     assert.deepEqual(f.compileQuery(), {
       query: null
     })
@@ -484,6 +509,8 @@ describe("Filter sets, compile", function () {
     assert.equal(f.toString(), 'nwr["amenity"]->.a;nwr["xxx"]->.b;nwr.a.b["cuisine"];')
     assert.equal(f.toQl(), 'nwr["amenity"]->.a;nwr["xxx"]->.b;nwr.a.b["cuisine"];')
     assert.equal(f.toQuery(), 'nwr["amenity"]->._1;nwr["xxx"]->._2;nwr._1._2["cuisine"]->._3;')
+    assert.deepEqual(f.recurse(), [])
+    assert.deepEqual(f.recurse({ set: 'a' }), [])
     assert.deepEqual(f.compileQuery(), {
       query: 'nwr["amenity"]->.a;nwr["xxx"]->.b;nwr.a.b["cuisine"];',
       loki: {
@@ -520,6 +547,10 @@ describe("Filter sets with relations, compile", function () {
     assert.equal(f.toQl(), 'nwr["amenity"];>;')
     assert.equal(f.toQuery(), '._1 > ->._2;')
     assert.equal(f.toQuery({ statement: 1 }), 'nwr["amenity"]->._1;')
+    assert.deepEqual(f.recurse(), [
+      { id: 1, type: '>' }
+    ])
+    assert.deepEqual(f.recurse({ statement: 1 }), [])
     assert.deepEqual(f.compileQuery(), {
       query: '>;',
       loki: {},
@@ -549,6 +580,10 @@ describe("Filter sets with relations, compile", function () {
     assert.equal(f.toQl(), 'nwr["amenity"];>;')
     assert.equal(f.toQuery(), '._1 > ->._2;')
     assert.equal(f.toQuery({ statement: 1 }), 'nwr["amenity"]->._1;')
+    assert.deepEqual(f.recurse(), [
+      { id: 1, type: '>' }
+    ])
+    assert.deepEqual(f.recurse({ statement: 1 }), [])
     assert.deepEqual(f.compileQuery(), {
       query: '>;',
       loki: {},
@@ -580,6 +615,11 @@ describe("Filter sets with relations, compile", function () {
     assert.equal(f.toQuery(), null)
     assert.equal(f.toQuery({ set: 'b' }), '._1 > ->._2;')
     assert.equal(f.toQuery({ statement: 1 }), 'nwr["amenity"]->._1;')
+    assert.deepEqual(f.recurse(), [])
+    assert.deepEqual(f.recurse({ set: 'b' }), [
+      { id: 1, type: '>' }
+    ])
+    assert.deepEqual(f.recurse({ statement: 1 }), [])
     assert.deepEqual(f.compileQuery(), {
       query: null
     })
@@ -627,6 +667,10 @@ describe("Filter sets with relations, compile", function () {
     assert.equal(f.toQl(), 'nwr["amenity"];node(w);')
     assert.equal(f.toQuery(), 'node(w._1)->._2;')
     assert.equal(f.toQuery({ statement: 1 }), 'nwr["amenity"]->._1;')
+    assert.deepEqual(f.recurse(), [
+      { id: 1, type: 'w' }
+    ])
+    assert.deepEqual(f.recurse({ statement: 1 }), [])
 
     assert.deepEqual(f.compileQuery(), {
       query: 'node(w);',
@@ -670,6 +714,10 @@ describe("Filter sets with relations, compile", function () {
     assert.equal(f.toQl(), 'way["highway"];node(w);node._["highway"];')
     assert.equal(f.toQuery(), 'node(w._1)->._2;node._2["highway"]->._3;')
     assert.equal(f.toQuery({ statement: 1 }), 'way["highway"]->._1;')
+    assert.deepEqual(f.recurse(), [
+      { id: 1, type: 'w' }
+    ])
+    assert.deepEqual(f.recurse({ statement: 1 }), [])
     assert.deepEqual(f.compileQuery(), {
       recurse: [{
         type: 'w',
@@ -730,6 +778,12 @@ describe("Filter sets with relations, compile", function () {
     assert.equal(f.toQuery(), 'node(w._1)->._2;node._2(w._3)->._4;')
     assert.equal(f.toQuery({ statement: 1 }), 'way["highway"]->._1;')
     assert.equal(f.toQuery({ statement: 3 }), 'way["railway"]->._3;')
+    assert.deepEqual(f.recurse(), [
+      { id: 3, type: 'w' },
+      { id: 1, type: 'w' }
+    ])
+    assert.deepEqual(f.recurse({ statement: 1 }), [])
+    assert.deepEqual(f.recurse({ statement: 3 }), [])
     assert.deepEqual(f.compileQuery(), {
       // TODO: assign input sets
       query: 'node(w)->.a;node.a(w);',
@@ -795,6 +849,12 @@ describe("Filter sets with relations, compile", function () {
     assert.equal(f.toQuery(), 'node(w._1)(w._2)->._3;')
     assert.equal(f.toQuery({ statement: 1 }), 'way["highway"]->._1;')
     assert.equal(f.toQuery({ statement: 2 }), 'way["railway"]->._2;')
+    assert.deepEqual(f.recurse(), [
+      { id: 1, type: 'w' },
+      { id: 2, type: 'w' }
+    ])
+    assert.deepEqual(f.recurse({ statement: 1 }), [])
+    assert.deepEqual(f.recurse({ statement: 2 }), [])
     assert.deepEqual(f.compileQuery(), {
       query: 'node(w.a)(w.b);',
       loki: {
@@ -849,6 +909,13 @@ describe("Filter sets with relations, compile", function () {
     assert.equal(f.toQuery(), 'node(w._2)->._3;')
     assert.equal(f.toQuery({ statement: 2 }), 'way(r._1)->._2;')
     assert.equal(f.toQuery({ statement: 1 }), 'relation["route"="tram"]->._1;')
+    assert.deepEqual(f.recurse(), [
+      { id: 2, type: 'w' }
+    ])
+    assert.deepEqual(f.recurse({ statement: 2 }), [
+      { id: 1, type: 'r' }
+    ])
+    assert.deepEqual(f.recurse({ statement: 1 }), [])
     assert.deepEqual(f.compileQuery(), {
       query: 'node(w);',
       loki: {
@@ -915,6 +982,7 @@ describe("Filter sets with relations, apply base filter", function () {
     assert.equal(f.toString(), 'nwr(46,16,47,17)->._base;nwr._base["amenity"];')
     assert.equal(f.toQl(), 'nwr(46,16,47,17)->._base;nwr._base["amenity"];')
     assert.equal(f.toQuery(), '(nwr(46,16,47,17)->._1;)->._base;nwr._base["amenity"]->._1;')
+    assert.deepEqual(f.recurse(), [])
     assert.deepEqual(f.compileQuery(), {
       query: 'nwr(46,16,47,17)->._base;nwr._base["amenity"];',
       loki: {
@@ -953,6 +1021,10 @@ describe("Filter sets with relations, apply base filter", function () {
     assert.equal(f.toQuery(), '._1 > ->._4;')
     assert.equal(f.toQuery({ statement: 1 }), '(nwr._base["a"]->._2;nwr._base["b"]->._3;)->._1;') // TODO: wrong, ._base missing
     // assert.equal(f.toQuery(), '(nwr(46,16,47,17)->._1;)->._base;nwr._base["amenity"]->._1;')
+    assert.deepEqual(f.recurse(), [
+      { id: 1, type: '>' }
+    ])
+    assert.deepEqual(f.recurse({ statement: 1 }), [])
     assert.deepEqual(f.compileQuery(), {
       query: '>;',
       loki: {},

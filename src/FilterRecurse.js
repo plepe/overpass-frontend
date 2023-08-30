@@ -50,8 +50,7 @@ class FilterRecurse extends FilterStatement {
   recurse (options = {}) {
     return [{
       type: this.type,
-      inputSet: this.inputSet,
-      statement: this.inputSetRef
+      id: this.inputSetRef.id
     }]
   }
 

@@ -798,22 +798,17 @@ class OverpassFrontend {
       db = this.db.chain()
     }
 
-    const statement = filter.getStatement({ set: options.set || '_' })
-    return this._queryStatement(statement, options, db)
-  }
-
-  _queryStatement (statement, options, db = null) {
+    const statement = filter.getStatement(options)
     if (!statement) {
       return []
     }
 
     const recurse = statement.recurse()
-
     if (recurse.length) {
       let ids = {}
 
       recurse.forEach(query => {
-        const list = this._queryStatement(query.statement, { set: query.inputSet }, db.branch())
+        const list = this.queryLokiDB(filter, { statement: query.id }, db.branch())
         list.forEach(ob => {
           const item = this.cacheElements[ob.id]
           let other
