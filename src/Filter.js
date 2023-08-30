@@ -379,14 +379,12 @@ class Filter {
    * @param {OverpassNode|OverpassWay|OverpassRelation} ob an object from Overpass API
    * @param {object} [options] Options
    * @param {string} [options.set=_] Which set should the object be matched against.
+   * @param {int} [options.statement] Return the statement with this id
    * @return {boolean}
    */
   match (ob, options = {}) {
-    if ((options.set ?? '_') in this.sets) {
-      return this.sets[options.set ?? '_'].match(ob)
-    }
-
-    return false
+    const statement = this.getStatement(options)
+    return statement ? statement.match(ob) : false
   }
 
   /**
@@ -399,10 +397,7 @@ class Filter {
 
   toQuery (options = {}) {
     const statement = this.getStatement(options)
-
-    if (statement) {
-      return statement.toQuery(options)
-    }
+    return statement ? statement.toQuery(options) : null
   }
 
   /**
@@ -426,14 +421,12 @@ class Filter {
    * Compile all (recursing) parts of a query
    */
   compileQuery (options = {}) {
-    const set = options.set ?? '_'
-    return set in this.sets ? this.sets[set].compileQuery(options) : { query: null }
+    const statement = this.getStatement(options)
+    return statement ? statement.compileQuery(options) : { query: null }
   }
 
   recurse (options = {}) {
-    const set = options.set ?? '_'
-    const statement = set in this.sets ? this.sets[set] : null
-
+    const statement = this.getStatement(options)
     return statement ? statement.recurse() : []
   }
 
@@ -441,14 +434,12 @@ class Filter {
    * Convert query to LokiJS query for local database. If the property 'needMatch' is set on the returned object, an additional match() should be executed for each returned object, as the query can't be fully compiled (and the 'needMatch' property removed).
    * @param {object} [options] Additional options
    * @param {string} [options.set=_] For which set should the query be compiled.
+   * @param {int} [options.statement] Return the statement with this id
    * @return {object}
    */
   toLokijs (options = {}) {
-    if ((options.set ?? '_') in this.sets) {
-      return this.sets[options.set ?? '_'].toLokijs(options)
-    }
-
-    return { $not: true }
+    const statement = this.getStatement(options)
+    return statement ? statement.toLokijs(options) : { $not: true }
   }
 
   /**
@@ -471,11 +462,8 @@ class Filter {
   }
 
   _caches (options = {}) {
-    if ((options.set ?? '_') in this.sets) {
-      return this.sets[options.set ?? '_']._caches(options)
-    }
-
-    return []
+    const statement = this.getStatement(options)
+    return statement ? statement._caches(options) : []
   }
 
   /**
