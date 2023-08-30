@@ -351,10 +351,19 @@ class Filter {
    * return the filter statement for the specified output set (or '_')
    * @param {object} [options] Options
    * @param {string} [options.set=_] Which set should the object be matched against.
+   * @param {int} [options.statement] Return the statement with this id
    * @return {FilterStatement}
    */
   getStatement (options = {}) {
-    return this.sets[options.set || '_']
+    if ('set' in options) {
+      return this.sets[options.set]
+    }
+
+    if ('statement' in options) {
+      return this.statements[options.statement]
+    }
+
+    return this.sets._
   }
 
   /**
