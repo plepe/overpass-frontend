@@ -835,6 +835,10 @@ class OverpassFrontend {
             case 'br':
               other = item.type === 'relation' ? item.memberOf.map(m => m.id) : []
               break
+            case 'or':
+            case 'and':
+              other = [ item.id ]
+              break
             default:
               throw new Error('invalid recurse type', query)
           }
@@ -845,10 +849,14 @@ class OverpassFrontend {
         })
       })
 
-      const count = recurse.length
-      ids = Object.entries(ids)
-        .filter(e => e[1] === count)
-        .map(e => e[0])
+      if (recurse[0].type === 'or') {
+        ids = Object.keys(ids)
+      } else {
+        const count = recurse.length
+        ids = Object.entries(ids)
+          .filter(e => e[1] === count)
+          .map(e => e[0])
+      }
 
       db.find({ 'id': { '$in': ids } })
     }
@@ -862,7 +870,7 @@ class OverpassFrontend {
     if (needMatch) {
       list = list.filter(ob => {
         const item = this.cacheElements[ob.id]
-        return statement.match(item, { set: options.set ?? '_' })
+        return statement.match(item)
       })
     }
 
