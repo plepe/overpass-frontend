@@ -793,7 +793,7 @@ class OverpassFrontend {
       .replace('$', '\\$')
   }
 
-  queryLokiDB (filter, options = {}, db = null) {
+  queryLokiDB (filter, options = {}, db = null, result = {}) {
     if (!db) {
       db = this.db.chain()
     }
@@ -803,12 +803,16 @@ class OverpassFrontend {
       return []
     }
 
+    if (statement.id in result) {
+      return result[statement.id].list
+    }
+
     const recurse = statement.recurse()
     if (recurse.length) {
       let ids = {}
 
       recurse.forEach(query => {
-        const list = this.queryLokiDB(filter, { statement: query.id }, db.branch())
+        const list = this.queryLokiDB(filter, { statement: query.id }, db.branch(), result)
         list.forEach(ob => {
           const item = this.cacheElements[ob.id]
           let other
@@ -873,6 +877,8 @@ class OverpassFrontend {
         return statement.match(item)
       })
     }
+
+    result[statement.id] = { list }
 
     return list
   }
