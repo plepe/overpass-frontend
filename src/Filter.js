@@ -366,6 +366,27 @@ class Filter {
     return this.sets._
   }
 
+  getScript (options = {}) {
+    let result = []
+
+    const statement = this.getStatement(options)
+    if (!statement) {
+      return []
+    }
+
+    const recurse = statement.recurse()
+    result = [
+      { id: statement.id, recurse }
+    ]
+
+    recurse.forEach(e => {
+      const r = this.getScript({ statement: e.id })
+      result = r.concat(result)
+    })
+
+    return result
+  }
+
   /**
    * set a filter which is applied to all queries which do not have a specified input set.
    * @param {string|Filter} filter a filter, e.g. 'nwr[x=y](1,1,2,2)'
