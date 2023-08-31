@@ -44,7 +44,7 @@ class FilterRecurse extends FilterStatement {
    * @returns {FilterStatement}
    */
   requiredInputSets () {
-    return [ this.inputSetRef ]
+    return [this.inputSetRef]
   }
 
   recurse (options = {}) {
@@ -63,7 +63,7 @@ class FilterRecurse extends FilterStatement {
     return {
       query: this.toQl(options),
       loki: {},
-      recurse: [ r ]
+      recurse: [r]
     }
   }
 
@@ -81,7 +81,7 @@ class FilterRecurse extends FilterStatement {
     if (this.inputSets) {
       result += Object.values(this.inputSets).map(s => s.fullString()).join('')
     } else if (this.filter.baseFilter) {
-      result += this.filter.baseFilter.toQl({outputSet: '._base'})
+      result += this.filter.baseFilter.toQl({ outputSet: '._base' })
     }
 
     result += this.toQl()

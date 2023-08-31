@@ -52,7 +52,7 @@ class RequestBBox extends Request {
           this.lokiQuery.setBaseFilter('nwr(' + this.bbox.toLatLonString() + ')')
         } else {
           // this does not support polygons with holes
-          let coords = this.bounds.geometry.coordinates[0]
+          const coords = this.bounds.geometry.coordinates[0]
             .slice(0, -1)
             .map(c => c[1] + ' ' + c[0])
             .join(' ')

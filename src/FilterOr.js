@@ -7,7 +7,6 @@ class FilterOr extends FilterStatement {
     this.outputSet = '_'
     this.parts = []
 
-    let hasType = false
     let hasOutputSet = false
     def.or.forEach(part => {
       if (part.outputSet) {
@@ -71,9 +70,9 @@ class FilterOr extends FilterStatement {
     }
 
     if (options.setsUseStatementIds) {
-      result = (hasOutputSet ? '(' + result + ';)' : result) + '->._' + this.id;
+      result = (hasOutputSet ? '(' + result + ';)' : result) + '->._' + this.id
     } else if (this.outputSet !== '_') {
-      result = (hasOutputSet ? '(' + result + ';)' : result) + '->.' + this.outputSet;
+      result = (hasOutputSet ? '(' + result + ';)' : result) + '->.' + this.outputSet
     }
 
     return result + ';'
@@ -144,8 +143,6 @@ class FilterOr extends FilterStatement {
   }
 
   _caches () {
-    const result = []
-
     return this.parts
       .map(part => part._caches())
       .flat()

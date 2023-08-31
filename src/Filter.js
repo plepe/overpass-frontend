@@ -1,6 +1,3 @@
-const strsearch2regexp = require('strsearch2regexp')
-const filterJoin = require('./filterJoin')
-const OverpassFrontend = require('./defines')
 const qlFunctions = require('./qlFunctions/__index__')
 const parseString = require('./parseString')
 const parseParentheses = require('./parseParentheses')
@@ -32,7 +29,7 @@ function parse (def, rek = 0) {
 
       keyRegexp = false
       m = def.match(/^\s*(node|way|relation|rel|nwr|\(|\))/)
-      let m1 = def.match(/^\s*(?:\.([A-Za-z_][A-Za-z0-9_]*))?\s*(>|<)\s*(?:->\s*.([A-Za-z_][A-Za-z0-9_]*))?;?/)
+      const m1 = def.match(/^\s*(?:\.([A-Za-z_][A-Za-z0-9_]*))?\s*(>|<)\s*(?:->\s*.([A-Za-z_][A-Za-z0-9_]*))?;?/)
       if (m && m[1] === '(') {
         def = def.slice(m[0].length)
 
@@ -213,8 +210,7 @@ function parse (def, rek = 0) {
         current = []
         notExists = null
         mode = 1
-      }
-      else {
+      } else {
         throw new Error("Can't parse query, expected output set and ';': " + def)
       }
     } else if (mode === 20) {
@@ -242,7 +238,7 @@ function parse (def, rek = 0) {
         mode = 10
       } else if (mRecurse) {
         def = r[1]
-        let c = { recurse: mRecurse[1] }
+        const c = { recurse: mRecurse[1] }
         if (mRecurse[2]) {
           c.inputSet = mRecurse[2]
         }
@@ -275,16 +271,20 @@ function check (def) {
     def = def.map(d => check(d))
   }
   if (def.and) {
-    def = [{and: def.and.map(p => {
-      const d = check(p)
-      return Array.isArray(d[0]) || (Array.isArray(d) && (d[0].or || d[0].and)) ? d[0] : d
-    })}]
+    def = [{
+      and: def.and.map(p => {
+        const d = check(p)
+        return Array.isArray(d[0]) || (Array.isArray(d) && (d[0].or || d[0].and)) ? d[0] : d
+      })
+    }]
   }
   if (def.or) {
-    def = [{or: def.or.map(p => {
-      const d = check(p)
-      return Array.isArray(d[0]) || (Array.isArray(d) && (d[0].or || d[0].and)) ? d[0] : d
-    })}]
+    def = [{
+      or: def.or.map(p => {
+        const d = check(p)
+        return Array.isArray(d[0]) || (Array.isArray(d) && (d[0].or || d[0].and)) ? d[0] : d
+      })
+    }]
   } else if (def.fun && !(def instanceof qlFunction)) {
     def = new qlFunctions[def.fun](def.value)
   }
@@ -555,8 +555,8 @@ class Filter {
   expandOr (def) {
     def.forEach((part, index) => {
       if (Array.isArray(part)) {
-        let or = []
-        let other = []
+        const or = []
+        const other = []
 
         part.forEach(q => {
           if (q.or) {
@@ -595,7 +595,7 @@ class Filter {
 
   convertToFilterScript (def) {
     this.sets = {}
-    let r = def.map(d => filterPart.get(d, this))
+    const r = def.map(d => filterPart.get(d, this))
 
     return r
   }

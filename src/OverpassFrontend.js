@@ -841,7 +841,7 @@ class OverpassFrontend {
               break
             case 'or':
             case 'and':
-              other = [ item.id ]
+              other = [item.id]
               break
             default:
               throw new Error('invalid recurse type', query)
@@ -862,7 +862,7 @@ class OverpassFrontend {
           .map(e => e[0])
       }
 
-      db.find({ 'id': { '$in': ids } })
+      db.find({ id: { $in: ids } })
     }
 
     const query = statement.toLokijs()

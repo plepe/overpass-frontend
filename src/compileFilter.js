@@ -71,5 +71,3 @@ module.exports = function compileFilter (part, options = {}) {
 function qlesc (str) {
   return '"' + str.replace(/"/g, '\\"') + '"'
 }
-
-

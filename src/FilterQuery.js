@@ -35,8 +35,7 @@ class FilterQuery extends FilterStatement {
           part.inputSet = '_'
         }
 
-        if (part.inputSet in filter.sets) {
-        } else {
+        if (!(part.inputSet in filter.sets)) {
           console.log('input set ' + part.inputSet + ' not defined')
           this.noResult = true
         }
@@ -143,7 +142,7 @@ class FilterQuery extends FilterStatement {
       query.$and = orQueries.map(q => { return { $or: q } })
     }
 
-    const inputSets = this.inputSets ?? (this.filter.baseFilter ? {_base: {set: this.filter.baseFilter}} : null)
+    const inputSets = this.inputSets ?? (this.filter.baseFilter ? { _base: { set: this.filter.baseFilter } } : null)
     if (inputSets) {
       const normalInputSets = Object.entries(inputSets)
         .filter(s => !s[1].recurse)
@@ -155,7 +154,7 @@ class FilterQuery extends FilterStatement {
         query = {
           $and: normalInputSets
             .map(([inputsSetKey, inputSet]) => {
-              const r = inputSet && inputSet.set ? inputSet.set.toLokijs() : {$not: true}
+              const r = inputSet && inputSet.set ? inputSet.set.toLokijs() : { $not: true }
               if (r.needMatch) {
                 needMatch = true
                 delete r.needMatch
@@ -306,7 +305,7 @@ class FilterQuery extends FilterStatement {
    * Compile all (recursing) parts of a query
    */
   compileQuery (options = {}) {
-    let result = {
+    const result = {
       query: ''
     }
 
@@ -375,7 +374,7 @@ class FilterQuery extends FilterStatement {
     if (this.inputSets) {
       result += Object.values(this.inputSets).map(s => s.set.fullString()).join('')
     } else if (this.filter.baseFilter) {
-      result += this.filter.baseFilter.toQl({outputSet: '._base'})
+      result += this.filter.baseFilter.toQl({ outputSet: '._base' })
     }
 
     result += this.toQl()
@@ -385,9 +384,6 @@ class FilterQuery extends FilterStatement {
 
   _caches () {
     let options = [{ filters: '', properties: 0 }]
-
-    const inputSets = []
-    let outputSet = '_'
 
     if (this.type !== 'nwr') {
       options.forEach(o => {
