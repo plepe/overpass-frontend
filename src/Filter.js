@@ -367,23 +367,23 @@ class Filter {
   }
 
   getScript (options = {}) {
-    let result = []
-
     const statement = this.getStatement(options)
     if (!statement) {
       return []
     }
 
+    const result = []
     const recurse = statement.recurse()
-    result = [
-      { id: statement.id, recurse }
-    ]
-
     recurse.forEach(e => {
       const r = this.getScript({ statement: e.id })
-      result = r.concat(result)
+      r.forEach(f => {
+        if (!result.filter(g => g.id === f.id).length) {
+          result.push(f)
+        }
+      })
     })
 
+    result.push({ id: statement.id, recurse })
     return result
   }
 

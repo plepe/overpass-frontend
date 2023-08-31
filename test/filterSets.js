@@ -373,6 +373,10 @@ describe("Filter sets, compile", function () {
     ])
     assert.deepEqual(f.recurse({ set: 'a' }), [])
     assert.deepEqual(f.getScript(), [
+      { id: 3, recurse: [] },
+      { id: 4, recurse: [
+        { id: 3, type: '>' }
+      ]},
       { id: 1, recurse: [] },
       { id: 6, recurse: [
         { id: 1, type: '>' }
@@ -380,11 +384,6 @@ describe("Filter sets, compile", function () {
       { id: 5, recurse: [
         { id: 6, type: 'or' }
       ]},
-      { id: 3, recurse: [] },
-      { id: 4, recurse: [
-        { id: 3, type: '>' }
-      ]},
-      { id: 3, recurse: [] }, // TODO: duplicate
       { id: 2, recurse: [
         { id: 3, type: 'or' },
         { id: 4, type: 'or' },
@@ -929,8 +928,8 @@ describe("Filter sets with relations, compile", function () {
     assert.deepEqual(f.recurse({ statement: 1 }), [])
     assert.deepEqual(f.recurse({ statement: 3 }), [])
     assert.deepEqual(f.getScript(), [
-      { id: 1, recurse: [] },
       { id: 3, recurse: [] },
+      { id: 1, recurse: [] },
       { id: 4, recurse: [
         { id: 3, type: 'w' },
         { id: 1, type: 'w' }
@@ -1014,8 +1013,8 @@ describe("Filter sets with relations, compile", function () {
     assert.deepEqual(f.recurse({ statement: 1 }), [])
     assert.deepEqual(f.recurse({ statement: 2 }), [])
     assert.deepEqual(f.getScript(), [
-      { id: 2, recurse: [] },
       { id: 1, recurse: [] },
+      { id: 2, recurse: [] },
       { id: 3, recurse: [
         { id: 1, type: 'w' },
         { id: 2, type: 'w' }
@@ -1198,7 +1197,6 @@ describe("Filter sets with relations, compile", function () {
       { id: 3, recurse: [
         { id: 2, type: '>' }
       ]},
-      { id: 2, recurse: [] }, // TODO: duplicate
       { id: 1, recurse: [
         { id: 2, type: 'or' },
         { id: 3, type: 'or' }
