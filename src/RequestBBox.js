@@ -180,9 +180,17 @@ class RequestBBox extends Request {
       effortAvailable = Math.min(effortAvailable, efforts.maxEffort)
     }
 
+    let query, resultSet = '.result'
+
     // if the context already has a bbox and it differs from this, we can't add
     // ours
-    let query = this.query.substr(0, this.query.length - 1) + '->.result;\n'
+    if (this.lokiQuery) {
+      query = this.lokiQuery.toQl({ setsUseStatementIds: true }) + '\n'
+      let resultSetId = this.lokiQuery.getStatement().id
+      resultSet = resultSetId ? '._' + resultSetId : '.result'
+    } else {
+      query = this.query.substr(0, this.query.length - 1) + '->.result;\n'
+    }
 
     let queryRemoveDoneFeatures = ''
     let countRemoveDoneFeatures = 0
@@ -200,13 +208,13 @@ class RequestBBox extends Request {
 
     if (countRemoveDoneFeatures) {
       query += '(' + queryRemoveDoneFeatures + ')->.done;\n'
-      query += '(.result; - .done;)->.result;\n'
+      query += '(' + resultSet + '; - .done;)->' + resultSet +';\n'
     }
 
     if (!('split' in this.options)) {
       this.options.effortSplit = Math.ceil(effortAvailable / this.overpass.options.effortBBoxFeature)
     }
-    query += '.result out ' + overpassOutOptions(this.options) + ';'
+    query += resultSet + ' out ' + overpassOutOptions(this.options) + ';'
 
     const subRequest = {
       query,
