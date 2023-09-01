@@ -21,7 +21,7 @@ class FilterRecurse extends FilterStatement {
     let result = ''
 
     if (options.setsUseStatementIds) {
-      result += '._' + this.inputSetRef.id + ' '
+      result += '._' + (this.inputSetRef ? this.inputSetRef.id : 'missing') + ' '
     } else if (this.inputSet !== '_') {
       result += '.' + this.inputSet + ' '
     }
@@ -50,11 +50,19 @@ class FilterRecurse extends FilterStatement {
   recurse (options = {}) {
     return [{
       type: this.type,
-      id: this.inputSetRef.id
+      id: this.inputSetRef ? this.inputSetRef.id : null
     }]
   }
 
   compileQuery (options = {}) {
+    if (!this.inputSetRef) {
+      return {
+        query: this.toQl(options),
+        loki: {},
+        recurse: [null]
+      }
+    }
+
     const r = this.inputSetRef.compileQuery()
 
     r.type = this.type

@@ -187,7 +187,7 @@ class FilterQuery extends FilterStatement {
     if (this.inputSets) {
       result += Object.entries(this.inputSets).map(([s, inputSet]) => {
         if (options.setsUseStatementIds) {
-          s = '_' + inputSet.set.id
+          s = '_' + (inputSet.set ? inputSet.set.id : 'missing')
         }
 
         if (inputSet.recurse) {
@@ -235,7 +235,7 @@ class FilterQuery extends FilterStatement {
         result = recursingInputSets.map(s => {
           return {
             type: s[1].recurse,
-            id: s[1].set.id
+            id: s[1].set ? s[1].set.id : null
           }
         })
       }
@@ -317,6 +317,10 @@ class FilterQuery extends FilterStatement {
 
       if (recursingInputSets.length) {
         result.recurse = recursingInputSets.map(s => {
+          if (!s[1].set) {
+            return null
+          }
+
           const r = s[1].set.compileQuery({ set: s[0] })
 
           r.inputSet = s[0]
