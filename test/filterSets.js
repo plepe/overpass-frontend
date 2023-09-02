@@ -1443,7 +1443,7 @@ describe("Filter sets with relations, apply base filter", function () {
   })
 })
 
-;[/*'via-server',*/ 'via-file'].forEach(mode => {
+;['via-file', 'via-server'].forEach(mode => {
   describe('Test filter sets ' + mode, function () {
     describe('initalize', function () {
       if (mode === 'via-server') {
@@ -1459,6 +1459,7 @@ describe("Filter sets with relations, apply base filter", function () {
       }
 
       it('recurse down', function (done) {
+        overpassFrontend.clearCache()
         test({
           mode,
           query: 'way["highway"="secondary"];>;',
@@ -1469,13 +1470,14 @@ describe("Filter sets with relations, apply base filter", function () {
             maxlon: 16.33841
           },
           expected: [ 'n378459', 'n3037431688', 'n3037431653', 'n2208875391', 'n270328331', 'n2213568001', 'n378462' ],
-          expectedSubRequestCount: 0,
+          expectedSubRequestCount: 1,
           expectedCacheDescriptors: [{
             "id": 'way["highway"="secondary"];>;(properties:5)',
           }]
         }, done)
       })
       it('nodes of way', function (done) {
+        overpassFrontend.clearCache()
         test({
           mode,
           query: 'way["highway"];node(w);',
@@ -1486,7 +1488,7 @@ describe("Filter sets with relations, apply base filter", function () {
             maxlon: 16.33854
           },
           expected: [ "n2208875391", "n2213567988", "n2213567992", "n2213567995", "n2213567996", "n2213568000", "n2213568001", "n2213568003", "n270328331" , "n3037431653", "n3037431688", "n378459", "n378462", "n683894778" ],
-          expectedSubRequestCount: 0,
+          expectedSubRequestCount: 1,
 //          expectedCacheDescriptors: [{
 //            "id": 'way["highway"="secondary"];>;(properties:5)',
 //          }]
@@ -1504,13 +1506,14 @@ describe("Filter sets with relations, apply base filter", function () {
             maxlon: 16.33854
           },
           expected: [ "n378459", "n378462" ],
-          expectedSubRequestCount: 0,
+          expectedSubRequestCount: 1,
 //          expectedCacheDescriptors: [{
 //            "id": 'way["highway"="secondary"];>;(properties:5)',
 //          }]
         }, done)
       })
       it('nodes of highway and railway ways', function (done) {
+        overpassFrontend.clearCache()
         test({
           mode,
           query: 'way["highway"]->.a;way["railway"]->.b;node(w.a)(w.b);',
@@ -1521,7 +1524,7 @@ describe("Filter sets with relations, apply base filter", function () {
             maxlon: 16.33854
           },
           expected: [ 'n2208875391', 'n270328331' ],
-          expectedSubRequestCount: 0,
+          expectedSubRequestCount: 1,
 //          expectedCacheDescriptors: [{
 //            "id": 'way["highway"="secondary"];>;(properties:5)',
 //          }]
@@ -1539,7 +1542,7 @@ describe("Filter sets with relations, apply base filter", function () {
             maxlon: 16.33854
           },
           expected: [ 'n2208875391', 'n270328331' ],
-          expectedSubRequestCount: 0,
+          expectedSubRequestCount: 1,
 //          expectedCacheDescriptors: [{
 //            "id": 'way["highway"="secondary"];>;(properties:5)',
 //          }]
@@ -1557,13 +1560,14 @@ describe("Filter sets with relations, apply base filter", function () {
             maxlon: 16.33902
           },
           expected: [ 'r1306478', 'r1530340', 'r1980077', 'r207109', 'r207110', 'r3636229', 'r3967946', 'r5275276', 'w146678747', 'w162373026', 'w170141442', 'w26738920', 'w366446524', 'w4583442' ],
-          expectedSubRequestCount: 0,
+          expectedSubRequestCount: 1,
 //          expectedCacheDescriptors: [{
 //            "id": 'way["highway"="secondary"];>;(properties:5)',
 //          }]
         }, done)
       })
       it('recurse up, relation only', function (done) {
+        overpassFrontend.clearCache()
         test({
           mode,
           query: 'node["highway"];<;relation._;',
@@ -1574,7 +1578,7 @@ describe("Filter sets with relations, apply base filter", function () {
             maxlon: 16.33902
           },
           expected: [ 'r1306478', 'r1530340', 'r1980077', 'r207109', 'r207110', 'r3636229', 'r3967946', 'r5275276' ],
-          expectedSubRequestCount: 0,
+          expectedSubRequestCount: 1,
 //          expectedCacheDescriptors: [{
 //            "id": 'way["highway"="secondary"];>;(properties:5)',
 //          }]
