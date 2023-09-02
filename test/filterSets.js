@@ -1485,7 +1485,7 @@ describe("Filter sets with relations, apply base filter", function () {
             maxlat: 48.19830,
             maxlon: 16.33854
           },
-          expected: [ "n2208875391", "n2213567988", "n2213567992", "n2213567995", "n2213567996", "n2213568000", "n2213568003", "n270328331" , "n3037431653", "n3037431688", "n378459", "n378462", "n683894778" ],
+          expected: [ "n2208875391", "n2213567988", "n2213567992", "n2213567995", "n2213567996", "n2213568000", "n2213568001", "n2213568003", "n270328331" , "n3037431653", "n3037431688", "n378459", "n378462", "n683894778" ],
           expectedSubRequestCount: 0,
 //          expectedCacheDescriptors: [{
 //            "id": 'way["highway"="secondary"];>;(properties:5)',
@@ -1493,6 +1493,7 @@ describe("Filter sets with relations, apply base filter", function () {
         }, done)
       })
       it('nodes of way, chain query', function (done) {
+        overpassFrontend.clearCache()
         test({
           mode,
           query: 'way["highway"];node(w);node._["highway"];',
@@ -1519,7 +1520,7 @@ describe("Filter sets with relations, apply base filter", function () {
             maxlat: 48.19830,
             maxlon: 16.33854
           },
-          expected: [ 'n2208875391', 'n270328331', 'n2213568001' ],
+          expected: [ 'n2208875391', 'n270328331' ],
           expectedSubRequestCount: 0,
 //          expectedCacheDescriptors: [{
 //            "id": 'way["highway"="secondary"];>;(properties:5)',
@@ -1527,6 +1528,7 @@ describe("Filter sets with relations, apply base filter", function () {
         }, done)
       })
       it('nodes of highway and railway ways 2', function (done) {
+        overpassFrontend.clearCache()
         test({
           mode,
           query: 'way["highway"];node(w)->.a;way["railway"];node.a(w);',
@@ -1536,7 +1538,7 @@ describe("Filter sets with relations, apply base filter", function () {
             maxlat: 48.19830,
             maxlon: 16.33854
           },
-          expected: [ 'n2208875391', 'n270328331', 'n2213568001' ],
+          expected: [ 'n2208875391', 'n270328331' ],
           expectedSubRequestCount: 0,
 //          expectedCacheDescriptors: [{
 //            "id": 'way["highway"="secondary"];>;(properties:5)',
@@ -1544,6 +1546,7 @@ describe("Filter sets with relations, apply base filter", function () {
         }, done)
       })
       it('recurse up', function (done) {
+        overpassFrontend.clearCache()
         test({
           mode,
           query: 'node["highway"];<;',
@@ -1553,7 +1556,7 @@ describe("Filter sets with relations, apply base filter", function () {
             maxlat: 48.19840,
             maxlon: 16.33902
           },
-          expected: [ 'r3636229', 'w146678747', 'w170141442', 'w366446524' ],
+          expected: [ 'r3636229', 'w146678747', 'w162373026', 'w170141442', 'w26738920', 'w366446524', 'w4583442' ],
           expectedSubRequestCount: 0,
 //          expectedCacheDescriptors: [{
 //            "id": 'way["highway"="secondary"];>;(properties:5)',

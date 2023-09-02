@@ -813,6 +813,8 @@ class OverpassFrontend {
 
       recurse.forEach(query => {
         const list = this.queryLokiDB(filter, { statement: query.id }, db.branch(), result)
+        const queryIds = {}
+
         list.forEach(ob => {
           const item = this.cacheElements[ob.id]
           let other
@@ -848,8 +850,12 @@ class OverpassFrontend {
           }
 
           other.forEach(id => {
-            ids[id] = id in ids ? ids[id] + 1 : 1
+            queryIds[id] = true
           })
+        })
+
+        Object.keys(queryIds).forEach(id => {
+          ids[id] = id in ids ? ids[id] + 1 : 1
         })
       })
 
