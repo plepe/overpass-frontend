@@ -180,13 +180,13 @@ class RequestBBox extends Request {
       effortAvailable = Math.min(effortAvailable, efforts.maxEffort)
     }
 
-    let query, resultSet = '.result'
+    let query; let resultSet = '.result'; let resultSetId = null
 
     // if the context already has a bbox and it differs from this, we can't add
     // ours
     if (this.lokiQuery) {
       query = this.lokiQuery.toQl({ setsUseStatementIds: true }) + '\n'
-      let resultSetId = this.lokiQuery.getStatement().id
+      resultSetId = this.lokiQuery.getStatement().id
       resultSet = resultSetId ? '._' + resultSetId : '.result'
     } else {
       query = this.query.substr(0, this.query.length - 1) + '->.result;\n'
@@ -208,19 +208,20 @@ class RequestBBox extends Request {
 
     if (countRemoveDoneFeatures) {
       query += '(' + queryRemoveDoneFeatures + ')->.done;\n'
-      query += '(' + resultSet + '; - .done;)->' + resultSet +';\n'
+      query += '(' + resultSet + '; - .done;)->' + resultSet + ';\n'
     }
 
     if (!('split' in this.options)) {
       this.options.effortSplit = Math.ceil(effortAvailable / this.overpass.options.effortBBoxFeature)
     }
-    query += resultSet + ' out ' + overpassOutOptions(this.options) + ';'
+    query += resultSet + ' out ' + overpassOutOptions(this.options) + ';\n'
 
     const subRequest = {
       query,
       request: this,
       parts: [
         {
+          statementId: resultSetId,
           properties: this.options.properties,
           receiveObject: this.receiveObject.bind(this),
           checkFeatureCallback: this.checkFeatureCallback.bind(this),
@@ -229,6 +230,44 @@ class RequestBBox extends Request {
       ],
       effort: this.options.split ? this.options.split * this.overpass.options.effortBBoxFeature : effortAvailable
     }
+
+    if (!this.lokiQuery) {
+      return subRequest
+    }
+
+    const script = this.lokiQuery.getScript()
+    const reverseParts = {}
+    script.reverse().forEach(e => {
+      e.recurse.forEach(r => {
+        subRequest.query += '._' + e.id + ' < ->._rev' + e.id + '_' + r.id + ';\n'
+        if (!(r.id in reverseParts)) {
+          reverseParts[r.id] = []
+        }
+        reverseParts[r.id].push({
+          id: e.id,
+          properties: defines.MEMBERS
+        })
+      })
+    })
+
+    Object.entries(reverseParts).forEach(([rid, from]) => {
+      const options = { properties: defines.ID_ONLY }
+      from.forEach(e => {
+        options.properties |= e.properties
+      })
+
+      subRequest.query += 'out count;\n(' +
+        from.map(e => 'nwr._' + rid + '._rev' + e.id + '_' + rid + ';')
+        .join('') + ');\n' +
+        'out ' + overpassOutOptions(options) + ';'
+
+      subRequest.parts.push({
+        statementId: rid,
+        properties: options.properties,
+        receiveObject: this.receiveRevObject.bind(this)
+      })
+    })
+
     return subRequest
   }
 
@@ -241,6 +280,10 @@ class RequestBBox extends Request {
   receiveObject (ob, subRequest, partIndex) {
     super.receiveObject(ob, subRequest, partIndex)
     this.doneFeatures[ob.id] = ob
+  }
+
+  receiveRevObject (ob, subRequest, partIndex) {
+    console.log(subRequest.parts[partIndex].statementId)
   }
 
   checkFeatureCallback (ob) {
