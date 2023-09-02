@@ -1556,7 +1556,7 @@ describe("Filter sets with relations, apply base filter", function () {
             maxlat: 48.19840,
             maxlon: 16.33902
           },
-          expected: [ 'r3636229', 'w146678747', 'w162373026', 'w170141442', 'w26738920', 'w366446524', 'w4583442' ],
+          expected: [ 'r1306478', 'r1530340', 'r1980077', 'r207109', 'r207110', 'r3636229', 'r3967946', 'r5275276', 'w146678747', 'w162373026', 'w170141442', 'w26738920', 'w366446524', 'w4583442' ],
           expectedSubRequestCount: 0,
 //          expectedCacheDescriptors: [{
 //            "id": 'way["highway"="secondary"];>;(properties:5)',
@@ -1573,7 +1573,7 @@ describe("Filter sets with relations, apply base filter", function () {
             maxlat: 48.19840,
             maxlon: 16.33902
           },
-          expected: [ 'r3636229' ],
+          expected: [ 'r1306478', 'r1530340', 'r1980077', 'r207109', 'r207110', 'r3636229', 'r3967946', 'r5275276' ],
           expectedSubRequestCount: 0,
 //          expectedCacheDescriptors: [{
 //            "id": 'way["highway"="secondary"];>;(properties:5)',

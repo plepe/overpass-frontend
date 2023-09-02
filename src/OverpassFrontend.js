@@ -822,9 +822,21 @@ class OverpassFrontend {
           switch (query.type) {
             case '>':
               other = item.memberIds()
+              other.forEach(id => {
+                const m = this.cacheElements[id]
+                if (m.type === 'way') {
+                  other = other.concat(m.memberIds())
+                }
+              })
               break
             case '<':
               other = item.memberOf.map(m => m.id)
+              other.forEach(id => {
+                const m = this.cacheElements[id]
+                if (m.type === 'way') {
+                  other = other.concat(m.memberOf.map(m => m.id))
+                }
+              })
               break
             case 'w':
               other = item.type === 'way' ? item.memberIds() : []
