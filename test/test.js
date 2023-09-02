@@ -1417,8 +1417,8 @@ describe('Overpass objects structure', function() {
             done('Query wrong, should not be successful')
 
           else if(err.message == "line 2: parse error: ']' expected - '->' found.\n" +
-            "line 4: parse error: Unexpected end of input.\n" +
-            "line 4: parse error: Unexpected end of input.\n\n")
+            "line 5: parse error: Unexpected end of input.\n" +
+            "line 5: parse error: Unexpected end of input.\n\n")
             done()
 
           else

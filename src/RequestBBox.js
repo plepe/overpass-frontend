@@ -125,11 +125,6 @@ class RequestBBox extends Request {
       return false
     }
 
-    if (context.bbox && context.bbox.toLatLonString() !== this.bbox.toLatLonString()) {
-      return false
-    }
-    context.bbox = this.bbox
-
     for (const i in context.requests) {
       const request = context.requests[i]
       if (request instanceof RequestBBox && request.query === this.query) {
@@ -287,10 +282,6 @@ class RequestBBox extends Request {
   }
 
   checkFeatureCallback (ob) {
-    if (this.bounds && ob.intersects(this.bounds) === 0) {
-      return false
-    }
-
     return true
   }
 
