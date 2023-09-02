@@ -7,6 +7,7 @@ const RequestBBoxMembers = require('./RequestBBoxMembers')
 const Filter = require('./Filter')
 const boundsToLokiQuery = require('./boundsToLokiQuery')
 const boundsIsFullWorld = require('./boundsIsFullWorld')
+const compileRecurseReverse = require('./compileRecurseReverse')
 
 /**
  * A BBox request
@@ -234,7 +235,7 @@ class RequestBBox extends Request {
     const reverseParts = {}
     script.reverse().forEach(e => {
       e.recurse.forEach(r => {
-        subRequest.query += '._' + e.id + ' < ->._rev' + e.id + '_' + r.id + ';\n'
+        subRequest.query += compileRecurseReverse(r, e)
         if (!(r.id in reverseParts)) {
           reverseParts[r.id] = []
         }
@@ -253,7 +254,7 @@ class RequestBBox extends Request {
 
       subRequest.query += 'out count;\n(' +
         from.map(e => 'nwr._' + rid + '._rev' + e.id + '_' + rid + ';')
-        .join('') + ');\n' +
+          .join('') + ');\n' +
         'out ' + overpassOutOptions(options) + ';'
 
       subRequest.parts.push({
