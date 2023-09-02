@@ -123,7 +123,7 @@ class Request {
    * @param {Request#SubRequest} subRequest - sub request which is being handled right now
    * @param {int} partIndex - Which part of the subRequest is being received
    */
-  receiveObject (ob) {
+  receiveObject (ob, subRequest, partIndex) {
     this.count++
   }
 

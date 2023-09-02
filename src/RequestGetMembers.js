@@ -186,8 +186,8 @@ class RequestGetMembers extends Request {
     fun(err, result, index)
   }
 
-  receiveObject (ob) {
-    super.receiveObject(ob)
+  receiveObject (ob, subRequest, partIndex) {
+    super.receiveObject(ob, subRequest, partIndex)
     this.doneFeatures[ob.id] = ob
   }
 

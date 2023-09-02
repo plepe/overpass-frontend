@@ -238,8 +238,8 @@ class RequestBBox extends Request {
    * @param {Request#SubRequest} subRequest - sub request which is being handled right now
    * @param {int} partIndex - Which part of the subRequest is being received
    */
-  receiveObject (ob) {
-    super.receiveObject(ob)
+  receiveObject (ob, subRequest, partIndex) {
+    super.receiveObject(ob, subRequest, partIndex)
     this.doneFeatures[ob.id] = ob
   }
 
