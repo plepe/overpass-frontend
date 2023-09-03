@@ -27,6 +27,10 @@ module.exports = function cacheMerge (a, b) {
     r.invalid = true
   }
 
+  if (b.recurse) {
+    r.recurse = (r.recurse ?? []).concat(b.recurse)
+  }
+
   if (b.bounds && a.bounds) {
     const mergeBounds = turf.intersect(a.bounds, b.bounds)
     if (mergeBounds) {

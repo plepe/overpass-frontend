@@ -406,8 +406,16 @@ describe("Filter sets, compile", function () {
     var r = f.cacheDescriptors()
     assert.deepEqual(r, [
       { id: 'nwr["b"](properties:1)' },
-      { id: 'nwr["b"];>;(properties:5)' },
-      { id: 'nwr["a"];>;(properties:5)' }
+      { id: 'nwr(properties:0)',
+        recurse: [
+          { id: 'nwr["b"](properties:5)', recurseType: '>' }
+        ]
+      },
+      { id: 'nwr(properties:0)',
+        recurse: [
+          { id: 'nwr["a"](properties:5)', recurseType: '>' }
+        ]
+      }
     ])
   })
   it ('(nwr[a]->.a;(nwr[b]->.b;nwr.a[b]););', function () {
@@ -700,8 +708,14 @@ describe("Filter sets with relations, compile", function () {
       }]
     })
     assert.deepEqual(f.toLokijs(), {})
-    //var r = f.cacheDescriptors()
-    //assert.deepEqual(r, [ { id: 'nwr["amenity"](properties:5)' }])
+    var r = f.cacheDescriptors()
+    assert.deepEqual(r, [
+      { id: 'nwr(properties:0)',
+        recurse: [
+          { id: 'nwr["amenity"](properties:5)', recurseType: '>' }
+        ]
+      }
+    ])
   })
   it ('nwr[amenity];>;', function () {
     var f = new Filter('nwr[amenity];>;')
@@ -740,8 +754,14 @@ describe("Filter sets with relations, compile", function () {
       }]
     })
     assert.deepEqual(f.toLokijs(), {})
-    //var r = f.cacheDescriptors()
-    //assert.deepEqual(r, [ { id: 'nwr["amenity"](properties:5)' }])
+    var r = f.cacheDescriptors()
+    assert.deepEqual(r, [
+      { id: 'nwr(properties:0)',
+        recurse: [
+          { id: 'nwr["amenity"](properties:5)', recurseType: '>' }
+        ]
+      }
+    ])
   })
   it ('nwr[amenity]->.a;.a > ->.b', function () {
     var f = new Filter('nwr[amenity]->.a;.a > ->.b')
@@ -844,8 +864,14 @@ describe("Filter sets with relations, compile", function () {
     assert.deepEqual(f.toLokijs(), {
       type: { $eq: 'node' }
     })
-    //var r = f.cacheDescriptors()
-    //assert.deepEqual(r, [ { id: 'nwr["amenity"](properties:5)' }])
+    var r = f.cacheDescriptors()
+    assert.deepEqual(r, [
+      { id: 'node(properties:0)',
+        recurse: [
+          { id: 'nwr["amenity"](properties:5)', recurseType: 'w' }
+        ]
+      }
+    ])
   })
   it ('way[highway];node(w);node._[highway];', function () {
     var f = new Filter('way[highway];node(w);node._[highway];')
@@ -909,8 +935,14 @@ describe("Filter sets with relations, compile", function () {
         }
       ]
     })
-    //var r = f.cacheDescriptors()
-    //assert.deepEqual(r, [ { id: 'nwr["amenity"](properties:5)' }])
+    var r = f.cacheDescriptors()
+    assert.deepEqual(r, [
+      { id: 'node["highway"](properties:1)',
+        recurse: [
+          { id: 'way["highway"](properties:5)', recurseType: 'w' }
+        ]
+      }
+    ])
   })
   it ('way["highway"];node(w)->.a;way["railway"];node.a(w);', function () {
     var f = new Filter('way["highway"];node(w)->.a;way["railway"];node.a(w);')
@@ -998,8 +1030,15 @@ describe("Filter sets with relations, compile", function () {
         {type: { $eq: 'node' }}
       ]
     })
-    //var r = f.cacheDescriptors()
-    //assert.deepEqual(r, [ { id: 'nwr["amenity"](properties:5)' }])
+    var r = f.cacheDescriptors()
+    assert.deepEqual(r, [
+      { id: 'node(properties:0)',
+        recurse: [
+          { id: 'way["highway"](properties:5)', recurseType: 'w' },
+          { id: 'way["railway"](properties:5)', recurseType: 'w' }
+        ]
+      }
+    ])
   })
   it ('way[highway]->.a;way[railway]->.b;node(w.a)(w.b);', function () {
     var f = new Filter('way[highway]->.a;way[railway]->.b;node(w.a)(w.b);')
@@ -1073,8 +1112,15 @@ describe("Filter sets with relations, compile", function () {
     assert.deepEqual(f.toLokijs(), {
       type: { $eq: 'node' }
     })
-    //var r = f.cacheDescriptors()
-    //assert.deepEqual(r, [ { id: 'nwr["amenity"](properties:5)' }])
+    var r = f.cacheDescriptors()
+    assert.deepEqual(r, [
+      { id: 'node(properties:0)',
+        recurse: [
+          { id: 'way["highway"](properties:5)', recurseType: 'w' },
+          { id: 'way["railway"](properties:5)', recurseType: 'w' }
+        ]
+      }
+    ])
   })
   it ('relation[route=tram];way(r);node(w);', function () {
     var f = new Filter('relation[route=tram];way(r);node(w);')
@@ -1143,8 +1189,18 @@ describe("Filter sets with relations, compile", function () {
     assert.deepEqual(f.toLokijs(), {
       type: { $eq: 'node' }
     })
-    //var r = f.cacheDescriptors()
-    //assert.deepEqual(r, [ { id: 'nwr["amenity"](properties:5)' }])
+    var r = f.cacheDescriptors()
+    assert.deepEqual(r, [
+      { id: 'node(properties:0)',
+        recurse: [
+          { id: 'way(properties:4)', recurseType: 'w',
+            recurse: [
+              { id: 'relation["route"="tram"](properties:5)', recurseType: 'r' }
+            ]
+          }
+        ]
+      }
+    ])
   })
   it ('way[highway];(node(w)[highway];);', function () {
     var f = new Filter('way[highway];(node(w)[highway];);')
@@ -1193,7 +1249,11 @@ describe("Filter sets with relations, compile", function () {
     })
     var r = f.cacheDescriptors()
     assert.deepEqual(r, [
-      { id: '-["highway"]["highway"](properties:1)' }, // TODO: wrong!
+      { id: 'node["highway"](properties:1)',
+        recurse: [
+          { id: 'way["highway"](properties:5)', recurseType: 'w' }
+        ]
+      },
     ])
   })
   it ('(nwr[b];>;);', function () {
@@ -1231,7 +1291,11 @@ describe("Filter sets with relations, compile", function () {
     var r = f.cacheDescriptors()
     assert.deepEqual(r, [
       { id: 'nwr["b"](properties:1)' },
-      { id: 'nwr["b"];>;(properties:5)' },
+      { id: 'nwr(properties:0)',
+        recurse: [
+          { id: 'nwr["b"](properties:5)', recurseType: '>' }
+        ]
+      }
     ])
   })
   it ('nwr[amenity];.foo >', function () {
@@ -1264,8 +1328,8 @@ describe("Filter sets with relations, compile", function () {
       recurse: [null]
     })
     assert.deepEqual(f.toLokijs(), {})
-    //var r = f.cacheDescriptors()
-    //assert.deepEqual(r, [ { id: 'nwr["amenity"](properties:5)' }])
+    var r = f.cacheDescriptors()
+    assert.deepEqual(r, [])
   })
   it ('nwr[amenity];node(w.foo);', function () {
     var f = new Filter('nwr[amenity];node(w.foo);')
@@ -1303,8 +1367,8 @@ describe("Filter sets with relations, compile", function () {
     assert.deepEqual(f.toLokijs(), {
       type: { $eq: 'node' }
     })
-    //var r = f.cacheDescriptors()
-    //assert.deepEqual(r, [ { id: 'nwr["amenity"](properties:5)' }])
+    var r = f.cacheDescriptors()
+    assert.deepEqual(r, [])
   })
   it ('nwr[amenity];(node(w.foo););', function () {
     var f = new Filter('nwr[amenity];(node(w.foo););')
@@ -1340,8 +1404,8 @@ describe("Filter sets with relations, compile", function () {
       loki: {}
     })
     assert.deepEqual(f.toLokijs(), {})
-    //var r = f.cacheDescriptors()
-    //assert.deepEqual(r, [ { id: 'nwr["amenity"](properties:5)' }])
+    var r = f.cacheDescriptors()
+    assert.deepEqual(r, [])
   })
 })
 
@@ -1437,8 +1501,16 @@ describe("Filter sets with relations, apply base filter", function () {
     assert.deepEqual(f.toLokijs(), {})
     var r = f.cacheDescriptors()
     assert.deepEqual(r, [
-      { id: 'nwr["a"];>;(properties:21)', bounds: { type: 'Polygon', coordinates: [[[16,46],[17,46],[17,47],[16,47],[16,46]]] } },
-      { id: 'nwr["b"];>;(properties:21)', bounds: { type: 'Polygon', coordinates: [[[16,46],[17,46],[17,47],[16,47],[16,46]]] } }
+      { id: 'nwr(properties:0)',
+        recurse: [
+          { id: 'nwr["a"](properties:21)', bounds: { type: 'Polygon', coordinates: [[[16,46],[17,46],[17,47],[16,47],[16,46]]] }, recurseType: '>' }
+        ]
+      },
+      { id: 'nwr(properties:0)',
+        recurse: [
+          { id: 'nwr["b"](properties:21)', bounds: { type: 'Polygon', coordinates: [[[16,46],[17,46],[17,47],[16,47],[16,46]]] }, recurseType: '>' }
+        ]
+      }
     ])
   })
 })
@@ -1472,7 +1544,11 @@ describe("Filter sets with relations, apply base filter", function () {
           expected: [ 'n378459', 'n3037431688', 'n3037431653', 'n2208875391', 'n270328331', 'n2213568001', 'n378462' ],
           expectedSubRequestCount: 1,
           expectedCacheDescriptors: [{
-            "id": 'way["highway"="secondary"];>;(properties:5)',
+            "id": 'nwr(properties:0)',
+            recurse: [{
+              id: 'way["highway"="secondary"](properties:5)',
+              recurseType: '>'
+            }]
           }]
         }, done)
       })
@@ -1489,9 +1565,13 @@ describe("Filter sets with relations, apply base filter", function () {
           },
           expected: [ "n2208875391", "n2213567988", "n2213567992", "n2213567995", "n2213567996", "n2213568000", "n2213568001", "n2213568003", "n270328331" , "n3037431653", "n3037431688", "n378459", "n378462", "n683894778" ],
           expectedSubRequestCount: 1,
-//          expectedCacheDescriptors: [{
-//            "id": 'way["highway"="secondary"];>;(properties:5)',
-//          }]
+          expectedCacheDescriptors: [{
+            "id": 'node(properties:0)',
+            recurse: [{
+              id: 'way["highway"](properties:5)',
+              recurseType: 'w'
+            }]
+          }]
         }, done)
       })
       it('nodes of way, chain query', function (done) {
@@ -1507,9 +1587,13 @@ describe("Filter sets with relations, apply base filter", function () {
           },
           expected: [ "n378459", "n378462" ],
           expectedSubRequestCount: 1,
-//          expectedCacheDescriptors: [{
-//            "id": 'way["highway"="secondary"];>;(properties:5)',
-//          }]
+          expectedCacheDescriptors: [{
+            "id": 'node["highway"](properties:1)',
+            recurse: [{
+              id: 'way["highway"](properties:5)',
+              recurseType: 'w'
+            }]
+          }]
         }, done)
       })
       it('nodes of highway and railway ways', function (done) {
@@ -1525,9 +1609,16 @@ describe("Filter sets with relations, apply base filter", function () {
           },
           expected: [ 'n2208875391', 'n270328331' ],
           expectedSubRequestCount: 1,
-//          expectedCacheDescriptors: [{
-//            "id": 'way["highway"="secondary"];>;(properties:5)',
-//          }]
+          expectedCacheDescriptors: [{
+            "id": 'node(properties:0)',
+            recurse: [{
+              id: 'way["highway"](properties:5)',
+              recurseType: 'w'
+            }, {
+              id: 'way["railway"](properties:5)',
+              recurseType: 'w'
+            }]
+          }]
         }, done)
       })
       it('nodes of highway and railway ways 2', function (done) {
@@ -1543,9 +1634,16 @@ describe("Filter sets with relations, apply base filter", function () {
           },
           expected: [ 'n2208875391', 'n270328331' ],
           expectedSubRequestCount: 1,
-//          expectedCacheDescriptors: [{
-//            "id": 'way["highway"="secondary"];>;(properties:5)',
-//          }]
+          expectedCacheDescriptors: [{
+            "id": 'node(properties:0)',
+            recurse: [{
+              id: 'way["highway"](properties:5)',
+              recurseType: 'w'
+            }, {
+              id: 'way["railway"](properties:5)',
+              recurseType: 'w'
+            }]
+          }]
         }, done)
       })
       it('recurse up', function (done) {
@@ -1561,9 +1659,13 @@ describe("Filter sets with relations, apply base filter", function () {
           },
           expected: [ 'r1306478', 'r1530340', 'r1980077', 'r207109', 'r207110', 'r3636229', 'r3967946', 'r5275276', 'w146678747', 'w162373026', 'w170141442', 'w26738920', 'w366446524', 'w4583442' ],
           expectedSubRequestCount: 1,
-//          expectedCacheDescriptors: [{
-//            "id": 'way["highway"="secondary"];>;(properties:5)',
-//          }]
+          expectedCacheDescriptors: [{
+            "id": 'nwr(properties:4)',
+            recurse: [{
+              id: 'node["highway"](properties:1)',
+              recurseType: '<'
+            }]
+          }]
         }, done)
       })
       it('recurse up, relation only', function (done) {
@@ -1580,9 +1682,13 @@ describe("Filter sets with relations, apply base filter", function () {
           expected: [ 'r1306478', 'r1530340', 'r1980077', 'r207109', 'r207110', 'r3636229', 'r3967946', 'r5275276' ],
           noRecurse: true, // TODO: to make caching for 'recurse up' work, we have to load intermediate ways too.
           expectedSubRequestCount: 1,
-//          expectedCacheDescriptors: [{
-//            "id": 'way["highway"="secondary"];>;(properties:5)',
-//          }]
+          expectedCacheDescriptors: [{
+            "id": 'relation(properties:4)',
+            recurse: [{
+              id: 'node["highway"](properties:1)',
+              recurseType: '<'
+            }]
+          }]
         }, done)
       })
 /*    TODO: cache descriptors creates bug

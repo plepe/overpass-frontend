@@ -389,6 +389,36 @@ class FilterQuery extends FilterStatement {
   _caches () {
     let options = [{ filters: '', properties: 0 }]
 
+    if (this.inputSets) {
+      const recursingInputSets = Object.values(this.inputSets)
+        .filter(s => s.recurse)
+
+      const recurse = recursingInputSets.forEach(inputSet => {
+        if (!inputSet.set) {
+          options = []
+          return
+        }
+
+        const recurse = inputSet.set._caches()
+        recurse.forEach(r => {
+          r.properties |= ['r', 'w'].includes(inputSet.recurse) ? OverpassFrontend.MEMBERS : 0
+          r.recurseType = inputSet.recurse
+        })
+
+        const _options = options
+        options = []
+        _options.forEach(o => {
+          recurse.forEach(r => {
+            options.push({
+              filters: '',
+              properties: ['bn', 'bw', 'br'].includes(this.type) ? OverpassFrontend.MEMBERS : 0,
+              recurse: o.recurse ? o.recurse.concat([r]) : [r]
+            })
+          })
+        })
+      })
+    }
+
     if (this.type !== 'nwr') {
       options.forEach(o => {
         o.type = this.type
@@ -410,7 +440,10 @@ class FilterQuery extends FilterStatement {
     })
 
     if (this.inputSets) {
-      Object.values(this.inputSets).reverse().forEach(inputSet => {
+      const normalInputSets = Object.values(this.inputSets)
+        .filter(s => !s.recurse)
+
+      normalInputSets.reverse().forEach(inputSet => {
         if (!inputSet || !inputSet.set) {
           options = []
           return

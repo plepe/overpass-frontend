@@ -98,15 +98,21 @@ class FilterRecurse extends FilterStatement {
   }
 
   _caches () {
-    if (!this.inputSet) {
+    if (!this.inputSet || !this.inputSetRef) {
       return []
     }
 
-    const result = this.inputSetRef._caches()
-    result.forEach(c => {
-      c.filters += ';' + this.type + ';'
-      if (this.type === '>') {
+    let result = this.inputSetRef._caches()
+    result = result.map(c => {
+      c.recurseType = this.type
+      if (['>'].includes(this.type)) {
         c.properties |= OverpassFrontend.MEMBERS
+      }
+
+      return {
+        filters: '',
+        properties: ['<'].includes(this.type) ? OverpassFrontend.MEMBERS : 0,
+        recurse: [c]
       }
     })
 

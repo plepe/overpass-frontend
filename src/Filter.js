@@ -598,6 +598,10 @@ class Filter {
 
 function compileCacheDescriptors (result) {
   result.forEach(entry => {
+    if (entry.recurse) {
+      compileCacheDescriptors(entry.recurse)
+    }
+
     entry.id = (entry.type || 'nwr') + entry.filters + '(properties:' + entry.properties + ')'
     delete entry.type
     delete entry.filters
