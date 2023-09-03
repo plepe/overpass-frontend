@@ -70,6 +70,8 @@ class RequestBBox extends Request {
           cacheDescriptors
         }
       })
+
+      this.doneFeaturesSets = {}
     }
 
     this.loadFinish = false
@@ -85,7 +87,7 @@ class RequestBBox extends Request {
   preprocess () {
     let items = []
     if (this.lokiQuery) {
-      items = this.overpass.queryLokiDB(this.lokiQuery, { properties: this.options.properties })
+      items = this.overpass.queryLokiDB(this.lokiQuery, { properties: this.options.properties }, null, this.doneFeaturesSets)
     }
 
     for (let i = 0; i < items.length; i++) {
