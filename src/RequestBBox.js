@@ -279,10 +279,16 @@ class RequestBBox extends Request {
   receiveObject (ob, subRequest, partIndex) {
     super.receiveObject(ob, subRequest, partIndex)
     this.doneFeatures[ob.id] = ob
+
+    if (subRequest) {
+      const statementId = subRequest.parts[partIndex].statementId
+      this.doneFeaturesSets[statementId].list.push(ob)
+    }
   }
 
   receiveRevObject (ob, subRequest, partIndex) {
-    console.log(subRequest.parts[partIndex].statementId)
+    const statementId = subRequest.parts[partIndex].statementId
+    this.doneFeaturesSets[statementId].list.push(ob)
   }
 
   checkFeatureCallback (ob) {
