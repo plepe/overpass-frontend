@@ -472,12 +472,7 @@ class Filter {
   cacheDescriptors (options = {}) {
     const result = this._caches(options)
 
-    result.forEach(entry => {
-      entry.id = (entry.type || 'nwr') + entry.filters + '(properties:' + entry.properties + ')'
-      delete entry.type
-      delete entry.filters
-      delete entry.properties
-    })
+    compileCacheDescriptors(result)
 
     return result
   }
@@ -599,6 +594,15 @@ class Filter {
 
     return r
   }
+}
+
+function compileCacheDescriptors (result) {
+  result.forEach(entry => {
+    entry.id = (entry.type || 'nwr') + entry.filters + '(properties:' + entry.properties + ')'
+    delete entry.type
+    delete entry.filters
+    delete entry.properties
+  })
 }
 
 module.exports = Filter
