@@ -1578,6 +1578,7 @@ describe("Filter sets with relations, apply base filter", function () {
             maxlon: 16.33902
           },
           expected: [ 'r1306478', 'r1530340', 'r1980077', 'r207109', 'r207110', 'r3636229', 'r3967946', 'r5275276' ],
+          noRecurse: true, // TODO: to make caching for 'recurse up' work, we have to load intermediate ways too.
           expectedSubRequestCount: 1,
 //          expectedCacheDescriptors: [{
 //            "id": 'way["highway"="secondary"];>;(properties:5)',
@@ -1609,6 +1610,10 @@ describe("Filter sets with relations, apply base filter", function () {
 })
 
 function test (options, callback) {
+  if (options.mode === 'via-server') {
+    console.log(options.rek ? '2nd run' : '1st run')
+  }
+
   const found = []
   let foundSubRequestCount = 0
 
@@ -1641,6 +1646,13 @@ function test (options, callback) {
       }
 
       request.off('subrequest-compile', compileListener)
+
+      if (!options.noRecurse && !options.rek) {
+        options.rek = true
+        options.expectedSubRequestCount = 0
+        return test(options, callback)
+      }
+
       callback()
     }
   )
