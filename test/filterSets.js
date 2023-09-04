@@ -341,83 +341,6 @@ describe("Filter sets, compile", function () {
       { id: 'nwr["a"]["b"](properties:1)' }
     ])
   })
-  it ('nwr[a]->.a;(nwr[b]; >;(.a >;););', function () {
-    var f = new Filter('nwr[a]->.a;(nwr[b]; >;(.a >;););')
-
-    assert.deepEqual(f.def, [
-        [ {"op":"has_key","key":"a"}, {"outputSet":"a"} ],
-        { or: [
-          [ {"op":"has_key","key":"b"} ],
-          { recurse: '>' },
-          { or: [
-            { recurse: '>', inputSet: "a" }
-          ]}
-        ]}
-      ]
-    )
-    assert.equal(f.toString(), 'nwr["a"]->.a;(nwr["b"];>;(.a >;););')
-    assert.equal(f.toQl(), 'nwr["a"]->.a;(nwr["b"];>;(.a >;););')
-    assert.equal(f.toQl({ setsUseStatementIds: true }), 'nwr["a"]->._1;(nwr["b"]->._3;._3 > ->._4;(._1 > ->._6;)->._5;)->._2;')
-    assert.equal(f.toQuery(), '(nwr._3;nwr._4;nwr._5;)->._2;')
-    assert.equal(f.toQuery({ statement: 3 }), 'nwr["b"]->._3;')
-    assert.equal(f.toQuery({ statement: 4 }), '._3 > ->._4;')
-    assert.equal(f.toQuery({ statement: 5 }), '(nwr._6;)->._5;')
-    assert.equal(f.toQuery({ statement: 6 }), '._1 > ->._6;')
-    assert.equal(f.toQuery({ statement: 1 }), 'nwr["a"]->._1;')
-    assert.deepEqual(f.recurse(), [
-      { id: 3, type: 'or' },
-      { id: 4, type: 'or' },
-      { id: 5, type: 'or' }
-    ])
-    assert.deepEqual(f.recurse({ statement: 1 }), [])
-    assert.deepEqual(f.recurse({ statement: 3 }), [])
-    assert.deepEqual(f.recurse({ statement: 4 }), [
-      { id: 3, type: '>' }
-    ])
-    assert.deepEqual(f.recurse({ statement: 5 }), [
-      { id: 6, type: 'or' }
-    ])
-    assert.deepEqual(f.recurse({ statement: 6 }), [
-      { id: 1, type: '>' }
-    ])
-    assert.deepEqual(f.recurse({ set: 'a' }), [])
-    assert.deepEqual(f.getScript(), [
-      { id: 3, recurse: [] },
-      { id: 4, recurse: [
-        { id: 3, type: '>' }
-      ]},
-      { id: 1, recurse: [] },
-      { id: 6, recurse: [
-        { id: 1, type: '>' }
-      ]},
-      { id: 5, recurse: [
-        { id: 6, type: 'or' }
-      ]},
-      { id: 2, recurse: [
-        { id: 3, type: 'or' },
-        { id: 4, type: 'or' },
-        { id: 5, type: 'or' }
-      ]}
-    ])
-    assert.deepEqual(f.getScript({ set: 'a' }), [
-      { id: 1, recurse: [] }
-    ])
-    assert.deepEqual(f.toLokijs(), {}) // TODO: wrong (should include nwr[b])
-    var r = f.cacheDescriptors()
-    assert.deepEqual(r, [
-      { id: 'nwr["b"](properties:1)' },
-      { id: 'nwr(properties:0)',
-        recurse: [
-          { id: 'nwr["b"](properties:5)', recurseType: '>' }
-        ]
-      },
-      { id: 'nwr(properties:0)',
-        recurse: [
-          { id: 'nwr["a"](properties:5)', recurseType: '>' }
-        ]
-      }
-    ])
-  })
   it ('(nwr[a]->.a;(nwr[b]->.b;nwr.a[b]););', function () {
     var f = new Filter('(nwr[a]->.a;(nwr[b]->.b;nwr.a[b];););')
 
@@ -714,6 +637,16 @@ describe("Filter sets with relations, compile", function () {
         recurse: [
           { id: 'nwr["amenity"](properties:5)', recurseType: '>' }
         ]
+      },
+      { id: 'node(properties:0)',
+        recurse: [
+          { id: 'nwr(properties:4)',
+            recurse: [
+              { id: 'nwr["amenity"](properties:5)', recurseType: '>' }
+            ],
+            recurseType: 'w'
+          }
+        ]
       }
     ])
   })
@@ -759,6 +692,16 @@ describe("Filter sets with relations, compile", function () {
       { id: 'nwr(properties:0)',
         recurse: [
           { id: 'nwr["amenity"](properties:5)', recurseType: '>' }
+        ]
+      },
+      { id: 'node(properties:0)',
+        recurse: [
+          { id: 'nwr(properties:4)',
+            recurse: [
+              { id: 'nwr["amenity"](properties:5)', recurseType: '>' }
+            ],
+            recurseType: 'w'
+          }
         ]
       }
     ])
@@ -1295,6 +1238,16 @@ describe("Filter sets with relations, compile", function () {
         recurse: [
           { id: 'nwr["b"](properties:5)', recurseType: '>' }
         ]
+      },
+      { id: 'node(properties:0)',
+        recurse: [
+          { id: 'nwr(properties:4)',
+            recurse: [
+              { id: 'nwr["b"](properties:5)', recurseType: '>' }
+            ],
+            recurseType: 'w'
+          }
+        ]
       }
     ])
   })
@@ -1407,6 +1360,103 @@ describe("Filter sets with relations, compile", function () {
     var r = f.cacheDescriptors()
     assert.deepEqual(r, [])
   })
+  it ('nwr[a]->.a;(nwr[b]; >;(.a >;););', function () {
+    var f = new Filter('nwr[a]->.a;(nwr[b]; >;(.a >;););')
+
+    assert.deepEqual(f.def, [
+        [ {"op":"has_key","key":"a"}, {"outputSet":"a"} ],
+        { or: [
+          [ {"op":"has_key","key":"b"} ],
+          { recurse: '>' },
+          { or: [
+            { recurse: '>', inputSet: "a" }
+          ]}
+        ]}
+      ]
+    )
+    assert.equal(f.toString(), 'nwr["a"]->.a;(nwr["b"];>;(.a >;););')
+    assert.equal(f.toQl(), 'nwr["a"]->.a;(nwr["b"];>;(.a >;););')
+    assert.equal(f.toQl({ setsUseStatementIds: true }), 'nwr["a"]->._1;(nwr["b"]->._3;._3 > ->._4;(._1 > ->._6;)->._5;)->._2;')
+    assert.equal(f.toQuery(), '(nwr._3;nwr._4;nwr._5;)->._2;')
+    assert.equal(f.toQuery({ statement: 3 }), 'nwr["b"]->._3;')
+    assert.equal(f.toQuery({ statement: 4 }), '._3 > ->._4;')
+    assert.equal(f.toQuery({ statement: 5 }), '(nwr._6;)->._5;')
+    assert.equal(f.toQuery({ statement: 6 }), '._1 > ->._6;')
+    assert.equal(f.toQuery({ statement: 1 }), 'nwr["a"]->._1;')
+    assert.deepEqual(f.recurse(), [
+      { id: 3, type: 'or' },
+      { id: 4, type: 'or' },
+      { id: 5, type: 'or' }
+    ])
+    assert.deepEqual(f.recurse({ statement: 1 }), [])
+    assert.deepEqual(f.recurse({ statement: 3 }), [])
+    assert.deepEqual(f.recurse({ statement: 4 }), [
+      { id: 3, type: '>' }
+    ])
+    assert.deepEqual(f.recurse({ statement: 5 }), [
+      { id: 6, type: 'or' }
+    ])
+    assert.deepEqual(f.recurse({ statement: 6 }), [
+      { id: 1, type: '>' }
+    ])
+    assert.deepEqual(f.recurse({ set: 'a' }), [])
+    assert.deepEqual(f.getScript(), [
+      { id: 3, recurse: [] },
+      { id: 4, recurse: [
+        { id: 3, type: '>' }
+      ]},
+      { id: 1, recurse: [] },
+      { id: 6, recurse: [
+        { id: 1, type: '>' }
+      ]},
+      { id: 5, recurse: [
+        { id: 6, type: 'or' }
+      ]},
+      { id: 2, recurse: [
+        { id: 3, type: 'or' },
+        { id: 4, type: 'or' },
+        { id: 5, type: 'or' }
+      ]}
+    ])
+    assert.deepEqual(f.getScript({ set: 'a' }), [
+      { id: 1, recurse: [] }
+    ])
+    assert.deepEqual(f.toLokijs(), {}) // TODO: wrong (should include nwr[b])
+    var r = f.cacheDescriptors()
+    assert.deepEqual(r, [
+      { id: 'nwr["b"](properties:1)' },
+      { id: 'nwr(properties:0)',
+        recurse: [
+          { id: 'nwr["b"](properties:5)', recurseType: '>' }
+        ]
+      },
+      { id: 'node(properties:0)',
+        recurse: [
+          { id: 'nwr(properties:4)',
+            recurse: [
+              { id: 'nwr["b"](properties:5)', recurseType: '>' }
+            ],
+            recurseType: 'w'
+          }
+        ]
+      },
+      { id: 'nwr(properties:0)',
+        recurse: [
+          { id: 'nwr["a"](properties:5)', recurseType: '>' }
+        ]
+      },
+      { id: 'node(properties:0)',
+        recurse: [
+          { id: 'nwr(properties:4)',
+            recurse: [
+              { id: 'nwr["a"](properties:5)', recurseType: '>' }
+            ],
+            recurseType: 'w'
+          }
+        ]
+      },
+    ])
+  })
 })
 
 describe("Filter sets with relations, apply base filter", function () {
@@ -1510,6 +1560,26 @@ describe("Filter sets with relations, apply base filter", function () {
         recurse: [
           { id: 'nwr["b"](properties:21)', bounds: { type: 'Polygon', coordinates: [[[16,46],[17,46],[17,47],[16,47],[16,46]]] }, recurseType: '>' }
         ]
+      },
+      { id: 'node(properties:0)',
+        recurse: [
+          { id: 'nwr(properties:4)',
+            recurse: [
+              { id: 'nwr["a"](properties:21)', bounds: { type: 'Polygon', coordinates: [[[16,46],[17,46],[17,47],[16,47],[16,46]]] }, recurseType: '>' }
+            ],
+            recurseType: 'w'
+          }
+        ]
+      },
+      { id: 'node(properties:0)',
+        recurse: [
+          { id: 'nwr(properties:4)',
+            recurse: [
+              { id: 'nwr["b"](properties:21)', bounds: { type: 'Polygon', coordinates: [[[16,46],[17,46],[17,47],[16,47],[16,46]]] }, recurseType: '>' }
+            ],
+            recurseType: 'w'
+          }
+        ]
       }
     ])
   })
@@ -1548,6 +1618,16 @@ describe("Filter sets with relations, apply base filter", function () {
             recurse: [{
               id: 'way["highway"="secondary"](properties:5)',
               recurseType: '>'
+            }]
+          }, {
+            id: 'node(properties:0)',
+            recurse: [{
+              id: 'nwr(properties:4)',
+              recurse: [{
+                id: 'way["highway"="secondary"](properties:5)',
+                recurseType: '>'
+              }],
+              recurseType: 'w'
             }]
           }]
         }, done)
@@ -1665,6 +1745,16 @@ describe("Filter sets with relations, apply base filter", function () {
               id: 'node["highway"](properties:1)',
               recurseType: '<'
             }]
+          }, {
+            id: 'relation(properties:4)',
+            recurse: [{
+              id: 'nwr(properties:4)',
+              recurse: [{
+                id: 'node["highway"](properties:1)',
+                recurseType: '<'
+              }],
+              recurseType: 'br'
+            }]
           }]
         }, done)
       })
@@ -1687,6 +1777,16 @@ describe("Filter sets with relations, apply base filter", function () {
             recurse: [{
               id: 'node["highway"](properties:1)',
               recurseType: '<'
+            }]
+          }, {
+            id: 'relation(properties:4)',
+            recurse: [{
+              id: 'nwr(properties:4)',
+              recurse: [{
+                id: 'node["highway"](properties:1)',
+                recurseType: '<'
+              }],
+              recurseType: 'br'
             }]
           }]
         }, done)

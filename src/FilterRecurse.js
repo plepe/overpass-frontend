@@ -102,8 +102,8 @@ class FilterRecurse extends FilterStatement {
       return []
     }
 
-    let result = this.inputSetRef._caches()
-    result = result.map(c => {
+    let r = this.inputSetRef._caches()
+    let result = r.map(c => {
       c.recurseType = this.type
       if (['>'].includes(this.type)) {
         c.properties |= OverpassFrontend.MEMBERS
@@ -115,6 +115,28 @@ class FilterRecurse extends FilterStatement {
         recurse: [c]
       }
     })
+
+    result = result.concat(r.map(c => {
+      c = { ...c }
+      c.recurseType = this.type
+      if (['>'].includes(this.type)) {
+        c.properties |= OverpassFrontend.MEMBERS
+      }
+
+      const inBetween = {
+        filters: '',
+        properties: OverpassFrontend.MEMBERS,
+        recurseType: this.type == '>' ? 'w' : 'br',
+        recurse: [c]
+      }
+
+      return {
+        type: this.type === '>' ? 'node' : 'relation',
+        filters: '',
+        properties: ['<'].includes(this.type) ? OverpassFrontend.MEMBERS : 0,
+        recurse: [inBetween]
+      }
+    }))
 
     return result
   }
