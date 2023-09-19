@@ -1,5 +1,5 @@
 <?php
-if ($_REQUEST['status'] === '429') {
+if (isset($_REQUEST['status']) && $_REQUEST['status'] === '429') {
   Header("HTTP/1.1 429 Bad Request");
 
   print <<<EOT
@@ -29,11 +29,16 @@ $descriptorspec = array(
    2 => array("pipe", "w") // stderr is a file to write to
 );
 
-$env = array();
+$env = array('PATH' => getenv('PATH'));
 $pipes = array();
 $cwd = getcwd();
 
-$process = proc_open('osm3s_query --concise --db-dir=data/', $descriptorspec, $pipes, $cwd, $env);
+$db_path = "data/";
+if (getenv("OVERPASS_DB_DIR") !== false) {
+    $db_path = getenv("OVERPASS_DB_DIR");
+}
+
+$process = proc_open('osm3s_query --concise --db-dir='.$db_path, $descriptorspec, $pipes, $cwd, $env);
 
 if (is_resource($process)) {
     // $pipes now looks like this:
