@@ -150,7 +150,43 @@ overpassFrontend.BBoxQuery(
 ```
 
 # DEVELOPMENT
-You should install [osm3s](https://wiki.openstreetmap.org/wiki/Overpass_API/Installation) (a local copy of Overpass API) for running the unit tests.
+
+To run unit tests, you need to have a local Overpass API server installed.
+For that, you can either set it up manually or use a pre-made Docker image.
+
+## Docker
+
+First, you need to build Docker images for osm3s, the Overpass API server. Please refer to the [official repository](https://github.com/drolbr/docker-overpass) for building instructions.
+
+Once you have built the images, you can build and run the image containing test data for `overpass-frontend`:
+
+```sh
+cd test/
+
+# Use the default test configuration for Docker
+cp ./conf.json-docker ./conf.js
+
+# Build the test server image
+docker build -t overpass-frontend-test .
+
+# Run the test server (it will be exposed on the port number 8080)
+docker run -p 8080:80 -it --rm overpass-frontend-test
+```
+
+Now you can run unit tests:
+
+```
+npm install
+npm run test
+```
+
+## Manual setup
+
+Please follow the installation instructions for [osm3s](https://wiki.openstreetmap.org/wiki/Overpass_API/Installation).
+
+Before running unit tests, you should copy `test/conf.json-dist` to `test/conf.json` and change the configuration parameters. They should point to your local server address.
+
+To run the tests, execute the following commands:
 
 ```sh
 git clone https://github.com/plepe/overpass-frontend
