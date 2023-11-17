@@ -7,7 +7,6 @@ class FilterAnd {
     this.filter = filter
     this.parts = []
 
-    let hasType = false
     let hasOutputSet = false
     def.and.forEach(part => {
       if (part.outputSet) {
@@ -79,7 +78,7 @@ class FilterAnd {
   }
 
   _caches () {
-    let result = []
+    const result = []
 
     const list = this.parts.concat()
     const first = list.shift()

@@ -27,8 +27,7 @@ class FilterQuery {
         this.type = part.type === 'rel' ? 'relation' : part.type
         hasType = true
       } else if (part.inputSet) {
-        if (part.inputSet in filter.sets) {
-        } else {
+        if (!(part.inputSet in filter.sets)) {
           console.log('input set ' + part.inputSet + ' not defined')
           this.noResult = true
         }
@@ -132,7 +131,7 @@ class FilterQuery {
     if (this.inputSets) {
       query = {
         $and: Object.values(this.inputSets)
-          .map(inputSet => inputSet ? inputSet.toLokijs() : {$not: true})
+          .map(inputSet => inputSet ? inputSet.toLokijs() : { $not: true })
           .concat(query)
       }
     }
@@ -175,9 +174,6 @@ class FilterQuery {
 
   _caches () {
     let options = [{ filters: '', properties: 0 }]
-
-    const inputSets = []
-    let outputSet = '_'
 
     if (this.type !== 'nwr') {
       options.forEach(o => {

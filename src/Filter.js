@@ -1,6 +1,3 @@
-const strsearch2regexp = require('strsearch2regexp')
-const filterJoin = require('./filterJoin')
-const OverpassFrontend = require('./defines')
 const qlFunctions = require('./qlFunctions/__index__')
 const parseString = require('./parseString')
 const parseParentheses = require('./parseParentheses')
@@ -200,8 +197,7 @@ function parse (def, rek = 0) {
         current = []
         notExists = null
         mode = 1
-      }
-      else {
+      } else {
         throw new Error("Can't parse query, expected output set and ';': " + def)
       }
     } else if (mode === 20) {
@@ -432,8 +428,8 @@ class Filter {
   expandOr (def) {
     def.forEach((part, index) => {
       if (Array.isArray(part)) {
-        let or = []
-        let other = []
+        const or = []
+        const other = []
 
         part.forEach(q => {
           if (q.or) {
@@ -484,7 +480,7 @@ class Filter {
     def = this.expandOr(def)
 
     this.sets = {}
-    let r = def.map(d => filterPart.get(d, this))
+    const r = def.map(d => filterPart.get(d, this))
 
     return r
   }

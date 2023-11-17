@@ -5,7 +5,6 @@ class FilterOr {
     this.outputSet = '_'
     this.parts = []
 
-    let hasType = false
     let hasOutputSet = false
     def.or.forEach(part => {
       if (part.outputSet) {
@@ -69,8 +68,6 @@ class FilterOr {
   }
 
   _caches () {
-    const result = []
-
     return this.parts
       .map(part => part._caches())
       .flat()
