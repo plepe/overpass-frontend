@@ -1,3 +1,4 @@
+const turf = require('./turf')
 const strsearch2regexp = require('strsearch2regexp')
 const filterJoin = require('./filterJoin')
 const OverpassFrontend = require('./defines')
@@ -172,8 +173,12 @@ function parse (def, rek = 0) {
     } else if (mode === 1) {
       m = def.match(/^\s*\)\s*;?\s*/)
       if (m) {
-        def = def.slice(m[0].length)
-        return [rek === 0 && script.length === 1 ? script[0] : script, def]
+        if (rek === 0) {
+          return [script.length === 1 ? script[0] : script, def]
+        } else {
+          def = def.slice(m[0].length)
+          return [script, def]
+        }
       } else {
         mode = 0
       }
@@ -189,6 +194,7 @@ function parse (def, rek = 0) {
         def = def.slice(m[0].length)
         script.push(current)
         current = []
+        notExists = null
         mode = 1
       } else if (!m && def.match(/^\s*$/)) {
         if (current.length) {
@@ -232,6 +238,7 @@ function parse (def, rek = 0) {
         }
         current.push(entry)
         def = def.slice(m[0].length)
+        notExists = null
         mode = 10
       } else if (m) {
         if (notExists) {
@@ -290,7 +297,7 @@ function parse (def, rek = 0) {
       const r = parseParentheses(def)
       def = r[1]
       const mId = r[0].match(/^\s*(\d+)\s*$/)
-      const mBbox = r[0].match(/^((\s*\d+(.\d+)?\s*,){3}\s*\d+(.\d+)?\s*)$/)
+      const mBbox = r[0].match(/^((\s*-?\d+(.\d+)?\s*,){3}\s*-?\d+(.\d+)?\s*)$/)
       const m = r[0].match(/^\s*(\w+)\s*:\s*(.*)\s*$/)
       /* eslint-disable new-cap */
       if (mId) {
@@ -316,10 +323,14 @@ function parse (def, rek = 0) {
 
 function check (def) {
   if (typeof def === 'string') {
-    return parse(def)[0]
+    const result = parse(def)
+    if (result[1].trim()) {
+      throw new Error("Can't parse query, trailing characters: " + result[1])
+    }
+    return result[0]
   } else if (def === null) {
     return
-  } else if (typeof def === 'object' && def.constructor.name === 'Filter') {
+  } else if (typeof def === 'object' && def instanceof Filter) {
     def = def.def
   } else if (Array.isArray(def)) {
     def = def.map(d => check(d))
@@ -531,14 +542,16 @@ class Filter {
 
       const r = {
         $and:
-        def.and.map(part => {
-          const r = this.toLokijs(options, part)
-          if (r.needMatch) {
-            needMatch = true
-          }
-          delete r.needMatch
-          return r
-        })
+        def.and
+          .map(part => {
+            const r = this.toLokijs(options, part)
+            if (r.needMatch) {
+              needMatch = true
+            }
+            delete r.needMatch
+            return r
+          })
+          .filter(part => Object.keys(part).length)
       }
 
       if (needMatch) {
@@ -753,6 +766,22 @@ class Filter {
       if (a.ids) {
         r.ids = b.ids.filter(n => a.ids.includes(n))
       }
+    }
+
+    if (b.invalid) {
+      r.invalid = true
+    }
+
+    if (b.bounds && a.bounds) {
+      const mergeBounds = turf.intersect(a.bounds, b.bounds)
+      if (mergeBounds) {
+        r.bounds = mergeBounds.geometry
+      } else {
+        r.invalid = true
+        delete r.bounds
+      }
+    } else if (b.bounds) {
+      r.bounds = b.bounds
     }
 
     return r

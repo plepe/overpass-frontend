@@ -79,23 +79,23 @@ class OverpassWay extends OverpassObject {
           type: 'node'
         })
 
-        const memberOptions = JSON.parse(JSON.stringify(options))
-
-        memberOptions.properties = OverpassFrontend.ID_ONLY
+        let obProperties = OverpassFrontend.ID_ONLY
         const ob = {
           id: this.data.nodes[i],
           type: 'node'
         }
 
         if (data.geometry &amp;&amp; data.geometry[i]) {
-          memberOptions.properties |= OverpassFrontend.GEOM
+          obProperties = obProperties | OverpassFrontend.GEOM
           ob.lat = data.geometry[i].lat
           ob.lon = data.geometry[i].lon
         }
 
-        const memberMetaOb = this.overpass.createOrUpdateOSMObject(ob, memberOptions)
+        const memberOb = this.overpass.createOrUpdateOSMObject(ob, {
+          properties: obProperties
+        })
 
-        memberMetaOb.notifyMemberOf(this, null, i)
+        memberOb.notifyMemberOf(this, null, i)
       }
     }
 
@@ -110,9 +110,10 @@ class OverpassWay extends OverpassObject {
 
   checkGeometry () {
     if (this.members &amp;&amp; (this.properties &amp; OverpassFrontend.GEOM) === 0) {
-      this.geometry = this.memberObjects().map(
-        node => {
-          return node.ob ? node.ob.geometry : null
+      this.geometry = this.members.map(
+        member => {
+          const node = this.overpass.cacheElements[member.id]
+          return node ? node.geometry : null
         }
       ).filter(geom => geom)
 
@@ -207,7 +208,7 @@ class OverpassWay extends OverpassObject {
         if (this.members) {
           async.each(this.members,
             (member, done) => {
-              const memberOb = this.overpass.cache.get(member.id)
+              const memberOb = this.overpass.cacheElements[member.id]
 
               const nd = parentNode.ownerDocument.createElement('nd')
               nd.setAttribute('ref', memberOb.osm_id)
@@ -242,7 +243,7 @@ class OverpassWay extends OverpassObject {
 
           async.each(this.members,
             (member, done) => {
-              const memberOb = this.overpass.cache.get(member.id)
+              const memberOb = this.overpass.cacheElements[member.id]
 
               result.nodes.push(memberOb.osm_id)
 
@@ -324,13 +325,13 @@ module.exports = OverpassWay
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Filter.html">Filter</a></li><li><a href="OverpassFrontend.html">OverpassFrontend</a></li><li><a href="OverpassNode.html">OverpassNode</a></li><li><a href="OverpassObject.html">OverpassObject</a></li><li><a href="OverpassRelation.html">OverpassRelation</a></li><li><a href="OverpassWay.html">OverpassWay</a></li><li><a href="Request.html">Request</a></li><li><a href="RequestBBox.html">RequestBBox</a></li><li><a href="RequestGet.html">RequestGet</a></li><li><a href="RequestMulti.html">RequestMulti</a></li><li><a href="RequestTimeline.html">RequestTimeline</a></li></ul><h3>Events</h3><ul><li><a href="OverpassFrontend.html#event:error">error</a></li><li><a href="OverpassFrontend.html#event:load">load</a></li><li><a href="OverpassFrontend.html#event:reject">reject</a></li><li><a href="OverpassFrontend.html#event:start">start</a></li><li><a href="OverpassFrontend.html#event:update">update</a></li><li><a href="Request.html#event:abort">abort</a></li><li><a href="Request.html#event:finish">finish</a></li><li><a href="Request.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="Request.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestBBox.html#event:abort">abort</a></li><li><a href="RequestBBox.html#event:finish">finish</a></li><li><a href="RequestBBox.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestBBox.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestGet.html#event:abort">abort</a></li><li><a href="RequestGet.html#event:finish">finish</a></li><li><a href="RequestGet.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestGet.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestMulti.html#event:abort">abort</a></li><li><a href="RequestMulti.html#event:finish">finish</a></li><li><a href="RequestMulti.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestMulti.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestTimeline.html#event:abort">abort</a></li><li><a href="RequestTimeline.html#event:finish">finish</a></li><li><a href="RequestTimeline.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestTimeline.html#event:subrequest-finished">subrequest-finished</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Filter.html">Filter</a></li><li><a href="OverpassFrontend.html">OverpassFrontend</a></li><li><a href="OverpassNode.html">OverpassNode</a></li><li><a href="OverpassObject.html">OverpassObject</a></li><li><a href="OverpassRelation.html">OverpassRelation</a></li><li><a href="OverpassWay.html">OverpassWay</a></li><li><a href="Request.html">Request</a></li><li><a href="RequestBBox.html">RequestBBox</a></li><li><a href="RequestGet.html">RequestGet</a></li><li><a href="RequestMulti.html">RequestMulti</a></li></ul><h3>Events</h3><ul><li><a href="OverpassFrontend.html#event:error">error</a></li><li><a href="OverpassFrontend.html#event:load">load</a></li><li><a href="OverpassFrontend.html#event:reject">reject</a></li><li><a href="OverpassFrontend.html#event:start">start</a></li><li><a href="OverpassFrontend.html#event:update">update</a></li><li><a href="Request.html#event:abort">abort</a></li><li><a href="Request.html#event:finish">finish</a></li><li><a href="Request.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="Request.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestBBox.html#event:abort">abort</a></li><li><a href="RequestBBox.html#event:finish">finish</a></li><li><a href="RequestBBox.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestBBox.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestGet.html#event:abort">abort</a></li><li><a href="RequestGet.html#event:finish">finish</a></li><li><a href="RequestGet.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestGet.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestMulti.html#event:abort">abort</a></li><li><a href="RequestMulti.html#event:finish">finish</a></li><li><a href="RequestMulti.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestMulti.html#event:subrequest-finished">subrequest-finished</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.11</a> on Wed Oct 26 2022 16:23:48 GMT+0200 (Mitteleuropäische Sommerzeit)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.11</a> on Fri Jan 05 2024 15:55:18 GMT+0100 (Mitteleuropäische Normalzeit)
 </footer>
 
 <script> prettyPrint(); </script>

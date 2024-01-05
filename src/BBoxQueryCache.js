@@ -40,7 +40,7 @@ class BBoxQueryCache {
    */
   check (bbox, cacheDescriptors = null) {
     if (cacheDescriptors && cacheDescriptors.invalid) {
-      return false
+      return true
     }
 
     if (cacheDescriptors && cacheDescriptors.ids) {

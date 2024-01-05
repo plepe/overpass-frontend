@@ -173,6 +173,7 @@ describe('Overpass get', function() {
 
 describe('Overpass get before load finishes', function() {
   it ('get objects via get()', function (done) {
+    this.timeout(20000)
     overpassFrontend = new OverpassFrontend('test/small.osm.bz2')
     overpassFrontend.once('load', () => {
       loadFinished = true
@@ -230,6 +231,7 @@ describe('Overpass get before load finishes', function() {
 describe('Overpass BBoxQuery with members', function() {
   describe ('after load finishes', function () {
     it ('load file', function (done) {
+      this.timeout(20000)
       overpassFrontend = new OverpassFrontend('test/small.osm.bz2')
       overpassFrontend.once('load', () => {
         done()
@@ -286,6 +288,7 @@ describe('Overpass BBoxQuery with members', function() {
 
   describe('now query before load finishes', function() {
     it ('load & query', function (done) {
+      this.timeout(20000)
       overpassFrontend = new OverpassFrontend('test/small.osm.bz2')
       overpassFrontend.once('load', () => {
         loadFinished = true

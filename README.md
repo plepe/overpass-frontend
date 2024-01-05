@@ -1,9 +1,63 @@
 # OverpassFrontend
-A JavaScript (NodeJS/Browser) library to easily access data from OpenStreetMap via Overpass API. The objects can directly be used with LeafletJS or exported to GeoJSON. Data will be cached in the browser memory (persistent caching in LocalStorage or so may be added in the future).
+A JavaScript (NodeJS/Browser) library to easily access data from OpenStreetMap via Overpass API or from an OSM File. The objects can directly be used with LeafletJS or exported to GeoJSON. Data will be cached in the browser memory (persistent caching in LocalStorage or so may be added in the future).
 
 # INSTALLATION
 ```sh
 npm install --save overpass-frontend
+```
+
+# EXAMPLES
+## BBOX Query
+You can execute this example as: `node example-bbox.js`
+
+```js
+const OverpassFrontend = require('overpass-frontend')
+
+// you may specify an OSM file as url, e.g. 'test/data.osm.bz2'
+const overpassFrontend = new OverpassFrontend('//overpass-api.de/api/interpreter')
+
+// request restaurants in the specified bounding box
+overpassFrontend.BBoxQuery(
+  'nwr[amenity=restaurant]',
+  { minlat: 48.19, maxlat: 48.20, minlon: 16.33, maxlon: 16.34 },
+  {
+    properties: OverpassFrontend.ALL
+  },
+  function (err, result) {
+    console.log('* ' + result.tags.name + ' (' + result.id + ')')
+  },
+  function (err) {
+    if (err) { console.log(err) }
+  }
+)
+```
+
+## By ID
+You can execute this example as: `node example-by-id.js`
+
+```js
+const OverpassFrontend = require('overpass-frontend')
+
+// you may specify an OSM file as url, e.g. 'test/data.osm.bz2'
+const overpassFrontend = new OverpassFrontend('//overpass-api.de/api/interpreter')
+
+// request restaurants in the specified bounding box
+overpassFrontend.get(
+  ['n27365030', 'w5013364'],
+  {
+    properties: OverpassFrontend.TAGS
+  },
+  function (err, result) {
+    if (result) {
+      console.log('* ' + result.tags.name + ' (' + result.id + ')')
+    } else {
+      console.log('* empty result')
+    }
+  },
+  function (err) {
+    if (err) { console.log(err) }
+  }
+)
 ```
 
 # DOCUMENTATION
@@ -95,62 +149,44 @@ node(if:count_tags() > 5 || t["name"] == "foo")
 node(if:debug(id()))
 ```
 
-# EXAMPLES
-## By ID
-You can execute this example as: `node example-by-id.js`
-
-```js
-const OverpassFrontend = require('overpass-frontend')
-
-// you may specify an OSM file as url, e.g. 'test/data.osm.bz2'
-const overpassFrontend = new OverpassFrontend('//overpass-api.de/api/interpreter')
-
-// request restaurants in the specified bounding box
-overpassFrontend.get(
-  ['n27365030', 'w5013364'],
-  {
-    properties: OverpassFrontend.TAGS
-  },
-  function (err, result) {
-    if (result) {
-      console.log('* ' + result.tags.name + ' (' + result.id + ')')
-    } else {
-      console.log('* empty result')
-    }
-  },
-  function (err) {
-    if (err) { console.log(err) }
-  }
-)
-```
-
-## BBOX Query
-You can execute this example as: `node example-bbox.js`
-
-```js
-const OverpassFrontend = require('overpass-frontend')
-
-// you may specify an OSM file as url, e.g. 'test/data.osm.bz2'
-const overpassFrontend = new OverpassFrontend('//overpass-api.de/api/interpreter')
-
-// request restaurants in the specified bounding box
-overpassFrontend.BBoxQuery(
-  'nwr[amenity=restaurant]',
-  { minlat: 48.19, maxlat: 48.20, minlon: 16.33, maxlon: 16.34 },
-  {
-    properties: OverpassFrontend.ALL
-  },
-  function (err, result) {
-    console.log('* ' + result.tags.name + ' (' + result.id + ')')
-  },
-  function (err) {
-    if (err) { console.log(err) }
-  }
-)
-```
-
 # DEVELOPMENT
-You should install [osm3s](https://wiki.openstreetmap.org/wiki/Overpass_API/Installation) (a local copy of Overpass API) for running the unit tests.
+
+To run unit tests, you need to have a local Overpass API server installed.
+For that, you can either set it up manually or use a pre-made Docker image.
+
+## Docker
+
+First, you need to build Docker images for osm3s, the Overpass API server. Please refer to the [official repository](https://github.com/drolbr/docker-overpass) for building instructions.
+
+Once you have built the images, you can build and run the image containing test data for `overpass-frontend`:
+
+```sh
+cd test/
+
+# Use the default test configuration for Docker
+cp ./conf.json-docker ./conf.js
+
+# Build the test server image
+docker build -t overpass-frontend-test .
+
+# Run the test server (it will be exposed on the port number 8080)
+docker run -p 8080:80 -it --rm overpass-frontend-test
+```
+
+Now you can run unit tests:
+
+```
+npm install
+npm run test
+```
+
+## Manual setup
+
+Please follow the installation instructions for [osm3s](https://wiki.openstreetmap.org/wiki/Overpass_API/Installation).
+
+Before running unit tests, you should copy `test/conf.json-dist` to `test/conf.json` and change the configuration parameters. They should point to your local server address.
+
+To run the tests, execute the following commands:
 
 ```sh
 git clone https://github.com/plepe/overpass-frontend

@@ -98,27 +98,25 @@ class OverpassRelation extends OverpassObject {
 
           member.id = member.type.substr(0, 1) + member.ref
 
-          const memberOptions = JSON.parse(JSON.stringify(options))
-
           const ob = JSON.parse(JSON.stringify(member))
           ob.id = ob.ref
           delete ob.ref
           delete ob.role
-          memberOptions.properties = OverpassFrontend.ID_ONLY
+          let memberProperties = OverpassFrontend.ID_ONLY
 
           if ((member.type === 'node' &amp;&amp; 'lat' in member) ||
               (member.type === 'way' &amp;&amp; 'geometry' in member)) {
-            memberOptions.properties |= OverpassFrontend.GEOM
+            memberProperties |= OverpassFrontend.GEOM
           }
 
-          const memberMetaOb = this.overpass.createOrUpdateOSMObject(ob, memberOptions)
+          const memberOb = this.overpass.createOrUpdateOSMObject(ob, { properties: memberProperties })
 
           // call notifyMemberOf only once per member
           if (!membersKnown) {
-            memberMetaOb.notifyMemberOf(this, member.role, sequence)
+            memberOb.notifyMemberOf(this, member.role, sequence)
           }
 
-          return memberMetaOb
+          return memberOb
         }
       )
 
@@ -129,11 +127,6 @@ class OverpassRelation extends OverpassObject {
   updateGeometry () {
     if (!this.members) {
       return
-    }
-
-    const cacheOptions = {}
-    if (this.data.timestamp) {
-      cacheOptions.date = this.data.timestamp
     }
 
     let allKnown = true
@@ -148,12 +141,12 @@ class OverpassRelation extends OverpassObject {
           role: member.role
         }
 
-        const ob = this.overpass.cache.get(member.id, cacheOptions)
-
-        if (ob === undefined) {
+        if (!(member.id in this.overpass.cacheElements)) {
           allKnown = false
           return data
         }
+
+        const ob = this.overpass.cacheElements[member.id]
 
         if ((ob.properties &amp; OverpassFrontend.GEOM) === 0) {
           allKnown = false
@@ -183,8 +176,8 @@ class OverpassRelation extends OverpassObject {
           return
         }
 
-        const memberOb = this.overpass.cache.get(member.id, cacheOptions)
-        if (!memberOb || !memberOb.members || member.type !== 'way') {
+        const memberOb = this.overpass.cacheElements[member.id]
+        if (!memberOb.members || member.type !== 'way') {
           return
         }
 
@@ -193,8 +186,8 @@ class OverpassRelation extends OverpassObject {
         const revMemberOf = memberOb.memberOf.filter(memberOf => memberOf.sequence === index &amp;&amp; memberOf.id === this.id)[0]
 
         if (index > 0) {
-          const prevMember = this.overpass.cache.get(this.members[index - 1].id, cacheOptions)
-          if (prevMember &amp;&amp; prevMember.type === 'way' &amp;&amp; prevMember.members) {
+          const prevMember = this.overpass.cacheElements[this.members[index - 1].id]
+          if (prevMember.type === 'way' &amp;&amp; prevMember.members) {
             if (firstMemberId === prevMember.members[0].id || firstMemberId === prevMember.members[prevMember.members.length - 1].id) {
               member.connectedPrev = 'forward'
             } else if (lastMemberId === prevMember.members[0].id || lastMemberId === prevMember.members[prevMember.members.length - 1].id) {
@@ -206,8 +199,8 @@ class OverpassRelation extends OverpassObject {
         }
 
         if (index &lt; this.members.length - 1) {
-          const nextMember = this.overpass.cache.get(this.members[index + 1].id, cacheOptions)
-          if (nextMember &amp;&amp; nextMember.type === 'way' &amp;&amp; nextMember.members) {
+          const nextMember = this.overpass.cacheElements[this.members[index + 1].id]
+          if (nextMember.type === 'way' &amp;&amp; nextMember.members) {
             if (firstMemberId === nextMember.members[0].id || firstMemberId === nextMember.members[nextMember.members.length - 1].id) {
               member.connectedNext = 'backward'
             } else if (lastMemberId === nextMember.members[0].id || lastMemberId === nextMember.members[nextMember.members.length - 1].id) {
@@ -244,8 +237,8 @@ class OverpassRelation extends OverpassObject {
 
     if (!(this.properties &amp; OverpassFrontend.BBOX)) {
       this.members.forEach(member => {
-        const ob = this.overpass.cache.get(member.id, cacheOptions)
-        if (ob &amp;&amp; ob.bounds) {
+        const ob = this.overpass.cacheElements[member.id]
+        if (ob.bounds) {
           if (this.bounds) {
             this.bounds.extend(ob.bounds)
           } else {
@@ -347,16 +340,16 @@ class OverpassRelation extends OverpassObject {
 
     // create an event handler on the 'update' event, so that loading member
     // features will update geometry
-    this.memberObjects().forEach(
+    this.memberFeatures.forEach(
       (member, index) => {
-        if (!(member.ob.properties &amp; OverpassFrontend.GEOM)) {
+        if (!(member.properties &amp; OverpassFrontend.GEOM)) {
           const updFun = member => {
             feature.clearLayers()
             feature.addData(this.geometry)
             feature.setStyle(options)
           }
 
-          member.ob.once('update', updFun)
+          member.once('update', updFun)
         }
       }
     )
@@ -377,8 +370,8 @@ class OverpassRelation extends OverpassObject {
       } else {
         ret.geometry = {
           type: 'GeometryCollection',
-          geometries: this.memberObjects()
-            .map(member => member.ob.GeoJSON().geometry) // .geometry may be undefined
+          geometries: this.memberFeatures
+            .map(member => member.GeoJSON().geometry) // .geometry may be undefined
             .filter(member => member)
             .filter(member => member.type !== 'GeometryCollection' || member.geometries.length)
         }
@@ -389,11 +382,6 @@ class OverpassRelation extends OverpassObject {
   }
 
   exportOSMXML (options, parentNode, callback) {
-    const cacheOptions = {}
-    if (this.data.timestamp) {
-      cacheOptions.date = this.data.timestamp
-    }
-
     super.exportOSMXML(options, parentNode,
       (err, result) => {
         if (err) {
@@ -407,7 +395,7 @@ class OverpassRelation extends OverpassObject {
         if (this.members) {
           async.each(this.members,
             (member, done) => {
-              const memberOb = this.overpass.cache.get(member.id, cacheOptions)
+              const memberOb = this.overpass.cacheElements[member.id]
 
               const nd = parentNode.ownerDocument.createElement('member')
               nd.setAttribute('ref', memberOb.osm_id)
@@ -429,11 +417,6 @@ class OverpassRelation extends OverpassObject {
   }
 
   exportOSMJSON (conf, elements, callback) {
-    const cacheOptions = {}
-    if (this.data.timestamp) {
-      cacheOptions.date = this.data.timestamp
-    }
-
     super.exportOSMJSON(conf, elements,
       (err, result) => {
         if (err) {
@@ -449,7 +432,7 @@ class OverpassRelation extends OverpassObject {
 
           async.each(this.members,
             (member, done) => {
-              const memberOb = this.overpass.cache.get(member.id, cacheOptions)
+              const memberOb = this.overpass.cacheElements[member.id]
 
               result.members.push({
                 ref: memberOb.osm_id,
@@ -471,11 +454,6 @@ class OverpassRelation extends OverpassObject {
   }
 
   intersects (bbox) {
-    const cacheOptions = {}
-    if (this.data.timestamp) {
-      cacheOptions.date = this.data.timestamp
-    }
-
     const result = super.intersects(bbox)
 
     if (result === 0 || result === 2) {
@@ -509,7 +487,7 @@ class OverpassRelation extends OverpassObject {
     } else if (this.members) {
       for (i in this.members) {
         const memberId = this.members[i].id
-        const member = this.overpass.cache.get(memberId, cacheOptions)
+        const member = this.overpass.cacheElements[memberId]
 
         if (member) {
           if (member.intersects(bbox) === 2) {
@@ -534,13 +512,13 @@ module.exports = OverpassRelation
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Filter.html">Filter</a></li><li><a href="OverpassFrontend.html">OverpassFrontend</a></li><li><a href="OverpassNode.html">OverpassNode</a></li><li><a href="OverpassObject.html">OverpassObject</a></li><li><a href="OverpassRelation.html">OverpassRelation</a></li><li><a href="OverpassWay.html">OverpassWay</a></li><li><a href="Request.html">Request</a></li><li><a href="RequestBBox.html">RequestBBox</a></li><li><a href="RequestGet.html">RequestGet</a></li><li><a href="RequestMulti.html">RequestMulti</a></li><li><a href="RequestTimeline.html">RequestTimeline</a></li></ul><h3>Events</h3><ul><li><a href="OverpassFrontend.html#event:error">error</a></li><li><a href="OverpassFrontend.html#event:load">load</a></li><li><a href="OverpassFrontend.html#event:reject">reject</a></li><li><a href="OverpassFrontend.html#event:start">start</a></li><li><a href="OverpassFrontend.html#event:update">update</a></li><li><a href="Request.html#event:abort">abort</a></li><li><a href="Request.html#event:finish">finish</a></li><li><a href="Request.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="Request.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestBBox.html#event:abort">abort</a></li><li><a href="RequestBBox.html#event:finish">finish</a></li><li><a href="RequestBBox.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestBBox.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestGet.html#event:abort">abort</a></li><li><a href="RequestGet.html#event:finish">finish</a></li><li><a href="RequestGet.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestGet.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestMulti.html#event:abort">abort</a></li><li><a href="RequestMulti.html#event:finish">finish</a></li><li><a href="RequestMulti.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestMulti.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestTimeline.html#event:abort">abort</a></li><li><a href="RequestTimeline.html#event:finish">finish</a></li><li><a href="RequestTimeline.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestTimeline.html#event:subrequest-finished">subrequest-finished</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Filter.html">Filter</a></li><li><a href="OverpassFrontend.html">OverpassFrontend</a></li><li><a href="OverpassNode.html">OverpassNode</a></li><li><a href="OverpassObject.html">OverpassObject</a></li><li><a href="OverpassRelation.html">OverpassRelation</a></li><li><a href="OverpassWay.html">OverpassWay</a></li><li><a href="Request.html">Request</a></li><li><a href="RequestBBox.html">RequestBBox</a></li><li><a href="RequestGet.html">RequestGet</a></li><li><a href="RequestMulti.html">RequestMulti</a></li></ul><h3>Events</h3><ul><li><a href="OverpassFrontend.html#event:error">error</a></li><li><a href="OverpassFrontend.html#event:load">load</a></li><li><a href="OverpassFrontend.html#event:reject">reject</a></li><li><a href="OverpassFrontend.html#event:start">start</a></li><li><a href="OverpassFrontend.html#event:update">update</a></li><li><a href="Request.html#event:abort">abort</a></li><li><a href="Request.html#event:finish">finish</a></li><li><a href="Request.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="Request.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestBBox.html#event:abort">abort</a></li><li><a href="RequestBBox.html#event:finish">finish</a></li><li><a href="RequestBBox.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestBBox.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestGet.html#event:abort">abort</a></li><li><a href="RequestGet.html#event:finish">finish</a></li><li><a href="RequestGet.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestGet.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestMulti.html#event:abort">abort</a></li><li><a href="RequestMulti.html#event:finish">finish</a></li><li><a href="RequestMulti.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestMulti.html#event:subrequest-finished">subrequest-finished</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.11</a> on Wed Oct 26 2022 16:23:48 GMT+0200 (Mitteleuropäische Sommerzeit)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.11</a> on Fri Jan 05 2024 15:55:18 GMT+0100 (Mitteleuropäische Normalzeit)
 </footer>
 
 <script> prettyPrint(); </script>

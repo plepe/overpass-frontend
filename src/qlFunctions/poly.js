@@ -6,6 +6,8 @@ const qlFunction = require('./qlFunction')
 module.exports = class poly extends qlFunction {
   constructor (str) {
     super()
+    this.fun = 'poly'
+
     const m = str.match(/^\s*["']([0-9. ]*)["']\s*$/)
     if (!m) {
       throw new Error('poly function expects quoted coordinates separated by space')

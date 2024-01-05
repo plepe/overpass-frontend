@@ -1,5 +1,5 @@
 <?php
-if ($_REQUEST['status'] === '429') {
+if (isset($_REQUEST['status']) && $_REQUEST['status'] === '429') {
   Header("HTTP/1.1 429 Bad Request");
 
   print <<<EOT
@@ -29,11 +29,11 @@ $descriptorspec = array(
    2 => array("pipe", "w") // stderr is a file to write to
 );
 
-$env = array();
+$env = array('PATH' => getenv('PATH'));
 $pipes = array();
 $cwd = getcwd();
 
-$db = array_key_exists('db', $_REQUEST) ? $_REQUEST['db'] : 'data';
+$db = $_REQUEST['db'] ?? getenv("OVERPASS_DB_DIR") ?: 'data';
 if (!preg_match('/^[a-z0-9_-]+$/i', $db)) {
   Header("HTTP/1.1 403 Forbidden");
 

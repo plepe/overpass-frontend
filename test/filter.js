@@ -178,6 +178,25 @@ describe('Filter', function () {
       assert.equal(r, false, 'Object should not match')
     })
 
+    it ('\\n   nwr [ amenity ]  ;\\n  ', function () {
+      var f = new Filter('\n   nwr [ amenity ]  ;\n  ')
+      assert.deepEqual(f.def, [{"key":"amenity","op":"has_key"}])
+      assert.equal(f.toString(), 'nwr["amenity"];')
+
+      var r = f.toLokijs()
+      assert.deepEqual(r, { 'tags.amenity': { $exists: true } })
+
+      var r = f.cacheDescriptors()
+      assert.deepEqual(r, [ { id: 'nwr["amenity"](properties:1)' } ])
+
+      var r = f.match({ tags: { amenity: 'restaurant' } })
+      assert.equal(r, true, 'Object should match')
+      var r = f.match({ tags: { amenity: 'cafe' } })
+      assert.equal(r, true, 'Object should match')
+      var r = f.match({ tags: { shop: 'supermarket' } })
+      assert.equal(r, false, 'Object should not match')
+    })
+
     it ('(node[amenity];way[amenity];)', function () {
       var f = new Filter('(node[amenity];way[amenity];)')
       assert.deepEqual(f.def, {or:[
@@ -844,6 +863,54 @@ describe('Filter', function () {
       ])
     })
 
+    it ('(nwr[!cuisine];nwr[amenity=cafe];)', function () {
+      var f = new Filter('(nwr[!cuisine];nwr[amenity=cafe];)')
+      assert.deepEqual(f.def, {or:[
+        [{"key":"cuisine","op":"not_exists"}],
+        [{"key":"amenity","op":"=","value":"cafe"}],
+      ]})
+      assert.equal(f.toString(), '(nwr[!"cuisine"];nwr["amenity"="cafe"];);')
+
+      var r = f.toLokijs()
+      assert.deepEqual(r, { $or: [ { 'tags.cuisine': { $exists: false } }, { 'tags.amenity': { $eq: "cafe" } } ] })
+
+      var r = f.cacheDescriptors()
+      assert.deepEqual(r, [
+        { id: 'nwr[!"cuisine"](properties:1)' },
+        { id: 'nwr["amenity"="cafe"](properties:1)' }
+      ])
+
+      var r = f.match({ tags: { amenity: 'restaurant' } })
+      assert.equal(r, true, 'Object should match')
+      var r = f.match({ tags: { amenity: 'cafe' } })
+      assert.equal(r, true, 'Object should match')
+      var r = f.match({ tags: { shop: 'supermarket' } })
+      assert.equal(r, true, 'Object should match')
+    })
+
+    it ('(nwr[!cuisine][amenity=cafe];)', function () {
+      var f = new Filter('(nwr[!cuisine][amenity=cafe];)')
+      assert.deepEqual(f.def, {or:[
+        [{"key":"cuisine","op":"not_exists"},{"key":"amenity","op":"=","value":"cafe"}],
+      ]})
+      assert.equal(f.toString(), '(nwr[!"cuisine"]["amenity"="cafe"];);')
+
+      var r = f.toLokijs()
+      assert.deepEqual(r, { $or: [ { 'tags.cuisine': { $exists: false }, 'tags.amenity': { $eq: "cafe" } } ] })
+
+      var r = f.cacheDescriptors()
+      assert.deepEqual(r, [
+        { id: 'nwr[!"cuisine"]["amenity"="cafe"](properties:1)' },
+      ])
+
+      var r = f.match({ tags: { amenity: 'restaurant' } })
+      assert.equal(r, false, 'Object should not match')
+      var r = f.match({ tags: { amenity: 'cafe' } })
+      assert.equal(r, true, 'Object should match')
+      var r = f.match({ tags: { shop: 'supermarket' } })
+      assert.equal(r, false, 'Object should not match')
+    })
+
     it ('node[~wikipedia~"."]', function () {
       var f = new Filter('node[~wikipedia]')
       assert.deepEqual(f.def, [
@@ -1147,6 +1214,17 @@ describe('Filter', function () {
       }
       catch (e) {
         assert.equal(e.message, "Can't parse query, expected operator or ']': ")
+        return
+      }
+      assert.fail("Expect an Exception")
+    })
+
+    it('node[amenity=bench];);', function () {
+      try {
+        var f = new Filter('node[amenity=bench];);')
+      }
+      catch (e) {
+        assert.equal(e.message, "Can't parse query, trailing characters: );")
         return
       }
       assert.fail("Expect an Exception")
@@ -1516,6 +1594,111 @@ describe('Function "around"', function () {
     var r = f.cacheDescriptors()
     assert.deepEqual(r, [ { id:"node(properties:16)",bounds:{"type":"Polygon","coordinates":[[[15.465769011510112,47.079116292410326],[15.46574364059531,47.079291741398514],[15.465668493825438,47.07946044852533],[15.465546458637188,47.07961593037691],[15.465382224499415,47.079752211732746],[15.465182102741352,47.0798640552115],[15.464953784026477,47.0799471625657],[15.46470604278992,47.07999833988624],[15.464448400000002,47.08001562036372],[15.464190757210083,47.07999833988624],[15.463943015973527,47.0799471625657],[15.463714697258652,47.0798640552115],[15.463514575500588,47.079752211732746],[15.463350341362815,47.07961593037691],[15.463228306174566,47.07946044852533],[15.463153159404694,47.079291741398514],[15.463127788489892,47.079116292410326],[15.463153167934774,47.07894084399987],[15.463228321936096,47.078772138518275],[15.463350361956252,47.078616659128976],[15.46351459779076,47.07848038067756],[15.463714717852085,47.07836854010326],[15.463943031735061,47.07828543521131],[15.464190765740163,47.07823425953603],[15.464448400000002,47.07821697963628],[15.46470603425984,47.07823425953603],[15.464953768264943,47.07828543521131],[15.46518208214792,47.07836854010326],[15.465382202209243,47.07848038067756],[15.465546438043752,47.078616659128976],[15.465668478063908,47.078772138518275],[15.46574363206523,47.07894084399987],[15.465769011510112,47.079116292410326]]]} }])
   })
+
+  it('merge two filters (tags + around)', function () {
+    var f1 = new Filter('nwr[amenity=restaurant]')
+    var f2 = new Filter('nwr(around:100,47.0791163,15.4644484)')
+    var f = new Filter({and: [ f1, f2 ]})
+
+    assert.deepEqual(f.def, {"and":[[{"key":"amenity","op":"=","value":"restaurant"}],[{"fun":"around","value":{distance: 100, geometry: { coordinates: [ 15.4644484, 47.0791163 ], type: 'Point' }}}]]})
+    assert.equal(f.toString(), 'nwr["amenity"="restaurant"]->.x1;nwr.x1(around:100,47.0791163,15.4644484);')
+    assert.equal(f.toQl(), 'nwr["amenity"="restaurant"]->.x2;nwr.x2(around:100,47.0791163,15.4644484);')
+    assert.deepEqual(f.toLokijs(), { $and: [
+      { 'tags.amenity': { $eq: 'restaurant' } }
+    ], needMatch: true})
+
+    check(f, [])
+
+    var r = f.cacheDescriptors()
+    assert.deepEqual(r, [ { id: 'nwr["amenity"="restaurant"](properties:17)', bounds:{"type":"Polygon","coordinates":[[[15.465769011510112,47.079116292410326],[15.46574364059531,47.079291741398514],[15.465668493825438,47.07946044852533],[15.465546458637188,47.07961593037691],[15.465382224499415,47.079752211732746],[15.465182102741352,47.0798640552115],[15.464953784026477,47.0799471625657],[15.46470604278992,47.07999833988624],[15.464448400000002,47.08001562036372],[15.464190757210083,47.07999833988624],[15.463943015973527,47.0799471625657],[15.463714697258652,47.0798640552115],[15.463514575500588,47.079752211732746],[15.463350341362815,47.07961593037691],[15.463228306174566,47.07946044852533],[15.463153159404694,47.079291741398514],[15.463127788489892,47.079116292410326],[15.463153167934774,47.07894084399987],[15.463228321936096,47.078772138518275],[15.463350361956252,47.078616659128976],[15.46351459779076,47.07848038067756],[15.463714717852085,47.07836854010326],[15.463943031735061,47.07828543521131],[15.464190765740163,47.07823425953603],[15.464448400000002,47.07821697963628],[15.46470603425984,47.07823425953603],[15.464953768264943,47.07828543521131],[15.46518208214792,47.07836854010326],[15.465382202209243,47.07848038067756],[15.465546438043752,47.078616659128976],[15.465668478063908,47.078772138518275],[15.46574363206523,47.07894084399987],[15.465769011510112,47.079116292410326]]]} } ])
+  })
+
+
+  it('merge two filters (around + tags)', function () {
+    var f1 = new Filter('nwr(around:100,47.0791163,15.4644484)')
+    var f2 = new Filter('nwr[amenity=restaurant]')
+    var f = new Filter({and: [ f1, f2 ]})
+
+    assert.deepEqual(f.def, {"and":[[{"fun":"around","value":{distance: 100, geometry: { coordinates: [ 15.4644484, 47.0791163 ], type: 'Point' }}}],[{"key":"amenity","op":"=","value":"restaurant"}]]})
+    assert.equal(f.toString(), 'nwr(around:100,47.0791163,15.4644484)->.x1;nwr.x1["amenity"="restaurant"];')
+    assert.equal(f.toQl(), 'nwr(around:100,47.0791163,15.4644484)->.x2;nwr.x2["amenity"="restaurant"];')
+    assert.deepEqual(f.toLokijs(), { $and: [
+      { 'tags.amenity': { $eq: 'restaurant' } },
+    ], needMatch: true})
+
+    check(f, [])
+
+    var r = f.cacheDescriptors()
+    assert.deepEqual(r, [ { id: 'nwr["amenity"="restaurant"](properties:17)', bounds:{"type":"Polygon","coordinates":[[[15.465769011510112,47.079116292410326],[15.46574364059531,47.079291741398514],[15.465668493825438,47.07946044852533],[15.465546458637188,47.07961593037691],[15.465382224499415,47.079752211732746],[15.465182102741352,47.0798640552115],[15.464953784026477,47.0799471625657],[15.46470604278992,47.07999833988624],[15.464448400000002,47.08001562036372],[15.464190757210083,47.07999833988624],[15.463943015973527,47.0799471625657],[15.463714697258652,47.0798640552115],[15.463514575500588,47.079752211732746],[15.463350341362815,47.07961593037691],[15.463228306174566,47.07946044852533],[15.463153159404694,47.079291741398514],[15.463127788489892,47.079116292410326],[15.463153167934774,47.07894084399987],[15.463228321936096,47.078772138518275],[15.463350361956252,47.078616659128976],[15.46351459779076,47.07848038067756],[15.463714717852085,47.07836854010326],[15.463943031735061,47.07828543521131],[15.464190765740163,47.07823425953603],[15.464448400000002,47.07821697963628],[15.46470603425984,47.07823425953603],[15.464953768264943,47.07828543521131],[15.46518208214792,47.07836854010326],[15.465382202209243,47.07848038067756],[15.465546438043752,47.078616659128976],[15.465668478063908,47.078772138518275],[15.46574363206523,47.07894084399987],[15.465769011510112,47.079116292410326]]]} } ])
+  })
+
+
+  it('merge two filters (around + around)', function () {
+    var f1 = new Filter('nwr(around:100,47.0791263,15.4644484)')
+    var f2 = new Filter('nwr(around:100,47.0791163,15.4644484)')
+    var f = new Filter({and: [ f1, f2 ]})
+
+    assert.deepEqual(f.def, {"and":[[{"fun":"around","value":{distance: 100, geometry: { coordinates: [ 15.4644484, 47.0791263 ], type: 'Point' }}}],[{"fun":"around","value":{distance: 100, geometry: { coordinates: [ 15.4644484, 47.0791163 ], type: 'Point' }}}]]})
+    assert.equal(f.toString(), 'nwr(around:100,47.0791263,15.4644484)->.x1;nwr.x1(around:100,47.0791163,15.4644484);')
+    assert.equal(f.toQl(), 'nwr(around:100,47.0791263,15.4644484)->.x2;nwr.x2(around:100,47.0791163,15.4644484);')
+    assert.deepEqual(f.toLokijs(), { $and: [
+    ], needMatch: true})
+
+    check(f, [])
+
+    var r = f.cacheDescriptors()
+    assert.deepEqual(r, [ { id: 'nwr(properties:16)', bounds:{"type":"Polygon","coordinates":[[[15.463128511517017,47.07912129240258],[15.463153167691685,47.07895084399988],[15.463228321707113,47.07878213851828],[15.463350361750171,47.078626659128986],[15.463514597615507,47.07849038067757],[15.463714717714389,47.078378540103266],[15.463943031640214,47.07829543521132],[15.464190765691809,47.078244259536035],[15.464448400000002,47.07822697963628],[15.464706034308195,47.078244259536035],[15.46495376835979,47.07829543521132],[15.465182082285615,47.078378540103266],[15.465382202384497,47.07849038067757],[15.465546438249833,47.078626659128986],[15.46566847829289,47.07878213851828],[15.46574363230832,47.07895084399988],[15.465768288482987,47.07912129240258],[15.46574364059531,47.079291741398514],[15.465668493825438,47.07946044852533],[15.465546458637188,47.07961593037691],[15.465382224499415,47.079752211732746],[15.465182102741352,47.0798640552115],[15.464953784026477,47.0799471625657],[15.46470604278992,47.07999833988624],[15.464448400000002,47.08001562036372],[15.464190757210083,47.07999833988624],[15.463943015973527,47.0799471625657],[15.463714697258652,47.0798640552115],[15.463514575500588,47.079752211732746],[15.463350341362815,47.07961593037691],[15.463228306174566,47.07946044852533],[15.463153159404694,47.079291741398514],[15.463128511517017,47.07912129240258]]]} } ])
+  })
+
+  it('merge two filters (around + around -> invalid)', function () {
+    var f1 = new Filter('nwr(around:100,48.0791263,15.4644484)')
+    var f2 = new Filter('nwr(around:100,47.0791163,15.4644484)')
+    var f = new Filter({and: [ f1, f2 ]})
+
+    assert.deepEqual(f.def, {"and":[[{"fun":"around","value":{distance: 100, geometry: { coordinates: [ 15.4644484, 48.0791263 ], type: 'Point' }}}],[{"fun":"around","value":{distance: 100, geometry: { coordinates: [ 15.4644484, 47.0791163 ], type: 'Point' }}}]]})
+    assert.equal(f.toString(), 'nwr(around:100,48.0791263,15.4644484)->.x1;nwr.x1(around:100,47.0791163,15.4644484);')
+    assert.equal(f.toQl(), 'nwr(around:100,48.0791263,15.4644484)->.x2;nwr.x2(around:100,47.0791163,15.4644484);')
+    assert.deepEqual(f.toLokijs(), { $and: [
+    ], needMatch: true})
+
+    check(f, [])
+
+    var r = f.cacheDescriptors()
+    assert.deepEqual(r, [ { id: 'nwr(properties:16)', invalid: true } ])
+  })
+
+  it('or two filters', function () {
+    var f = new Filter('((nwr[historic=memorial](around:50,48.191137309201835,16.371167502058015););(nwr[historic=memorial](around:50,48.19114,16.37117);););')
+
+    assert.deepEqual(f.def, { "or": [
+      { "or": [ [
+            { "key": "historic", "op": "=", "value": "memorial" },
+            { "fun": "around", "value": { "distance": 50, "geometry": { "type": "Point", "coordinates": [ 16.371167502058015, 48.191137309201835 ] } } }
+          ] ]
+      },
+      {
+        "or": [ [
+            { "key": "historic", "op": "=", "value": "memorial" },
+            { "fun": "around", "value": { "distance": 50, "geometry": { "type": "Point", "coordinates": [ 16.37117, 48.19114 ] } } }
+          ] ]
+      }
+    ] })
+
+    assert.equal(f.toString(), '((nwr["historic"="memorial"](around:50,48.191137309201835,16.371167502058015););(nwr["historic"="memorial"](around:50,48.19114,16.37117);););')
+    assert.equal(f.toQl(), '((nwr["historic"="memorial"](around:50,48.191137309201835,16.371167502058015););(nwr["historic"="memorial"](around:50,48.19114,16.37117);););')
+    assert.deepEqual(f.toLokijs(), { $or: [
+      {"$or":[{"tags.historic":{"$eq":"memorial"}}]},
+      {"$or":[{"tags.historic":{"$eq":"memorial"}}]}
+    ], needMatch: true})
+
+    check(f, [])
+
+    var r = f.cacheDescriptors()
+    assert.deepEqual(r, [
+      {"id":"nwr[\"historic\"=\"memorial\"](properties:17)","bounds":{"type":"Polygon","coordinates":[[[16.371842011444862,48.191137307229],[16.371829052068627,48.19122503165375],[16.3717906695676,48.1913093850197],[16.3717283388505,48.191387125649946],[16.371644455178814,48.19145526597923],[16.371542242129358,48.19151118736998],[16.37142562771794,48.191552740751526],[16.37129909344401,48.191578329214316],[16.371167502058015,48.19158696938371],[16.37103591067202,48.191578329214316],[16.37090937639809,48.191552740751526],[16.370792761986667,48.19151118736998],[16.37069054893722,48.19145526597923],[16.37060666526553,48.191387125649946],[16.37054433454843,48.1913093850197],[16.3705059520474,48.19122503165375],[16.370492992671164,48.191137307229],[16.370505954312392,48.19104958295441],[16.370544338733588,48.190965230016126],[16.3706066707337,48.19088749002592],[16.370690554855923,48.19081935045159],[16.370792767454844,48.19076342981583],[16.370909380583246,48.190721877074324],[16.37103591293701,48.1906962890392],[16.371167502058015,48.19068764901998],[16.37129909117902,48.1906962890392],[16.371425623532783,48.190721877074324],[16.371542236661185,48.19076342981583],[16.371644449260103,48.19081935045159],[16.371728333382325,48.19088749002592],[16.37179066538244,48.190965230016126],[16.371829049803637,48.19104958295441],[16.371842011444862,48.191137307229]]]}},
+      {"id":"nwr[\"historic\"=\"memorial\"](properties:17)","bounds":{"type":"Polygon","coordinates":[[[16.371844509422267,48.191139998027154],[16.371831550045354,48.19122772245193],[16.37179316754231,48.19131207581786],[16.371730836821936,48.1913898164481],[16.371646953145845,48.19145795677739],[16.371544740091025,48.191513878168145],[16.371428125673482,48.19155543154969],[16.371301591392903,48.19158102001247],[16.371170000000003,48.19158966018186],[16.3710384086071,48.19158102001247],[16.37091187432652,48.19155543154969],[16.370795259908977,48.191513878168145],[16.370693046854157,48.19145795677739],[16.370609163178067,48.1913898164481],[16.37054683245769,48.19131207581786],[16.37050844995465,48.19122772245193],[16.37049549057774,48.191139998027154],[16.370508452219642,48.19105227375257],[16.370546836642852,48.19096792081429],[16.37060916864624,48.190890180824084],[16.370693052772868,48.19082204124976],[16.370795265377154,48.19076612061399],[16.370911878511677,48.190724567872486],[16.37103841087209,48.190698979837364],[16.371170000000003,48.19069033981815],[16.371301589127913,48.190698979837364],[16.371428121488325,48.190724567872486],[16.371544734622848,48.19076612061399],[16.371646947227134,48.19082204124976],[16.371730831353762,48.190890180824084],[16.37179316335715,48.19096792081429],[16.37183154778036,48.19105227375257],[16.371844509422267,48.191139998027154]]]}}
+    ])
+  })
 })
 
 describe('Function "bbox"', function () {
@@ -1531,5 +1714,18 @@ describe('Function "bbox"', function () {
 
     var r = f.cacheDescriptors()
     assert.deepEqual(r, [ { id:"node(properties:16)",bounds:{"type":"Polygon","coordinates":[[[40,10.2],[45,10.2],[45,11],[40,11],[40,10.2]]]} }])
+  })
+  it('south/west', function () {
+    var f = new Filter('node(-10.2,-40.0,11,45)')
+
+    assert.deepEqual(f.def, [{"type":"node"},{"fun":"bbox","value":{"minlon":-40,"minlat":-10.2,"maxlon":45,"maxlat":11}}])
+    assert.equal(f.toString(), 'node(-10.2,-40,11,45);')
+    assert.equal(f.toQl(), 'node(-10.2,-40,11,45);')
+    assert.deepEqual(f.toLokijs(), { type: { '$eq': 'node' }, needMatch: true })
+
+    check(f, [])
+
+    var r = f.cacheDescriptors()
+    assert.deepEqual(r, [ { id:"node(properties:16)",bounds:{"type":"Polygon","coordinates":[[[-40,-10.2],[45,-10.2],[45,11],[-40,11],[-40,-10.2]]]} }])
   })
 })

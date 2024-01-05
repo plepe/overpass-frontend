@@ -5,12 +5,13 @@ const map = require('lodash/map')
 const keys = require('lodash/keys')
 const BoundingBox = require('boundingbox')
 const isGeoJSON = require('./isGeoJSON')
+const Request = require('./Request')
 
-class RequestGetMembers {
+class RequestGetMembers extends Request {
   constructor (request) {
+    super(request.overpass, {})
     this.master = request
     this.options = this.master.options
-    this.overpass = this.master.overpass
 
     this.options.properties |= defines.MEMBERS
     this.options.memberProperties = this.options.memberProperties || defines.DEFAULT
@@ -95,8 +96,7 @@ class RequestGetMembers {
         }
 
         if ((this.options.memberProperties & ob.properties) === this.options.memberProperties) {
-          this.doneFeatures[id] = ob
-
+          this.receiveObject(ob)
           this.options.memberCallback(null, ob)
         }
       }
@@ -186,6 +186,7 @@ class RequestGetMembers {
   }
 
   receiveObject (ob) {
+    super.receiveObject(ob)
     this.doneFeatures[ob.id] = ob
   }
 

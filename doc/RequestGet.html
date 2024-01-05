@@ -165,7 +165,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="RequestGet.js.html">RequestGet.js</a>, <a href="RequestGet.js.html#line13">line 13</a>
+        <a href="RequestGet.js.html">RequestGet.js</a>, <a href="RequestGet.js.html#line12">line 12</a>
     </li></ul></dd>
     
 
@@ -333,7 +333,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="RequestGet.js.html">RequestGet.js</a>, <a href="RequestGet.js.html#line179">line 179</a>
+        <a href="RequestGet.js.html">RequestGet.js</a>, <a href="RequestGet.js.html#line156">line 156</a>
     </li></ul></dd>
     
 
@@ -448,7 +448,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Request.js.html">Request.js</a>, <a href="Request.js.html#line50">line 50</a>
+        <a href="Request.js.html">Request.js</a>, <a href="Request.js.html#line51">line 51</a>
     </li></ul></dd>
     
 
@@ -590,7 +590,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Request.js.html">Request.js</a>, <a href="Request.js.html#line110">line 110</a>
+        <a href="Request.js.html">Request.js</a>, <a href="Request.js.html#line111">line 111</a>
     </li></ul></dd>
     
 
@@ -757,7 +757,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Request.js.html">Request.js</a>, <a href="Request.js.html#line66">line 66</a>
+        <a href="Request.js.html">Request.js</a>, <a href="Request.js.html#line67">line 67</a>
     </li></ul></dd>
     
 
@@ -992,7 +992,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="RequestGet.js.html">RequestGet.js</a>, <a href="RequestGet.js.html#line98">line 98</a>
+        <a href="RequestGet.js.html">RequestGet.js</a>, <a href="RequestGet.js.html#line78">line 78</a>
     </li></ul></dd>
     
 
@@ -1102,7 +1102,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="RequestGet.js.html">RequestGet.js</a>, <a href="RequestGet.js.html#line114">line 114</a>
+        <a href="RequestGet.js.html">RequestGet.js</a>, <a href="RequestGet.js.html#line94">line 94</a>
     </li></ul></dd>
     
 
@@ -1138,7 +1138,7 @@
     
 
     
-    <h4 class="name" id="receiveObject"><span class="type-signature"></span>receiveObject<span class="signature">(ob, ob)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="receiveObject"><span class="type-signature"></span>receiveObject<span class="signature">(ob, subRequest, partIndex)</span><span class="type-signature"></span></h4>
     
 
     
@@ -1189,9 +1189,6 @@
             
                 
 <span class="param-type"><a href="OverpassObject.html">OverpassObject</a></span>
-|
-
-<span class="param-type">undefined</span>
 
 
             
@@ -1208,13 +1205,13 @@
 
         <tr>
             
-                <td class="name"><code>ob</code></td>
+                <td class="name"><code>subRequest</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">OverpassMetaObject</span>
+<span class="param-type"><a href="Request.html#SubRequest">Request#SubRequest</a></span>
 
 
             
@@ -1224,7 +1221,30 @@
 
             
 
-            <td class="description last">Meta Object which has been received</td>
+            <td class="description last">sub request which is being handled right now</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>partIndex</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">int</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Which part of the subRequest is being received</td>
         </tr>
 
     
@@ -1270,7 +1290,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Request.js.html">Request.js</a>, <a href="Request.js.html#line124">line 124</a>
+        <a href="Request.js.html">Request.js</a>, <a href="Request.js.html#line126">line 126</a>
     </li></ul></dd>
     
 
@@ -1412,7 +1432,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Request.js.html">Request.js</a>, <a href="Request.js.html#line81">line 81</a>
+        <a href="Request.js.html">Request.js</a>, <a href="Request.js.html#line82">line 82</a>
     </li></ul></dd>
     
 
@@ -1605,7 +1625,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Request.js.html">Request.js</a>, <a href="Request.js.html#line85">line 85</a>
+        <a href="Request.js.html">Request.js</a>, <a href="Request.js.html#line86">line 86</a>
     </li></ul></dd>
     
 
@@ -1766,6 +1786,29 @@
 
         <tr>
             
+                <td class="name"><code>count</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">int</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Count of discovered items</td>
+        </tr>
+
+    
+
+        <tr>
+            
                 <td class="name"><code>request</code></td>
             
 
@@ -1911,7 +1954,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Request.js.html">Request.js</a>, <a href="Request.js.html#line42">line 42</a>
+        <a href="Request.js.html">Request.js</a>, <a href="Request.js.html#line43">line 43</a>
     </li></ul></dd>
     
 
@@ -2052,7 +2095,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Request.js.html">Request.js</a>, <a href="Request.js.html#line56">line 56</a>
+        <a href="Request.js.html">Request.js</a>, <a href="Request.js.html#line57">line 57</a>
     </li></ul></dd>
     
 
@@ -2194,7 +2237,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Request.js.html">Request.js</a>, <a href="Request.js.html#line99">line 99</a>
+        <a href="Request.js.html">Request.js</a>, <a href="Request.js.html#line100">line 100</a>
     </li></ul></dd>
     
 
@@ -2378,13 +2421,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Filter.html">Filter</a></li><li><a href="OverpassFrontend.html">OverpassFrontend</a></li><li><a href="OverpassNode.html">OverpassNode</a></li><li><a href="OverpassObject.html">OverpassObject</a></li><li><a href="OverpassRelation.html">OverpassRelation</a></li><li><a href="OverpassWay.html">OverpassWay</a></li><li><a href="Request.html">Request</a></li><li><a href="RequestBBox.html">RequestBBox</a></li><li><a href="RequestGet.html">RequestGet</a></li><li><a href="RequestMulti.html">RequestMulti</a></li><li><a href="RequestTimeline.html">RequestTimeline</a></li></ul><h3>Events</h3><ul><li><a href="OverpassFrontend.html#event:error">error</a></li><li><a href="OverpassFrontend.html#event:load">load</a></li><li><a href="OverpassFrontend.html#event:reject">reject</a></li><li><a href="OverpassFrontend.html#event:start">start</a></li><li><a href="OverpassFrontend.html#event:update">update</a></li><li><a href="Request.html#event:abort">abort</a></li><li><a href="Request.html#event:finish">finish</a></li><li><a href="Request.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="Request.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestBBox.html#event:abort">abort</a></li><li><a href="RequestBBox.html#event:finish">finish</a></li><li><a href="RequestBBox.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestBBox.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestGet.html#event:abort">abort</a></li><li><a href="RequestGet.html#event:finish">finish</a></li><li><a href="RequestGet.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestGet.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestMulti.html#event:abort">abort</a></li><li><a href="RequestMulti.html#event:finish">finish</a></li><li><a href="RequestMulti.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestMulti.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestTimeline.html#event:abort">abort</a></li><li><a href="RequestTimeline.html#event:finish">finish</a></li><li><a href="RequestTimeline.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestTimeline.html#event:subrequest-finished">subrequest-finished</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Filter.html">Filter</a></li><li><a href="OverpassFrontend.html">OverpassFrontend</a></li><li><a href="OverpassNode.html">OverpassNode</a></li><li><a href="OverpassObject.html">OverpassObject</a></li><li><a href="OverpassRelation.html">OverpassRelation</a></li><li><a href="OverpassWay.html">OverpassWay</a></li><li><a href="Request.html">Request</a></li><li><a href="RequestBBox.html">RequestBBox</a></li><li><a href="RequestGet.html">RequestGet</a></li><li><a href="RequestMulti.html">RequestMulti</a></li></ul><h3>Events</h3><ul><li><a href="OverpassFrontend.html#event:error">error</a></li><li><a href="OverpassFrontend.html#event:load">load</a></li><li><a href="OverpassFrontend.html#event:reject">reject</a></li><li><a href="OverpassFrontend.html#event:start">start</a></li><li><a href="OverpassFrontend.html#event:update">update</a></li><li><a href="Request.html#event:abort">abort</a></li><li><a href="Request.html#event:finish">finish</a></li><li><a href="Request.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="Request.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestBBox.html#event:abort">abort</a></li><li><a href="RequestBBox.html#event:finish">finish</a></li><li><a href="RequestBBox.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestBBox.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestGet.html#event:abort">abort</a></li><li><a href="RequestGet.html#event:finish">finish</a></li><li><a href="RequestGet.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestGet.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestMulti.html#event:abort">abort</a></li><li><a href="RequestMulti.html#event:finish">finish</a></li><li><a href="RequestMulti.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestMulti.html#event:subrequest-finished">subrequest-finished</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.11</a> on Wed Oct 26 2022 16:23:48 GMT+0200 (Mitteleuropäische Sommerzeit)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.11</a> on Fri Jan 05 2024 15:55:19 GMT+0100 (Mitteleuropäische Normalzeit)
 </footer>
 
 <script> prettyPrint(); </script>

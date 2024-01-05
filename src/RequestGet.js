@@ -153,6 +153,7 @@ class RequestGet extends Request {
 
         // if sort is set in options maybe defer calling featureCallback
         if (ready) {
+          this.receiveObject(ob)
           this.featureCallback(null, ob, i)
           this.ids[i] = null
           return

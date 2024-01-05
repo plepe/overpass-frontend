@@ -34,7 +34,6 @@ const RequestBBoxMembers = require('./RequestBBoxMembers')
 const Filter = require('./Filter')
 const boundsToLokiQuery = require('./boundsToLokiQuery')
 const boundsIsFullWorld = require('./boundsIsFullWorld')
-const isodate = require('./isodate')
 
 /**
  * A BBox request
@@ -51,12 +50,6 @@ class RequestBBox extends Request {
 
     if (typeof this.options.properties === 'undefined') {
       this.options.properties = defines.DEFAULT
-    }
-    if (this.overpass.options.attic) {
-      this.options.properties |= defines.META
-    }
-    if (this.options.date) {
-      this.options.date = isodate(this.options.date)
     }
     this.options.properties |= defines.BBOX
     this.options.minEffort = this.options.minEffort || 256
@@ -86,16 +79,6 @@ class RequestBBox extends Request {
         this.lokiQuery = { $and: [this.lokiQuery, boundsToLokiQuery(this.bbox, this.overpass)] }
       }
 
-      if (this.options.date) {
-        this.lokiQuery = { $and: [this.lokiQuery, { timestamp: { $lte: isodate(this.options.date) } }] }
-      }
-
-      // if attic date is enabled, we have to check again to filter out false
-      // positives (an older version of an object might have matched)
-      if (this.overpass.options.attic) {
-        this.lokiQueryNeedMatch = true
-      }
-
       const cacheFilter = new Filter({ and: [this.filterQuery, new Filter('nwr(properties:' + this.options.properties + ')')] })
       this.options.properties = cacheFilter.properties()
 
@@ -123,43 +106,42 @@ class RequestBBox extends Request {
       items = this.overpass.db.find(this.lokiQuery)
     }
 
-    // items should be a list of IDs
-    items = items.map(item => item.id)
-    if (this.overpass.options.attic) {
-      // filter out duplicates
-      items = [...new Set(items)]
-    }
-
-    items.forEach(id => {
-      const ob = this.overpass.cache.get(id, this.options)
-      if (!ob) {
+    for (let i = 0; i &lt; items.length; i++) {
+      if (this.options.limit &amp;&amp; this.count >= this.options.limit) {
+        this.loadFinish = true
         return
       }
 
-      if (id in this.hasUnfinished) {
-        delete this.hasUnfinished[id]
+      const id = items[i].id
+
+      if (!(id in this.overpass.cacheElements)) {
+        continue
       }
+      const ob = this.overpass.cacheElements[id]
 
       if (id in this.doneFeatures) {
-        return
+        continue
       }
 
       // maybe we need an additional check
       if (this.lokiQueryNeedMatch &amp;&amp; !this.filterQuery.match(ob)) {
-        return
+        continue
       }
 
       // also check the object directly if it intersects the bbox - if possible
       if (ob.intersects(this.bounds) &lt; 2) {
-        return
+        continue
       }
 
       if ((this.options.properties &amp; ob.properties) === this.options.properties) {
-        this.doneFeatures[id] = ob
-
+        this.receiveObject(ob)
         this.featureCallback(null, ob)
       }
-    })
+    }
+
+    if (this.options.limit &amp;&amp; this.count >= this.options.limit) {
+      this.loadFinish = true
+    }
   }
 
   /**
@@ -176,14 +158,6 @@ class RequestBBox extends Request {
       return false
     }
     context.bbox = this.bbox
-
-    if (context.date === undefined) {
-      context.date = this.options.date
-    } else {
-      if (context.date !== this.options.date) {
-        return false
-      }
-    }
 
     for (const i in context.requests) {
       const request = context.requests[i]
@@ -204,7 +178,14 @@ class RequestBBox extends Request {
       return { minEffort: 0, maxEffort: 0 }
     }
 
-    return { minEffort: this.options.minEffort, maxEffort: null }
+    let minEffort = this.options.minEffort
+    let maxEffort = null
+    if (this.options.limit) {
+      maxEffort = (this.options.limit - this.count) * this.overpass.options.effortBBoxFeature
+      minEffort = Math.min(minEffort, maxEffort)
+    }
+
+    return { minEffort, maxEffort }
   }
 
   /**
@@ -222,7 +203,11 @@ class RequestBBox extends Request {
       }
     }
 
-    const effortAvailable = Math.max(context.maxEffort, this.options.minEffort)
+    const efforts = this.minMaxEffort()
+    let effortAvailable = Math.max(context.maxEffort, efforts.minEffort)
+    if (efforts.maxEffort) {
+      effortAvailable = Math.min(effortAvailable, efforts.maxEffort)
+    }
 
     // if the context already has a bbox and it differs from this, we can't add
     // ours
@@ -248,7 +233,7 @@ class RequestBBox extends Request {
     }
 
     if (!('split' in this.options)) {
-      this.options.effortSplit = Math.ceil(effortAvailable / 4)
+      this.options.effortSplit = Math.ceil(effortAvailable / this.overpass.options.effortBBoxFeature)
     }
     query += '.result out ' + overpassOutOptions(this.options) + ';'
 
@@ -263,7 +248,7 @@ class RequestBBox extends Request {
           featureCallback: this.featureCallback
         }
       ],
-      effort: this.options.split ? this.options.split * 4 : effortAvailable // TODO: configure bbox effort
+      effort: this.options.split ? this.options.split * this.overpass.options.effortBBoxFeature : effortAvailable
     }
     return subRequest
   }
@@ -274,12 +259,9 @@ class RequestBBox extends Request {
    * @param {Request#SubRequest} subRequest - sub request which is being handled right now
    * @param {int} partIndex - Which part of the subRequest is being received
    */
-  receiveObject (ob, metaOb) {
-    super.receiveObject(ob, metaOb)
-
-    if (ob) {
-      this.doneFeatures[ob.id] = ob
-    }
+  receiveObject (ob) {
+    super.receiveObject(ob)
+    this.doneFeatures[ob.id] = ob
   }
 
   checkFeatureCallback (ob) {
@@ -305,6 +287,10 @@ class RequestBBox extends Request {
         cache.cache.add(this.bbox, cache.cacheDescriptors)
       })
     }
+
+    if (this.options.limit &amp;&amp; this.options.limit &lt;= this.count) {
+      this.loadFinish = true
+    }
   }
 
   /**
@@ -322,10 +308,6 @@ class RequestBBox extends Request {
   }
 
   mayFinish () {
-    if (Object.keys(this.hasUnfinished).length) {
-      return false
-    }
-
     return !this.needLoad()
   }
 }
@@ -341,13 +323,13 @@ module.exports = RequestBBox
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Filter.html">Filter</a></li><li><a href="OverpassFrontend.html">OverpassFrontend</a></li><li><a href="OverpassNode.html">OverpassNode</a></li><li><a href="OverpassObject.html">OverpassObject</a></li><li><a href="OverpassRelation.html">OverpassRelation</a></li><li><a href="OverpassWay.html">OverpassWay</a></li><li><a href="Request.html">Request</a></li><li><a href="RequestBBox.html">RequestBBox</a></li><li><a href="RequestGet.html">RequestGet</a></li><li><a href="RequestMulti.html">RequestMulti</a></li><li><a href="RequestTimeline.html">RequestTimeline</a></li></ul><h3>Events</h3><ul><li><a href="OverpassFrontend.html#event:error">error</a></li><li><a href="OverpassFrontend.html#event:load">load</a></li><li><a href="OverpassFrontend.html#event:reject">reject</a></li><li><a href="OverpassFrontend.html#event:start">start</a></li><li><a href="OverpassFrontend.html#event:update">update</a></li><li><a href="Request.html#event:abort">abort</a></li><li><a href="Request.html#event:finish">finish</a></li><li><a href="Request.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="Request.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestBBox.html#event:abort">abort</a></li><li><a href="RequestBBox.html#event:finish">finish</a></li><li><a href="RequestBBox.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestBBox.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestGet.html#event:abort">abort</a></li><li><a href="RequestGet.html#event:finish">finish</a></li><li><a href="RequestGet.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestGet.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestMulti.html#event:abort">abort</a></li><li><a href="RequestMulti.html#event:finish">finish</a></li><li><a href="RequestMulti.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestMulti.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestTimeline.html#event:abort">abort</a></li><li><a href="RequestTimeline.html#event:finish">finish</a></li><li><a href="RequestTimeline.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestTimeline.html#event:subrequest-finished">subrequest-finished</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Filter.html">Filter</a></li><li><a href="OverpassFrontend.html">OverpassFrontend</a></li><li><a href="OverpassNode.html">OverpassNode</a></li><li><a href="OverpassObject.html">OverpassObject</a></li><li><a href="OverpassRelation.html">OverpassRelation</a></li><li><a href="OverpassWay.html">OverpassWay</a></li><li><a href="Request.html">Request</a></li><li><a href="RequestBBox.html">RequestBBox</a></li><li><a href="RequestGet.html">RequestGet</a></li><li><a href="RequestMulti.html">RequestMulti</a></li></ul><h3>Events</h3><ul><li><a href="OverpassFrontend.html#event:error">error</a></li><li><a href="OverpassFrontend.html#event:load">load</a></li><li><a href="OverpassFrontend.html#event:reject">reject</a></li><li><a href="OverpassFrontend.html#event:start">start</a></li><li><a href="OverpassFrontend.html#event:update">update</a></li><li><a href="Request.html#event:abort">abort</a></li><li><a href="Request.html#event:finish">finish</a></li><li><a href="Request.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="Request.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestBBox.html#event:abort">abort</a></li><li><a href="RequestBBox.html#event:finish">finish</a></li><li><a href="RequestBBox.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestBBox.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestGet.html#event:abort">abort</a></li><li><a href="RequestGet.html#event:finish">finish</a></li><li><a href="RequestGet.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestGet.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestMulti.html#event:abort">abort</a></li><li><a href="RequestMulti.html#event:finish">finish</a></li><li><a href="RequestMulti.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestMulti.html#event:subrequest-finished">subrequest-finished</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.11</a> on Wed Oct 26 2022 16:23:48 GMT+0200 (Mitteleuropäische Sommerzeit)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.11</a> on Fri Jan 05 2024 15:55:18 GMT+0100 (Mitteleuropäische Normalzeit)
 </footer>
 
 <script> prettyPrint(); </script>
