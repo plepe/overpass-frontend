@@ -1,7 +1,7 @@
 {
   "name": "overpass-frontend",
   "description": "A JavaScript (NodeJS/Browser) library to easily access data from OpenStreetMap via Overpass API or from an OSM File. The objects can directly be used with LeafletJS or exported to GeoJSON. Data will be cached in the browser memory.",
-  "version": "3.1.4",
+  "version": "3.1.5",
   "main": "src/OverpassFrontend.js",
   "directories": {
     "test": "test"
