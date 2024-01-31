@@ -1,4 +1,5 @@
 var assert = require('assert')
+const BoundingBox = require('boundingbox')
 
 const loadOsmFile = require('../src/loadOsmFile')
 if (typeof XMLHttpRequest === 'undefined') {
@@ -18,6 +19,13 @@ describe('Load OSM data from file', function () {
   })
 
   it ('.osm', function (done) {
+    parsedData.bounds = new BoundingBox({
+      "maxlat": 48.2089847,
+      "maxlon": 16.3395023,
+      "minlat": 48.2076584,
+      "minlon": 16.3382176
+    })
+
     loadOsmFile('test/small.osm', (err, result) => {
       if (err) {
         return done(err)
