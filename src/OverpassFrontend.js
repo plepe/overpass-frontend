@@ -199,6 +199,7 @@ class OverpassFrontend {
               return this.emit('error', err)
             }
 
+            this.meta = osm3sMeta
             this.emit('load', osm3sMeta)
 
             this.ready = true
@@ -467,6 +468,7 @@ class OverpassFrontend {
     this.errorCount = 0
 
     const osm3sMeta = copyOsm3sMetaFrom(results)
+    this.meta = osm3sMeta
     this.emit('load', osm3sMeta, context)
 
     let subRequestsIndex = 0
@@ -791,6 +793,20 @@ class OverpassFrontend {
       .replace('*', '\\*')
       .replace('^', '\\^')
       .replace('$', '\\$')
+  }
+
+  /**
+   * get meta data of last request or - if no request was submitted - the first.
+   * @params [function] callback - a callback which will receive (err, meta)
+   */
+  getMeta (callback) {
+    if (this.meta) {
+      return callback(null, this.meta)
+    }
+
+    this.once('load', () => {
+      callback(null, this.meta)
+    })
   }
 }
 
