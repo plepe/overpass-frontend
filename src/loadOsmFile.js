@@ -1,33 +1,44 @@
 const fs = require('fs')
 const DOMParser = require('@xmldom/xmldom').DOMParser
 const bzip2 = require('bzip2')
+const parseDataUrl = require('parse-data-url')
 
 const convertFromXML = require('./convertFromXML')
 
 module.exports = function loadOsmFile (url, callback) {
+  if (url.match(/^data:/)) {
+    const parsed = parseDataUrl(url)
+    if (!parsed) {
+      const e = new Error('Error parsing data URL')
+      return callback(e)
+    }
+
+    url = parsed.contentType === 'application/json'
+      ? 'file.json'
+      : parsed.contentType.match(/^application\/x-bzip/)
+        ? 'file.osm.bz2'
+        : 'file.osm'
+
+    let data
+    try {
+      data = convertData(url, parsed.toBuffer())
+    } catch (err) {
+      return callback(err)
+    }
+
+    return callback(null, data)
+  }
+
   if (typeof location === 'undefined' && !url.match(/^(http:|https:|)\/\//)) {
     fs.readFile(url,
       (err, content) => {
+        if (err) { return callback(err) }
+
         let data
-
-        if (err) {
+        try {
+          data = convertData(url, content)
+        } catch (err) {
           return callback(err)
-        }
-
-        if (url.match(/\.osm(\.bz2)?$/)) {
-          if (url.match(/\.osm\.bz2$/)) {
-            data = bzip2.simple(bzip2.array(content))
-            content = ''
-            for (let i = 0; i < data.byteLength; i++) {
-              content += String.fromCharCode(data[i])
-            }
-            content = decodeURIComponent(escape(content))
-          }
-
-          data = new DOMParser().parseFromString(content.toString(), 'text/xml')
-          data = convertFromXML(data.getElementsByTagName('osm')[0])
-        } else {
-          data = JSON.parse(content)
         }
 
         callback(null, data)
@@ -37,50 +48,61 @@ module.exports = function loadOsmFile (url, callback) {
     return
   }
 
-  const req = new global.XMLHttpRequest()
-
-  req.onreadystatechange = function () {
-    if (req.readyState === 4) {
-      if (req.status === 200) {
-        let data
-
-        if (url.match(/\.osm\.bz2$/)) {
-          let content = new Uint8Array(req.response)
-          data = bzip2.simple(bzip2.array(content))
-          content = ''
-          for (let i = 0; i < data.byteLength; i++) {
-            content += String.fromCharCode(data[i])
-          }
-
-          content = decodeURIComponent(escape(content))
-          data = new DOMParser().parseFromString(content.toString(), 'text/xml')
-          data = convertFromXML(data.getElementsByTagName('osm')[0])
-        } else if (req.responseXML) {
-          data = convertFromXML(req.responseXML.firstChild)
-        } else {
-          data = JSON.parse(req.responseText)
-        }
-
-        callback(null, data)
-      } else {
-        callback(req)
+  fetch(url)
+    .then(req => {
+      if (!req.ok) {
+        const e = new Error('Received error ' + req.status + ' (' + req.statusText + ')')
+        return callback(e)
       }
+
+      return url.match(/\.osm\.bz2$/) ? req.arrayBuffer() : req.text()
+    })
+    .then(content => {
+      let data = url.match(/\.osm\.bz2$/) ? new Uint8Array(content) : content
+      try {
+        data = convertData(url, data)
+      } catch (err) {
+        return callback(err)
+      }
+
+      callback(null, data)
+    })
+    .catch(err => {
+      global.setTimeout(() => callback(err), 0)
+    })
+}
+
+function convertData (url, content) {
+  let data
+  if (url.match(/\.osm(\.bz2)?$/)) {
+    if (url.match(/\.osm\.bz2$/)) {
+      try {
+        data = bzip2.simple(bzip2.array(content))
+      } catch (err) {
+        throw new Error('Error decoding bzip2 stream')
+      }
+
+      content = ''
+      for (let i = 0; i < data.byteLength; i++) {
+        content += String.fromCharCode(data[i])
+      }
+      content = decodeURIComponent(escape(content))
+    }
+
+    const parser = new DOMParser({
+      errorHandler: {
+        error: (err) => { throw new Error('Error parsing XML file: ' + err) },
+        fatalError: (err) => { throw new Error('Error parsing XML file: ' + err) }
+      }
+    })
+    data = parser.parseFromString(content.toString(), 'text/xml')
+
+    return convertFromXML(data.getElementsByTagName('osm')[0])
+  } else {
+    try {
+      return JSON.parse(content)
+    } catch (err) {
+      throw new Error('Error parsing JSON file: ' + err)
     }
   }
-
-  if (url.substr(0, 2) === '//') {
-    if (typeof location === 'undefined') {
-      url = 'https:' + url
-    } else {
-      url = global.location.protocol + url
-    }
-  }
-
-  if (url.match(/\.osm\.bz2$/)) {
-    req.responseType = 'arraybuffer'
-  }
-
-  req.overrideMimeType('text/xml')
-  req.open('GET', url)
-  req.send()
 }

@@ -60,6 +60,15 @@ overpassFrontend.get(
 )
 ```
 
+## Demo
+```sh
+git clone https://github.com/plepe/overpass-frontend
+npm install
+npm start
+```
+
+Browse to http://localhost:8000/demo/
+
 # DOCUMENTATION
 Find documentation in [doc](https://rawgit.com/plepe/overpass-frontend/master/doc/OverpassFrontend.html). You can re-generate the documentation with `npm run doc`.
 
