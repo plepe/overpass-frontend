@@ -16,7 +16,7 @@ const RequestGet = require('./RequestGet')
 const RequestBBox = require('./RequestBBox')
 const RequestMulti = require('./RequestMulti')
 const defines = require('./defines')
-const loadOsmFile = require('./loadOsmFile')
+const loadFile = require('./loadFile')
 const copyOsm3sMetaFrom = require('./copyOsm3sMeta')
 const timestamp = require('./timestamp')
 const Filter = require('./Filter')
@@ -150,12 +150,22 @@ class OverpassFrontend {
   _loadFile () {
     let osm3sMeta
 
-    loadOsmFile(this.url,
-      (err, result) => {
+    loadFile(this.url,
+      (err, content) => {
         if (err) {
           console.log('Error loading file', err)
           return this.emit('error', err)
         }
+
+        let handler = OverpassFrontend.fileFormats.filter(format => format.willLoad(this.url, content))
+        if (!handler.length) {
+          console.log('No file format handler found')
+          return this.emit('error', 'No file format handler found')
+        }
+
+        handler = handler[0]
+
+        const result = handler.load(content)
 
         osm3sMeta = copyOsm3sMetaFrom(result)
 
@@ -795,6 +805,11 @@ class OverpassFrontend {
       .replace('$', '\\$')
   }
 }
+
+OverpassFrontend.fileFormats = [
+  require('./fileFormatOSMXML'),
+  require('./fileFormatOSMJSON'),
+]
 
 for (const k in defines) {
   OverpassFrontend[k] = defines[k]
