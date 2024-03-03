@@ -6,7 +6,7 @@ let overpassFrontend
 describe('Load OSM data from JSON file created with "out body geom" from Overpass API', function () {
   it ('.osm', function (done) {
     this.timeout(20000)
-    overpassFrontend = new OverpassFrontend('test/body-geom.json')
+    overpassFrontend = new OverpassFrontend('test/body-geom.osm.json')
     overpassFrontend.once('load', (meta) => {
       done()
     })
