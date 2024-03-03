@@ -2,7 +2,7 @@ module.exports = {
   id: 'OSMJSON',
 
   willLoad (url, content, options) {
-    return url.match(/\.json(\.bz2)?$/)
+    return url.match(/\.osm\.json(\.bz2)?$/)
   },
 
   load (content, options, callback) {

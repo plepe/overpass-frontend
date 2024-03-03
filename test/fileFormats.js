@@ -10,8 +10,8 @@ if (typeof XMLHttpRequest === 'undefined') {
 }
 
 describe('Load OSM data from file', function () {
-  it ('.json', function (done) {
-    loadFile('test/small.json', (err, content) => {
+  it ('.osm.json', function (done) {
+    loadFile('test/small.osm.json', (err, content) => {
       fileFormatOSMJSON.load(content, {}, (err, result) => {
         parsedData = result
 
