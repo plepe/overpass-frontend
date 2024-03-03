@@ -8,8 +8,10 @@ module.exports = {
     return url.match(/\.osm(\.bz2)?$/)
   },
 
-  load (content, options) {
-    let data = new DOMParser().parseFromString(content.toString(), 'text/xml')
-    return convertFromXML(data.getElementsByTagName('osm')[0])
+  load (content, options, callback) {
+    const data = new DOMParser().parseFromString(content.toString(), 'text/xml')
+    const result = convertFromXML(data.getElementsByTagName('osm')[0])
+
+    callback(null, result)
   }
 }

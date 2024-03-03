@@ -5,7 +5,7 @@ module.exports = {
     return url.match(/\.json(\.bz2)?$/)
   },
 
-  load (content, options) {
-    return JSON.parse(content)
+  load (content, options, callback) {
+    callback(null, JSON.parse(content))
   }
 }

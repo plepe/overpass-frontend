@@ -151,8 +151,7 @@ class OverpassFrontend {
   _loadFile () {
     let osm3sMeta
 
-    loadFile(this.url,
-      (err, content) => {
+    loadFile(this.url, (err, content) => {
         if (err) {
           console.log('Error loading file', err)
           return this.emit('error', err)
@@ -166,9 +165,20 @@ class OverpassFrontend {
 
         handler = handler[0]
 
-        const result = handler.load(content, this.options.fileFormatOptions ?? {})
+         handler.load(content, this.options.fileFormatOptions ?? {}, (err, result) => {
+           if (err) {
+              console.log('No file format handler found')
+              return this.emit('error', 'No file format handler found')
+           }
 
-        osm3sMeta = copyOsm3sMetaFrom(result)
+           this._loadFileContent(result)
+         })
+      }
+    )
+  }
+
+  _loadFileContent (result) {
+        const osm3sMeta = copyOsm3sMetaFrom(result)
 
         const chunks = []
         for (let i = 0; i < result.elements.length; i += this.options.loadChunkSize) {
@@ -219,8 +229,6 @@ class OverpassFrontend {
           }
         )
       }
-    )
-  }
 
   /**
    * @param {string|string[]} ids - Id or array of Ids of OSM map features, e.g. [ 'n123', 'w2345', 'n123' ]. Illegal IDs will not produce an error but generate a 'null' object.
