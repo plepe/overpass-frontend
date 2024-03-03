@@ -149,86 +149,83 @@ class OverpassFrontend {
   }
 
   _loadFile () {
-    let osm3sMeta
-
     loadFile(this.url, (err, content) => {
+      if (err) {
+        console.log('Error loading file', err)
+        return this.emit('error', err)
+      }
+
+      let handler = OverpassFrontend.fileFormats.filter(format => format.willLoad(this.url, content, this.options.fileFormatOptions ?? {}))
+      if (!handler.length) {
+        console.log('No file format handler found')
+        return this.emit('error', 'No file format handler found')
+      }
+
+      handler = handler[0]
+
+      handler.load(content, this.options.fileFormatOptions ?? {}, (err, result) => {
+        if (err) {
+          console.log('No file format handler found')
+          return this.emit('error', 'No file format handler found')
+        }
+
+        this._loadFileContent(result)
+      })
+    })
+  }
+
+  _loadFileContent (result) {
+    const osm3sMeta = copyOsm3sMetaFrom(result)
+
+    const chunks = []
+    for (let i = 0; i < result.elements.length; i += this.options.loadChunkSize) {
+      chunks.push(result.elements.slice(i, i + this.options.loadChunkSize))
+    }
+
+    // collect all objects, so they can be completed later-on
+    const obs = []
+    async.eachLimit(
+      chunks,
+      1,
+      (chunk, done) => {
+        chunk.forEach(
+          (element) => {
+            const ob = this.createOrUpdateOSMObject(element, {
+              osm3sMeta,
+              properties: OverpassFrontend.TAGS | OverpassFrontend.META | OverpassFrontend.MEMBERS
+            })
+
+            obs.push(ob)
+          }
+        )
+
+        global.setTimeout(done, 0)
+      },
+      (err) => {
+        this.pendingNotifies()
+
+        // Set objects to fully known, as no more data can be loaded from the file
+        obs.forEach(ob => {
+          ob.properties |= OverpassFrontend.ALL
+          if (osm3sMeta.bounds) {
+            osm3sMeta.bounds.extend(ob.bounds)
+          } else {
+            osm3sMeta.bounds = new BoundingBox(ob.bounds)
+          }
+        })
+
         if (err) {
           console.log('Error loading file', err)
           return this.emit('error', err)
         }
 
-        let handler = OverpassFrontend.fileFormats.filter(format => format.willLoad(this.url, content, this.options.fileFormatOptions ?? {}))
-        if (!handler.length) {
-          console.log('No file format handler found')
-          return this.emit('error', 'No file format handler found')
-        }
+        this.emit('load', osm3sMeta)
 
-        handler = handler[0]
-
-         handler.load(content, this.options.fileFormatOptions ?? {}, (err, result) => {
-           if (err) {
-              console.log('No file format handler found')
-              return this.emit('error', 'No file format handler found')
-           }
-
-           this._loadFileContent(result)
-         })
+        this.ready = true
+        this._overpassProcess()
       }
     )
   }
-
-  _loadFileContent (result) {
-        const osm3sMeta = copyOsm3sMetaFrom(result)
-
-        const chunks = []
-        for (let i = 0; i < result.elements.length; i += this.options.loadChunkSize) {
-          chunks.push(result.elements.slice(i, i + this.options.loadChunkSize))
-        }
-
-        // collect all objects, so they can be completed later-on
-        const obs = []
-        async.eachLimit(
-          chunks,
-          1,
-          (chunk, done) => {
-            chunk.forEach(
-              (element) => {
-                const ob = this.createOrUpdateOSMObject(element, {
-                  osm3sMeta,
-                  properties: OverpassFrontend.TAGS | OverpassFrontend.META | OverpassFrontend.MEMBERS
-                })
-
-                obs.push(ob)
-              }
-            )
-
-            global.setTimeout(done, 0)
-          },
-          (err) => {
-            this.pendingNotifies()
-
-            // Set objects to fully known, as no more data can be loaded from the file
-            obs.forEach(ob => {
-              ob.properties |= OverpassFrontend.ALL
-              if (osm3sMeta.bounds) {
-                osm3sMeta.bounds.extend(ob.bounds)
-              } else {
-                osm3sMeta.bounds = new BoundingBox(ob.bounds)
-              }
-            })
-
-            if (err) {
-              console.log('Error loading file', err)
-              return this.emit('error', err)
-            }
-
-            this.emit('load', osm3sMeta)
-
-            this.ready = true
-            this._overpassProcess()
-          }
-        )
-      }
 
   /**
    * @param {string|string[]} ids - Id or array of Ids of OSM map features, e.g. [ 'n123', 'w2345', 'n123' ]. Illegal IDs will not produce an error but generate a 'null' object.
@@ -817,7 +814,7 @@ class OverpassFrontend {
 
 OverpassFrontend.fileFormats = [
   require('./fileFormatOSMXML'),
-  require('./fileFormatOSMJSON'),
+  require('./fileFormatOSMJSON')
 ]
 
 for (const k in defines) {

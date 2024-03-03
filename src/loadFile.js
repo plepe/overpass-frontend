@@ -1,8 +1,6 @@
 const fs = require('fs')
 const bzip2 = require('bzip2')
 
-const convertFromXML = require('./convertFromXML')
-
 module.exports = function loadFile (url, callback) {
   if (typeof location === 'undefined' && !url.match(/^(http:|https:|)\/\//)) {
     fs.readFile(url,
@@ -59,7 +57,7 @@ module.exports = function loadFile (url, callback) {
 }
 
 function bzip2decode (file) {
-  let data = bzip2.simple(bzip2.array(file))
+  const data = bzip2.simple(bzip2.array(file))
   let content = ''
 
   for (let i = 0; i < data.byteLength; i++) {

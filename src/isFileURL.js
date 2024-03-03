@@ -1,9 +1,9 @@
 module.exports = (url) => {
-  if (!url || url.match(/\/\/[^\/]+$/)) { // url without path
+  if (!url || url.match(/\/\/[^/]+$/)) { // url without path
     return false
   }
 
-  if (url.match(/\/[^\/.]+$/)) { // last url part without '.'
+  if (url.match(/\/[^/.]+$/)) { // last url part without '.'
     return false
   }
 
