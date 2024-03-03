@@ -46,7 +46,6 @@ function geojson2elements (data, elements, options) {
     case 'Point':
       element = {
         type: 'node',
-        id: --elementIds.node,
         lon: data.geometry.coordinates[0],
         lat: data.geometry.coordinates[1]
       }
@@ -54,7 +53,6 @@ function geojson2elements (data, elements, options) {
     case 'LineString':
       element = {
         type: 'way',
-        id: --elementIds.way,
         geometry: data.geometry.coordinates.map(c => {
           return { lon: c[0], lat: c[1] }
         })
@@ -64,7 +62,6 @@ function geojson2elements (data, elements, options) {
       if (data.geometry.coordinates.length === 1) {
         element = {
           type: 'way',
-          id: --elementIds.way,
           geometry: data.geometry.coordinates[0].map(c => {
             return { lon: c[0], lat: c[1] }
           })
@@ -72,7 +69,6 @@ function geojson2elements (data, elements, options) {
       } else {
         element = {
           type: 'relation',
-          id: --elementIds.relation,
           members: data.geometry.coordinates.map((ring, i) => {
             return {
               type: 'way',
@@ -95,6 +91,8 @@ function geojson2elements (data, elements, options) {
   if (data.properties) {
     element.tags = data.properties
   }
+
+  element.id = --elementIds[element.type]
 
   elements.push(element)
 }
