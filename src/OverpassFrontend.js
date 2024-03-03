@@ -821,7 +821,8 @@ class OverpassFrontend {
 
 OverpassFrontend.fileFormats = [
   require('./fileFormatOSMXML'),
-  require('./fileFormatOSMJSON')
+  require('./fileFormatOSMJSON'),
+  require('./fileFormatGeoJSON')
 ]
 
 for (const k in defines) {
