@@ -172,8 +172,8 @@ class OverpassFrontend {
 
       handler.load(content, this.options.fileFormatOptions ?? {}, (err, result) => {
         if (err) {
-          console.log('No file format handler found')
-          return this.emit('error', 'No file format handler found')
+          console.log('Error loading file with handler ' + handler.id, err)
+          return this.emit('error', 'Error loading file with handler ' + handler.id + ': ' + err.message)
         }
 
         this._loadFileContent(result)
