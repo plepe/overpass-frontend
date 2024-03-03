@@ -77,6 +77,7 @@ const isFileURL = require('./isFileURL')
  * @param {string} url The URL of the API, e.g. 'https://overpass-api.de/api/'. If you omit the protocol, it will use the protocol which is in use for the current page (or https: on nodejs): '//overpass-api.de/api/'. If the url ends in .json, .osm or .osm.bz2 it will load this OpenStreetMap file and use the data from there.
  * @param {object} options Options
  * @param {boolean} [options.isFile] true, if the URL is a file; false if the URL points to an Overpass API server. if unset, will be autodetected.
+ * @param {object} [options.fileFormatOptions] options for the file format parser.
  * @param {number} [options.count=0] Only return a maximum of count items. If count=0, no limit is used (default).
  * @param {number} [options.effortPerRequest=1000] To avoid huge requests to the Overpass API, the request will be split into smaller chunks. This value defines, how many objects will be requested per API call (for get() calls see effortNode, effortWay, effortRelation, e.g. up to 1000 nodes or 250 ways or (500 nodes and 125 ways) at default values; for BBoxQuery() calls the setting will be divided by 4).
  * @param {number} [options.effortNode=1] The effort for request a node. Default: 1.
@@ -157,7 +158,7 @@ class OverpassFrontend {
           return this.emit('error', err)
         }
 
-        let handler = OverpassFrontend.fileFormats.filter(format => format.willLoad(this.url, content))
+        let handler = OverpassFrontend.fileFormats.filter(format => format.willLoad(this.url, content, this.options.fileFormatOptions ?? {}))
         if (!handler.length) {
           console.log('No file format handler found')
           return this.emit('error', 'No file format handler found')
@@ -165,7 +166,7 @@ class OverpassFrontend {
 
         handler = handler[0]
 
-        const result = handler.load(content)
+        const result = handler.load(content, this.options.fileFormatOptions ?? {})
 
         osm3sMeta = copyOsm3sMetaFrom(result)
 
