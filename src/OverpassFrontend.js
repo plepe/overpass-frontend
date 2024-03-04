@@ -825,6 +825,10 @@ OverpassFrontend.fileFormats = [
   require('./fileFormatGeoJSON')
 ]
 
+OverpassFrontend.registerFileFormat = (format) => {
+  OverpassFrontend.fileFormats.push(format)
+}
+
 for (const k in defines) {
   OverpassFrontend[k] = defines[k]
 }
