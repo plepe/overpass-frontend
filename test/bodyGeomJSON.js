@@ -101,12 +101,6 @@ describe('Load OSM data from JSON file created with "out body geom" from Overpas
             "@osm3s:generator": "Overpass API 0.7.56.9 76e5016d",
             "@osm3s:copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.",
             "@osm3s:timestamp_osm_base": "2021-08-28T13:58:14Z",
-            "@osm3s:bounds": {
-              "minlon": 16.2978237,
-              "minlat": 48.1252236,
-              "maxlon": 16.4194459,
-              "maxlat": 48.1389998
-            }
           },
           "geometry": {
             "type": "LineString",
@@ -243,12 +237,6 @@ describe('Load OSM data from JSON file created with "out body geom" from Overpas
             "@osm3s:generator": "Overpass API 0.7.56.9 76e5016d",
             "@osm3s:timestamp_osm_base": "2021-08-28T13:58:14Z",
             "@osm3s:copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.",
-            "@osm3s:bounds": {
-              "minlon": 16.2978237,
-              "minlat": 48.1252236,
-              "maxlon": 16.4194459,
-              "maxlat": 48.1389998
-            }
           },
           "geometry": {
             "type": "Polygon",

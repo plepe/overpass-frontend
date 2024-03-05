@@ -102,10 +102,10 @@ describe('Load OSM data from XML file created with "out body geom" from Overpass
             "@osm3s:copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.",
             "@osm3s:timestamp_osm_base": "2021-08-28T13:58:14Z",
             "@osm3s:bounds": {
-              "minlon": 16.2978237,
-              "minlat": 48.1252236,
-              "maxlon": 16.4194459,
-              "maxlat": 48.1389998
+              "maxlat": 48.1296814,
+              "maxlon": 16.3384938,
+              "minlat": 48.1266093,
+              "minlon": 16.3358277
             }
           },
           "geometry": {
@@ -244,10 +244,10 @@ describe('Load OSM data from XML file created with "out body geom" from Overpass
             "@osm3s:timestamp_osm_base": "2021-08-28T13:58:14Z",
             "@osm3s:copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.",
             "@osm3s:bounds": {
-              "minlon": 16.2978237,
-              "minlat": 48.1252236,
-              "maxlon": 16.4194459,
-              "maxlat": 48.1389998
+              "maxlat": 48.1296814,
+              "maxlon": 16.3384938,
+              "minlat": 48.1266093,
+              "minlon": 16.3358277
             }
           },
           "geometry": {

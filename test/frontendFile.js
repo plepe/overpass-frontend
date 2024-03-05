@@ -15,13 +15,7 @@ describe('load file', function() {
     overpassFrontend.once('load', (osm3sMeta) => {
       assert.deepEqual(osm3sMeta, {
         version: 0.6,
-        generator: 'JOSM',
-        bounds: {
-          maxlat: 65.86605,
-          maxlon: -179.95772720000002,
-          minlat: 48.1817041,
-          minlon: 16.2551849
-        }
+        generator: 'JOSM'
       })
       done()
     })

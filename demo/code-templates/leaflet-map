@@ -1,0 +1,33 @@
+<DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="dist/overpass-frontend.js"></script>
+    <style>
+#map {
+  position: absolute; top: 0; left: 0; bottom: 0; right: 0;
+}
+    </style>
+  </head><body>
+    <div id='map'>
+    <script>
+      const overpassFrontend = new OverpassFrontend(__URL__)
+
+      const map = L.map('map').fitBounds(__BBOX_LEAFLET__)
+
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+          attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+      }).addTo(map)
+
+      const request = overpassFrontend.BBoxQuery(
+        __BBOXQUERY_PARAMS__
+        (err, feature) => feature.leafletFeature().addTo(map),
+        (err) => console.error(err)
+      )
+    </script>
+  </body>
+</html>

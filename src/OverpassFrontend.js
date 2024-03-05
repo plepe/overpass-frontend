@@ -124,7 +124,7 @@ class OverpassFrontend {
     if (this.options.isFile ?? isFileURL(this.url)) {
       this.options.isFile = true
       this.ready = false
-      this._loadFile()
+      global.setTimeout(() => this._loadFile(), 0)
     } else {
       this.options.isFile = false
       this.ready = true
@@ -222,10 +222,10 @@ class OverpassFrontend {
         })
 
         if (err) {
-          console.log('Error loading file', err)
           return this.emit('error', err)
         }
 
+        this.meta = osm3sMeta
         this.emit('load', osm3sMeta)
 
         this.ready = true
@@ -492,6 +492,7 @@ class OverpassFrontend {
     this.errorCount = 0
 
     const osm3sMeta = copyOsm3sMetaFrom(results)
+    this.meta = osm3sMeta
     this.emit('load', osm3sMeta, context)
 
     let subRequestsIndex = 0
@@ -816,6 +817,20 @@ class OverpassFrontend {
       .replace('*', '\\*')
       .replace('^', '\\^')
       .replace('$', '\\$')
+  }
+
+  /**
+   * get meta data of last request or - if no request was submitted - the first.
+   * @params [function] callback - a callback which will receive (err, meta)
+   */
+  getMeta (callback) {
+    if (this.meta) {
+      return callback(null, this.meta)
+    }
+
+    this.once('load', () => {
+      callback(null, this.meta)
+    })
   }
 }
 
