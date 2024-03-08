@@ -1,3 +1,7 @@
+# Version 3.2.0 - release 2024-03-08
+* Add a .getMeta() which returns meta information about the server/file.
+* Before, as bounds of the file (see .getMeta()) the bounding box of all present elements was calculated. Now, the bounding box from the file is used (or `null`).
+
 # Version 3.1.0 - release 2022-12-25
 * .BBoxQuery() now accept the option 'limit' - limit count of returned features.
 
