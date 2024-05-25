@@ -79,7 +79,7 @@ function clear_map () {
 }
 
 window.onload = function() {
-  map = L.map('map').setView([51.505, -0.09], 18)
+  map = L.map('map')
 
   var osm_mapnik = L.tileLayer('//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     {
@@ -90,10 +90,29 @@ window.onload = function() {
   osm_mapnik.addTo(map)
 
   form = document.getElementById('form')
+
+  if (form.elements.lat.value !== '' && form.elements.lng.value !== '') {
+    map.setView([form.elements.lat.value, form.elements.lng.value], form.elements.zoom.value || 18)
+  } else {
+    map.setView([51.505, -0.09], 18)
+
+    const center = map.getCenter()
+    form.elements.lat.value = center.lat.toFixed(5)
+    form.elements.lng.value = center.lng.toFixed(5)
+    form.elements.zoom.value = map.getZoom()
+  }
+
   form.onsubmit = () => update()
   update()
 
-  map.on('moveend', check_update_map)
+  map.on('moveend', () => {
+    const center = map.getCenter()
+    form.elements.lat.value = center.lat.toFixed(5)
+    form.elements.lng.value = center.lng.toFixed(5)
+    form.elements.zoom.value = map.getZoom()
+    check_update_map()
+  })
+
   check_update_map()
 
   document.getElementById('template').onchange = check_update_map
@@ -101,6 +120,8 @@ window.onload = function() {
 
 function update () {
   clear_map()
+
+  map.setView([form.elements.lat.value, form.elements.lng.value], form.elements.zoom.value)
 
   if (!overpass || form.elements.url.value !== formValues.url) {
     overpass = new OverpassFrontend(form.elements.url.value)
