@@ -6,6 +6,15 @@ A JavaScript (NodeJS/Browser) library to easily access data from OpenStreetMap v
 npm install --save overpass-frontend
 ```
 
+## Demo
+```sh
+git clone https://github.com/plepe/overpass-frontend
+npm install
+npm start
+```
+
+Browse to http://localhost:8000/demo/
+
 # EXAMPLES
 ## BBOX Query
 You can execute this example as: `node example-bbox.js`
