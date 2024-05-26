@@ -2,6 +2,8 @@ const fs = require('fs')
 const bzip2 = require('bzip2')
 
 module.exports = function loadFile (url, callback) {
+  let filename = url
+
   if (typeof location === 'undefined' && !url.match(/^(http:|https:|)\/\//)) {
     fs.readFile(url,
       (err, content) => {
@@ -9,11 +11,13 @@ module.exports = function loadFile (url, callback) {
           return callback(err)
         }
 
-        if (url.match(/\.bz2$/)) {
+        const m = filename.match(/^(.*)\.bz2$/)
+        if (m) {
           content = bzip2decode(content)
+          filename = m[1]
         }
 
-        callback(null, content)
+        callback(null, content, filename)
       }
     )
 
@@ -27,13 +31,15 @@ module.exports = function loadFile (url, callback) {
       if (req.status === 200) {
         let content
 
-        if (url.match(/\.bz2$/)) {
+        const m = filename.match(/^(.*)\.bz2$/)
+        if (m) {
           content = bzip2decode(new Uint8Array(req.response))
+          filename = m[1]
         } else {
           content = req.response
         }
 
-        callback(null, content)
+        callback(null, content, filename)
       } else {
         callback(req)
       }
@@ -48,7 +54,7 @@ module.exports = function loadFile (url, callback) {
     }
   }
 
-  if (url.match(/\.bz2$/)) {
+  if (filename.match(/\.bz2$/)) {
     req.responseType = 'arraybuffer'
   }
 

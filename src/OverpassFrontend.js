@@ -150,7 +150,7 @@ class OverpassFrontend {
   }
 
   _loadFile () {
-    loadFile(this.url, (err, content) => {
+    loadFile(this.url, (err, content, filename) => {
       if (err) {
         console.log('Error loading file', err)
         return this.emit('error', err)
@@ -160,7 +160,7 @@ class OverpassFrontend {
       if (this.options.fileFormat) {
         handler = OverpassFrontend.fileFormats.filter(format => format.id === this.options.fileFormat)
       } else {
-        handler = OverpassFrontend.fileFormats.filter(format => format.willLoad(this.url, content, this.options.fileFormatOptions ?? {}))
+        handler = OverpassFrontend.fileFormats.filter(format => format.willLoad(filename, content, this.options.fileFormatOptions ?? {}))
       }
 
       if (!handler.length) {

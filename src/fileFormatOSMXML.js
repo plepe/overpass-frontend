@@ -5,7 +5,7 @@ module.exports = {
   id: 'OSMXML',
 
   willLoad (url, content, options) {
-    return url.match(/\.osm(\.bz2)?$/)
+    return url.match(/\.osm$/)
   },
 
   load (content, options, callback) {

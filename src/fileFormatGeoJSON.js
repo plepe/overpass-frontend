@@ -8,7 +8,7 @@ module.exports = {
   id: 'GeoJSON',
 
   willLoad (url, content, options) {
-    return url.match(/\.geojson(\.bz2)?$/i)
+    return url.match(/\.geojson$/i)
   },
 
   load (content, options, callback) {
