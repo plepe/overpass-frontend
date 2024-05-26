@@ -11,7 +11,7 @@ if (typeof XMLHttpRequest === 'undefined') {
 
 describe('Load OSM data from file', function () {
   it ('.osm.json', function (done) {
-    loadFile('test/small.osm.json', (err, content) => {
+    loadFile('test/small.osm.json', {}, (err, content) => {
       fileFormatOSMJSON.load(content, {}, (err, result) => {
         parsedData = result
 
@@ -21,7 +21,7 @@ describe('Load OSM data from file', function () {
   })
 
   it ('.osm', function (done) {
-    loadFile('test/small.osm', (err, content) => {
+    loadFile('test/small.osm', {}, (err, content) => {
       fileFormatOSMXML.load(content, {}, (err, result) => {
         if (err) {
           return done(err)
@@ -35,7 +35,7 @@ describe('Load OSM data from file', function () {
   })
 
   it ('.osm.bz2', function (done) {
-    loadFile('test/small.osm.bz2', (err, content) => {
+    loadFile('test/small.osm.bz2', {}, (err, content) => {
       fileFormatOSMXML.load(content, {}, (err, result) => {
         if (err) {
           return done(err)

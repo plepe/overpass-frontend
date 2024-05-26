@@ -1,8 +1,11 @@
 const fs = require('fs')
 const bzip2 = require('bzip2')
 
-module.exports = function loadFile (url, callback) {
+module.exports = function loadFile (url, options, callback) {
   let filename = url
+  if ('filename' in options) {
+    filename = options.filename
+  }
 
   if (typeof location === 'undefined' && !url.match(/^(http:|https:|)\/\//)) {
     fs.readFile(url,

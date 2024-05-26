@@ -77,6 +77,7 @@ const isFileURL = require('./isFileURL')
  * @param {string} url The URL of the API, e.g. 'https://overpass-api.de/api/'. If you omit the protocol, it will use the protocol which is in use for the current page (or https: on nodejs): '//overpass-api.de/api/'. If the url ends in .json, .osm or .osm.bz2 it will load this OpenStreetMap file and use the data from there.
  * @param {object} options Options
  * @param {boolean} [options.isFile] true, if the URL is a file; false if the URL points to an Overpass API server. if unset, will be autodetected.
+ * @param {string} [options.filename] override file name; if undefined, the last part of the URL.
  * @param {string} [options.fileFormat] force file format; if undefined, auto-detect.
  * @param {object} [options.fileFormatOptions] options for the file format parser.
  * @param {number} [options.count=0] Only return a maximum of count items. If count=0, no limit is used (default).
@@ -150,7 +151,7 @@ class OverpassFrontend {
   }
 
   _loadFile () {
-    loadFile(this.url, (err, content, filename) => {
+    loadFile(this.url, this.options, (err, content, filename) => {
       if (err) {
         console.log('Error loading file', err)
         return this.emit('error', err)
