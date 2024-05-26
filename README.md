@@ -68,7 +68,8 @@ Usually, an Overpass API server is used as backend. Alternatively, a file can be
 
 ```js
 const overpassFrontend = new OverpassFrontend(fileUrl, {
-  fileFormat: 'OSMXML' // optional, if detection from url fails
+  filename: 'file.osm', // optional, override filename to enable auto-detection
+  fileFormat: 'OSMXML', // optional, if detection from url fails
   fileFormatOptions: { ... } // optional, depending on the file type
 })
 ```
