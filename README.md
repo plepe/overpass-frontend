@@ -63,6 +63,28 @@ overpassFrontend.get(
 # DOCUMENTATION
 Find documentation in [doc](https://rawgit.com/plepe/overpass-frontend/master/doc/OverpassFrontend.html). You can re-generate the documentation with `npm run doc`.
 
+## The following file types are supported:
+Usually, an Overpass API server is used as backend. Alternatively, a file can be used, e.g. exported from the [https://openstreetmap.org](OpenStreetMap homepage) or [https://overpass-turbo.eu/](Overpass Turbo).
+
+```js
+const overpassFrontend = new OverpassFrontend(fileUrl, {
+  fileFormat: 'OSMXML' // optional, if detection from url fails
+  fileFormatOptions: { ... } // optional, depending on the file type
+})
+```
+
+All files can be used raw or compressed with bzip2 (detected from the additional extension `.bz2`).
+
+Supported file formats:
+
+ID | Example file name | Documentation
+---+-------------------+---------------
+OSMXML | `export.osm` | https://wiki.openstreetmap.org/wiki/OSM_XML (including the JOSM and Overpass 'out geom' extensions).
+OSMJSON | `export.osm.json` | https://wiki.openstreetmap.org/wiki/OSM_JSON (including the Overpass 'out geom' extensions).
+GeoJSON | `export.geojson` | https://geojson.org/
+
+Read [#Additional file formats](below) how to enable additional file formats.
+
 ## The following queries are supported:
 ### Type
 | Type | Description
