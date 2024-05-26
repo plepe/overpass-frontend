@@ -125,7 +125,7 @@ class OverpassFrontend {
     if (this.options.isFile ?? isFileURL(this.url)) {
       this.options.isFile = true
       this.ready = false
-      this._loadFile()
+      global.setTimeout(() => this._loadFile(), 0)
     } else {
       this.options.isFile = false
       this.ready = true
@@ -166,7 +166,7 @@ class OverpassFrontend {
 
       if (!handler.length) {
         console.log('No file format handler found')
-        return this.emit('error', 'No file format handler found')
+        return this.emit('error', new Error('No file format handler found'))
       }
 
       handler = handler[0]
@@ -174,7 +174,7 @@ class OverpassFrontend {
       handler.load(content, this.options.fileFormatOptions ?? {}, (err, result) => {
         if (err) {
           console.log('Error loading file with handler ' + handler.id, err)
-          return this.emit('error', 'Error loading file with handler ' + handler.id + ': ' + err.message)
+          return this.emit('error', new Error('Error loading file with handler ' + handler.id + ': ' + err.message))
         }
 
         this._loadFileContent(result)
@@ -218,7 +218,6 @@ class OverpassFrontend {
         })
 
         if (err) {
-          console.log('Error loading file', err)
           return this.emit('error', err)
         }
 

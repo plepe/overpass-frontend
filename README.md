@@ -85,6 +85,8 @@ const overpassFrontend = new OverpassFrontend(fileUrl, {
 
 All files can be used raw or compressed with bzip2 (detected from the additional extension `.bz2`).
 
+`data:` URLs are supported as well (e.g. generated from a file upload field). Passing the `filename` and/or `fileFormat` as options is recommended, as file type detection might not work.
+
 Supported file formats:
 
 ID | Example file name | Documentation

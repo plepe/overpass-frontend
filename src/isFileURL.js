@@ -1,4 +1,8 @@
 module.exports = (url) => {
+  if (url && url.match(/^data:/)) {
+    return true
+  }
+
   if (!url || url.match(/\/\/[^/]+$/)) { // url without path
     return false
   }
