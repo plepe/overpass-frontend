@@ -72,6 +72,29 @@ overpassFrontend.get(
 # DOCUMENTATION
 Find documentation in [doc](https://rawgit.com/plepe/overpass-frontend/master/doc/OverpassFrontend.html). You can re-generate the documentation with `npm run doc`.
 
+## The following file types are supported:
+Usually, an Overpass API server is used as backend. Alternatively, a file can be used, e.g. exported from the [https://openstreetmap.org](OpenStreetMap homepage) or [https://overpass-turbo.eu/](Overpass Turbo).
+
+```js
+const overpassFrontend = new OverpassFrontend(fileUrl, {
+  filename: 'file.osm', // optional, override filename to enable auto-detection
+  fileFormat: 'OSMXML', // optional, if detection from url fails
+  fileFormatOptions: { ... } // optional, depending on the file type
+})
+```
+
+All files can be used raw or compressed with bzip2 (detected from the additional extension `.bz2`).
+
+Supported file formats:
+
+ID | Example file name | Documentation
+---+-------------------+---------------
+OSMXML | `export.osm` | https://wiki.openstreetmap.org/wiki/OSM_XML (including the JOSM and Overpass 'out geom' extensions).
+OSMJSON | `export.osm.json` | https://wiki.openstreetmap.org/wiki/OSM_JSON (including the Overpass 'out geom' extensions).
+GeoJSON | `export.geojson` | https://geojson.org/
+
+Read [#Additional file formats](below) how to enable additional file formats.
+
 ## The following queries are supported:
 ### Type
 | Type | Description
@@ -211,3 +234,52 @@ npm run test
 # Check code style (Standard JS)
 npm run lint
 ```
+
+## Additional file formats
+Currently, the following file formats are supported: OSMXML, OSMJSON and GeoJSON. To add support to an additional file format, do this:
+
+```
+import OverpassFronted from 'overpass-frontend'
+OverpassFrontend.registerFileFormat({
+  // unique id
+  id: 'myFileFormat',
+
+  // return true for autodetecting a file of this format
+  willLoad (url, content, options) {
+    return !!url.match(/\.myff$/i)
+  },
+
+  // convert the file to OSMJSON format (see below for an example)
+  load (content, options, callback) {
+    const data = convertToMyFileFormat(content, options)
+    callback(null, data)
+  }
+})
+
+const database = new OverpassFrontend('path/to/file.myff', {
+  fileFormat: 'myFileFormat', // optionally override auto-detection
+  fileFormatOptions: { // will be passed as 'options' to willLoad() and load()
+    whatever: 'value'
+  }
+})
+```
+
+Example OSMJSON result:
+```json
+{
+  "version": 0.6,
+  "elements": [
+    {
+      "type": "node",
+      "id": 1234,
+      "lat": 12.34567,
+      "lon": -12.34567
+      "tags": {
+        "key": "value"
+      }
+    }
+  ]
+}
+```
+
+The supported OSMJSON format is quite flexible, it supports (almost?) all combinations of 'out' in the Overpass QL, e.g.: if meta data is present, it will be loaded, but it is not required. Geometry of ways and relations can be loaded inline, member ids may be present.

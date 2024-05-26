@@ -1450,7 +1450,7 @@ describe('Overpass objects structure', function() {
 
     it('Server not available - BBoxQuery request', function (done) {
       var finalCalled = 0
-      var of = new OverpassFrontend('invalid')
+      var of = new OverpassFrontend('invalid', { isFile: false })
       of.BBoxQuery(
         'node[amenity=bench];',
         {
