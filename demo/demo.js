@@ -124,12 +124,13 @@ window.onload = function() {
     form.elements.lat.value = center.lat.toFixed(5)
     form.elements.lng.value = center.lng.toFixed(5)
     form.elements.zoom.value = map.getZoom()
-    check_update_map()
+
+    if (overpass) {
+      check_update_map()
+    }
   })
 
-  if (overpass) {
-    check_update_map()
-  }
+  update()
 
   templateSelector.onchange = check_update_map
 }
