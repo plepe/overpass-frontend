@@ -9,6 +9,7 @@ npm install --save overpass-frontend
 ## Demo
 ```sh
 git clone https://github.com/plepe/overpass-frontend
+cd overpass-frontend
 npm install
 npm start
 ```
