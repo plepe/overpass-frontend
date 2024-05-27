@@ -138,7 +138,12 @@ window.onload = function() {
 function update () {
   clear_map()
 
-  map.setView([form.elements.lat.value, form.elements.lng.value], form.elements.zoom.value)
+  const center = map.getCenter()
+  if (Math.abs(parseFloat(form.elements.lat.value) - center.lat) > 0.00001 ||
+    Math.abs(parseFloat(form.elements.lng.value) - center.lng) > 0.00001 ||
+    form.elements.zoom.value != map.getZoom()) {
+    map.setView([form.elements.lat.value, form.elements.lng.value], form.elements.zoom.value)
+  }
 
   if (form.elements.file.value !== formValues.file) {
     var reader = new FileReader()
