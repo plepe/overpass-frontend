@@ -23,6 +23,8 @@ let lokidb = db.addCollection('db')
 lokidb.insert(objects)
 
 function check(filter, expectedMatches) {
+  let r
+
   objects.forEach(
     ob => {
       assert.equal(filter.match(ob), expectedMatches.includes(ob.id), 'Object ' + ob.id + ' should ' + (expectedMatches.includes(ob.id) ? 'not ' : '') + 'match')
