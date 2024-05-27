@@ -72,6 +72,9 @@ describe('Test loading OSM data from Data URL', function() {
           overpassFrontend.once('load', () => {
             done()
           })
+          overpassFrontend.once('error', (err) => {
+            done(err)
+          })
         })
       })
 
@@ -114,7 +117,7 @@ describe('Test loading OSM data from Data URL', function() {
           },
           function (err) {
             assert.deepEqual(actual, expected)
-            done()
+            done(err)
           }
         )
       })
