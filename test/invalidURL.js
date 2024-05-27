@@ -30,7 +30,10 @@ const files = [
   },
   {
     filename: 'invalid.osm.json',
-    error: 'Error loading file with handler OSMJSON: Error parsing JSON file: Unexpected token \'}\', ..."lements":\n}\n" is not valid JSON'
+    error: [
+      'Error loading file with handler OSMJSON: Error parsing JSON file: Unexpected token \'}\', ..."lements":\n}\n" is not valid JSON',
+      'Error loading file with handler OSMJSON: Error parsing JSON file: JSON.parse: unexpected character at line 9 column 1 of the JSON data'
+    ]
   }
 ]
 
