@@ -1,13 +1,102 @@
 # OverpassFrontend
-A JavaScript (NodeJS/Browser) library to easily access data from OpenStreetMap via Overpass API. The objects can directly be used with LeafletJS or exported to GeoJSON. Data will be cached in the browser memory (persistent caching in LocalStorage or so may be added in the future).
+A JavaScript (NodeJS/Browser) library to easily access data from OpenStreetMap via Overpass API or from an OSM File. The objects can directly be used with LeafletJS or exported to GeoJSON. Data will be cached in the browser memory (persistent caching in LocalStorage or so may be added in the future).
 
 # INSTALLATION
 ```sh
 npm install --save overpass-frontend
 ```
 
+## Demo
+```sh
+git clone https://github.com/plepe/overpass-frontend
+cd overpass-frontend
+npm install
+npm start
+```
+
+Browse to http://localhost:8000/demo/
+
+# EXAMPLES
+## BBOX Query
+You can execute this example as: `node example-bbox.js`
+
+```js
+const OverpassFrontend = require('overpass-frontend')
+
+// you may specify an OSM file as url, e.g. 'test/data.osm.bz2'
+const overpassFrontend = new OverpassFrontend('//overpass-api.de/api/interpreter')
+
+// request restaurants in the specified bounding box
+overpassFrontend.BBoxQuery(
+  'nwr[amenity=restaurant]',
+  { minlat: 48.19, maxlat: 48.20, minlon: 16.33, maxlon: 16.34 },
+  {
+    properties: OverpassFrontend.ALL
+  },
+  function (err, result) {
+    console.log('* ' + result.tags.name + ' (' + result.id + ')')
+  },
+  function (err) {
+    if (err) { console.log(err) }
+  }
+)
+```
+
+## By ID
+You can execute this example as: `node example-by-id.js`
+
+```js
+const OverpassFrontend = require('overpass-frontend')
+
+// you may specify an OSM file as url, e.g. 'test/data.osm.bz2'
+const overpassFrontend = new OverpassFrontend('//overpass-api.de/api/interpreter')
+
+// request restaurants in the specified bounding box
+overpassFrontend.get(
+  ['n27365030', 'w5013364'],
+  {
+    properties: OverpassFrontend.TAGS
+  },
+  function (err, result) {
+    if (result) {
+      console.log('* ' + result.tags.name + ' (' + result.id + ')')
+    } else {
+      console.log('* empty result')
+    }
+  },
+  function (err) {
+    if (err) { console.log(err) }
+  }
+)
+```
+
 # DOCUMENTATION
 Find documentation in [doc](https://rawgit.com/plepe/overpass-frontend/master/doc/OverpassFrontend.html). You can re-generate the documentation with `npm run doc`.
+
+## The following file types are supported:
+Usually, an Overpass API server is used as backend. Alternatively, a file can be used, e.g. exported from the [https://openstreetmap.org](OpenStreetMap homepage) or [https://overpass-turbo.eu/](Overpass Turbo).
+
+```js
+const overpassFrontend = new OverpassFrontend(fileUrl, {
+  filename: 'file.osm', // optional, override filename to enable auto-detection
+  fileFormat: 'OSMXML', // optional, if detection from url fails
+  fileFormatOptions: { ... } // optional, depending on the file type
+})
+```
+
+All files can be used raw or compressed with bzip2 (detected from the additional extension `.bz2`).
+
+`data:` URLs are supported as well (e.g. generated from a file upload field). Passing the `filename` and/or `fileFormat` as options is recommended, as file type detection might not work.
+
+Supported file formats:
+
+ID | Example file name | Documentation
+---+-------------------+---------------
+OSMXML | `export.osm` | https://wiki.openstreetmap.org/wiki/OSM_XML (including the JOSM and Overpass 'out geom' extensions).
+OSMJSON | `export.osm.json` | https://wiki.openstreetmap.org/wiki/OSM_JSON (including the Overpass 'out geom' extensions).
+GeoJSON | `export.geojson` | https://geojson.org/
+
+Read [#Additional file formats](below) how to enable additional file formats.
 
 ## The following queries are supported:
 ### Type
@@ -95,62 +184,44 @@ node(if:count_tags() > 5 || t["name"] == "foo")
 node(if:debug(id()))
 ```
 
-# EXAMPLES
-## By ID
-You can execute this example as: `node example-by-id.js`
-
-```js
-const OverpassFrontend = require('overpass-frontend')
-
-// you may specify an OSM file as url, e.g. 'test/data.osm.bz2'
-const overpassFrontend = new OverpassFrontend('//overpass-api.de/api/interpreter')
-
-// request restaurants in the specified bounding box
-overpassFrontend.get(
-  ['n27365030', 'w5013364'],
-  {
-    properties: OverpassFrontend.TAGS
-  },
-  function (err, result) {
-    if (result) {
-      console.log('* ' + result.tags.name + ' (' + result.id + ')')
-    } else {
-      console.log('* empty result')
-    }
-  },
-  function (err) {
-    if (err) { console.log(err) }
-  }
-)
-```
-
-## BBOX Query
-You can execute this example as: `node example-bbox.js`
-
-```js
-const OverpassFrontend = require('overpass-frontend')
-
-// you may specify an OSM file as url, e.g. 'test/data.osm.bz2'
-const overpassFrontend = new OverpassFrontend('//overpass-api.de/api/interpreter')
-
-// request restaurants in the specified bounding box
-overpassFrontend.BBoxQuery(
-  'nwr[amenity=restaurant]',
-  { minlat: 48.19, maxlat: 48.20, minlon: 16.33, maxlon: 16.34 },
-  {
-    properties: OverpassFrontend.ALL
-  },
-  function (err, result) {
-    console.log('* ' + result.tags.name + ' (' + result.id + ')')
-  },
-  function (err) {
-    if (err) { console.log(err) }
-  }
-)
-```
-
 # DEVELOPMENT
-You should install [osm3s](https://wiki.openstreetmap.org/wiki/Overpass_API/Installation) (a local copy of Overpass API) for running the unit tests.
+
+To run unit tests, you need to have a local Overpass API server installed.
+For that, you can either set it up manually or use a pre-made Docker image.
+
+## Docker
+
+First, you need to build Docker images for osm3s, the Overpass API server. Please refer to the [official repository](https://github.com/drolbr/docker-overpass) for building instructions.
+
+Once you have built the images, you can build and run the image containing test data for `overpass-frontend`:
+
+```sh
+cd test/
+
+# Use the default test configuration for Docker
+cp ./conf.json-docker ./conf.js
+
+# Build the test server image
+docker build -t overpass-frontend-test .
+
+# Run the test server (it will be exposed on the port number 8080)
+docker run -p 8080:80 -it --rm overpass-frontend-test
+```
+
+Now you can run unit tests:
+
+```
+npm install
+npm run test
+```
+
+## Manual setup
+
+Please follow the installation instructions for [osm3s](https://wiki.openstreetmap.org/wiki/Overpass_API/Installation).
+
+Before running unit tests, you should copy `test/conf.json-dist` to `test/conf.json` and change the configuration parameters. They should point to your local server address.
+
+To run the tests, execute the following commands:
 
 ```sh
 git clone https://github.com/plepe/overpass-frontend
@@ -166,3 +237,52 @@ npm run test
 # Check code style (Standard JS)
 npm run lint
 ```
+
+## Additional file formats
+Currently, the following file formats are supported: OSMXML, OSMJSON and GeoJSON. To add support to an additional file format, do this:
+
+```
+import OverpassFronted from 'overpass-frontend'
+OverpassFrontend.registerFileFormat({
+  // unique id
+  id: 'myFileFormat',
+
+  // return true for autodetecting a file of this format
+  willLoad (url, content, options) {
+    return !!url.match(/\.myff$/i)
+  },
+
+  // convert the file to OSMJSON format (see below for an example)
+  load (content, options, callback) {
+    const data = convertToMyFileFormat(content, options)
+    callback(null, data)
+  }
+})
+
+const database = new OverpassFrontend('path/to/file.myff', {
+  fileFormat: 'myFileFormat', // optionally override auto-detection
+  fileFormatOptions: { // will be passed as 'options' to willLoad() and load()
+    whatever: 'value'
+  }
+})
+```
+
+Example OSMJSON result:
+```json
+{
+  "version": 0.6,
+  "elements": [
+    {
+      "type": "node",
+      "id": 1234,
+      "lat": 12.34567,
+      "lon": -12.34567
+      "tags": {
+        "key": "value"
+      }
+    }
+  ]
+}
+```
+
+The supported OSMJSON format is quite flexible, it supports (almost?) all combinations of 'out' in the Overpass QL, e.g.: if meta data is present, it will be loaded, but it is not required. Geometry of ways and relations can be loaded inline, member ids may be present.

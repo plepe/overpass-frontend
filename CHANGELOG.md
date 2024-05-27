@@ -1,3 +1,12 @@
+# Version 3.3.0 - release 2024-05-27
+* Allow additional file formats (via registerFileFormat, see README). For demonstration purposes, support for GeoJSON was added.
+* Support for data urls (e.g. from an file-input field).
+* Add a demo website (demo/), where queries can be tested. Overpass API server can be changed, alternatively files can be loaded (or uploaded). Code examples are generated, which can be used as templates for own applications.
+
+# Version 3.2.0 - release 2024-03-08
+* Add a .getMeta() which returns meta information about the server/file.
+* Before, as bounds of the file (see .getMeta()) the bounding box of all present elements was calculated. Now, the bounding box from the file is used (or `null`).
+
 # Version 3.1.0 - release 2022-12-25
 * .BBoxQuery() now accept the option 'limit' - limit count of returned features.
 

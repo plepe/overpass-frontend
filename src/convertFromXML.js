@@ -1,3 +1,5 @@
+const BoundingBox = require('boundingbox')
+
 module.exports = function convertFromXML (xml) {
   const result = {
     version: parseFloat(xml.getAttribute('version')),
@@ -96,6 +98,19 @@ module.exports = function convertFromXML (xml) {
       }
 
       result.elements.push(element)
+    } else if (current.nodeName === 'bounds') {
+      const bounds = new BoundingBox({
+        minlat: parseFloat(current.getAttribute('minlat')),
+        minlon: parseFloat(current.getAttribute('minlon')),
+        maxlat: parseFloat(current.getAttribute('maxlat')),
+        maxlon: parseFloat(current.getAttribute('maxlon'))
+      })
+
+      if (result.bounds) {
+        result.bounds = result.bounds.extend(bounds)
+      } else {
+        result.bounds = bounds
+      }
     }
 
     current = current.nextSibling
