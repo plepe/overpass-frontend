@@ -18,7 +18,7 @@ module.exports = function loadFile (url, options, callback) {
     let content = parsed.toBuffer()
 
     const m = filename.match(/^(.*)\.bz2$/)
-    if (m || parsed.contentType === 'application/x-bzip') {
+    if (m || parsed.contentType.match(/^application\/x-bzip/)) {
       try {
         content = bzip2decode(content)
       } catch (err) {
