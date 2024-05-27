@@ -50,6 +50,9 @@ function check_update_map () {
       current_objects[ob.id] = ob
     },
     function (err) {
+      if (err) {
+        alert(err.message)
+      }
     }
   )
 
