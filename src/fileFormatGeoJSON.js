@@ -1,5 +1,5 @@
 const elementIds = {
-  node:0,
+  node: 0,
   way: 0,
   relation: 0
 }
@@ -80,11 +80,11 @@ function geojson2elements (data, elements, options) {
             }
           })
         }
-        data.properties = {...data.properties, type: 'multipolygon'}
+        data.properties = { ...data.properties, type: 'multipolygon' }
       }
       break
     default:
-      console.log("Unknown geometry type " + data.geometry.type)
+      console.log('Unknown geometry type ' + data.geometry.type)
       return
   }
 

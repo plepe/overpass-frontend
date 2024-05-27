@@ -30,7 +30,7 @@ module.exports = function loadFile (url, options, callback) {
     if (filename === url) {
       filename = parsed.contentType === 'application/json'
         ? 'file.osm.json'
-          : 'file.osm'
+        : 'file.osm'
     }
 
     return callback(null, content, filename)
