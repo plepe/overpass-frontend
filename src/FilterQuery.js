@@ -5,6 +5,7 @@ const OverpassFrontend = require('./defines')
 const cacheMerge = require('./cacheMerge')
 const strsearch2regexp = require('strsearch2regexp')
 const FilterStatement = require('./FilterStatement')
+const qlQuoteString = require('./qlQuoteString')
 
 class FilterQuery extends FilterStatement {
   constructor (def, filter) {
@@ -46,6 +47,10 @@ class FilterQuery extends FilterStatement {
 
         if (part.recurse) {
           this.inputSets[part.inputSet].recurse = part.recurse
+        }
+
+        if (part.role) {
+          this.inputSets[part.inputSet].role = part.role
         }
       } else if (part.outputSet) {
         if (hasOutputSet) {
@@ -191,7 +196,7 @@ class FilterQuery extends FilterStatement {
         }
 
         if (inputSet.recurse) {
-          return '(' + inputSet.recurse + (s === '_' ? '' : '.' + s) + ')'
+          return '(' + inputSet.recurse + (s === '_' ? '' : '.' + s) + ('role' in inputSet ? ':' + qlQuoteString(inputSet.role) : '') + ')'
         } else {
           return '.' + s
         }
@@ -403,6 +408,9 @@ class FilterQuery extends FilterStatement {
         recurse.forEach(r => {
           r.properties |= ['r', 'w'].includes(inputSet.recurse) ? OverpassFrontend.MEMBERS : 0
           r.recurseType = inputSet.recurse
+          if (inputSet.role) {
+            r.role = inputSet.role
+          }
         })
 
         const _options = options
