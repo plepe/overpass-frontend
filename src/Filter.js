@@ -228,14 +228,6 @@ function parse (def, rek = 0) {
         def = r[1]
         current.push(new qlFunctions.bbox(mBbox[1]))
         mode = 10
-      } else if (m) {
-        def = r[1]
-        const fun = m[1]
-        if (!qlFunctions[fun]) {
-          throw new Error('Unsupported filter function: ' + fun)
-        }
-        current.push(new qlFunctions[fun](m[2]))
-        mode = 10
       } else if (mRecurse) {
         def = r[1]
         const c = { recurse: mRecurse[1] }
@@ -243,6 +235,14 @@ function parse (def, rek = 0) {
           c.inputSet = mRecurse[2]
         }
         current.push(c)
+        mode = 10
+      } else if (m) {
+        def = r[1]
+        const fun = m[1]
+        if (!qlFunctions[fun]) {
+          throw new Error('Unsupported filter function: ' + fun)
+        }
+        current.push(new qlFunctions[fun](m[2]))
         mode = 10
       } else {
         throw new Error("Can't parse query, expected id, bbox or function: " + def)
