@@ -1,5 +1,6 @@
 const strsearch2regexp = require('strsearch2regexp')
 const qlFunction = require('./qlFunctions/qlFunction')
+const qlQuoteString = require('./qlQuoteString')
 
 module.exports = function compileFilter (part, options = {}) {
   if (Array.isArray(part)) {
@@ -29,7 +30,7 @@ module.exports = function compileFilter (part, options = {}) {
   }
 
   if (part.recurse) {
-    return '(' + part.recurse + (part.inputSet ? '.' + part.inputSet : '') + ')'
+    return '(' + part.recurse + (part.inputSet ? '.' + part.inputSet : '') + ('role' in part ? part.role : '') + ')'
   }
 
   if (part.inputSet) {
@@ -43,31 +44,27 @@ module.exports = function compileFilter (part, options = {}) {
   switch (part.op) {
     case 'has_key':
       if (part.keyRegexp === 'i') {
-        return '[~' + qlesc(part.key) + '~".",i]'
+        return '[~' + qlQuoteString(part.key) + '~".",i]'
       } else if (keyRegexp) {
-        return '[~' + qlesc(part.key) + '~"."]'
+        return '[~' + qlQuoteString(part.key) + '~"."]'
       } else {
-        return '[' + keyRegexp + qlesc(part.key) + ']'
+        return '[' + keyRegexp + qlQuoteString(part.key) + ']'
       }
     case 'not_exists':
-      return '[!' + qlesc(part.key) + ']'
+      return '[!' + qlQuoteString(part.key) + ']'
     case '=':
     case '!=':
     case '~':
     case '!~':
-      return '[' + keyRegexp + qlesc(part.key) + part.op + qlesc(part.value) + ']'
+      return '[' + keyRegexp + qlQuoteString(part.key) + part.op + qlQuoteString(part.value) + ']'
     case '~i':
     case '!~i':
-      return '[' + keyRegexp + qlesc(part.key) + part.op.substr(0, part.op.length - 1) + qlesc(part.value) + ',i]'
+      return '[' + keyRegexp + qlQuoteString(part.key) + part.op.substr(0, part.op.length - 1) + qlQuoteString(part.value) + ',i]'
     case 'has':
-      return '[' + keyRegexp + qlesc(part.key) + '~' + qlesc('^(.*;|)' + part.value + '(|;.*)$') + ']'
+      return '[' + keyRegexp + qlQuoteString(part.key) + '~' + qlQuoteString('^(.*;|)' + part.value + '(|;.*)$') + ']'
     case 'strsearch':
-      return '[' + keyRegexp + qlesc(part.key) + '~' + qlesc(strsearch2regexp(part.value)) + ',i]'
+      return '[' + keyRegexp + qlQuoteString(part.key) + '~' + qlQuoteString(strsearch2regexp(part.value)) + ',i]'
     default:
       throw new Error('unknown operator' + JSON.stringify(part))
   }
-}
-
-function qlesc (str) {
-  return '"' + str.replace(/"/g, '\\"') + '"'
 }
