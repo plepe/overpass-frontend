@@ -52,6 +52,10 @@ describe('Function "properties"', function () {
     assert.equal(f.toString(), 'node(properties:4);')
     assert.equal(f.toQl(), 'node;')
     assert.deepEqual(f.toLokijs(), { type: { '$eq': 'node' }, needMatch: true })
+    assert.deepEqual(f.derefSets(), [
+      { type: 'node', filters: [ { fun: 'properties', value: 4 } ] }
+    ])
+
 
     check(f, [])
 
@@ -65,6 +69,9 @@ describe('Function "properties"', function () {
     assert.equal(f.toString(), 'node(properties:11)(properties:4);')
     assert.equal(f.toQl(), 'node;')
     assert.deepEqual(f.toLokijs(), { type: { '$eq': 'node' }, needMatch: true })
+    assert.deepEqual(f.derefSets(), [
+      { type: 'node', filters: [ { fun: 'properties', value: 11 }, { fun: 'properties', value: 4 } ] }
+    ])
 
     check(f, [])
 
@@ -98,6 +105,9 @@ describe('Filter', function () {
       assert.equal(f.toString(), 'nwr;')
       assert.equal(f.toQl(), 'nwr;')
       assert.deepEqual(f.toLokijs(), {})
+      assert.deepEqual(f.derefSets(), [
+        { type: 'nwr', filters: [] }
+      ])
 
       check(f, [ 1, 2, 3, 4, 5, 6, 7 ])
 
@@ -112,6 +122,9 @@ describe('Filter', function () {
       assert.equal(f.toString(), 'nwr;')
       assert.equal(f.toQl(), 'nwr;')
       assert.deepEqual(f.toLokijs(), {})
+      assert.deepEqual(f.derefSets(), [
+        { type: 'nwr', filters: [] }
+      ])
 
       check(f, [ 1, 2, 3, 4, 5, 6, 7 ])
 
@@ -126,6 +139,9 @@ describe('Filter', function () {
       assert.equal(f.toString(), 'node;')
       assert.equal(f.toQl(), 'node;')
       assert.deepEqual(f.toLokijs(), {type:{$eq:'node'}})
+      assert.deepEqual(f.derefSets(), [
+        { type: 'node', filters: [] }
+      ])
 
       check(f, [ 1, 2, 3, 4, 5, 6, 7 ])
 
@@ -140,6 +156,10 @@ describe('Filter', function () {
 
       var r = f.toLokijs()
       assert.deepEqual(r, { 'tags.amenity': { $exists: true }})
+
+      assert.deepEqual(f.derefSets(), [
+        { type: 'nwr', filters: [{ key: 'amenity', op: 'has_key' }] }
+      ])
 
       var r = f.cacheDescriptors()
       assert.deepEqual(r, [ { id: 'nwr["amenity"](properties:1)' } ])
@@ -162,6 +182,10 @@ describe('Filter', function () {
       var r = f.toLokijs()
       assert.deepEqual(r, { $or: [ { 'tags.amenity': { $exists: true } } ] })
 
+      assert.deepEqual(f.derefSets(), [
+        { type: 'nwr', filters: [{ key: 'amenity', op: 'has_key' }] }
+      ])
+
       var r = f.cacheDescriptors()
       assert.deepEqual(r, [ { id: 'nwr["amenity"](properties:1)' } ])
 
@@ -183,6 +207,10 @@ describe('Filter', function () {
       var r = f.toLokijs()
       assert.deepEqual(r, { $or: [ { 'tags.amenity': { $exists: true } } ] })
 
+      assert.deepEqual(f.derefSets(), [
+        { type: 'nwr', filters: [{ key: 'amenity', op: 'has_key' }] }
+      ])
+
       var r = f.cacheDescriptors()
       assert.deepEqual(r, [ { id: 'nwr["amenity"](properties:1)' } ])
 
@@ -201,6 +229,10 @@ describe('Filter', function () {
 
       var r = f.toLokijs()
       assert.deepEqual(r, { 'tags.amenity': { $exists: true } })
+
+      assert.deepEqual(f.derefSets(), [
+        { type: 'nwr', filters: [{ key: 'amenity', op: 'has_key' }] }
+      ])
 
       var r = f.cacheDescriptors()
       assert.deepEqual(r, [ { id: 'nwr["amenity"](properties:1)' } ])
@@ -226,6 +258,11 @@ describe('Filter', function () {
         { type: { $eq: 'node' }, 'tags.amenity': { $exists: true } },
         { type: { $eq: 'way' }, 'tags.amenity': { $exists: true } }
       ] })
+
+      assert.deepEqual(f.derefSets(), [
+        { type: 'node', filters: [{ key: 'amenity', op: 'has_key' }] },
+        { type: 'way', filters: [{ key: 'amenity', op: 'has_key' }] }
+      ])
 
       var r = f.cacheDescriptors()
       assert.deepEqual(r, [ { id: 'node["amenity"](properties:1)' }, { id: 'way["amenity"](properties:1)' } ])
@@ -264,6 +301,10 @@ describe('Filter', function () {
       var r = f.toLokijs()
       assert.deepEqual(r, { $or: [ { $or: [ { 'tags.amenity': { $exists: true } } ] } ] })
 
+      assert.deepEqual(f.derefSets(), [
+        { type: 'nwr', filters: [{ key: 'amenity', op: 'has_key' }] }
+      ])
+
       var r = f.cacheDescriptors()
       assert.deepEqual(r, [ { id: 'nwr["amenity"](properties:1)' } ])
 
@@ -291,6 +332,12 @@ describe('Filter', function () {
       var r = f.toLokijs()
       assert.deepEqual(r, { $or: [ { $or: [ { 'tags.a': { $eq: 'b' } }, { 'tags.c': { $eq: 'd' } } ] }, { $or: [ { 'tags.amenity': { $exists: true } } ] } ] })
 
+      assert.deepEqual(f.derefSets(), [
+        { type: 'nwr', filters: [{ key: 'a', op: '=', value: 'b' }] },
+        { type: 'nwr', filters: [{ key: 'c', op: '=', value: 'd' }] },
+        { type: 'nwr', filters: [{ key: 'amenity', op: 'has_key' }] }
+      ])
+
       var r = f.cacheDescriptors()
       assert.deepEqual(r, [
         { id: 'nwr["a"="b"](properties:1)' },
@@ -317,6 +364,10 @@ describe('Filter', function () {
       var r = f.toLokijs()
       assert.deepEqual(r, { 'tags.amenity': { $exists: true } })
 
+      assert.deepEqual(f.derefSets(), [
+        { type: 'nwr', filters: [{ key: 'amenity', op: 'has_key' }] }
+      ])
+
       var r = f.cacheDescriptors()
       assert.deepEqual(r, [ { id: 'nwr["amenity"](properties:1)' } ])
 
@@ -335,6 +386,10 @@ describe('Filter', function () {
 
       var r = f.toLokijs()
       assert.deepEqual(r, { 'type': { $eq: 'node' }, 'tags.amenity': { $eq: 'restaurant' } })
+
+      assert.deepEqual(f.derefSets(), [
+        { type: 'node', filters: [{ key: 'amenity', op: '=', value: 'restaurant' }] }
+      ])
 
       var r = f.cacheDescriptors()
       assert.deepEqual(r, [ { id: 'node["amenity"="restaurant"](properties:1)' } ])
@@ -357,6 +412,10 @@ describe('Filter', function () {
       var r = f.toLokijs()
       assert.deepEqual(r, { 'type': { $eq: 'node' }, 'tags.amenity': { $and: [ { $exists: true }, { $ne: 'restaurant' } ] } } )
 
+      assert.deepEqual(f.derefSets(), [
+        { type: 'node', filters: [{ key: 'amenity', op: 'has_key' }, { key: 'amenity', op: '!=', value: 'restaurant' }] }
+      ])
+
       var r = f.cacheDescriptors()
       assert.deepEqual(r, [ { id: 'node["amenity"]["amenity"!="restaurant"](properties:1)' } ])
 
@@ -377,6 +436,10 @@ describe('Filter', function () {
 
       var r = f.toLokijs()
       assert.deepEqual(r, { 'type': { $eq: 'node' }, 'tags.amenity': { $and: [ { $exists: true }, { $ne: 'cafe' }, { $ne: 'restaurant' } ] } } )
+
+      assert.deepEqual(f.derefSets(), [
+        { type: 'node', filters: [{ key: 'amenity', op: 'has_key' }, { key: 'amenity', op: '!=', value: 'cafe' }, { key: 'amenity', op: '!=', value: 'restaurant' }] }
+      ])
 
       var r = f.cacheDescriptors()
       assert.deepEqual(r, [ { id: 'node["amenity"]["amenity"!="cafe"]["amenity"!="restaurant"](properties:1)' } ])
@@ -399,6 +462,10 @@ describe('Filter', function () {
       var r = f.toLokijs()
       assert.deepEqual(r, { 'tags.amenity': { $eq: 'restaurant' }, 'tags.shop': { $exists: true } })
 
+      assert.deepEqual(f.derefSets(), [
+        { type: 'nwr', filters: [{ key: 'amenity', op: '=', value: 'restaurant' }, { key: 'shop', op: 'has_key' }] }
+      ])
+
       var r = f.cacheDescriptors()
       assert.deepEqual(r, [ { id: 'nwr["amenity"="restaurant"]["shop"](properties:1)' } ])
 
@@ -419,6 +486,10 @@ describe('Filter', function () {
 
       var r = f.toLokijs()
       assert.deepEqual(r, { 'tags.cuisine': { $regex: '^(.*;|)asian(|;.*)$' } })
+
+      assert.deepEqual(f.derefSets(), [
+        { type: 'nwr', filters: [{ key: 'cuisine', op: 'has', value: 'asian' }] }
+      ])
 
       var r = f.cacheDescriptors()
       assert.deepEqual(r, [ { id: 'nwr["cuisine"~"^(.*;|)asian(|;.*)$"](properties:1)' } ])
@@ -475,6 +546,12 @@ describe('Filter', function () {
         { 'type': { $eq: 'node' }, 'tags.shop': { $eq: 'ice_cream' } }
       ]})
 
+      assert.deepEqual(f.derefSets(), [
+        { type: 'node', filters: [{ key: 'amenity', op: '=', value: 'cafe' }, { key: 'cuisine', op: '=', value: 'ice_cream' }] },
+        { type: 'node', filters: [{ key: 'amenity', op: '=', value: 'ice_cream' }] },
+        { type: 'node', filters: [{ key: 'shop', op: '=', value: 'ice_cream' }] },
+      ])
+
       var r = f.cacheDescriptors()
       assert.deepEqual(r, [
         { id: 'node["amenity"="cafe"]["cuisine"="ice_cream"](properties:1)' },
@@ -508,6 +585,10 @@ describe('Filter', function () {
       var r = f.toLokijs()
       assert.deepEqual(r, { needMatch: true })
 
+      assert.deepEqual(f.derefSets(), [
+        { type: 'nwr', filters: [{ key: 'wikipedia', keyRegexp: true, op: 'has_key' }] },
+      ])
+
       var r = f.cacheDescriptors()
       assert.deepEqual(r, [ { id: 'nwr[~"wikipedia"~"."](properties:1)' } ])
 
@@ -530,6 +611,10 @@ describe('Filter', function () {
 
       var r = f.toLokijs()
       assert.deepEqual(r, { needMatch: true })
+
+      assert.deepEqual(f.derefSets(), [
+        { type: 'nwr', filters: [{ key: 'wikipedia', keyRegexp: true, op: '~', value: 'foo' }] },
+      ])
 
       var r = f.cacheDescriptors()
       assert.deepEqual(r, [ { id: 'nwr[~"wikipedia"~"foo"](properties:1)' } ])
@@ -564,6 +649,10 @@ describe('Filter', function () {
       var r = f.toLokijs()
       assert.deepEqual(r, { needMatch: true })
 
+      assert.deepEqual(f.derefSets(), [
+        { type: 'nwr', filters: [{ key: 'wikipedia', keyRegexp: 'i', op: 'has_key' }] },
+      ])
+
       var r = f.cacheDescriptors()
       assert.deepEqual(r, [ { id: 'nwr[~"wikipedia"~".",i](properties:1)' } ])
 
@@ -586,6 +675,10 @@ describe('Filter', function () {
 
       var r = f.toLokijs()
       assert.deepEqual(r, { needMatch: true })
+
+      assert.deepEqual(f.derefSets(), [
+        { type: 'nwr', filters: [{ key: 'wikipedia', keyRegexp: 'i', op: '~i', value: 'foo' }] },
+      ])
 
       var r = f.cacheDescriptors()
       assert.deepEqual(r, [ { id: 'nwr[~"wikipedia"~"foo",i](properties:1)' } ])
@@ -622,6 +715,11 @@ describe('Filter', function () {
 
       var r = f.toLokijs()
       assert.deepEqual(r, { needMatch: true })
+
+      assert.deepEqual(f.derefSets(), [
+        { type: 'nwr', filters: [{ key: 'wikipedia', keyRegexp: true, op: '~', value: 'foo' } ] },
+        { type: 'node', filters: [ { key: 'amenity', op: 'has_key' } ] }
+      ])
 
       var r = f.cacheDescriptors()
       assert.deepEqual(r, [

@@ -3,4 +3,8 @@ module.exports = class FilterStatement {
     this.id = filter.createStatementId()
     filter.statements[this.id] = this
   }
+
+  derefSets () {
+    return []
+  }
 }

@@ -143,6 +143,32 @@ class FilterRecurse extends FilterStatement {
 
   match (ob) {
   }
+
+  derefSets () {
+    if (!this.inputSetRef) {
+      return []
+    }
+
+    const deref = this.inputSetRef.derefSets()
+
+    return deref.map(d => {
+      const r = {
+        type: 'nwr',
+        filters: [],
+        recurse: [{
+          recurseType: this.type,
+          type: d.type,
+          filters: d.filters
+        }]
+      }
+
+      if (d.recurse) {
+        r.recurse[0].recurse = d.recurse
+      }
+
+      return r
+    })
+  }
 }
 
 filterPart.register('recurse', FilterRecurse)

@@ -140,6 +140,10 @@ class FilterAnd extends FilterStatement {
   match (ob) {
     return this.parts.every(part => part.match(ob))
   }
+
+  derefSets () {
+    throw new Error('FilterAnd.derefSets() not supported yet')
+  }
 }
 
 filterPart.register('and', FilterAnd)

@@ -6,6 +6,7 @@ const cacheMerge = require('./cacheMerge')
 const strsearch2regexp = require('strsearch2regexp')
 const FilterStatement = require('./FilterStatement')
 const qlQuoteString = require('./qlQuoteString')
+const andTypes = require('./andTypes')
 
 class FilterQuery extends FilterStatement {
   constructor (def, filter) {
@@ -398,7 +399,7 @@ class FilterQuery extends FilterStatement {
       const recursingInputSets = Object.values(this.inputSets)
         .filter(s => s.recurse)
 
-      const recurse = recursingInputSets.forEach(inputSet => {
+      recursingInputSets.forEach(inputSet => {
         if (!inputSet.set) {
           options = []
           return
@@ -547,6 +548,82 @@ class FilterQuery extends FilterStatement {
           return false
       }
     })
+  }
+
+  derefSets () {
+    let result = [{
+      type: 'nwr',
+      filters: []
+    }]
+
+    if (this.inputSets) {
+      Object.values(this.inputSets).forEach(set => {
+        if (!set.set) {
+          result = []
+          return
+        }
+
+        const deref = set.set.derefSets()
+
+        if (set.recurse) {
+          result = result.map(r => {
+            return deref.map(d => {
+              const t = {
+                recurseType: set.recurse,
+                type: d.type,
+                filters: d.filters
+              }
+
+              if (set.role) {
+                t.role = set.role
+              }
+
+              if (d.recurse) {
+                t.recurse = d.recurse
+              }
+
+              const s = {
+                type: r.type,
+                filters: r.filters,
+                recurse: (r.recurse ?? []).concat([t])
+              }
+
+              return s
+            })
+          }).flat()
+
+          return
+        }
+
+        result = result.map(r => {
+          return deref.map(d => {
+            const e = {
+              type: andTypes(r.type, d.type),
+              filters: [...r.filters, ...d.filters]
+            }
+
+            if (r.recurse || d.recurse) {
+              e.recurse = [...(r.recurse ?? []), ...(d.recurse ?? [])]
+            }
+
+            return e
+          })
+        }).flat().filter(d => d.type)
+      })
+
+      result = result.map(r => {
+        r.type = andTypes(r.type, this.type)
+        r.filters = [...r.filters, ...this.filters]
+        return r
+      }).filter(d => d.type)
+    } else {
+      result = [{
+        type: this.type,
+        filters: this.filters
+      }]
+    }
+
+    return result
   }
 }
 

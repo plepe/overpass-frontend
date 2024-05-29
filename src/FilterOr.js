@@ -151,6 +151,10 @@ class FilterOr extends FilterStatement {
   match (ob) {
     return this.parts.some(part => part.match(ob))
   }
+
+  derefSets () {
+    return this.parts.map(p => p.derefSets()).flat()
+  }
 }
 
 filterPart.register('or', FilterOr)

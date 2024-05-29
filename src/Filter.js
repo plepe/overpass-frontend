@@ -607,6 +607,14 @@ class Filter {
 
     return r
   }
+
+  /**
+   * dereferences input sets into a list of simple filters
+   */
+  derefSets (options = {}) {
+    const statement = this.getStatement(options)
+    return statement ? statement.derefSets() : []
+  }
 }
 
 function compileCacheDescriptors (result) {
