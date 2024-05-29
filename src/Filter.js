@@ -4,6 +4,7 @@ const parseParentheses = require('./parseParentheses')
 const qlFunction = require('./qlFunctions/qlFunction')
 const compile = require('./compileFilter')
 const filterPart = require('./filterPart')
+const filterCheckSuperset = require('./filterCheckSuperset.js')
 require('./FilterQuery')
 require('./FilterAnd')
 require('./FilterOr')
@@ -501,52 +502,7 @@ class Filter {
    * @return boolean true, if the current filter is equal other or a super-set of other.
    */
   isSupersetOf (other) {
-    return this.def.every(entry =>
-      other.def.every(otherEntry => this._isSupersetOf(entry, otherEntry)))
-  }
-
-  _isSupersetOf (def, otherDef) {
-    if (def.or) {
-      return def.or.some(d => this._isSupersetOf(d, otherDef))
-    }
-    if (def.and) {
-      return def.and.every(d => this._isSupersetOf(d, otherDef))
-    }
-
-    if (otherDef.or) {
-      return otherDef.or.every(d => this._isSupersetOf(def, d))
-    }
-    if (otherDef.and) {
-      return otherDef.and.some(d => this._isSupersetOf(def, d))
-    }
-
-    // search for something, where otherPart is not equal or subset
-    return !def.some(part => {
-      return !otherDef.some(otherPart => {
-        if (part.type && otherPart.type) {
-          return part.type === otherPart.type
-        }
-        if (compile(otherPart, { toString: true }) === compile(part, { toString: true })) {
-          return true
-        }
-        if (['~', '~i'].includes(part.op) && otherPart.op === '=' && part.key === otherPart.key && otherPart.value.match(RegExp(part.value, part.op === '~i' ? 'i' : ''))) {
-          return true
-        }
-        if (['~', '~i'].includes(part.op) && part.keyRegexp && otherPart.op === '=' && otherPart.key.match(RegExp(part.key, part.keyRegexp === 'i' ? 'i' : '')) && otherPart.value.match(RegExp(part.value, part.op === '~i' ? 'i' : ''))) {
-          return true
-        }
-        if (part.op === 'has_key' && otherPart.op && !['!=', '!~', '!~i', 'not_exists'].includes(otherPart.op) && part.key === otherPart.key) {
-          return true
-        }
-        if (part.op === 'has_key' && part.keyRegexp && otherPart.op && !['!=', '!~', '!~i', 'not_exists'].includes(otherPart.op) && otherPart.key.match(RegExp(part.key, part.keyRegexp === 'i' ? 'i' : ''))) {
-          return true
-        }
-        if (part instanceof qlFunction && otherPart instanceof qlFunction && part.isSupersetOf(otherPart)) {
-          return true
-        }
-        return false
-      })
-    })
+    return filterCheckSuperset(this.derefSets(), other.derefSets())
   }
 
   /**
