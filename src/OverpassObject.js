@@ -39,6 +39,18 @@ class OverpassObject {
     return this.memberIds()
   }
 
+  /**
+   * Return list of ways/relations where this item is a member of.
+   * @return {string[]}
+   */
+  memberOfIds () {
+    if (!this.memberOf) {
+      return null
+    }
+
+    return this.memberOf.map(m => m.id)
+  }
+
   notifyMemberOf (relation, role, sequence) {
     this.memberOf.push({ id: relation.id, role, sequence })
   }
