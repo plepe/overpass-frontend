@@ -2232,6 +2232,116 @@ describe("Filter sets with relations, apply base filter", function () {
           }]
         }, done)
       })
+
+      it('inner members of buildings', function (done) {
+        overpassFrontend.clearCache()
+        test({
+          mode,
+          query: 'relation["building"];way(r:"inner");',
+          bounds: {
+            minlat: 48.19853,
+            minlon: 16.33990,
+            maxlat: 48.19919,
+            maxlon: 16.34236
+          },
+          expected: [ "w175757214", "w175757217", "w175757222", "w175757225", "w199715278", "w86273649" ],
+          expectedSubRequestCount: 1,
+          expectedCacheDescriptors: [{
+            id: 'way(properties:0)',
+            recurse: [{
+              id: 'relation["building"](properties:5)',
+              recurseType: 'r',
+              role: 'inner'
+            }]
+          }]
+        }, done)
+      })
+
+      it('all members of buildings', function (done) {
+        overpassFrontend.clearCache()
+        test({
+          mode,
+          query: 'relation["building"];way(r);',
+          bounds: {
+            minlat: 48.19853,
+            minlon: 16.33990,
+            maxlat: 48.19919,
+            maxlon: 16.34236
+          },
+          expected: [ "w175757214", "w175757217", "w175757222", "w175757225", "w199715277", "w199715278", "w199911273", "w86273643", "w86273649" ],
+          expectedSubRequestCount: 1,
+          expectedCacheDescriptors: [{
+            id: 'way(properties:0)',
+            recurse: [{
+              id: 'relation["building"](properties:5)',
+              recurseType: 'r'
+            }]
+          }]
+        }, done)
+      })
+
+      it('all buildings', function (done) {
+        overpassFrontend.clearCache()
+        test({
+          mode,
+          query: 'relation["building"];',
+          bounds: {
+            minlat: 48.19817,
+            minlon: 16.34037,
+            maxlat: 48.19881,
+            maxlon: 16.34191
+          },
+          expected: [ "r2681532", "r2681533", "r2684275" ],
+          expectedSubRequestCount: 1,
+          expectedCacheDescriptors: [{
+            id: 'relation["building"](properties:1)'
+          }]
+        }, done)
+      })
+
+      it('all buildings with intersecting bbox', function (done) {
+        overpassFrontend.clearCache()
+        test({
+          mode,
+          query: 'relation["building"];',
+          bounds: {
+            minlat: 48.19853,
+            minlon: 16.33990,
+            maxlat: 48.19919,
+            maxlon: 16.34236
+          },
+          expected: [ "r1283879", "r2681533", "r2684275" ],
+          expectedSubRequestCount: 1,
+          expectedCacheDescriptors: [{
+            id: 'relation["building"](properties:1)'
+          }]
+        }, done)
+      })
+
+      it('buildings with inner members', function (done) {
+        overpassFrontend.clearCache()
+        test({
+          mode,
+          query: 'way;relation(bw:"inner")["building"];',
+          bounds: {
+            minlat: 48.19853,
+            minlon: 16.33990,
+            maxlat: 48.19919,
+            maxlon: 16.34236
+          },
+          expected: [ "r1283879", "r2681533" ],
+          expectedSubRequestCount: 1,
+          expectedCacheDescriptors: [{
+            id: 'relation["building"](properties:1)',
+            recurse: [{
+              id: 'way(properties:0)',
+              recurseType: 'bw',
+              role: 'inner'
+            }]
+          }]
+        }, done)
+      })
+
       it('recurse up, relation only', function (done) {
         overpassFrontend.clearCache()
         test({
