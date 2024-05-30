@@ -61,7 +61,7 @@ class RequestBBox extends Request {
         }
       }
 
-      const cacheFilter = new Filter({ and: [this.filterQuery, new Filter('nwr(properties:' + this.options.properties + ')')] })
+      const cacheFilter = new Filter(this.filterQuery.toQl() + 'nwr._(properties:' + this.options.properties + ');')
       this.options.properties = cacheFilter.properties()
 
       this.cacheDescriptors = cacheFilter.cacheDescriptors().map(cacheDescriptors => {
