@@ -1448,16 +1448,16 @@ describe("Filter sets with relations, compile", function () {
     assert.equal(f.toQuery(), 'way(r._1:"outer")->._2;')
     assert.equal(f.toQuery({ statement: 1 }), 'relation["building"]->._1;')
     assert.deepEqual(f.recurse(), [
-      { id: 1, type: 'r' }
+      { id: 1, role: 'outer', type: 'r' }
     ])
     assert.deepEqual(f.recurse({ statement: 2 }), [
-      { id: 1, type: 'r' }
+      { id: 1, role: 'outer', type: 'r' }
     ])
     assert.deepEqual(f.recurse({ statement: 1 }), [])
     assert.deepEqual(f.getScript(), [
       { id: 1, recurse: [] },
       { id: 2, recurse: [
-        { id: 1, type: 'r' }
+        { id: 1, role: 'outer', type: 'r' }
       ]},
     ])
     assert.deepEqual(f.compileQuery(), {
@@ -1513,16 +1513,16 @@ describe("Filter sets with relations, compile", function () {
     assert.equal(f.toQuery(), 'way(r._1:"outer")->._2;')
     assert.equal(f.toQuery({ statement: 1 }), 'relation["building"]->._1;')
     assert.deepEqual(f.recurse(), [
-      { id: 1, type: 'r' }
+      { id: 1, role: 'outer', type: 'r' }
     ])
     assert.deepEqual(f.recurse({ statement: 2 }), [
-      { id: 1, type: 'r' }
+      { id: 1, role: 'outer', type: 'r' }
     ])
     assert.deepEqual(f.recurse({ statement: 1 }), [])
     assert.deepEqual(f.getScript(), [
       { id: 1, recurse: [] },
       { id: 2, recurse: [
-        { id: 1, type: 'r' }
+        { id: 1, role: 'outer', type: 'r' }
       ]},
     ])
     assert.deepEqual(f.compileQuery(), {

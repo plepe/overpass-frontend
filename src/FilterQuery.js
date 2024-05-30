@@ -239,10 +239,16 @@ class FilterQuery extends FilterStatement {
 
       if (recursingInputSets.length) {
         result = recursingInputSets.map(s => {
-          return {
+          const r = {
             type: s[1].recurse,
             id: s[1].set ? s[1].set.id : null
           }
+
+          if ('role' in s[1]) {
+            r.role = s[1].role
+          }
+
+          return r
         })
       }
 
