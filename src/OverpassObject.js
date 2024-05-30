@@ -41,14 +41,21 @@ class OverpassObject {
 
   /**
    * Return list of ways/relations where this item is a member of.
+   * @return {null|string} [role] only return members with the specified role (null -> all members)
    * @return {string[]}
    */
-  memberOfIds () {
+  memberOfIds (role = null) {
     if (!this.memberOf) {
       return null
     }
 
-    return this.memberOf.map(m => m.id)
+    let list = this.memberOf
+
+    if (role !== null) {
+      list = list.filter(m => m.role === role)
+    }
+
+    return list.map(m => m.id)
   }
 
   notifyMemberOf (relation, role, sequence) {

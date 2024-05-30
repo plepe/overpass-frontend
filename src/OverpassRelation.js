@@ -240,9 +240,10 @@ class OverpassRelation extends OverpassObject {
 
   /**
    * Return list of member ids.
+   * @return {null|string} [role] only return members with the specified role (null -> all members)
    * @return {string[]}
    */
-  memberIds () {
+  memberIds (role = null) {
     if (this._memberIds) {
       return this._memberIds
     }
@@ -255,7 +256,9 @@ class OverpassRelation extends OverpassObject {
     for (let i = 0; i < this.data.members.length; i++) {
       const member = this.data.members[i]
 
-      this._memberIds.push(member.type.substr(0, 1) + member.ref)
+      if (role === null || member.role === role) {
+        this._memberIds.push(member.type.substr(0, 1) + member.ref)
+      }
     }
 
     return this._memberIds
