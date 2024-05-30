@@ -823,9 +823,11 @@ class OverpassFrontend {
    * @param {number} [options.properties] Items need at least these properties.
    * @param {LokiDB} [db] Optional database (e.g. an already filtered chain)
    * @param {object} [result] cache of already checked results
-   * @return {OverpassObject[]} list of items
+   * @return {OverpassObject[]} list of items. If undecided items were found, a property 'undecidedItems' is set with a list of these items.
    */
   queryLokiDB (filter, options = {}, db = null, result = {}) {
+    const undecidedItems = []
+
     if (!db) {
       db = this.db.chain()
     }
@@ -924,15 +926,29 @@ class OverpassFrontend {
     if (needMatch) {
       list = list.filter(ob => {
         const item = this.cacheElements[ob.id]
-        return statement.match(item)
+        const r = statement.match(item)
+        if (r === null) {
+          undecidedItems.push(item)
+        }
+        return r
       })
     }
 
     list = list
       .map(ob => this.cacheElements[ob.id])
-      .filter(item => !('properties' in options) || (options.properties & item.properties) === options.properties)
+      .filter(item => {
+        const r = !('properties' in options) || (options.properties & item.properties) === options.properties
+        if (!r) {
+          undecidedItems.push(item)
+        }
+        return r
+      })
 
     result[statement.id] = { list }
+
+    if (undecidedItems.length) {
+      list.undecidedItems = undecidedItems
+    }
 
     return list
   }
