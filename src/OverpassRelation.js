@@ -244,24 +244,20 @@ class OverpassRelation extends OverpassObject {
    * @return {string[]}
    */
   memberIds (role = null) {
-    if (this._memberIds) {
-      return this._memberIds
-    }
-
     if (typeof this.data.members === 'undefined') {
       return null
     }
 
-    this._memberIds = []
+    const result = []
     for (let i = 0; i < this.data.members.length; i++) {
       const member = this.data.members[i]
 
       if (role === null || member.role === role) {
-        this._memberIds.push(member.type.substr(0, 1) + member.ref)
+        result.push(member.type.substr(0, 1) + member.ref)
       }
     }
 
-    return this._memberIds
+    return result
   }
 
   member_ids () { // eslint-disable-line
