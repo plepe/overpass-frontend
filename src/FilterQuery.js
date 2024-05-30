@@ -495,8 +495,9 @@ class FilterQuery extends FilterStatement {
         return r
       }
     } else if (this.filter.baseFilter) {
-      if (!this.filter.baseFilter.match(ob)) {
-        return false
+      const r = this.filter.baseFilter.match(ob)
+      if (r !== true) {
+        return r
       }
     }
 
@@ -504,7 +505,7 @@ class FilterQuery extends FilterStatement {
       return false
     }
 
-    return this.filters.every(part => {
+    const results = this.filters.map(part => {
       if (part.keyRegexp) {
         let regex
         if (part.value) {
@@ -557,6 +558,8 @@ class FilterQuery extends FilterStatement {
           return false
       }
     })
+
+    return results.includes(false) ? false : results.includes(null) ? null : true
   }
 
   derefSets () {

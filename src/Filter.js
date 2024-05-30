@@ -415,7 +415,7 @@ class Filter {
    * @param {object} [options] Options
    * @param {string} [options.set=_] Which set should the object be matched against.
    * @param {int} [options.statement] Return the statement with this id
-   * @return {boolean}
+   * @return {boolean|null} true if matches, null if unsure, false if not
    */
   match (ob, options = {}) {
     const statement = this.getStatement(options)
