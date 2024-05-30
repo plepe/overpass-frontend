@@ -2020,6 +2020,43 @@ describe("Filter sets with relations, apply base filter", function () {
       }
     ])
   })
+  it ('way;relation(bw:inner); - base filter: nwr(46,16,47,17)', function () {
+    var f = new Filter('way;relation(bw:inner);')
+    f.setBaseFilter('nwr(46,16,47,17)')
+
+    assert.equal(f.toString(), 'nwr(46,16,47,17)->._base;way._base;relation(bw:"inner");')
+    assert.equal(f.toQl(), 'nwr(46,16,47,17)->._base;way._base;relation(bw:"inner");')
+    assert.equal(f.toQl({ setsUseStatementIds: true }), 'nwr(46,16,47,17)->._base;way._base->._1;relation(bw._1:"inner")->._2;')
+    assert.equal(f.toQuery(), 'relation(bw._1:"inner")->._2;')
+    assert.equal(f.toQuery({ statement: 1 }), '(nwr(46,16,47,17)->._1;)->._base;way._base->._1;')
+    assert.deepEqual(f.recurse(), [
+      { id: 1, role: 'inner', type: 'bw' }
+    ])
+    assert.deepEqual(f.recurse({ statement: 1 }), [])
+    assert.deepEqual(f.getScript(), [
+      { id: 1, recurse: [] },
+      { id: 2, recurse: [
+        { id: 1, role: 'inner', type: 'bw' }
+      ]}
+    ])
+    assert.deepEqual(f.compileQuery(), {
+      loki: { type: { '$eq': 'relation' } },
+      query: 'relation(bw:"inner");',
+      recurse: [
+        {
+          inputSet: '_',
+          loki: { '$and': [ { type: { '$eq': 'way' } } ], needMatch: true },
+          query: 'nwr(46,16,47,17)->._base;way._base;',
+          type: 'bw'
+        }
+      ]
+    })
+    assert.deepEqual(f.toLokijs(), { type: { $eq: 'relation' } })
+    var r = f.cacheDescriptors()
+    assert.deepEqual(r, [
+      {"id":"relation(properties:0)","recurse":[{"bounds":{"type":"Polygon","coordinates":[[[16,46],[17,46],[17,47],[16,47],[16,46]]]},"recurseType":"bw","role":"inner","id":"way(properties:16)"}]}
+    ])
+  })
 })
 
 ;['via-file', 'via-server'].forEach(mode => {
