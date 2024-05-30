@@ -490,7 +490,10 @@ class FilterQuery extends FilterStatement {
 
   match (ob) {
     if (this.inputSets) {
-      return Object.values(this.inputSets).every(s => s.set.match(ob))
+      const r = Object.values(this.inputSets).every(s => s.set.match(ob))
+      if (r !== true) {
+        return r
+      }
     } else if (this.filter.baseFilter) {
       if (!this.filter.baseFilter.match(ob)) {
         return false
