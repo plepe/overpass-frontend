@@ -815,6 +815,16 @@ class OverpassFrontend {
       .replace('$', '\\$')
   }
 
+  /**
+   * Query the LokiDB for matching items. If the filter has operations that
+   * LokiDB does not support, the filter will be tested against matching items.
+   * @param {Filter} filter The filter to test agains
+   * @param {object} [options={}] Additional options
+   * @param {number} [options.properties] Items need at least these properties.
+   * @param {LokiDB} [db] Optional database (e.g. an already filtered chain)
+   * @param {object} [result] cache of already checked results
+   * @return {OverpassObject[]} list of items
+   */
   queryLokiDB (filter, options = {}, db = null, result = {}) {
     if (!db) {
       db = this.db.chain()
