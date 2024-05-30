@@ -15,7 +15,7 @@ const objects = [
 ]
 objects.forEach(ob => {
   ob.GeoJSON = () => {return {type: 'Feature', properties: ob.tags, geometry: {type: 'Point', coordinates: [ 0, 0 ]}}}
-  ob.intersects = () => {}
+  ob.intersects = () => 0
 })
 
 let db = new loki()

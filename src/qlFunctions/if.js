@@ -12,7 +12,7 @@ module.exports = class If extends qlFunction {
   }
 
   test (ob) {
-    return this.value.exec(ob)
+    return !!this.value.exec(ob)
   }
 
   toString (options = {}) {

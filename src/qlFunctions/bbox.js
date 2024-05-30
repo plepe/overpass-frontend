@@ -25,7 +25,8 @@ module.exports = class bbox extends qlFunction {
   }
 
   test (ob) {
-    return ob.intersects(this.value) === 2
+    const r = ob.intersects(this.value)
+    return r === 2 ? true : r === 0 ? false : null
   }
 
   toString () {

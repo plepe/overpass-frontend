@@ -22,7 +22,8 @@ module.exports = class poly extends qlFunction {
   }
 
   test (ob) {
-    return ob.intersects(this.bounds())
+    const r = ob.intersects(this.bounds())
+    return r === 2 ? true : r === 0 ? false : null
   }
 
   toString () {
