@@ -49,9 +49,13 @@ function compare (f, o) {
   // if the filters are a superset, also check recurses
   if (result && f.recurse) {
     return f.recurse.every(filterRec =>
-      (o.recurse ?? []).some(otherRec =>
-        compare(filterRec, otherRec)
-      )
+      (o.recurse ?? []).some(otherRec => {
+        if (filterRec.role && (!otherRec.role || filterRec.role !== otherRec.role)) {
+          return false
+        }
+
+        return compare(filterRec, otherRec)
+      })
     )
   }
 
