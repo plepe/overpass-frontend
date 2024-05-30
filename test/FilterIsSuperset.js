@@ -364,6 +364,14 @@ describe("Filters - test isSupersetOf", function () {
     assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should not be a super set of " + f1.toString())
   })
 
+  it("(node;way;) - way", function () {
+    const f1 = new Filter("(node;way;)")
+    const f2 = new Filter("way")
+
+    assert.equal(f1.isSupersetOf(f2), true, f1.toString() + " should be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should not be a super set of " + f1.toString())
+  })
+
   it("(node;way;) - relation", function () {
     const f1 = new Filter("(node;way;)")
     const f2 = new Filter("relation")
@@ -530,6 +538,85 @@ describe("Filters - test isSupersetOf", function () {
 
     assert.equal(f1.isSupersetOf(f2), true, f1.toString() + " should be a super set of " + f2.toString())
     assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should not be a super set of " + f1.toString())
+  })
+  it("node;nwr._[cuisine]; - nwr[cuisine];node._;", function () {
+    const f1 = new Filter("node;nwr._[cuisine];")
+    const f2 = new Filter("nwr[cuisine];node._;")
+
+    assert.equal(f1.isSupersetOf(f2), true, f1.toString() + " should be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), true, f2.toString() + " should be a super set of " + f1.toString())
+  })
+  it("relation[a];node(r); - node;", function () {
+    const f1 = new Filter("relation[a];node(r);")
+    const f2 = new Filter("node;")
+
+    assert.equal(f1.isSupersetOf(f2), false, f1.toString() + " should not be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), true, f2.toString() + " should be a super set of " + f1.toString())
+  })
+  it("relation;node(r); - relation[a];node(r);", function () {
+    const f1 = new Filter("relation;node(r);")
+    const f2 = new Filter("relation[a];node(r);")
+
+    assert.equal(f1.isSupersetOf(f2), true, f1.toString() + " should be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should not be a super set of " + f1.toString())
+  })
+  it("(relation[a];relation[b];);node(r); - relation[a];node(r);", function () {
+    const f1 = new Filter("(relation[a];relation[b];);node(r);")
+    const f2 = new Filter("relation[a];node(r);")
+
+    assert.equal(f1.isSupersetOf(f2), true, f1.toString() + " should be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should not be a super set of " + f1.toString())
+  })
+  it("(relation[a];relation[b];)->._;node(r); - node;", function () {
+    const f1 = new Filter("(relation[a];relation[b];)->._;node(r);")
+    const f2 = new Filter("node;")
+
+    assert.equal(f1.isSupersetOf(f2), false, f1.toString() + " should not be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), true, f2.toString() + " should be a super set of " + f1.toString())
+  })
+  it("node;nwr._[cuisine]; - nwr[cuisine];node._[cuisine];", function () {
+    const f1 = new Filter("node;nwr._[cuisine];")
+    const f2 = new Filter("nwr[cuisine];node._[cuisine];")
+
+    assert.equal(f1.isSupersetOf(f2), true, f1.toString() + " should be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), true, f2.toString() + " should be a super set of " + f1.toString())
+  })
+  it("node;nwr._[cuisine]; - nwr[cuisine];node._[cuisine];", function () {
+    const f1 = new Filter("node;nwr._[cuisine];")
+    const f2 = new Filter("nwr[cuisine];node._[cuisine];")
+
+    assert.equal(f1.isSupersetOf(f2), true, f1.toString() + " should be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), true, f2.toString() + " should be a super set of " + f1.toString())
+  })
+  it("(node;way;)->._;nwr._[cuisine]; - node[cuisine];", function () {
+    const f1 = new Filter("(node;way;)->._;nwr._[cuisine];")
+    const f2 = new Filter("node[cuisine];")
+
+    console.log(1)
+    assert.equal(f1.isSupersetOf(f2), true, f1.toString() + " should be a super set of " + f2.toString())
+    console.log(2)
+    assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should not be a super set of " + f1.toString())
+  })
+  it("way;node; - node;", function () {
+    const f1 = new Filter("way;node;")
+    const f2 = new Filter("node;")
+
+    assert.equal(f1.isSupersetOf(f2), true, f1.toString() + " should be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), true, f2.toString() + " should be a super set of " + f1.toString())
+  })
+  it("way;node._; - node;", function () {
+    const f1 = new Filter("way;node._;")
+    const f2 = new Filter("node;")
+
+    assert.equal(f1.isSupersetOf(f2), false, f1.toString() + " should not be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), true, f2.toString() + " should be a super set of " + f1.toString())
+  })
+  it("relation;node(r); - node;", function () {
+    const f1 = new Filter("relation;node(r);")
+    const f2 = new Filter("node;")
+
+    assert.equal(f1.isSupersetOf(f2), false, f1.toString() + " should not be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), true, f2.toString() + " should be a super set of " + f1.toString())
   })
 
   /** TODO
