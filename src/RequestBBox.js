@@ -72,6 +72,7 @@ class RequestBBox extends Request {
       })
 
       this.doneFeaturesSets = {}
+      this.undecidedItems = []
     }
 
     this.loadFinish = false
@@ -86,8 +87,11 @@ class RequestBBox extends Request {
    */
   preprocess () {
     let items = []
+    this.undecidedItems = []
+
     if (this.lokiQuery) {
       items = this.overpass.queryLokiDB(this.lokiQuery, { properties: this.options.properties }, null, this.doneFeaturesSets)
+      this.undecidedItems = items.undecidedItems ?? []
     }
 
     for (let i = 0; i < items.length; i++) {
@@ -323,6 +327,10 @@ class RequestBBox extends Request {
   needLoad () {
     if (this.loadFinish) {
       return false
+    }
+
+    if (this.undecidedItems.length) {
+      return true
     }
 
     return !this.cacheDescriptors || !this.cacheDescriptors.every(cache => {
