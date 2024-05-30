@@ -864,16 +864,16 @@ class OverpassFrontend {
               other = item.type === 'way' ? item.memberIds() : []
               break
             case 'r':
-              other = item.type === 'relation' ? item.memberIds() : []
+              other = item.type === 'relation' ? item.memberIds(query.role) : []
               break
             case 'bn':
-              other = item.type === 'node' ? item.memberOf.map(m => m.id) : []
+              other = item.type === 'node' ? item.memberOfIds(query.role) : []
               break
             case 'bw':
-              other = item.type === 'way' ? item.memberOf.map(m => m.id) : []
+              other = item.type === 'way' ? item.memberOfIds(query.role) : []
               break
             case 'br':
-              other = item.type === 'relation' ? item.memberOf.map(m => m.id) : []
+              other = item.type === 'relation' ? item.memberOfIds(query.role) : []
               break
             case 'or':
             case 'and':
