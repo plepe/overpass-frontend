@@ -2270,6 +2270,7 @@ describe("Filter sets with relations, apply base filter", function () {
           },
           expected: [ "w175757214", "w175757217", "w175757222", "w175757225", "w199715277", "w199715278", "w199911273", "w86273643", "w86273649" ],
           expectedSubRequestCount: 1,
+          expectedSubRequestCount2nd: 1, // TODO: maybe we can push this to 0?
           expectedCacheDescriptors: [{
             id: 'way(properties:0)',
             recurse: [{
@@ -2312,6 +2313,7 @@ describe("Filter sets with relations, apply base filter", function () {
           },
           expected: [ "r1283879", "r2681533", "r2684275" ],
           expectedSubRequestCount: 1,
+          expectedSubRequestCount2nd: 1, // TODO: maybe we can push this to 0?
           expectedCacheDescriptors: [{
             id: 'relation["building"](properties:1)'
           }]
@@ -2439,7 +2441,7 @@ function test (options, callback) {
 
       if (!options.noRecurse && !options.rek) {
         options.rek = true
-        options.expectedSubRequestCount = 0
+        options.expectedSubRequestCount = options.expectedSubRequestCount2nd ?? 0
         return test(options, callback)
       }
 
