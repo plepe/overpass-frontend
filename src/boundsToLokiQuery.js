@@ -1,6 +1,6 @@
-module.exports = function boundsToLokiQuery (bounds, overpass) {
+module.exports = function boundsToLokiQuery (bounds, options) {
   if (bounds.minlon <= bounds.maxlon) {
-    if (overpass.hasStretchLon180) {
+    if (options.hasStretchLon180) {
       return {
         minlat: { $lte: bounds.maxlat },
         maxlat: { $gte: bounds.minlat },
@@ -36,7 +36,7 @@ module.exports = function boundsToLokiQuery (bounds, overpass) {
       }]
     }
 
-    if (overpass.hasStretchLon180) {
+    if (options.hasStretchLon180) {
       result.$or.push({
         stretchLon180: { $eq: true }
       })
