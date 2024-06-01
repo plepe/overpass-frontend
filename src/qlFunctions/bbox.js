@@ -2,6 +2,7 @@ const BoundingBox = require('boundingbox')
 const turf = require('../turf')
 const OverpassFrontend = require('../defines')
 const qlFunction = require('./qlFunction')
+const boundsToLokiQuery = require('../boundsToLokiQuery')
 
 module.exports = class bbox extends qlFunction {
   constructor (str) {
@@ -33,8 +34,11 @@ module.exports = class bbox extends qlFunction {
     return '(' + this.value.toLatLonString() + ')'
   }
 
-  compileLokiJS () {
-    return { needMatch: true }
+  compileLokiJS (options) {
+    const r = boundsToLokiQuery(this.value, options)
+    r.needMatch = true
+
+    return r
   }
 
   cacheDescriptors (descriptors) {

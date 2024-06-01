@@ -189,7 +189,13 @@ describe("Filter sets, compile", function () {
       query: '(nwr["amenity"](1,1,2,2)->.a;);',
       loki: {
         $or: [{
-          "tags.amenity": { $exists: true }
+          "tags.amenity": { $exists: true },
+          $and: [{
+            maxlat: { '$gte': 1 },
+            maxlon: { '$gte': 1 },
+            minlat: { '$lte': 2 },
+            minlon: { '$lte': 2 }
+          }],
         }],
         needMatch: true
       }
@@ -199,7 +205,13 @@ describe("Filter sets, compile", function () {
     ])
     assert.deepEqual(f.toLokijs(), {
       $or: [{
-        "tags.amenity": { $exists: true }
+        "tags.amenity": { $exists: true },
+        $and: [{
+          maxlat: { '$gte': 1 },
+          maxlon: { '$gte': 1 },
+          minlat: { '$lte': 2 },
+          minlon: { '$lte': 2 }
+        }],
       }],
       needMatch: true
     })
@@ -243,14 +255,19 @@ describe("Filter sets, compile", function () {
         $and: [{
           $or: [{
             "tags.amenity": { $exists: true },
-            }]
-          },
-          {
-            "tags.cuisine": { $exists: true },
-            type: { $eq: 'node' }
-          },
-        ]
-      }
+            $and: [{
+              maxlat: { '$gte': 1 },
+              maxlon: { '$gte': 1 },
+              minlat: { '$lte': 2 },
+              minlon: { '$lte': 2 }
+            }],
+          }]
+        },
+        {
+          "tags.cuisine": { $exists: true },
+          type: { $eq: 'node' }
+        }
+      ]}
     })
     assert.deepEqual(f.derefSets(), [
       { type: 'node', filters: [ { key: 'amenity', op: 'has_key' }, { fun: 'bbox', value: { minlat: 1, minlon: 1, maxlat: 2, maxlon: 2 } }, { key: 'cuisine', op: 'has_key' } ] }
@@ -260,14 +277,19 @@ describe("Filter sets, compile", function () {
       $and: [{
         $or: [{
           "tags.amenity": { $exists: true },
-          }]
-        },
-        {
-          "tags.cuisine": { $exists: true },
-          type: { $eq: 'node' }
-        },
-      ]
-    })
+          $and: [{
+            maxlat: { '$gte': 1 },
+            maxlon: { '$gte': 1 },
+            minlat: { '$lte': 2 },
+            minlon: { '$lte': 2 }
+          }],
+        }]
+      },
+      {
+        "tags.cuisine": { $exists: true },
+        type: { $eq: 'node' }
+      },
+    ]})
     var r = f.cacheDescriptors()
     assert.deepEqual(r, [ { id: 'node["amenity"]["cuisine"](properties:17)', bounds: { type: 'Polygon', coordinates: [[[1,1],[2,1],[2,2],[1,2],[1,1]]] } } ])
   })
@@ -1918,6 +1940,13 @@ describe("Filter sets with relations, apply base filter", function () {
       query: 'nwr(46,16,47,17)->._base;nwr._base["amenity"];',
       loki: {
         $and: [{
+          $and: [{
+            maxlat: { '$gte': 46 },
+            maxlon: { '$gte': 16 },
+            minlat: { '$lte': 47 },
+            minlon: { '$lte': 17 }
+          }],
+        }, {
           "tags.amenity": { $exists: true }
         }],
         needMatch: true
@@ -1925,6 +1954,13 @@ describe("Filter sets with relations, apply base filter", function () {
     })
     assert.deepEqual(f.toLokijs(), {
       $and: [{
+        $and: [{
+          maxlat: { '$gte': 46 },
+          maxlon: { '$gte': 16 },
+          minlat: { '$lte': 47 },
+          minlon: { '$lte': 17 }
+        }],
+        }, {
         "tags.amenity": { $exists: true },
       }],
       needMatch: true
@@ -1974,10 +2010,24 @@ describe("Filter sets with relations, apply base filter", function () {
         loki: {
           $or: [{
             $and: [{
+              $and: [{
+                maxlat: { '$gte': 46 },
+                maxlon: { '$gte': 16 },
+                minlat: { '$lte': 47 },
+                minlon: { '$lte': 17 }
+              }],
+            }, {
               "tags.a": { $exists: true }
             }],
           }, {
             $and: [{
+              $and: [{
+                maxlat: { '$gte': 46 },
+                maxlon: { '$gte': 16 },
+                minlat: { '$lte': 47 },
+                minlon: { '$lte': 17 }
+              }],
+            }, {
               "tags.b": { $exists: true }
             }]
           }],
@@ -2045,7 +2095,16 @@ describe("Filter sets with relations, apply base filter", function () {
       recurse: [
         {
           inputSet: '_',
-          loki: { '$and': [ { type: { '$eq': 'way' } } ], needMatch: true },
+          loki: { '$and': [ {
+              $and: [{
+                maxlat: { '$gte': 46 },
+                maxlon: { '$gte': 16 },
+                minlat: { '$lte': 47 },
+                minlon: { '$lte': 17 }
+              }],
+            }, {
+            type: { '$eq': 'way' }
+          } ], needMatch: true },
           query: 'nwr(46,16,47,17)->._base;way._base;',
           type: 'bw'
         }

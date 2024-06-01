@@ -1846,7 +1846,16 @@ describe('Function "bbox"', function () {
     assert.deepEqual(f.def, [[{"fun":"bbox","value":{"minlon":40,"minlat":10.2,"maxlon":45,"maxlat":11}}]])
     assert.equal(f.toString(), 'nwr(10.2,40,11,45);')
     assert.equal(f.toQl(), 'nwr(10.2,40,11,45);')
-    assert.deepEqual(f.toLokijs(), { needMatch: true })
+    assert.deepEqual(f.toLokijs(), { needMatch: true,
+      $and: [
+        {
+          maxlat: { '$gte': 10.2 },
+          maxlon: { '$gte': 40 },
+          minlat: { '$lte': 11 },
+          minlon: { '$lte': 45 }
+        }
+      ]
+    })
 
     check(f, [])
 
@@ -1859,7 +1868,18 @@ describe('Function "bbox"', function () {
     assert.deepEqual(f.def, [[{"type":"node"},{"fun":"bbox","value":{"minlon":40,"minlat":10.2,"maxlon":45,"maxlat":11}}]])
     assert.equal(f.toString(), 'node(10.2,40,11,45);')
     assert.equal(f.toQl(), 'node(10.2,40,11,45);')
-    assert.deepEqual(f.toLokijs(), { type: { '$eq': 'node' }, needMatch: true })
+    assert.deepEqual(f.toLokijs(), {
+      type: { '$eq': 'node' },
+      needMatch: true,
+      $and: [
+        {
+          maxlat: { '$gte': 10.2 },
+          maxlon: { '$gte': 40 },
+          minlat: { '$lte': 11 },
+          minlon: { '$lte': 45 }
+        }
+      ]
+    })
 
     check(f, [])
 
@@ -1872,7 +1892,18 @@ describe('Function "bbox"', function () {
     assert.deepEqual(f.def, [[{"type":"node"},{"fun":"bbox","value":{"minlon":-40,"minlat":-10.2,"maxlon":45,"maxlat":11}}]])
     assert.equal(f.toString(), 'node(-10.2,-40,11,45);')
     assert.equal(f.toQl(), 'node(-10.2,-40,11,45);')
-    assert.deepEqual(f.toLokijs(), { type: { '$eq': 'node' }, needMatch: true })
+    assert.deepEqual(f.toLokijs(), {
+      type: { '$eq': 'node' },
+      needMatch: true,
+      $and: [
+        {
+          maxlat: { '$gte': -10.2 },
+          maxlon: { '$gte': -40 },
+          minlat: { '$lte': 11 },
+          minlon: { '$lte': 45 }
+        }
+      ]
+    })
 
     check(f, [])
 
