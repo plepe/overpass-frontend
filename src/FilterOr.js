@@ -125,10 +125,10 @@ class FilterOr extends FilterStatement {
 
   compileQuery (options = {}) {
     const result = {
-      query: this.toQl()
+      query: this.toQl(options)
     }
 
-    result.loki = this.toLokijs()
+    result.loki = this.toLokijs(options)
     delete result.loki.recurse
 
     return result

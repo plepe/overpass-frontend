@@ -917,7 +917,9 @@ class OverpassFrontend {
       db.find({ id: { $in: ids } })
     }
 
-    const query = statement.toLokijs()
+    const lokiOptions = {}
+
+    const query = statement.toLokijs(lokiOptions)
     const needMatch = !!query.needMatch
     delete query.needMatch
 

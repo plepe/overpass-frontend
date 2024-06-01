@@ -87,7 +87,7 @@ class FilterQuery extends FilterStatement {
         v = true
         // can't query for key regexp, skip
       } else if (filter instanceof qlFunction) {
-        const d = filter.compileLokiJS()
+        const d = filter.compileLokiJS(options)
         if (d.needMatch) {
           query.needMatch = true
         }
@@ -160,7 +160,7 @@ class FilterQuery extends FilterStatement {
         query = {
           $and: normalInputSets
             .map(([inputsSetKey, inputSet]) => {
-              const r = inputSet && inputSet.set ? inputSet.set.toLokijs() : { $not: true }
+              const r = inputSet && inputSet.set ? inputSet.set.toLokijs(options) : { $not: true }
               if (r.needMatch) {
                 needMatch = true
                 delete r.needMatch
