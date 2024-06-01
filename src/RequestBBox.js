@@ -5,7 +5,6 @@ const defines = require('./defines')
 const BBoxQueryCache = require('./BBoxQueryCache')
 const RequestBBoxMembers = require('./RequestBBoxMembers')
 const Filter = require('./Filter')
-const boundsToLokiQuery = require('./boundsToLokiQuery')
 const boundsIsFullWorld = require('./boundsIsFullWorld')
 const compileRecurseReverse = require('./compileRecurseReverse')
 

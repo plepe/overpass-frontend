@@ -102,7 +102,7 @@ class FilterRecurse extends FilterStatement {
       return []
     }
 
-    let r = this.inputSetRef._caches()
+    const r = this.inputSetRef._caches()
     let result = r.map(c => {
       c.recurseType = this.type
       if (['>'].includes(this.type)) {
@@ -126,7 +126,7 @@ class FilterRecurse extends FilterStatement {
       const inBetween = {
         filters: '',
         properties: OverpassFrontend.MEMBERS,
-        recurseType: this.type == '>' ? 'w' : 'br',
+        recurseType: this.type === '>' ? 'w' : 'br',
         recurse: [c]
       }
 
