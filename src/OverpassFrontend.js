@@ -112,6 +112,7 @@ class OverpassFrontend {
 
     const db = new LokiJS()
     this.db = db.addCollection('osm', { unique: ['id'] })
+    this.bboxQueryCache = new BBoxQueryCache(this)
 
     this.clearCache()
 
@@ -144,7 +145,7 @@ class OverpassFrontend {
     this.cacheElementsMemberOf = {}
     this.cacheTimestamp = timestamp()
     this.db.clear()
-    BBoxQueryCache.clear()
+    this.bboxQueryCache.clear()
 
     // Set default properties
     this.hasStretchLon180 = false
@@ -660,7 +661,7 @@ class OverpassFrontend {
     const cacheDescriptors = new Filter(query).cacheDescriptors()
 
     cacheDescriptors.forEach(id => {
-      BBoxQueryCache.get({ id }).clear()
+      this.bboxQueryCache.get({ id }).clear()
     })
   }
 

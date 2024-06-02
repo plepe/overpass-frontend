@@ -2,7 +2,6 @@ const BoundingBox = require('boundingbox')
 const Request = require('./Request')
 const overpassOutOptions = require('./overpassOutOptions')
 const defines = require('./defines')
-const BBoxQueryCache = require('./BBoxQueryCache')
 const RequestBBoxMembers = require('./RequestBBoxMembers')
 const Filter = require('./Filter')
 const boundsIsFullWorld = require('./boundsIsFullWorld')
@@ -65,7 +64,7 @@ class RequestBBox extends Request {
 
       this.cacheDescriptors = cacheFilter.cacheDescriptors().map(cacheDescriptors => {
         return {
-          cache: BBoxQueryCache.get(this.overpass, cacheDescriptors.id),
+          cache: this.overpass.bboxQueryCache.get(cacheDescriptors.id),
           cacheDescriptors
         }
       })
