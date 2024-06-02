@@ -3,11 +3,30 @@ const turf = require('./turf')
 
 const Filter = require('./Filter')
 
-const list = {}
-
 class BBoxQueryCache {
-  constructor (overpass, id) {
+  constructor (overpass) {
     this.overpass = overpass
+    this.list = {}
+  }
+
+  get (id) {
+    if (!(id in this.list)) {
+      this.list[id] = new BBoxQueryCacheItem(this, id)
+    }
+
+    return this.list[id]
+  }
+
+  clear () {
+    for (const k in this.list) {
+      delete this.list[k]
+    }
+  }
+}
+
+class BBoxQueryCacheItem {
+  constructor (main, id) {
+    this.main = main
     this.id = id
     this.filter = new Filter(id)
     this.area = null
@@ -51,7 +70,7 @@ class BBoxQueryCache {
 
       return types.every(type =>
         cacheDescriptors.ids.every(id =>
-          (type.substr(0, 1) + id) in this.overpass.cacheElements
+          (type.substr(0, 1) + id) in this.main.overpass.cacheElements
         )
       )
     }
@@ -71,7 +90,7 @@ class BBoxQueryCache {
     }
 
     // check if a superset matches
-    return Object.values(list).some(cache => {
+    return Object.values(this.main.list).some(cache => {
       if (cache.id === this.id) { return false }
 
       if (cache.filter.isSupersetOf(this.filter)) {
@@ -89,7 +108,7 @@ class BBoxQueryCache {
    */
   clear () {
     this.area = null
-    delete list[this.id]
+    delete this.main.list[this.id]
   }
 
   /**
@@ -99,21 +118,5 @@ class BBoxQueryCache {
     return this.area
   }
 }
-
-BBoxQueryCache.get = (overpass, id) => {
-  if (!(id in list)) {
-    list[id] = new BBoxQueryCache(overpass, id)
-  }
-
-  return list[id]
-}
-
-BBoxQueryCache.clear = () => {
-  for (const k in list) {
-    delete list[k]
-  }
-}
-
-BBoxQueryCache.list = list
 
 module.exports = BBoxQueryCache
