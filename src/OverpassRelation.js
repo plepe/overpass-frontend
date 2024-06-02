@@ -129,12 +129,20 @@ class OverpassRelation extends OverpassObject {
             data.lat = ob.geometry.lat
             data.lon = ob.geometry.lon
           }
+
+          if (data.lat === undefined) {
+            return undefined
+          }
         } else if (ob.type === 'way') {
           data.geometry = ob.geometry
+
+          if (!data.geometry || !data.geometry.length) {
+            return undefined
+          }
         }
 
         return data
-      })
+      }).filter(d => d)
     }]
 
     this.geometry = osmtogeojson({ elements })
