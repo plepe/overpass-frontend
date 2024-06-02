@@ -8,6 +8,15 @@ const FilterStatement = require('./FilterStatement')
 const qlQuoteString = require('./qlQuoteString')
 const andTypes = require('./andTypes')
 
+const reverseRecurse = {
+  'r': 'b', // bn or bw
+  'w': 'bn',
+  'bn': 'u', // r or w
+  'bw': 'r',
+  'br': 'r',
+}
+
+
 class FilterQuery extends FilterStatement {
   constructor (def, filter) {
     super(def, filter)
@@ -399,7 +408,7 @@ class FilterQuery extends FilterStatement {
   }
 
   _caches () {
-    let options = [{ filters: '', properties: 0 }]
+    let options = [{ filters: '', filtersRec: '', properties: 0 }]
 
     if (this.inputSets) {
       const recursingInputSets = Object.values(this.inputSets)
@@ -411,8 +420,11 @@ class FilterQuery extends FilterStatement {
           return
         }
 
+        const setId = '._' + inputSet.set.id
+
         const recurse = inputSet.set._caches()
         recurse.forEach(r => {
+          r.setId = setId
           r.properties |= ['r', 'w'].includes(inputSet.recurse) ? OverpassFrontend.MEMBERS : 0
           r.recurseType = inputSet.recurse
           if (inputSet.role) {
@@ -425,7 +437,8 @@ class FilterQuery extends FilterStatement {
         _options.forEach(o => {
           recurse.forEach(r => {
             options.push({
-              filters: '',
+              filters: o.filters + '(' + inputSet.recurse + setId + ('role' in inputSet ? ':' + qlQuoteString(inputSet.role) : '') + ')',
+              filtersRec: o.filtersRec + '(' + reverseRecurse[inputSet.recurse] + setId + ('role' in inputSet ? ':' + qlQuoteString(inputSet.role) : '') + ')',
               properties: ['bn', 'bw', 'br'].includes(this.type) ? OverpassFrontend.MEMBERS : 0,
               recurse: o.recurse ? o.recurse.concat([r]) : [r]
             })
@@ -444,6 +457,7 @@ class FilterQuery extends FilterStatement {
       if (part.op) {
         options = options.map(o => {
           o.filters += compileFilter(part)
+          o.filtersRec += compileFilter(part)
           o.properties |= OverpassFrontend.TAGS
           return o
         })

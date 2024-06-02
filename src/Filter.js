@@ -573,16 +573,52 @@ class Filter {
 }
 
 function compileCacheDescriptors (result) {
-  result.forEach(entry => {
+  result = _compileCacheDescriptors(result)
+  _compileCacheDescriptorsRecurses(result)
+
+  //console.log(JSON.stringify(result, null, '  '))
+  return result
+}
+
+function _compileCacheDescriptors (result) {
+  return result.map(entry => {
+    let recurse = []
     if (entry.recurse) {
-      compileCacheDescriptors(entry.recurse)
+      recurse = _compileCacheDescriptors(entry.recurse)
     }
 
-    entry.id = (entry.type || 'nwr') + entry.filters + '(properties:' + entry.properties + ')'
+    entry.id = recurse
+      .map(r => {
+        return r.id + '->' + r.setId + ';'
+      })
+      .join(';') +
+      (entry.type || 'nwr') + entry.filters + '(properties:' + entry.properties + ')'
+
     delete entry.type
     delete entry.filters
     delete entry.properties
+
+    return entry
   })
 }
+
+function _compileCacheDescriptorsRecurses (result) {
+  result.forEach(entry => {
+    if (entry.recurse) {
+      entry.recurse.forEach(r => {
+        r.id = entry.id + '->' + r.setId + ';' + (entry.type || 'nwr') + entry.filtersRec
+
+        _compileCacheDescriptorsRecurses([r])
+      })
+    }
+
+    delete entry.type
+    delete entry.filters
+    delete entry.filtersRec
+    delete entry.properties
+    delete entry.setId
+  })
+}
+
 
 module.exports = Filter

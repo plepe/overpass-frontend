@@ -102,15 +102,18 @@ class FilterRecurse extends FilterStatement {
       return []
     }
 
+    const setId = '._' + this.inputSetRef.id
     const r = this.inputSetRef._caches()
     let result = r.map(c => {
       c.recurseType = this.type
+      c.setId = setId
       if (['>'].includes(this.type)) {
         c.properties |= OverpassFrontend.MEMBERS
       }
 
       return {
-        filters: '',
+        filters: '(' + this.type + setId + ')',
+        filtersRec: '(' + (this.type === '<' ? 'r_w' : 'b') + setId + ')' + c.filtersRec,
         properties: ['<'].includes(this.type) ? OverpassFrontend.MEMBERS : 0,
         recurse: [c]
       }
@@ -123,16 +126,22 @@ class FilterRecurse extends FilterStatement {
         c.properties |= OverpassFrontend.MEMBERS
       }
 
+      const setIdInBetween = '._' + this.inputSetRef.id + 'A'
+      const recurseType = this.type === '>' ? 'w' : 'br'
+      const recurseRecType = this.type === '>' ? 'bn' : 'r_w'
       const inBetween = {
-        filters: '',
+        setId: setIdInBetween,
+        filters: '(' + recurseType + setId + ')',
+        filtersRec: '(' + recurseRecType + setId + ')' + c.filtersRec,
         properties: OverpassFrontend.MEMBERS,
-        recurseType: this.type === '>' ? 'w' : 'br',
+        recurseType,
         recurse: [c]
       }
 
       return {
         type: this.type === '>' ? 'node' : 'relation',
-        filters: '',
+        filters: '(' + recurseType + setIdInBetween + ')',
+        filtersRec: '(' + recurseType + setIdInBetween + ')',
         properties: ['<'].includes(this.type) ? OverpassFrontend.MEMBERS : 0,
         recurse: [inBetween]
       }
