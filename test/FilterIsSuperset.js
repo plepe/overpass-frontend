@@ -640,6 +640,14 @@ describe("Filters - test isSupersetOf", function () {
     assert.equal(f2.isSupersetOf(f1), true, f2.toString() + " should be a super set of " + f1.toString())
   })
 
+  it("relation->.r2;node(r.r2); - relation;node(r);", function () {
+    const f1 = new Filter("relation->.r2;node(r.r2);")
+    const f2 = new Filter("relation;node(r);")
+
+    assert.equal(f1.isSupersetOf(f2), true, f1.toString() + " should be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), true, f2.toString() + " should be a super set of " + f1.toString())
+  })
+
   /** TODO
   it("node - nwr(if:type()=='node')", function () {
     const f1 = new Filter("node")
