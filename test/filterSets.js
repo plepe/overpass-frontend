@@ -2209,6 +2209,32 @@ describe("Filter sets with relations, apply base filter", function () {
           }]
         }, done)
       })
+      it('nodes of ways of relations', function (done) {
+        overpassFrontend.clearCache()
+        test({
+          mode,
+          query: 'relation["route"="bus"];way(r);node(w);',
+          bounds: {
+            minlat: 48.19821,
+            minlon: 16.33835,
+            maxlat: 48.19827,
+            maxlon: 16.33841
+          },
+          expected: [ 'n1001523589', 'n1198288962', 'n17322841', 'n1871276164', 'n1881459157', 'n1941351811', 'n2061395859', 'n2208875391', 'n2213568001', 'n2443294047', 'n252548482', 'n270328331', 'n277976046', 'n277976134', 'n298955272', 'n3037431653', 'n3037431688', 'n316634879', 'n347982837', 'n3592094592', 'n3765072046', 'n3767244949', 'n3767266723', 'n378459', 'n378462', 'n378463', 'n378464', 'n394761', 'n395262', 'n451666739', 'n46918704', 'n46918737', 'n46918752', 'n60586287', 'n69232202', 'n83517944', 'n83519448', 'n93279422', 'n93279423', 'n93279643', 'n93279646' ],
+          expectedSubRequestCount: 1,
+          expectedCacheDescriptors: [{
+            id: 'node(properties:0)',
+            recurse: [{
+              id: 'way(properties:4)',
+              recurseType: 'w',
+              recurse: [{
+                id: 'relation["route"="bus"](properties:5)',
+                recurseType: 'r'
+              }]
+            }]
+          }]
+        }, done)
+      })
       it('nodes of highway and railway ways', function (done) {
         overpassFrontend.clearCache()
         test({
