@@ -896,9 +896,11 @@ class OverpassFrontend {
               throw new Error('invalid recurse type', query)
           }
 
-          other.forEach(id => {
-            queryIds[id] = true
-          })
+          if (other) {
+            other.forEach(id => {
+              queryIds[id] = true
+            })
+          }
         })
 
         Object.keys(queryIds).forEach(id => {
