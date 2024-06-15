@@ -2462,6 +2462,52 @@ describe("Filter sets with relations, apply base filter", function () {
           }]
         }, done)
       })
+
+      it('route members', function (done) {
+        overpassFrontend.clearCache()
+        test({
+          mode,
+          query: 'relation["route"="bus"];way(r)["highway"="secondary"];',
+          bounds: {
+            minlat: 48.19798,
+            minlon: 16.33788,
+            maxlat: 48.19880,
+            maxlon: 16.33933
+          },
+          expected: [ "w31275228", "w4583442" ],
+          expectedSubRequestCount: 1,
+          expectedCacheDescriptors: [{
+            id: 'way["highway"="secondary"](properties:1)',
+            recurse: [{
+              id: 'relation["route"="bus"](properties:5)',
+              recurseType: 'r'
+            }]
+          }]
+        }, (err) => {
+          console.log(overpassFrontend.bboxQueryCache.list)
+          done()
+        })
+      })
+
+      it('highways (partly cached from test before)', function (done) {
+        test({
+          mode,
+          query: 'way["highway"="secondary"];',
+          bounds: {
+            minlat: 48.19798,
+            minlon: 16.33788,
+            maxlat: 48.19880,
+            maxlon: 16.33933
+          },
+          expected: [ "w272668388", "w38279773", "w4583259", "w4583442" ],
+          expectedSubRequestCount: 1,
+          expectedSubRequestCount2nd: 1, // TODO: this should be 0
+          expectedCacheDescriptors: [{
+            id: 'way["highway"="secondary"](properties:1)',
+          }]
+        }, done)
+      })
+
 /*    TODO: cache descriptors creates bug
       it('or1', function (done) {
         test({
