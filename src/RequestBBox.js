@@ -6,6 +6,7 @@ const RequestBBoxMembers = require('./RequestBBoxMembers')
 const Filter = require('./Filter')
 const boundsIsFullWorld = require('./boundsIsFullWorld')
 const compileRecurseReverse = require('./compileRecurseReverse')
+const compileRecurseFilter = require('./compileRecurseFilter')
 
 /**
  * A BBox request
@@ -222,6 +223,7 @@ class RequestBBox extends Request {
       request: this,
       parts: [
         {
+          filter: this.lokiQuery,
           statementId: resultSetId,
           properties: this.options.properties,
           receiveObject: this.receiveObject.bind(this),
@@ -237,6 +239,7 @@ class RequestBBox extends Request {
     }
 
     const script = this.lokiQuery.getScript()
+    let filter = this.lokiQuery.toQl({ setsUseStatementIds: true })
     const reverseParts = {}
     script.reverse().forEach(e => {
       e.recurse.forEach(r => {
@@ -262,8 +265,10 @@ class RequestBBox extends Request {
           .join('') + ');\n' +
         'out ' + overpassOutOptions(options) + ';'
 
+      const statementId = this.lokiQuery.getStatement().id
       subRequest.parts.push({
         statementId: rid,
+        filter: new Filter(filter + compileRecurseFilter(script, statementId, rid) + 'nwr._rev' + statementId + '_' + rid),
         properties: options.properties,
         receiveObject: this.receiveRevObject.bind(this)
       })
