@@ -575,6 +575,7 @@ class Filter {
 function compileCacheDescriptors (result) {
   result = _compileCacheDescriptors(result)
   _compileCacheDescriptorsRecurses(result)
+  _compileCacheDescriptorsClearProperties(result)
 
   //console.log(JSON.stringify(result, null, '  '))
   return result
@@ -594,10 +595,6 @@ function _compileCacheDescriptors (result) {
       .join(';') +
       (entry.type || 'nwr') + entry.filters + '(properties:' + entry.properties + ')'
 
-    delete entry.type
-    delete entry.filters
-    delete entry.properties
-
     return entry
   })
 }
@@ -606,9 +603,20 @@ function _compileCacheDescriptorsRecurses (result) {
   result.forEach(entry => {
     if (entry.recurse) {
       entry.recurse.forEach(r => {
-        r.id = entry.id + '->' + r.setId + ';' + (entry.type || 'nwr') + entry.filtersRec
+        r.id = entry.id + '->' + r.setId + ';' +
+          (r.type || 'nwr') + r.filters + entry.filtersRec + '(properties:' + r.properties + ')'
 
         _compileCacheDescriptorsRecurses([r])
+      })
+    }
+  })
+}
+
+function _compileCacheDescriptorsClearProperties (result) {
+  result.forEach(entry => {
+    if (entry.recurse) {
+      entry.recurse.forEach(r => {
+        _compileCacheDescriptorsClearProperties([r])
       })
     }
 
