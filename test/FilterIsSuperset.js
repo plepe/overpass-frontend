@@ -648,6 +648,46 @@ describe("Filters - test isSupersetOf", function () {
     assert.equal(f2.isSupersetOf(f1), true, f2.toString() + " should be a super set of " + f1.toString())
   })
 
+  it('nwr["amenity"](properties:5)->._1;node(w._1)(properties:0) - node;', function () {
+    const f1 = new Filter('nwr["amenity"](properties:5)->._1;node(w._1)(properties:0)')
+    const f2 = new Filter("node")
+
+    assert.equal(f1.isSupersetOf(f2), false, f1.toString() + " should not be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), true, f2.toString() + " should be a super set of " + f1.toString())
+  })
+
+  it('nwr["amenity"](properties:5)->._1;node(w._1)(properties:0);nwr["amenity"](bn._1)(properties:5) - nwr["amenity"](properties:5);', function () {
+    const f1 = new Filter('nwr["amenity"](properties:5)->._1;node(w._1)(properties:0);nwr["amenity"](bn._1)(properties:5)')
+    const f2 = new Filter('nwr["amenity"](properties:5)')
+
+    assert.equal(f1.isSupersetOf(f2), false, f1.toString() + " should not be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), true, f2.toString() + " should be a super set of " + f1.toString())
+  })
+
+  it('nwr["amenity"](properties:5)->._1;node(w._1)(properties:0);nwr["amenity"](bn._1)(properties:5) - nwr["amenity"](properties:1);', function () {
+    const f1 = new Filter('nwr["amenity"](properties:5)->._1;node(w._1)(properties:0);nwr["amenity"](bn._1)(properties:5)')
+    const f2 = new Filter('nwr["amenity"](properties:1)')
+
+    assert.equal(f1.isSupersetOf(f2), false, f1.toString() + " should not be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should not be a super set of " + f1.toString())
+  })
+
+  it('nwr["amenity"](properties:5)->._1;node(w._1)(properties:0);nwr["amenity"](bn._1)(properties:5) - node(properties:0);nwr["amenity"](bn._1)(properties:5);', function () {
+    const f1 = new Filter('nwr["amenity"](properties:5)->._1;node(w._1)(properties:0)->._1;nwr["amenity"](bn._1)(properties:5)')
+    const f2 = new Filter('node(properties:0)->._1;nwr["amenity"](bn._1)(properties:5)')
+
+    assert.equal(f1.isSupersetOf(f2), false, f1.toString() + " should not be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), true, f2.toString() + " should be a super set of " + f1.toString())
+  })
+
+  it('nwr["amenity"](properties:5)->._1;node(w._1)(properties:0);nwr["amenity"](bn._1)(properties:5) - node["x"](w._1)(properties:0);nwr["amenity"](properties:5);', function () {
+    const f1 = new Filter('nwr["amenity"](properties:5)->._1;node(w._1)(properties:0)->._1;nwr["amenity"](bn._1)(properties:5)')
+    const f2 = new Filter('node["x"](properties:0)->._1;nwr["amenity"](bn._1)(properties:5)')
+
+    assert.equal(f1.isSupersetOf(f2), false, f1.toString() + " should not be a super set of " + f2.toString())
+    assert.equal(f2.isSupersetOf(f1), false, f2.toString() + " should not be a super set of " + f1.toString())
+  })
+
   /** TODO
   it("node - nwr(if:type()=='node')", function () {
     const f1 = new Filter("node")

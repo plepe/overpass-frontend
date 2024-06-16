@@ -102,6 +102,7 @@ class FilterRecurse extends FilterStatement {
       return []
     }
 
+    // direct decendants
     const setId = '._' + this.inputSetRef.id
     const r = this.inputSetRef._caches()
     let result = r.map(c => {
@@ -119,6 +120,7 @@ class FilterRecurse extends FilterStatement {
       }
     })
 
+    // 2nd level decendants
     result = result.concat(r.map(c => {
       c = { ...c }
       c.recurseType = this.type
@@ -127,17 +129,19 @@ class FilterRecurse extends FilterStatement {
       }
 
       const setIdInBetween = '._' + this.inputSetRef.id + 'A'
-      const recurseType = this.type === '>' ? 'w' : 'br'
-      const recurseRecType = this.type === '>' ? 'bn' : 'r_w'
+      let recurseRecType = this.type === '>' ? 'bn' : 'r_w'
       const inBetween = {
+        type: 'way',
         setId: setIdInBetween,
-        filters: '(' + recurseType + setId + ')',
+        filters: '(' + this.type + setId + ')',
         filtersRec: '(' + recurseRecType + setId + ')' + c.filtersRec,
         properties: OverpassFrontend.MEMBERS,
-        recurseType,
+        recurseType: this.type,
         recurse: [c]
       }
 
+      const recurseType = this.type === '>' ? 'w' : 'br'
+      recurseRecType = this.type === '>' ? 'bn' : 'r_w'
       return {
         type: this.type === '>' ? 'node' : 'relation',
         filters: '(' + recurseType + setIdInBetween + ')',
