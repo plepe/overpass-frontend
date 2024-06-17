@@ -10,7 +10,7 @@ module.exports = function cacheMerge (a, b) {
 
   if (b.type) {
     if (a.type && a.type !== b.type) {
-      r.type = '-'
+      return
     } else {
       r.type = b.type
     }

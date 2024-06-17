@@ -127,7 +127,10 @@ class FilterAnd extends FilterStatement {
 
       r.forEach(r1 => {
         current.forEach(c => {
-          result.push(cacheMerge(c, r1))
+          const r = cacheMerge(c, r1)
+          if (r) {
+            result.push(r)
+          }
         })
       })
 

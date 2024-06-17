@@ -40,6 +40,74 @@ describe("Filter sets, compile", function () {
     var r = f.cacheDescriptors()
     assert.deepEqual(r, [ { id: 'nwr["amenity"](properties:1)' }])
   })
+  it ('node[amenity];way._;', function () {
+    var f = new Filter('node[amenity];way._;')
+
+    assert.deepEqual(f.def, [
+      [
+        {"type":"node"},
+        {"op":"has_key","key":"amenity"},
+      ], [
+        {"type":"way"},
+        {"inputSet": "_"}
+      ]
+    ])
+    assert.equal(f.toString(), 'node["amenity"];way._;')
+    assert.equal(f.toQl(), 'node["amenity"];way._;')
+    assert.equal(f.toQl({ setsUseStatementIds: true }), 'node["amenity"]->._1;way._1->._2;')
+    assert.equal(f.toQuery(), 'node["amenity"]->._1;way._1->._2;')
+    assert.equal(f.toQuery({ set: 'a' }), null)
+    assert.deepEqual(f.getScript(), [{
+      id: 2, recurse: []
+    }])
+    assert.deepEqual(f.getScript({ set: 'a' }), [])
+    assert.deepEqual(f.recurse(), [])
+    assert.deepEqual(f.recurse({ set: 'a' }), [])
+    assert.deepEqual(f.compileQuery(), {
+      query: 'node["amenity"];way._;',
+      loki: {
+        '$and': [
+          {
+            'tags.amenity': {
+              '$exists': true
+            },
+            type: {
+              '$eq': 'node'
+            }
+          },
+          {
+            type: {
+              '$eq': 'way'
+            }
+          }
+        ]
+      }
+    })
+    assert.deepEqual(f.toLokijs(), {
+        '$and': [
+          {
+            'tags.amenity': {
+              '$exists': true
+            },
+            type: {
+              '$eq': 'node'
+            }
+          },
+          {
+            type: {
+              '$eq': 'way'
+            }
+          }
+        ]
+    })
+    assert.deepEqual(f.derefSets(), [
+    ])
+    assert.deepEqual(f.toLokijs({set: 'a'}), {
+      $not: true
+    })
+    var r = f.cacheDescriptors()
+    assert.deepEqual(r, [])
+  })
   it ('nwr[amenity]->.a;', function () {
     var f = new Filter('nwr[amenity]->.a;')
 
@@ -926,6 +994,324 @@ describe("Filter sets with relations, compile", function () {
           recurse: [
             { id: 'relation["amenity"](properties:5)->._1;way(r._1)(properties:4)->._1;node(w._1)(properties:0)->._1;way(bn._1)(properties:4)->._1;relation["amenity"](bw._1)(properties:5)' }
           ]
+        }]
+      }
+    ])
+  })
+  it ('nwr[amenity];<;', function () {
+    var f = new Filter('nwr[amenity];<;')
+
+    assert.deepEqual(f.def, [
+      [
+        {"op":"has_key","key":"amenity"}
+      ],
+      {"recurse":"<"}
+    ])
+    assert.equal(f.toString(), 'nwr["amenity"];<;')
+    assert.equal(f.toQl(), 'nwr["amenity"];<;')
+    assert.equal(f.toQl({ setsUseStatementIds: true }), 'nwr["amenity"]->._1;._1 < ->._2;')
+    assert.equal(f.toQuery(), '._1 < ->._2;')
+    assert.equal(f.toQuery({ statement: 1 }), 'nwr["amenity"]->._1;')
+    assert.deepEqual(f.recurse(), [
+      { id: 1, type: '<' }
+    ])
+    assert.deepEqual(f.recurse({ statement: 1 }), [])
+    assert.deepEqual(f.getScript(), [
+      { id: 1, recurse: [] },
+      { id: 2, recurse: [
+        { id: 1, type: '<' }
+      ]}
+    ])
+    assert.deepEqual(f.compileQuery(), {
+      query: '<;',
+      loki: {},
+      recurse: [{
+        type: '<',
+        inputSet: '_',
+        query: 'nwr["amenity"];',
+        loki: {
+          "tags.amenity": { $exists: true }
+        }
+      }]
+    })
+    assert.deepEqual(f.toLokijs(), {})
+    assert.deepEqual(f.derefSets(), [
+      { type: 'nwr', filters: [], recurse:
+        [
+          { recurseType: '<', type: 'nwr', filters: [ { key: 'amenity', op: 'has_key' } ] }
+        ]
+      }
+    ])
+    var r = f.cacheDescriptors()
+    assert.deepEqual(r, [
+      {
+        id: 'node["amenity"](properties:1)->._1;way(bn._1)(properties:4)',
+        recurse: [{
+          id: 'node["amenity"](properties:1)->._1;way(bn._1)(properties:4)->._1;node["amenity"](w._1)(properties:1)'
+        }]
+      },
+      {
+        id: 'node["amenity"](properties:1)->._1;relation(bn._1)(properties:4)',
+        recurse: [{
+          id: 'node["amenity"](properties:1)->._1;relation(bn._1)(properties:4)->._1;node["amenity"](r._1)(properties:1)'
+        }]
+      },
+      {
+        id: 'way["amenity"](properties:1)->._1;relation(bw._1)(properties:4)',
+        recurse: [{
+          id: 'way["amenity"](properties:1)->._1;relation(bw._1)(properties:4)->._1;way["amenity"](r._1)(properties:1)'
+        }]
+      },
+      {
+        id: 'node["amenity"](properties:1)->._1;way(bn._1)(properties:4)->._1;relation(bw._1)(properties:4)',
+        recurse: [{
+          id: 'node["amenity"](properties:1)->._1;way(bn._1)(properties:4)->._1;relation(bw._1)(properties:4)->._1;way(r._1)(properties:4)',
+          recurse: [{
+            id: 'node["amenity"](properties:1)->._1;way(bn._1)(properties:4)->._1;relation(bw._1)(properties:4)->._1;way(r._1)(properties:4)->._1;node["amenity"](w._1)(properties:1)'
+          }]
+        }]
+      }
+    ])
+  })
+  it ('nwr[amenity];>;node._[highway]', function () {
+    var f = new Filter('nwr[amenity];>;node._[highway]')
+
+    assert.deepEqual(f.def, [
+      [
+        {"op":"has_key","key":"amenity"}
+      ],
+      {"recurse":">"},
+      [
+        {type: 'node'},
+        {inputSet: '_'},
+        {key:'highway',op:'has_key'}
+      ]
+    ])
+    assert.equal(f.toString(), 'nwr["amenity"];>;node._["highway"];')
+    assert.equal(f.toQl(), 'nwr["amenity"];>;node._["highway"];')
+    assert.equal(f.toQl({ setsUseStatementIds: true }), 'nwr["amenity"]->._1;._1 > ->._2;node._2["highway"]->._3;')
+    assert.equal(f.toQuery(), '._1 > ->._2;node._2["highway"]->._3;')
+    assert.equal(f.toQuery({ statement: 1 }), 'nwr["amenity"]->._1;')
+    assert.deepEqual(f.recurse(), [
+      { id: 1, type: '>' }
+    ])
+    assert.deepEqual(f.recurse({ statement: 1 }), [])
+    assert.deepEqual(f.getScript(), [
+      { id: 1, recurse: [] },
+      { id: 3, recurse: [
+        { id: 1, type: '>' }
+      ]}
+    ])
+    assert.deepEqual(f.compileQuery(), {
+      query: '>;node._["highway"];',
+      loki: {
+        $and: [{
+          'tags.highway': {$exists:true},
+          'type': {$eq: 'node'}
+        }]
+      },
+      recurse: [{
+        type: '>',
+        inputSet: '_',
+        query: 'nwr["amenity"];',
+        loki: {
+          "tags.amenity": { $exists: true }
+        }
+      }]
+    })
+    assert.deepEqual(f.toLokijs(), {
+      $and: [{
+        'tags.highway': {$exists:true},
+        'type': {$eq: 'node'}
+      }]
+    })
+    assert.deepEqual(f.derefSets(), [
+      { type: 'node', filters: [{key: 'highway', op: 'has_key'}], recurse:
+        [
+          { recurseType: '>', type: 'nwr', filters: [ { key: 'amenity', op: 'has_key' } ] }
+        ]
+      }
+    ])
+    var r = f.cacheDescriptors()
+    assert.deepEqual(r, [
+      {
+        id: 'way["amenity"](properties:5)->._1;node["highway"](w._1)(properties:1)',
+        recurse: [{
+          id: 'way["amenity"](properties:5)->._1;node["highway"](w._1)(properties:1)->._1;way["amenity"](bn._1)(properties:5)'
+        }]
+      },
+      {
+        id: 'relation["amenity"](properties:5)->._1;node["highway"](r._1)(properties:1)',
+        recurse: [{
+          id: 'relation["amenity"](properties:5)->._1;node["highway"](r._1)(properties:1)->._1;relation["amenity"](bn._1)(properties:5)'
+        }]
+      },
+      {
+        id: 'relation["amenity"](properties:5)->._1;way(r._1)(properties:4)->._1;node["highway"](w._1)(properties:1)',
+        recurse: [{
+          id: 'relation["amenity"](properties:5)->._1;way(r._1)(properties:4)->._1;node["highway"](w._1)(properties:1)->._1;way(bn._1)(properties:4)',
+          recurse: [{
+            id: 'relation["amenity"](properties:5)->._1;way(r._1)(properties:4)->._1;node["highway"](w._1)(properties:1)->._1;way(bn._1)(properties:4)->._1;relation["amenity"](bw._1)(properties:5)'
+          }]
+        }]
+      }
+    ])
+  })
+  it ('node[amenity];<;relation._[highway]', function () {
+    var f = new Filter('node[amenity];<;relation._[highway]')
+
+    assert.deepEqual(f.def, [
+      [
+        {"type":"node"},
+        {"op":"has_key","key":"amenity"}
+      ],
+      {"recurse":"<"},
+      [
+        {"type":"relation"},
+        {"inputSet":"_"},
+        {"key":"highway","op":"has_key"}
+      ]
+    ])
+    assert.equal(f.toString(), 'node["amenity"];<;relation._["highway"];')
+    assert.equal(f.toQl(), 'node["amenity"];<;relation._["highway"];')
+    assert.equal(f.toQl({ setsUseStatementIds: true }), 'node["amenity"]->._1;._1 < ->._2;relation._2["highway"]->._3;')
+    assert.equal(f.toQuery(), '._1 < ->._2;relation._2["highway"]->._3;')
+    assert.equal(f.toQuery({ statement: 1 }), 'node["amenity"]->._1;')
+    assert.deepEqual(f.recurse(), [
+      { id: 1, type: '<' }
+    ])
+    assert.deepEqual(f.recurse({ statement: 1 }), [])
+    assert.deepEqual(f.getScript(), [
+      { id: 1, recurse: [] },
+      { id: 3, recurse: [
+        { id: 1, type: '<' }
+      ]}
+    ])
+    assert.deepEqual(f.compileQuery(), {
+      query: '<;relation._["highway"];',
+      loki: {
+        $and: [
+          {
+            'tags.highway': { $exists: true },
+            type: { $eq: 'relation' }
+          }
+        ]
+      },
+      recurse: [{
+        type: '<',
+        inputSet: '_',
+        query: 'node["amenity"];',
+        loki: {
+          "tags.amenity": { $exists: true },
+          "type": { $eq: 'node' }
+        }
+      }]
+    })
+    assert.deepEqual(f.toLokijs(), {
+      $and: [
+        {
+          'tags.highway': { $exists: true },
+          type: { $eq: 'relation' }
+        }
+      ]
+    })
+    assert.deepEqual(f.derefSets(), [
+      { type: 'relation', filters: [{ key: 'highway', op: 'has_key' }], recurse:
+        [
+          { recurseType: '<', type: 'node', filters: [ { key: 'amenity', op: 'has_key' } ] }
+        ]
+      }
+    ])
+    var r = f.cacheDescriptors()
+    assert.deepEqual(r, [
+      {
+        id: 'node["amenity"](properties:1)->._1;relation["highway"](bn._1)(properties:5)',
+        recurse: [{
+          id: 'node["amenity"](properties:1)->._1;relation["highway"](bn._1)(properties:5)->._1;node["amenity"](r._1)(properties:1)'
+        }]
+      },
+      {
+        id: 'node["amenity"](properties:1)->._1;way(bn._1)(properties:4)->._1;relation["highway"](bw._1)(properties:5)',
+        recurse: [{
+          id: 'node["amenity"](properties:1)->._1;way(bn._1)(properties:4)->._1;relation["highway"](bw._1)(properties:5)->._1;way(r._1)(properties:4)',
+          recurse: [{
+            id: 'node["amenity"](properties:1)->._1;way(bn._1)(properties:4)->._1;relation["highway"](bw._1)(properties:5)->._1;way(r._1)(properties:4)->._1;node["amenity"](w._1)(properties:1)'
+          }]
+        }]
+      }
+    ])
+  })
+  it ('node[amenity];<;way._[highway]', function () {
+    var f = new Filter('node[amenity];<;way._[highway]')
+
+    assert.deepEqual(f.def, [
+      [
+        {"type":"node"},
+        {"op":"has_key","key":"amenity"}
+      ],
+      {"recurse":"<"},
+      [
+        {"type":"way"},
+        {"inputSet":"_"},
+        {"key":"highway","op":"has_key"}
+      ]
+    ])
+    assert.equal(f.toString(), 'node["amenity"];<;way._["highway"];')
+    assert.equal(f.toQl(), 'node["amenity"];<;way._["highway"];')
+    assert.equal(f.toQl({ setsUseStatementIds: true }), 'node["amenity"]->._1;._1 < ->._2;way._2["highway"]->._3;')
+    assert.equal(f.toQuery(), '._1 < ->._2;way._2["highway"]->._3;')
+    assert.equal(f.toQuery({ statement: 1 }), 'node["amenity"]->._1;')
+    assert.deepEqual(f.recurse(), [
+      { id: 1, type: '<' }
+    ])
+    assert.deepEqual(f.recurse({ statement: 1 }), [])
+    assert.deepEqual(f.getScript(), [
+      { id: 1, recurse: [] },
+      { id: 3, recurse: [
+        { id: 1, type: '<' }
+      ]}
+    ])
+    assert.deepEqual(f.compileQuery(), {
+      query: '<;way._["highway"];',
+      loki: {
+        $and: [
+          {
+            'tags.highway': { $exists: true },
+            type: { $eq: 'way' }
+          }
+        ]
+      },
+      recurse: [{
+        type: '<',
+        inputSet: '_',
+        query: 'node["amenity"];',
+        loki: {
+          "tags.amenity": { $exists: true },
+          "type": { $eq: 'node' }
+        }
+      }]
+    })
+    assert.deepEqual(f.toLokijs(), {
+      $and: [
+        {
+          'tags.highway': { $exists: true },
+          type: { $eq: 'way' }
+        }
+      ]
+    })
+    assert.deepEqual(f.derefSets(), [
+      { type: 'way', filters: [{ key: 'highway', op: 'has_key' }], recurse:
+        [
+          { recurseType: '<', type: 'node', filters: [ { key: 'amenity', op: 'has_key' } ] }
+        ]
+      }
+    ])
+    var r = f.cacheDescriptors()
+    assert.deepEqual(r, [
+      {
+        id: 'node["amenity"](properties:1)->._1;way["highway"](bn._1)(properties:5)',
+        recurse: [{
+          id: 'node["amenity"](properties:1)->._1;way["highway"](bn._1)(properties:5)->._1;node["amenity"](w._1)(properties:1)'
         }]
       }
     ])
@@ -2689,7 +3075,6 @@ describe("Filter sets with relations, apply base filter", function () {
       })
 
       it('recurse up, relation only', function (done) {
-        return done() // TODO
         overpassFrontend.clearCache()
         test({
           mode,
@@ -2703,23 +3088,23 @@ describe("Filter sets with relations, apply base filter", function () {
           expected: [ 'r1306478', 'r1530340', 'r1980077', 'r207109', 'r207110', 'r3636229', 'r3967946', 'r5275276' ],
           noRecurse: true, // TODO: to make caching for 'recurse up' work, we have to load intermediate ways too.
           expectedSubRequestCount: 1,
-          expectedCacheDescriptors: [{
-            "id": 'relation(properties:4)',
-            recurse: [{
-              id: 'node["highway"](properties:1)',
-              recurseType: '<'
-            }]
-          }, {
-            id: 'relation(properties:4)',
-            recurse: [{
-              id: 'nwr(properties:4)',
+          expectedCacheDescriptors: [
+            {
+              id: 'node["highway"](properties:1)->._1;relation(bn._1)(properties:4)',
               recurse: [{
-                id: 'node["highway"](properties:1)',
-                recurseType: '<'
-              }],
-              recurseType: 'br'
-            }]
-          }]
+                id: 'node["highway"](properties:1)->._1;relation(bn._1)(properties:4)->._1;node["highway"](r._1)(properties:1)'
+              }]
+            },
+            {
+              id: 'node["highway"](properties:1)->._1;way(bn._1)(properties:4)->._1;relation(bw._1)(properties:4)',
+              recurse: [{
+                id: 'node["highway"](properties:1)->._1;way(bn._1)(properties:4)->._1;relation(bw._1)(properties:4)->._1;way(r._1)(properties:4)',
+                recurse: [{
+                  id: 'node["highway"](properties:1)->._1;way(bn._1)(properties:4)->._1;relation(bw._1)(properties:4)->._1;way(r._1)(properties:4)->._1;node["highway"](w._1)(properties:1)'
+                }]
+              }]
+            }
+          ]
         }, done)
       })
 

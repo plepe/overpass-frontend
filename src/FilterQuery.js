@@ -483,7 +483,10 @@ class FilterQuery extends FilterStatement {
         const result = []
         set._caches().forEach(a => {
           options.forEach(b => {
-            result.push(cacheMerge(a, b))
+            const r = cacheMerge(a, b)
+            if (r) {
+              result.push(r)
+            }
           })
         })
 
@@ -493,7 +496,10 @@ class FilterQuery extends FilterStatement {
       const result = []
       this.filter.baseFilter._caches().forEach(a => {
         options.forEach(b => {
-          result.push(cacheMerge(a, b))
+          const r = cacheMerge(a, b)
+          if (r) {
+            result.push(r)
+          }
         })
       })
 
