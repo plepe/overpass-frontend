@@ -1,6 +1,48 @@
 const filterPart = require('./filterPart')
 const OverpassFrontend = require('./defines')
 const FilterStatement = require('./FilterStatement')
+const andTypes = require('./andTypes')
+
+const cachesMapTypes = {
+  '>': [
+    [
+      { type: 'way', properties: OverpassFrontend.MEMBERS },
+      { type: 'node', recurseType: 'w', recurseRecType: 'bn' },
+    ],
+    [
+      { type: 'relation', properties: OverpassFrontend.MEMBERS },
+      { type: 'node', recurseType: 'r', recurseRecType: 'bn' },
+    ],
+    [
+      { type: 'relation', properties: OverpassFrontend.MEMBERS },
+      { type: 'way', recurseType: 'r', recurseRecType: 'bw' },
+    ],
+    [
+      { type: 'relation', properties: OverpassFrontend.MEMBERS },
+      { type: 'way', recurseType: 'r', recurseRecType: 'bw', properties: OverpassFrontend.MEMBERS },
+      { type: 'node', recurseType: 'w', recurseRecType: 'bn' },
+    ]
+  ],
+  '<': [
+    [
+      { type: 'node' },
+      { type: 'way', properties: OverpassFrontend.MEMBERS, recurseType: 'bn', recurseRecType: 'w' },
+    ],
+    [
+      { type: 'node' },
+      { type: 'relation', properties: OverpassFrontend.MEMBERS, recurseType: 'bn', recurseRecType: 'r' },
+    ],
+    [
+      { type: 'way' },
+      { type: 'relation', properties: OverpassFrontend.MEMBERS, recurseType: 'bw', recurseRecType: 'r' },
+    ],
+    [
+      { type: 'node' },
+      { type: 'way', properties: OverpassFrontend.MEMBERS, recurseType: 'bn', recurseRecType: 'w' },
+      { type: 'relation', properties: OverpassFrontend.MEMBERS, recurseType: 'bw', recurseRecType: 'r' },
+    ]
+  ]
+}
 
 class FilterRecurse extends FilterStatement {
   constructor (def, filter) {
@@ -102,54 +144,52 @@ class FilterRecurse extends FilterStatement {
       return []
     }
 
-    // direct decendants
-    const setId = '._' + this.inputSetRef.id
-    const r = this.inputSetRef._caches()
-    let result = r.map(c => {
-      c.recurseType = this.type
-      c.setId = setId
-      if (['>'].includes(this.type)) {
-        c.properties |= OverpassFrontend.MEMBERS
-      }
+    const possRecursions = cachesMapTypes[this.type]
+    if (!possRecursions) {
+      console.log('_caches(): unknown recursion type', this.type)
+      return []
+    }
 
-      return {
-        filters: '(' + this.type + setId + ')',
-        filtersRec: '(' + (this.type === '<' ? 'r_w' : 'b') + setId + ')' + c.filtersRec,
-        properties: ['<'].includes(this.type) ? OverpassFrontend.MEMBERS : 0,
-        recurse: [c]
-      }
+    const result = []
+    possRecursions.forEach(recursions => {
+      const setId = '._' + this.inputSetRef.id
+      const r = this.inputSetRef._caches()
+
+      recursions = [...recursions]
+      const thisFilter = recursions.shift()
+
+      r.forEach(c => {
+        c.type = andTypes(c.type ?? 'nwr', thisFilter.type)
+        if (!c.type) {
+          return
+        }
+
+        c.setId = setId
+        if (thisFilter.properties) {
+          c.properties |= OverpassFrontend.MEMBERS
+        }
+
+        let inBetween = c
+
+        recursions.forEach((b, i) => {
+          inBetween.setId = setId
+
+          inBetween.filtersFwd = '(' + b.recurseType + setId + ')'
+          inBetween.filtersRec = '(' + b.recurseRecType + setId + ')'
+
+          const e = {
+            type: b.type,
+            properties: (b.properties ?? 0),
+            filters: '',
+            recurse: [inBetween]
+          }
+
+          inBetween = e
+        })
+
+        result.push(inBetween)
+      })
     })
-
-    // 2nd level decendants
-    result = result.concat(r.map(c => {
-      c = { ...c }
-      c.recurseType = this.type
-      if (['>'].includes(this.type)) {
-        c.properties |= OverpassFrontend.MEMBERS
-      }
-
-      const setIdInBetween = '._' + this.inputSetRef.id + 'A'
-      let recurseRecType = this.type === '>' ? 'bn' : 'r_w'
-      const inBetween = {
-        type: 'way',
-        setId: setIdInBetween,
-        filters: '(' + this.type + setId + ')',
-        filtersRec: '(' + recurseRecType + setId + ')' + c.filtersRec,
-        properties: OverpassFrontend.MEMBERS,
-        recurseType: this.type,
-        recurse: [c]
-      }
-
-      const recurseType = this.type === '>' ? 'w' : 'br'
-      recurseRecType = this.type === '>' ? 'bn' : 'r_w'
-      return {
-        type: this.type === '>' ? 'node' : 'relation',
-        filters: '(' + recurseType + setIdInBetween + ')',
-        filtersRec: '(' + recurseType + setIdInBetween + ')',
-        properties: ['<'].includes(this.type) ? OverpassFrontend.MEMBERS : 0,
-        recurse: [inBetween]
-      }
-    }))
 
     return result
   }

@@ -436,9 +436,11 @@ class FilterQuery extends FilterStatement {
         options = []
         _options.forEach(o => {
           recurse.forEach(r => {
+            r.filtersFwd = (r.filtersFwd ?? '') + (o.filtersFwd ?? '') + '(' + inputSet.recurse + setId + ('role' in inputSet ? ':' + qlQuoteString(inputSet.role) : '') + ')'
+            r.filtersRec = (r.filtersRec ?? '') + '(' + reverseRecurse[inputSet.recurse] + setId + ('role' in inputSet ? ':' + qlQuoteString(inputSet.role) : '') + ')',
+
             options.push({
-              filters: o.filters + '(' + inputSet.recurse + setId + ('role' in inputSet ? ':' + qlQuoteString(inputSet.role) : '') + ')',
-              filtersRec: o.filtersRec + '(' + reverseRecurse[inputSet.recurse] + setId + ('role' in inputSet ? ':' + qlQuoteString(inputSet.role) : '') + ')',
+              filters: o.filters,
               properties: ['bn', 'bw', 'br'].includes(this.type) ? OverpassFrontend.MEMBERS : 0,
               recurse: o.recurse ? o.recurse.concat([r]) : [r]
             })
@@ -457,7 +459,6 @@ class FilterQuery extends FilterStatement {
       if (part.op) {
         options = options.map(o => {
           o.filters += compileFilter(part)
-          o.filtersRec += compileFilter(part)
           o.properties |= OverpassFrontend.TAGS
           return o
         })

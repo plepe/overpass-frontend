@@ -577,7 +577,6 @@ function compileCacheDescriptors (result) {
   _compileCacheDescriptorsRecurses(result)
   _compileCacheDescriptorsClearProperties(result)
 
-  //console.log(JSON.stringify(result, null, '  '))
   return result
 }
 
@@ -592,8 +591,10 @@ function _compileCacheDescriptors (result) {
       .map(r => {
         return r.id + '->' + r.setId + ';'
       })
-      .join(';') +
-      (entry.type || 'nwr') + entry.filters + '(properties:' + entry.properties + ')'
+      .join('') +
+      (entry.type || 'nwr') + entry.filters +
+        recurse.map(r => r.filtersFwd ?? '').join('') +
+        '(properties:' + entry.properties + ')'
 
     return entry
   })
@@ -604,7 +605,7 @@ function _compileCacheDescriptorsRecurses (result) {
     if (entry.recurse) {
       entry.recurse.forEach(r => {
         r.id = entry.id + '->' + r.setId + ';' +
-          (r.type || 'nwr') + r.filters + entry.filtersRec + '(properties:' + r.properties + ')'
+          (r.type || 'nwr') + r.filters + r.filtersRec + '(properties:' + r.properties + ')'
 
         _compileCacheDescriptorsRecurses([r])
       })
@@ -622,11 +623,14 @@ function _compileCacheDescriptorsClearProperties (result) {
 
     delete entry.type
     delete entry.filters
+    delete entry.filtersFwd
     delete entry.filtersRec
+    delete entry.recurseType
+    delete entry.recurseRecType
     delete entry.properties
     delete entry.setId
+    delete entry.role
   })
 }
-
 
 module.exports = Filter
