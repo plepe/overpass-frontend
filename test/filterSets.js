@@ -284,7 +284,7 @@ describe("Filter sets, compile", function () {
       needMatch: true
     })
     var r = f.cacheDescriptors()
-    assert.deepEqual(r, [ { id: 'nwr["amenity"](properties:17)', bounds: { type: 'Polygon', coordinates: [[[1,1],[2,1],[2,2],[1,2],[1,1]]] } } ])
+    assert.deepEqual(r, [ { id: 'nwr["amenity"](properties:9)', bounds: { type: 'Polygon', coordinates: [[[1,1],[2,1],[2,2],[1,2],[1,1]]] } } ])
   })
   it ('(nwr[amenity](1,1,2,2)->.a;);node._[cuisine];', function () {
     var f = new Filter('(nwr[amenity](1,1,2,2)->.a;);node._[cuisine];')
@@ -359,7 +359,7 @@ describe("Filter sets, compile", function () {
       },
     ]})
     var r = f.cacheDescriptors()
-    assert.deepEqual(r, [ { id: 'node["amenity"]["cuisine"](properties:17)', bounds: { type: 'Polygon', coordinates: [[[1,1],[2,1],[2,2],[1,2],[1,1]]] } } ])
+    assert.deepEqual(r, [ { id: 'node["amenity"]["cuisine"](properties:9)', bounds: { type: 'Polygon', coordinates: [[[1,1],[2,1],[2,2],[1,2],[1,1]]] } } ])
   })
   it ('nwr[amenity]->.a;nwr.a[cuisine];', function () {
     var f = new Filter('nwr[amenity]->.a;nwr.a[cuisine];')
@@ -2477,7 +2477,7 @@ describe("Filter sets with relations, apply base filter", function () {
     })
     var r = f.cacheDescriptors()
     assert.deepEqual(r, [
-      { id: 'nwr["amenity"](properties:17)', bounds: { type: 'Polygon', coordinates: [[[16,46],[17,46],[17,47],[16,47],[16,46]]] } }
+      { id: 'nwr["amenity"](properties:9)', bounds: { type: 'Polygon', coordinates: [[[16,46],[17,46],[17,47],[16,47],[16,46]]] } }
     ])
   })
   it ('(nwr[a];nwr[b];);>; - additional filter: nwr(46,16,47,17)', function () {
@@ -2561,10 +2561,10 @@ describe("Filter sets with relations, apply base filter", function () {
                 ]
               ]
             },
-            id: 'way["a"](properties:21)->._1;node(w._1)(properties:0)->._1;way["a"](bn._1)(properties:21)'
+            id: 'way["a"](properties:13)->._1;node(w._1)(properties:0)->._1;way["a"](bn._1)(properties:13)'
           }
         ],
-        id: 'way["a"](properties:21)->._1;node(w._1)(properties:0)'
+        id: 'way["a"](properties:13)->._1;node(w._1)(properties:0)'
       },
       {
         recurse: [
@@ -2581,10 +2581,10 @@ describe("Filter sets with relations, apply base filter", function () {
                 ]
               ]
             },
-            id: 'way["b"](properties:21)->._1;node(w._1)(properties:0)->._1;way["b"](bn._1)(properties:21)'
+            id: 'way["b"](properties:13)->._1;node(w._1)(properties:0)->._1;way["b"](bn._1)(properties:13)'
           }
         ],
-        id: 'way["b"](properties:21)->._1;node(w._1)(properties:0)'
+        id: 'way["b"](properties:13)->._1;node(w._1)(properties:0)'
       },
       {
         recurse: [
@@ -2601,10 +2601,10 @@ describe("Filter sets with relations, apply base filter", function () {
                 ]
               ]
             },
-            id: 'relation["a"](properties:21)->._1;node(r._1)(properties:0)->._1;relation["a"](bn._1)(properties:21)'
+            id: 'relation["a"](properties:13)->._1;node(r._1)(properties:0)->._1;relation["a"](bn._1)(properties:13)'
           }
         ],
-        id: 'relation["a"](properties:21)->._1;node(r._1)(properties:0)'
+        id: 'relation["a"](properties:13)->._1;node(r._1)(properties:0)'
       },
       {
         recurse: [
@@ -2621,10 +2621,10 @@ describe("Filter sets with relations, apply base filter", function () {
                 ]
               ]
             },
-            id: 'relation["b"](properties:21)->._1;node(r._1)(properties:0)->._1;relation["b"](bn._1)(properties:21)'
+            id: 'relation["b"](properties:13)->._1;node(r._1)(properties:0)->._1;relation["b"](bn._1)(properties:13)'
           }
         ],
-        id: 'relation["b"](properties:21)->._1;node(r._1)(properties:0)'
+        id: 'relation["b"](properties:13)->._1;node(r._1)(properties:0)'
       },
       {
         recurse: [
@@ -2641,10 +2641,10 @@ describe("Filter sets with relations, apply base filter", function () {
                 ]
               ]
             },
-            id: 'relation["a"](properties:21)->._1;way(r._1)(properties:0)->._1;relation["a"](bw._1)(properties:21)'
+            id: 'relation["a"](properties:13)->._1;way(r._1)(properties:0)->._1;relation["a"](bw._1)(properties:13)'
           }
         ],
-        id: 'relation["a"](properties:21)->._1;way(r._1)(properties:0)'
+        id: 'relation["a"](properties:13)->._1;way(r._1)(properties:0)'
       },
       {
         recurse: [
@@ -2661,10 +2661,10 @@ describe("Filter sets with relations, apply base filter", function () {
                 ]
               ]
             },
-            id: 'relation["b"](properties:21)->._1;way(r._1)(properties:0)->._1;relation["b"](bw._1)(properties:21)'
+            id: 'relation["b"](properties:13)->._1;way(r._1)(properties:0)->._1;relation["b"](bw._1)(properties:13)'
           }
         ],
-        id: 'relation["b"](properties:21)->._1;way(r._1)(properties:0)'
+        id: 'relation["b"](properties:13)->._1;way(r._1)(properties:0)'
       },
       {
         recurse: [
@@ -2683,13 +2683,13 @@ describe("Filter sets with relations, apply base filter", function () {
                     ]
                   ]
                 },
-                id: 'relation["a"](properties:21)->._1;way(r._1)(properties:4)->._1;node(w._1)(properties:0)->._1;way(bn._1)(properties:4)->._1;relation["a"](bw._1)(properties:21)'
+                id: 'relation["a"](properties:13)->._1;way(r._1)(properties:4)->._1;node(w._1)(properties:0)->._1;way(bn._1)(properties:4)->._1;relation["a"](bw._1)(properties:13)'
               }
             ],
-            id: 'relation["a"](properties:21)->._1;way(r._1)(properties:4)->._1;node(w._1)(properties:0)->._1;way(bn._1)(properties:4)'
+            id: 'relation["a"](properties:13)->._1;way(r._1)(properties:4)->._1;node(w._1)(properties:0)->._1;way(bn._1)(properties:4)'
           }
         ],
-        id: 'relation["a"](properties:21)->._1;way(r._1)(properties:4)->._1;node(w._1)(properties:0)'
+        id: 'relation["a"](properties:13)->._1;way(r._1)(properties:4)->._1;node(w._1)(properties:0)'
       },
       {
         recurse: [
@@ -2708,13 +2708,13 @@ describe("Filter sets with relations, apply base filter", function () {
                     ]
                   ]
                 },
-                id: 'relation["b"](properties:21)->._1;way(r._1)(properties:4)->._1;node(w._1)(properties:0)->._1;way(bn._1)(properties:4)->._1;relation["b"](bw._1)(properties:21)'
+                id: 'relation["b"](properties:13)->._1;way(r._1)(properties:4)->._1;node(w._1)(properties:0)->._1;way(bn._1)(properties:4)->._1;relation["b"](bw._1)(properties:13)'
               }
             ],
-            id: 'relation["b"](properties:21)->._1;way(r._1)(properties:4)->._1;node(w._1)(properties:0)->._1;way(bn._1)(properties:4)'
+            id: 'relation["b"](properties:13)->._1;way(r._1)(properties:4)->._1;node(w._1)(properties:0)->._1;way(bn._1)(properties:4)'
           }
         ],
-        id: 'relation["b"](properties:21)->._1;way(r._1)(properties:4)->._1;node(w._1)(properties:0)'
+        id: 'relation["b"](properties:13)->._1;way(r._1)(properties:4)->._1;node(w._1)(properties:0)'
       }
     ])
   })
@@ -2776,10 +2776,10 @@ describe("Filter sets with relations, apply base filter", function () {
                 ]
               ]
             },
-            id: 'way(properties:16)->._1;relation(bw._1:"inner")(properties:0)->._1;way(r._1:"inner")(properties:16)'
+            id: 'way(properties:8)->._1;relation(bw._1:"inner")(properties:0)->._1;way(r._1:"inner")(properties:8)'
           }
         ],
-        id: 'way(properties:16)->._1;relation(bw._1:"inner")(properties:0)'
+        id: 'way(properties:8)->._1;relation(bw._1:"inner")(properties:0)'
       }
     ])
   })

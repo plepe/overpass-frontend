@@ -1860,7 +1860,7 @@ describe('Function "bbox"', function () {
     check(f, [])
 
     var r = f.cacheDescriptors()
-    assert.deepEqual(r, [ { id:"nwr(properties:16)",bounds:{"type":"Polygon","coordinates":[[[40,10.2],[45,10.2],[45,11],[40,11],[40,10.2]]]} }])
+    assert.deepEqual(r, [ { id:"nwr(properties:8)",bounds:{"type":"Polygon","coordinates":[[[40,10.2],[45,10.2],[45,11],[40,11],[40,10.2]]]} }])
   })
   it('simple', function () {
     var f = new Filter('node(10.2,40.0,11,45)')
@@ -1884,7 +1884,7 @@ describe('Function "bbox"', function () {
     check(f, [])
 
     var r = f.cacheDescriptors()
-    assert.deepEqual(r, [ { id:"node(properties:16)",bounds:{"type":"Polygon","coordinates":[[[40,10.2],[45,10.2],[45,11],[40,11],[40,10.2]]]} }])
+    assert.deepEqual(r, [ { id:"node(properties:8)",bounds:{"type":"Polygon","coordinates":[[[40,10.2],[45,10.2],[45,11],[40,11],[40,10.2]]]} }])
   })
   it('south/west', function () {
     var f = new Filter('node(-10.2,-40.0,11,45)')
@@ -1908,7 +1908,7 @@ describe('Function "bbox"', function () {
     check(f, [])
 
     var r = f.cacheDescriptors()
-    assert.deepEqual(r, [ { id:"node(properties:16)",bounds:{"type":"Polygon","coordinates":[[[-40,-10.2],[45,-10.2],[45,11],[-40,11],[-40,-10.2]]]} }])
+    assert.deepEqual(r, [ { id:"node(properties:8)",bounds:{"type":"Polygon","coordinates":[[[-40,-10.2],[45,-10.2],[45,11],[-40,11],[-40,-10.2]]]} }])
   })
 })
 

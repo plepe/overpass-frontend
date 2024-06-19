@@ -481,7 +481,7 @@ var overpassFrontend
           expected: [ 'n1599448219', 'n1871276160', 'n3765072046', 'n395262', 'n643386609' ],
           expectedSubRequestCount: 1,
           expectedCacheDescriptors: [{
-            "id": "node(properties:16)",
+            "id": "node(properties:8)",
             "bounds": {
               "type": "Polygon",
               "coordinates": [
@@ -504,7 +504,7 @@ var overpassFrontend
           expected: [ 'n1599448219', 'n1871276160', 'n3765072046', 'n395262', 'n643386609' ],
           expectedSubRequestCount: 0,
           expectedCacheDescriptors: [{
-            "id": "node(properties:16)",
+            "id": "node(properties:8)",
             "bounds": {
               "type": "Polygon",
               "coordinates": [
@@ -526,7 +526,7 @@ var overpassFrontend
           expected: [ 'n395262' ],
           expectedSubRequestCount: 0,
           expectedCacheDescriptors: [{
-            "id": "node(properties:16)",
+            "id": "node(properties:8)",
             "bounds": {
               "type": "Polygon",
               "coordinates": [
@@ -551,7 +551,7 @@ var overpassFrontend
           expectedSubRequestCount: 1, // TODO: 0
           expectedCacheDescriptors: [
             {
-              "id": "node(properties:16)",
+              "id": "node(properties:8)",
               "bounds": {
                 "type": "Polygon",
                 "coordinates": [
@@ -566,7 +566,7 @@ var overpassFrontend
               }
             },
             {
-              "id": "way(properties:16)",
+              "id": "way(properties:8)",
               "bounds": {
                 "type": "Polygon",
                 "coordinates": [

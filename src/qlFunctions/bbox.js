@@ -50,7 +50,7 @@ module.exports = class bbox extends qlFunction {
         d.invalid = true
       } else {
         d.bounds = newBounds.geometry
-        d.properties |= OverpassFrontend.GEOM
+        d.properties |= OverpassFrontend.BBOX
       }
     })
   }
