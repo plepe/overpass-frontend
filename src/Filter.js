@@ -569,6 +569,17 @@ class Filter {
     const statement = this.getStatement(options)
     return statement ? statement.derefSets() : []
   }
+
+  /**
+   * returns possible bounds for this object as GeoJSON
+   * @param {OverpassObject} ob the object to test against
+   * @param {object} [options] Additional options
+   * @param {string} [options.set=_] For which set should the query be compiled.
+   * @returns {null|GeoJSON} null if the filter does not use a geometry (bbox, around, ...)
+   */
+  possibleBounds (ob, options = {}) {
+    return null
+  }
 }
 
 function compileCacheDescriptors (result) {

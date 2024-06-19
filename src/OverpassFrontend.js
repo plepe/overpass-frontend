@@ -764,9 +764,10 @@ class OverpassFrontend {
       create = false
 
       // no new information -> return
-      if (~ob.properties & options.properties === 0) {
-        return ob
-      }
+      // TODO: ignored, as filter might improve boundsPossibleMatch
+      //if (~ob.properties & options.properties === 0) {
+      //  return ob
+      //}
     } else if (el.type === 'relation') {
       ob = new OverpassRelation(id)
     } else if (el.type === 'way') {

@@ -104,6 +104,18 @@ class OverpassObject {
       this.boundsPossibleMatch = turf.difference(this.boundsPossibleMatch, options.bounds.toGeoJSON())
     }
 
+    if (options.filter && !(this.properties & OverpassFrontend.GEOM)) {
+      const bounds = options.filter.possibleBounds(this)
+
+      if (bounds) {
+        if (typeof this.boundsPossibleMatch === 'undefined') {
+          this.boundsPossibleMatch = bounds
+        }
+
+        this.boundsPossibleMatch = turf.difference(this.boundsPossibleMatch, bounds)
+      }
+    }
+
     // geometry is known -> no need for this.boundsPossibleMatch
     if (this.geometry) {
       delete this.boundsPossibleMatch
