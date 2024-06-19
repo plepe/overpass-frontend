@@ -186,6 +186,7 @@ class RequestBBox extends Request {
     // ours
     if (this.lokiQuery) {
       query = this.lokiQuery.toQl({ setsUseStatementIds: true }) + '\n'
+      this.options.properties |= this.lokiQuery.properties()
       resultSetId = this.lokiQuery.getStatement().id
       resultSet = resultSetId ? '._' + resultSetId : '.result'
     } else {
