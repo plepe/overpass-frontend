@@ -237,6 +237,31 @@ class FilterQuery extends FilterStatement {
     return result + ';'
   }
 
+  properties () {
+    let properties = 0
+
+    if (this.inputSets) {
+      const nonrecursingInputSets = Object.values(this.inputSets)
+        .filter(s => !s.recurse)
+
+      nonrecursingInputSets.forEach(inputSet => {
+        properties |= inputSet.set.properties()
+      })
+    }
+
+    this.filters.forEach(part => {
+      if (part.op) {
+        properties |= OverpassFrontend.TAGS
+      } else if (part instanceof qlFunction) {
+        properties |= part.properties()
+      } else {
+        throw new Error('properties(): invalid entry')
+      }
+    })
+
+    return properties
+  }
+
   recurse () {
     let result = []
 

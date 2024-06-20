@@ -65,4 +65,8 @@ module.exports = class around extends qlFunction {
 
     return this._bounds
   }
+
+  properties () {
+    return OverpassFrontend.GEOM
+  }
 }

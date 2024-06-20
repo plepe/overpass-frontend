@@ -510,9 +510,8 @@ class Filter {
    * @returns {number} properties which are required for this filter
    */
   properties (options = {}) {
-    const result = this._caches(options)
-
-    return result.reduce((current, entry) => current | entry.properties, 0)
+    const statement = this.getStatement(options)
+    return statement.properties()
   }
 
   expandOr (def) {

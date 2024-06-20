@@ -7,4 +7,8 @@ module.exports = class FilterStatement {
   derefSets () {
     return []
   }
+
+  properties () {
+    return 0
+  }
 }

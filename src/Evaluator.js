@@ -198,6 +198,18 @@ class Evaluator {
   isSupersetOf (other) {
     return this.data.isSupersetOf(other.data)
   }
+
+  properties () {
+    let properties = 0
+    let descriptors = [{ filters: '', properties: 0 }]
+    this.cacheDescriptors (descriptors)
+
+    descriptors.forEach(d => {
+      properties |= d.properties
+    })
+
+    return properties
+  }
 }
 
 module.exports = Evaluator

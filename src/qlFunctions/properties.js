@@ -35,4 +35,8 @@ module.exports = class properties extends qlFunction {
       return (other.value & this.value) === other.value
     }
   }
+
+  properties () {
+    return this.value
+  }
 }

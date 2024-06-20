@@ -147,6 +147,14 @@ class FilterAnd extends FilterStatement {
   derefSets () {
     throw new Error('FilterAnd.derefSets() not supported yet')
   }
+
+  properties () {
+    let result = 0
+    this.parts.forEach(p => {
+      result |= p.properties()
+    })
+    return result
+  }
 }
 
 filterPart.register('and', FilterAnd)

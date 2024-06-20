@@ -69,4 +69,8 @@ module.exports = class poly extends qlFunction {
 
     return this._bounds
   }
+
+  properties () {
+    return OverpassFrontend.GEOM
+  }
 }

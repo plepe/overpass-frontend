@@ -7,7 +7,6 @@ module.exports = class user extends qlFunction {
     super()
     this.fun = 'user'
 
-    this.requestProperties = OverpassFrontend.META
     this.value = []
     let cont = true
     while (cont) {
@@ -62,5 +61,9 @@ module.exports = class user extends qlFunction {
     if (other instanceof user) {
       return !other.value.filter(id => !this.value.includes(id)).length
     }
+  }
+
+  properties () {
+    return OverpassFrontend.META
   }
 }

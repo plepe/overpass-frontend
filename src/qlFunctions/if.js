@@ -41,4 +41,8 @@ module.exports = class If extends qlFunction {
 
     return false
   }
+
+  properties () {
+    return this.value.properties()
+  }
 }

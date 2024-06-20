@@ -46,4 +46,8 @@ module.exports = class id extends qlFunction {
       return !other.value.filter(id => !this.value.includes(id)).length
     }
   }
+
+  properties () {
+    return OverpassFrontend.ID_ONLY
+  }
 }
