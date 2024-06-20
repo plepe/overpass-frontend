@@ -3003,6 +3003,7 @@ describe("Filter sets with relations, apply base filter", function () {
             maxlon: 16.34236
           },
           expected: [ "w175757214", "w175757217", "w175757222", "w175757225", "w199715277", "w199715278", "w199911273", "w86273643", "w86273649" ],
+          ignoreMissing: [ "w199911274", "w199911275" ],
           expectedSubRequestCount: 1,
           expectedSubRequestCount2nd: 1, // TODO: maybe we can push this to 0?
           expectedCacheDescriptors: [{
@@ -3179,12 +3180,15 @@ describe("Filter sets with relations, apply base filter", function () {
   })
 })
 
+/**
+ * @param {string[]} [options.ignoreMissing] ids of items which are missing from the database. As they get created by references, they could appear in results nonetheless.
+ */
 function test (options, callback) {
   if (options.mode === 'via-server') {
     console.log(options.rek ? '2nd run' : '1st run')
   }
 
-  const found = []
+  let found = []
   let foundSubRequestCount = 0
 
   function compileListener (subrequest) {
@@ -3210,6 +3214,9 @@ function test (options, callback) {
 
       assert.equal(request.filterQuery.toString(), options.expectedQuery || options.query)
       const expected = (options.mode === 'via-server' ? options.expectedViaServer : options.expectedViaFile) || options.expected
+      if (options.ignoreMissing) {
+        found = found.filter(id => !options.ignoreMissing.includes(id))
+      }
       assert.deepEqual(found.sort(), expected.sort(), 'List of found objects wrong!')
       if (options.mode === 'via-server') {
         assert.equal(foundSubRequestCount, options.expectedSubRequestCount, 'Wrong count of sub requests!')
