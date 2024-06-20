@@ -9,4 +9,8 @@ module.exports = class qlFunction {
   properties () {
     return 0
   }
+
+  possibleBounds (ob) {
+    return null
+  }
 }
