@@ -824,10 +824,11 @@ class OverpassFrontend {
    * @param {number} [options.properties] Items need at least these properties.
    * @param {LokiDB} [db] Optional database (e.g. an already filtered chain)
    * @param {object} [result] cache of already checked results
-   * @return {OverpassObject[]} list of items. If undecided items were found, a property 'undecidedItems' is set with a list of these items.
+   * @return {OverpassObject[]} list of items. If undecided items were found, a property 'undecidedItems' is set with a list of these items (if undecidedItems is an empty list, there were undecided items in the recursion).
    */
   queryLokiDB (filter, options = {}, db = null, result = {}) {
     const undecidedItems = []
+    let undecidedRecurse = false
 
     if (!db) {
       db = this.db.chain()
@@ -848,6 +849,9 @@ class OverpassFrontend {
 
       recurse.forEach(query => {
         const list = this.queryLokiDB(filter, { statement: query.id }, db.branch(), result)
+        if (list.undecidedItems) {
+          undecidedRecurse = true
+        }
         const queryIds = {}
 
         list.forEach(ob => {
@@ -953,7 +957,7 @@ class OverpassFrontend {
 
     result[statement.id] = { list }
 
-    if (undecidedItems.length) {
+    if (undecidedItems.length || undecidedRecurse) {
       list.undecidedItems = undecidedItems
     }
 
