@@ -246,7 +246,7 @@ class RequestBBox extends Request {
         }
         reverseParts[r.id].push({
           id: e.id,
-          properties: defines.MEMBERS
+          properties: r.properties
         })
       })
     })
@@ -257,7 +257,6 @@ class RequestBBox extends Request {
         options.properties |= e.properties
       })
 
-      options.properties |= defines.ALL // TODO: load only necessary properties for the requested recurse type
       subRequest.query += 'out count;\n(' +
         from.map(e => 'nwr._' + rid + '._rev' + e.id + '_' + rid + ';')
           .join('') + ');\n' +

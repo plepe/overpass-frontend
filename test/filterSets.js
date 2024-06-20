@@ -2981,6 +2981,7 @@ describe("Filter sets with relations, apply base filter", function () {
           },
           expected: [ "w175757214", "w175757217", "w175757222", "w175757225", "w199715278", "w86273649" ],
           expectedSubRequestCount: 1,
+          expectedSubRequestCount2nd: 1,
           expectedCacheDescriptors: [{
             id: 'relation["building"](properties:5)->._1;way(r._1:"inner")(properties:0)',
             recurse: [{
@@ -3065,6 +3066,7 @@ describe("Filter sets with relations, apply base filter", function () {
           },
           expected: [ "r1283879", "r2681533" ],
           expectedSubRequestCount: 1,
+          expectedSubRequestCount2nd: 1,
           expectedCacheDescriptors: [{
             id: 'way(properties:0)->._1;relation["building"](bw._1:"inner")(properties:5)',
             recurse: [{
@@ -3121,6 +3123,7 @@ describe("Filter sets with relations, apply base filter", function () {
           },
           expected: [ "w31275228", "w4583442" ],
           expectedSubRequestCount: 1,
+          expectedSubRequestCount2nd: 1,
           expectedCacheDescriptors: [{
             id: 'relation["route"="bus"](properties:5)->._1;way["highway"="secondary"](r._1)(properties:1)',
             recurse: [{
