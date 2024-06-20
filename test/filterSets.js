@@ -2444,7 +2444,7 @@ describe("Filter sets with relations, apply base filter", function () {
     assert.equal(f.toQuery(), '(nwr(46,16,47,17)->._1;)->._base;nwr._base["amenity"]->._1;')
     assert.deepEqual(f.recurse(), [])
     assert.deepEqual(f.getScript(), [
-      { id: 1, properties: 1, recurse: [] }
+      { id: 1, properties: 9, recurse: [] }
     ])
     assert.deepEqual(f.compileQuery(), {
       query: 'nwr(46,16,47,17)->._base;nwr._base["amenity"];',
@@ -2500,13 +2500,13 @@ describe("Filter sets with relations, apply base filter", function () {
     assert.equal(f.toQuery({ statement: 1 }), '(nwr._base["a"]->._2;nwr._base["b"]->._3;)->._1;') // TODO: wrong, ._base missing
     // assert.equal(f.toQuery(), '(nwr(46,16,47,17)->._1;)->._base;nwr._base["amenity"]->._1;')
     assert.deepEqual(f.recurse(), [
-      { id: 1, properties: 5, type: '>' }
+      { id: 1, properties: 13, type: '>' }
     ])
     assert.deepEqual(f.recurse({ statement: 1 }), [])
     assert.deepEqual(f.getScript(), [
-      { id: 1, properties: 1, recurse: [] },
+      { id: 1, properties: 9, recurse: [] },
       { id: 4, properties: 0, recurse: [
-        { id: 1, properties: 5, type: '>' }
+        { id: 1, properties: 13, type: '>' }
       ]}
     ])
     assert.deepEqual(f.compileQuery(), {
@@ -2728,13 +2728,13 @@ describe("Filter sets with relations, apply base filter", function () {
     assert.equal(f.toQuery(), 'relation(bw._1:"inner")->._2;')
     assert.equal(f.toQuery({ statement: 1 }), '(nwr(46,16,47,17)->._1;)->._base;way._base->._1;')
     assert.deepEqual(f.recurse(), [
-      { id: 1, properties: 0, role: 'inner', type: 'bw' }
+      { id: 1, properties: 8, role: 'inner', type: 'bw' }
     ])
     assert.deepEqual(f.recurse({ statement: 1 }), [])
     assert.deepEqual(f.getScript(), [
-      { id: 1, properties: 0, recurse: [] },
+      { id: 1, properties: 8, recurse: [] },
       { id: 2, properties: 4, recurse: [
-        { id: 1, properties: 0, role: 'inner', type: 'bw' }
+        { id: 1, properties: 8, role: 'inner', type: 'bw' }
       ]}
     ])
     assert.deepEqual(f.compileQuery(), {

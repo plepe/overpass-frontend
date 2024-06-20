@@ -240,8 +240,10 @@ class FilterQuery extends FilterStatement {
   properties () {
     let properties = 0
 
-    if (this.inputSets) {
-      Object.values(this.inputSets).forEach(inputSet => {
+    const inputSets = this.inputSets ?? (this.filter.baseFilter ? { _base: { set: this.filter.baseFilter } } : null)
+
+    if (inputSets) {
+      Object.values(inputSets).forEach(inputSet => {
         if (inputSet.recurse) {
           properties |= ['bn', 'bw', 'br'].includes(inputSet.recurse) ? OverpassFrontend.MEMBERS : 0
         } else if (inputSet.set) {
