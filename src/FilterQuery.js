@@ -441,7 +441,7 @@ class FilterQuery extends FilterStatement {
 
             options.push({
               filters: o.filters,
-              properties: ['bn', 'bw', 'br'].includes(this.type) ? OverpassFrontend.MEMBERS : 0,
+              properties: ['bn', 'bw', 'br'].includes(inputSet.recurse) ? OverpassFrontend.MEMBERS : 0,
               recurse: o.recurse ? o.recurse.concat([r]) : [r]
             })
           })

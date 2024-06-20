@@ -2776,10 +2776,10 @@ describe("Filter sets with relations, apply base filter", function () {
                 ]
               ]
             },
-            id: 'way(properties:8)->._1;relation(bw._1:"inner")(properties:0)->._1;way(r._1:"inner")(properties:8)'
+            id: 'way(properties:8)->._1;relation(bw._1:"inner")(properties:4)->._1;way(r._1:"inner")(properties:8)'
           }
         ],
-        id: 'way(properties:8)->._1;relation(bw._1:"inner")(properties:0)'
+        id: 'way(properties:8)->._1;relation(bw._1:"inner")(properties:4)'
       }
     ])
   })
@@ -3066,9 +3066,9 @@ describe("Filter sets with relations, apply base filter", function () {
           expected: [ "r1283879", "r2681533" ],
           expectedSubRequestCount: 1,
           expectedCacheDescriptors: [{
-            id: 'way(properties:0)->._1;relation["building"](bw._1:"inner")(properties:1)',
+            id: 'way(properties:0)->._1;relation["building"](bw._1:"inner")(properties:5)',
             recurse: [{
-              id: 'way(properties:0)->._1;relation["building"](bw._1:"inner")(properties:1)->._1;way(r._1:"inner")(properties:0)'
+              id: 'way(properties:0)->._1;relation["building"](bw._1:"inner")(properties:5)->._1;way(r._1:"inner")(properties:0)'
             }]
           }]
         }, done)
