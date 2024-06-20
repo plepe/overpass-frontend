@@ -11,4 +11,8 @@ module.exports = class FilterStatement {
   properties () {
     return 0
   }
+
+  possibleBounds (ob) {
+    return null
+  }
 }

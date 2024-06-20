@@ -578,7 +578,8 @@ class Filter {
    * @returns {null|GeoJSON} null if the filter does not use a geometry (bbox, around, ...)
    */
   possibleBounds (ob, options = {}) {
-    return null
+    const statement = this.getStatement(options)
+    return statement.possibleBounds(ob, options)
   }
 }
 

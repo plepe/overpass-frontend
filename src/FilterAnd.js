@@ -155,6 +155,10 @@ class FilterAnd extends FilterStatement {
     })
     return result
   }
+
+  possibleBounds (ob) {
+    return null
+  }
 }
 
 filterPart.register('and', FilterAnd)

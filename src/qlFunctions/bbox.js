@@ -72,4 +72,8 @@ module.exports = class bbox extends qlFunction {
   properties () {
     return OverpassFrontend.BBOX
   }
+
+  possibleBounds (ob) {
+    return this.value.toGeoJSON()
+  }
 }

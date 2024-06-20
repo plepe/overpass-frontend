@@ -163,6 +163,10 @@ class FilterOr extends FilterStatement {
     })
     return result
   }
+
+  possibleBounds (ob) {
+    return null
+  }
 }
 
 filterPart.register('or', FilterOr)

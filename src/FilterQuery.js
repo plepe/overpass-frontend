@@ -689,6 +689,26 @@ class FilterQuery extends FilterStatement {
 
     return result
   }
+
+  possibleBounds (ob) {
+    let bounds
+
+    this.filters.forEach(filter => {
+      if (filter instanceof qlFunction) {
+        b = filter.possibleBounds(ob)
+        if (b) {
+          if (bounds) {
+            bounds = turf.difference(b, bounds)
+          } else {
+            bounds = b
+          }
+          console.log(bounds)
+        }
+      }
+    })
+
+    return bounds
+  }
 }
 
 filterPart.register('default', FilterQuery)

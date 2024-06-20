@@ -230,6 +230,10 @@ class FilterRecurse extends FilterStatement {
   properties () {
     return ['<', '<<'].includes(this.type) ? OverpassFrontend.MEMBERS : 0
   }
+
+  possibleBounds (ob) {
+    return null
+  }
 }
 
 filterPart.register('recurse', FilterRecurse)
