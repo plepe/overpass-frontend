@@ -396,7 +396,7 @@ class Filter {
       })
     })
 
-    result.push({ id: statement.id, recurse })
+    result.push({ id: statement.id, properties: statement.properties(), recurse })
     return result
   }
 

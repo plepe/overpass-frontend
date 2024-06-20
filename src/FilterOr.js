@@ -89,7 +89,7 @@ class FilterOr extends FilterStatement {
     }
 
     return this.parts.map(p => {
-      return { id: p.id, type: 'or' }
+      return { id: p.id, properties: p.properties(), type: 'or' }
     })
   }
 

@@ -241,11 +241,12 @@ class FilterQuery extends FilterStatement {
     let properties = 0
 
     if (this.inputSets) {
-      const nonrecursingInputSets = Object.values(this.inputSets)
-        .filter(s => !s.recurse)
-
-      nonrecursingInputSets.forEach(inputSet => {
-        properties |= inputSet.set.properties()
+      Object.values(this.inputSets).forEach(inputSet => {
+        if (inputSet.recurse) {
+          properties |= ['bn', 'bw', 'br'].includes(inputSet.recurse) ? OverpassFrontend.MEMBERS : 0
+        } else if (inputSet.set) {
+          properties |= inputSet.set.properties()
+        }
       })
     }
 
@@ -273,8 +274,11 @@ class FilterQuery extends FilterStatement {
 
       if (recursingInputSets.length) {
         result = recursingInputSets.map(s => {
+          const p = s[1].set ? s[1].set.properties() : 0
+
           const r = {
             type: s[1].recurse,
+            properties: p | (['r', 'w'].includes(s[1].recurse) ? OverpassFrontend.MEMBERS : 0),
             id: s[1].set ? s[1].set.id : null
           }
 

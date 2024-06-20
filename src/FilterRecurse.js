@@ -90,8 +90,12 @@ class FilterRecurse extends FilterStatement {
   }
 
   recurse (options = {}) {
+    let properties = this.inputSetRef ? this.inputSetRef.properties() : 0
+    properties |= ['>', '>>'].includes(this.type) ? OverpassFrontend.MEMBERS : 0
+
     return [{
       type: this.type,
+      properties,
       id: this.inputSetRef ? this.inputSetRef.id : null
     }]
   }
@@ -221,6 +225,10 @@ class FilterRecurse extends FilterStatement {
 
       return r
     })
+  }
+
+  properties () {
+    return ['<', '<<'].includes(this.type) ? OverpassFrontend.MEMBERS : 0
   }
 }
 
