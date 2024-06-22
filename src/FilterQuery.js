@@ -698,6 +698,10 @@ class FilterQuery extends FilterStatement {
   possibleBounds (ob) {
     let bounds = null
 
+    if (this.match(ob) === false) {
+      return null
+    }
+
     if (this.inputSets) {
       Object.values(this.inputSets)
         .filter(s => !s.recurse) // check only inputSets which are on the same item
