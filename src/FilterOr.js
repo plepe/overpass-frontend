@@ -1,5 +1,6 @@
 const FilterStatement = require('./FilterStatement')
 const filterPart = require('./filterPart')
+const turf = require('./turf')
 
 class FilterOr extends FilterStatement {
   constructor (def, filter) {
@@ -165,7 +166,20 @@ class FilterOr extends FilterStatement {
   }
 
   possibleBounds (ob) {
-    return null
+    let bounds = null
+
+    this.parts.forEach(p => {
+      const b = p.possibleBounds(ob)
+      if (b) {
+        if (bounds) {
+          bounds = turf.difference(b, bounds)
+        } else {
+          bounds = b
+        }
+      }
+    })
+
+    return bounds
   }
 }
 

@@ -7,6 +7,7 @@ const strsearch2regexp = require('strsearch2regexp')
 const FilterStatement = require('./FilterStatement')
 const qlQuoteString = require('./qlQuoteString')
 const andTypes = require('./andTypes')
+const turf = require('./turf')
 
 const reverseRecurse = {
   'r': 'b', // bn or bw
@@ -695,7 +696,32 @@ class FilterQuery extends FilterStatement {
   }
 
   possibleBounds (ob) {
-    let bounds
+    let bounds = null
+
+    if (this.inputSets) {
+      Object.values(this.inputSets)
+        .filter(s => !s.recurse) // check only inputSets which are on the same item
+        .filter(s => s.set)
+        .forEach(s => {
+          const b = s.set.possibleBounds(ob)
+          if (b) {
+            if (bounds) {
+              bounds = turf.difference(b, bounds)
+            } else {
+              bounds = b
+            }
+          }
+        })
+    } else if (this.filter.baseFilter) {
+      const b = this.filter.baseFilter.possibleBounds(ob)
+      if (b) {
+        if (bounds) {
+          bounds = turf.difference(b, bounds)
+        } else {
+          bounds = b
+        }
+      }
+    }
 
     this.filters.forEach(filter => {
       if (filter instanceof qlFunction) {
@@ -706,7 +732,6 @@ class FilterQuery extends FilterStatement {
           } else {
             bounds = b
           }
-          console.log(bounds)
         }
       }
     })
