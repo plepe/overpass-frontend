@@ -1785,7 +1785,6 @@ describe("Filter sets with relations, compile", function () {
         { id: 1, properties: 5, type: 'w' }
       ]}
     ])
-    console.log(JSON.stringify(f.compileQuery().recurse[0].loki))
     assert.deepEqual(f.compileQuery(), {
       query: 'node(w);',
       recurse: [
@@ -3131,7 +3130,6 @@ describe("Filter sets with relations, apply base filter", function () {
             }]
           }]
         }, (err) => {
-          console.log(overpassFrontend.bboxQueryCache.list)
           done()
         })
       })
@@ -3156,7 +3154,6 @@ describe("Filter sets with relations, apply base filter", function () {
             }]
           }]
         }, (err) => {
-          console.log(overpassFrontend.bboxQueryCache.list)
           done()
         })
       })
@@ -3180,7 +3177,6 @@ describe("Filter sets with relations, apply base filter", function () {
             }]
           }]
         }, (err) => {
-          console.log(overpassFrontend.bboxQueryCache.list)
           done()
         })
       })
@@ -3209,7 +3205,6 @@ describe("Filter sets with relations, apply base filter", function () {
             }]
           }]
         }, (err) => {
-          console.log(overpassFrontend.bboxQueryCache.list)
           done()
         })
       })
@@ -3237,7 +3232,6 @@ describe("Filter sets with relations, apply base filter", function () {
             }]
           }]
         }, (err) => {
-          console.log(overpassFrontend.bboxQueryCache.list)
           done()
         })
       })
