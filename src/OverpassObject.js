@@ -110,9 +110,9 @@ class OverpassObject {
       if (bounds) {
         if (typeof this.boundsPossibleMatch === 'undefined') {
           this.boundsPossibleMatch = bounds
+        } else {
+          this.boundsPossibleMatch = turf.difference(this.boundsPossibleMatch, bounds)
         }
-
-        this.boundsPossibleMatch = turf.difference(this.boundsPossibleMatch, bounds)
       }
     }
 
