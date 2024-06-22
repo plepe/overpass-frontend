@@ -199,6 +199,7 @@ class FilterRecurse extends FilterStatement {
   }
 
   match (ob) {
+    return true
   }
 
   derefSets () {

@@ -542,7 +542,11 @@ class FilterQuery extends FilterStatement {
 
   match (ob) {
     if (this.inputSets) {
-      const r = Object.values(this.inputSets).every(s => s.set.match(ob))
+      const r = Object
+        .values(this.inputSets)
+        .filter(s => !s.recurse) // match only inputSets which are on the same item
+        .filter(s => s.set)
+        .every(s => s.set.match(ob))
       if (r !== true) {
         return r
       }

@@ -3137,6 +3137,55 @@ describe("Filter sets with relations, apply base filter", function () {
         })
       })
 
+      it('route members (cached)', function (done) {
+        test({
+          mode,
+          query: 'relation(48.19798,16.33788,48.1988,16.33933)["route"="bus"];way(r)["highway"="secondary"];',
+          expected: [ "w31275228", "w4583442" ],
+          expectedSubRequestCount: 1, // TODO: 0
+          expectedSubRequestCount2nd: 1, // TODO: 0
+          expectedCacheDescriptors: [{
+            id: 'relation["route"="bus"](properties:13)->._1;way["highway"="secondary"](r._1)(properties:1)',
+            recurse: [{
+              id: 'relation["route"="bus"](properties:13)->._1;way["highway"="secondary"](r._1)(properties:1)->._1;relation["route"="bus"](b._1)(properties:13)',
+              bounds: {
+                type: "Polygon",
+                coordinates: [
+                  [ [ 16.33788, 48.19798 ], [ 16.33933, 48.19798 ], [ 16.33933, 48.1988 ], [ 16.33788, 48.1988 ], [ 16.33788, 48.19798 ] ]
+                ]
+              }
+            }]
+          }]
+        }, (err) => {
+          console.log(overpassFrontend.bboxQueryCache.list)
+          done()
+        })
+      })
+
+      it('route members, bbox on way (cached)', function (done) {
+        test({
+          mode,
+          query: 'relation["route"="bus"];way(r)(48.19798,16.33788,48.1988,16.33933)["highway"="secondary"];',
+          expected: [ "w4583442" ],
+          expectedSubRequestCount: 0,
+          expectedCacheDescriptors: [{
+            id: 'relation["route"="bus"](properties:5)->._1;way["highway"="secondary"](r._1)(properties:9)',
+            bounds: {
+              type: "Polygon",
+              coordinates: [
+                [ [ 16.33788, 48.19798 ], [ 16.33933, 48.19798 ], [ 16.33933, 48.1988 ], [ 16.33788, 48.1988 ], [ 16.33788, 48.19798 ] ]
+              ]
+            },
+            recurse: [{
+              id: 'relation["route"="bus"](properties:5)->._1;way["highway"="secondary"](r._1)(properties:9)->._1;relation["route"="bus"](b._1)(properties:5)'
+            }]
+          }]
+        }, (err) => {
+          console.log(overpassFrontend.bboxQueryCache.list)
+          done()
+        })
+      })
+
       it('highways (partly cached from test before)', function (done) {
         test({
           mode,
