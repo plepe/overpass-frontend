@@ -3047,7 +3047,6 @@ describe("Filter sets with relations, apply base filter", function () {
           },
           expected: [ "r1283879", "r2681533", "r2684275" ],
           expectedSubRequestCount: 1,
-          expectedSubRequestCount2nd: 1, // TODO: maybe we can push this to 0?
           expectedCacheDescriptors: [{
             id: 'relation["building"](properties:1)'
           }]
@@ -3254,7 +3253,6 @@ describe("Filter sets with relations, apply base filter", function () {
           },
           expected: [ "w272668388", "w38279773", "w4583259", "w4583442" ],
           expectedSubRequestCount: 1,
-          expectedSubRequestCount2nd: 1, // TODO: this should be 0
           expectedCacheDescriptors: [{
             id: 'way["highway"="secondary"](properties:1)',
           }]
