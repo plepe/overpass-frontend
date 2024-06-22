@@ -3186,6 +3186,62 @@ describe("Filter sets with relations, apply base filter", function () {
         })
       })
 
+      it('route members, bbox on route & way (cached)', function (done) {
+        test({
+          mode,
+          query: 'relation["route"="bus"](48.19511,16.33785,48.19627,16.34103);way(r)(48.19798,16.33788,48.1988,16.33933)["highway"="secondary"];',
+          expected: [ "w4583442" ],
+          expectedSubRequestCount: 1,
+          expectedSubRequestCount2nd: 1, // TODO: 0
+          expectedCacheDescriptors: [{
+            id: 'relation["route"="bus"](properties:13)->._1;way["highway"="secondary"](r._1)(properties:9)',
+            bounds: {
+              type: "Polygon",
+              coordinates: [
+                [ [ 16.33788, 48.19798 ], [ 16.33933, 48.19798 ], [ 16.33933, 48.1988 ], [ 16.33788, 48.1988 ], [ 16.33788, 48.19798 ] ]
+              ]
+            },
+            recurse: [{
+              id: 'relation["route"="bus"](properties:13)->._1;way["highway"="secondary"](r._1)(properties:9)->._1;relation["route"="bus"](b._1)(properties:13)',
+              bounds: {
+                type: "Polygon",
+                coordinates: [ [ [ 16.33785, 48.19511 ], [ 16.34103, 48.19511 ], [ 16.34103, 48.19627 ], [ 16.33785, 48.19627 ], [ 16.33785, 48.19511 ] ] ]
+              }
+            }]
+          }]
+        }, (err) => {
+          console.log(overpassFrontend.bboxQueryCache.list)
+          done()
+        })
+      })
+      it('route members, bbox on route & way 2 (cached)', function (done) {
+        test({
+          mode,
+          query: 'relation["route"="bus"](48.19816,16.33403,48.19932,16.33721);way(r)(48.19798,16.33788,48.1988,16.33933)["highway"="secondary"];',
+          expected: [],
+          expectedSubRequestCount: 1,
+          expectedSubRequestCount2nd: 1, // TODO: 0
+          expectedCacheDescriptors: [{
+            id: 'relation["route"="bus"](properties:13)->._1;way["highway"="secondary"](r._1)(properties:9)',
+            bounds: {
+              type: "Polygon",
+              coordinates: [
+                [ [ 16.33788, 48.19798 ], [ 16.33933, 48.19798 ], [ 16.33933, 48.1988 ], [ 16.33788, 48.1988 ], [ 16.33788, 48.19798 ] ]
+              ]
+            },
+            recurse: [{
+              id: 'relation["route"="bus"](properties:13)->._1;way["highway"="secondary"](r._1)(properties:9)->._1;relation["route"="bus"](b._1)(properties:13)',
+              bounds: {
+                type: "Polygon",
+                coordinates: [ [ [ 16.33403, 48.19816 ], [ 16.33721, 48.19816 ], [ 16.33721, 48.19932 ], [ 16.33403, 48.19932 ], [ 16.33403, 48.19816 ] ] ]
+              }
+            }]
+          }]
+        }, (err) => {
+          console.log(overpassFrontend.bboxQueryCache.list)
+          done()
+        })
+      })
       it('highways (partly cached from test before)', function (done) {
         test({
           mode,
