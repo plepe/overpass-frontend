@@ -29,7 +29,7 @@ module.exports = class id extends qlFunction {
     }
   }
 
-  cacheDescriptors (descriptors) {
+  cacheDescriptors (descriptors, options) {
     descriptors.forEach(o => {
       let v = this.value
       if (o.ids) {

@@ -41,7 +41,7 @@ module.exports = class bbox extends qlFunction {
     return r
   }
 
-  cacheDescriptors (descriptors) {
+  cacheDescriptors (descriptors, options) {
     const bounds = this.value.toGeoJSON()
 
     descriptors.forEach(d => {

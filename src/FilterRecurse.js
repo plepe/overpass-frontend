@@ -143,7 +143,7 @@ class FilterRecurse extends FilterStatement {
     return result
   }
 
-  _caches () {
+  _caches (options) {
     if (!this.inputSet || !this.inputSetRef) {
       return []
     }
@@ -157,7 +157,7 @@ class FilterRecurse extends FilterStatement {
     const result = []
     possRecursions.forEach(recursions => {
       const setId = '._' + this.inputSetRef.id
-      const r = this.inputSetRef._caches()
+      const r = this.inputSetRef._caches(options)
 
       recursions = [...recursions]
       const thisFilter = recursions.shift()

@@ -143,9 +143,9 @@ class FilterOr extends FilterStatement {
     return this.toString()
   }
 
-  _caches () {
+  _caches (options) {
     return this.parts
-      .map(part => part._caches())
+      .map(part => part._caches(options))
       .flat()
   }
 

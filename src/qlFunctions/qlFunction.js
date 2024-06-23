@@ -1,5 +1,5 @@
 module.exports = class qlFunction {
-  cacheDescriptors (descriptors) {
+  cacheDescriptors (descriptors, options) {
     descriptors.forEach(d => {
       d.filters += this.toString()
       d.properties |= this.properties()

@@ -439,7 +439,7 @@ class FilterQuery extends FilterStatement {
     return result
   }
 
-  _caches () {
+  _caches (options) {
     let descriptors = [{ filters: '', filtersRec: '', properties: 0 }]
 
     if (this.inputSets) {
@@ -454,7 +454,7 @@ class FilterQuery extends FilterStatement {
 
         const setId = '._' + inputSet.set.id
 
-        const recurse = inputSet.set._caches()
+        const recurse = inputSet.set._caches(options)
         recurse.forEach(r => {
           r.setId = setId
           r.properties |= ['r', 'w'].includes(inputSet.recurse) ? OverpassFrontend.MEMBERS : 0
@@ -495,7 +495,7 @@ class FilterQuery extends FilterStatement {
           return o
         })
       } else if (part instanceof qlFunction) {
-        part.cacheDescriptors(descriptors)
+        part.cacheDescriptors(descriptors, options)
       } else {
         throw new Error('caches(): invalid entry')
       }
@@ -513,7 +513,7 @@ class FilterQuery extends FilterStatement {
 
         const set = inputSet.set
         const result = []
-        set._caches().forEach(a => {
+        set._caches(options).forEach(a => {
           descriptors.forEach(b => {
             const r = cacheMerge(a, b)
             if (r) {
@@ -526,7 +526,7 @@ class FilterQuery extends FilterStatement {
       })
     } else if (this.filter.baseFilter) {
       const result = []
-      this.filter.baseFilter._caches().forEach(a => {
+      this.filter.baseFilter._caches(options).forEach(a => {
         descriptors.forEach(b => {
           const r = cacheMerge(a, b)
           if (r) {

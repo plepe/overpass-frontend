@@ -115,15 +115,15 @@ class FilterAnd extends FilterStatement {
     return this.toString()
   }
 
-  _caches () {
+  _caches (options) {
     const result = []
 
     const list = this.parts.concat()
     const first = list.shift()
 
-    let current = first._caches()
+    let current = first._caches(options)
     list.forEach(part => {
-      const r = part._caches()
+      const r = part._caches(options)
 
       r.forEach(r1 => {
         current.forEach(c => {

@@ -30,7 +30,7 @@ module.exports = class If extends qlFunction {
     return r
   }
 
-  cacheDescriptors (descriptors) {
+  cacheDescriptors (descriptors, options) {
     this.value.cacheDescriptors(descriptors)
   }
 

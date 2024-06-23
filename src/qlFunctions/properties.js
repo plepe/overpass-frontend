@@ -24,7 +24,7 @@ module.exports = class properties extends qlFunction {
     return { needMatch: true }
   }
 
-  cacheDescriptors (descriptors) {
+  cacheDescriptors (descriptors, options) {
     descriptors.forEach(o => {
       o.properties |= this.value
     })

@@ -33,7 +33,7 @@ module.exports = class around extends qlFunction {
     return { needMatch: true }
   }
 
-  cacheDescriptors (descriptors) {
+  cacheDescriptors (descriptors, options) {
     const bounds = this.bounds()
 
     descriptors.forEach(d => {
