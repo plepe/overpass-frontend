@@ -542,20 +542,21 @@ class FilterQuery extends FilterStatement {
   }
 
   match (ob) {
+    let result = true
+
     if (this.inputSets) {
-      const r = Object
-        .values(this.inputSets)
+      const sets = Object.values(this.inputSets)
         .filter(s => !s.recurse) // match only inputSets which are on the same item
         .filter(s => s.set)
-        .every(s => s.set.match(ob))
-      if (r !== true) {
-        return r
-      }
+
+      for (let i = 0; i < sets.length; i++) {
+        const r = sets[i].set.match(ob)
+        if (r === false) { return false }
+        if (r === null) { result = null }
+     }
     } else if (this.filter.baseFilter) {
-      const r = this.filter.baseFilter.match(ob)
-      if (r !== true) {
-        return r
-      }
+      result = this.filter.baseFilter.match(ob)
+      if (result === false) { return false }
     }
 
     if (this.type !== 'nwr' && ob.type !== this.type) {
@@ -616,7 +617,7 @@ class FilterQuery extends FilterStatement {
       }
     })
 
-    return results.includes(false) ? false : results.includes(null) ? null : true
+    return results.includes(false) ? false : results.includes(null) ? null : result
   }
 
   derefSets () {

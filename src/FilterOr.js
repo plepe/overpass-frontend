@@ -150,7 +150,15 @@ class FilterOr extends FilterStatement {
   }
 
   match (ob) {
-    return this.parts.some(part => part.match(ob))
+    let result = false
+
+    for (let i = 0; i < this.parts.length; i++) {
+      const r = this.parts[i].match(ob)
+      if (r === true) { return true }
+      if (r === null) { result = null }
+    }
+
+    return result
   }
 
   derefSets () {

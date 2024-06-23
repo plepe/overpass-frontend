@@ -141,7 +141,15 @@ class FilterAnd extends FilterStatement {
   }
 
   match (ob) {
-    return this.parts.every(part => part.match(ob))
+    let result = true
+
+    for (let i = 0; i < this.parts.length; i++) {
+      const r = this.parts[i].match(ob)
+      if (r === false) { return false }
+      if (r === null) { result = null }
+    }
+
+    return result
   }
 
   derefSets () {
