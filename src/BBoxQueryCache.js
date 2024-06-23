@@ -9,7 +9,8 @@ class BBoxQueryCache {
     this.list = {}
   }
 
-  get (id) {
+  get (descriptor) {
+    const id = descriptor.id
     if (!(id in this.list)) {
       this.list[id] = new BBoxQueryCacheItem(this, id)
     }

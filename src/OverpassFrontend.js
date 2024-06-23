@@ -661,7 +661,7 @@ class OverpassFrontend {
     const cacheDescriptors = new Filter(query).cacheDescriptors()
 
     cacheDescriptors.forEach(descriptor => {
-      this.bboxQueryCache.get(descriptor.id).clear()
+      this.bboxQueryCache.get(descriptor).clear()
     })
   }
 

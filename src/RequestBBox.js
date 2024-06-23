@@ -63,10 +63,10 @@ class RequestBBox extends Request {
       const cacheFilter = new Filter(this.filterQuery.toQl() + 'nwr._(properties:' + this.options.properties + ');')
       this.options.properties = cacheFilter.properties()
 
-      this.cacheDescriptors = cacheFilter.cacheDescriptors().map(cacheDescriptors => {
+      this.cacheDescriptors = cacheFilter.cacheDescriptors().map(cacheDescriptor => {
         return {
-          cache: this.overpass.bboxQueryCache.get(cacheDescriptors.id),
-          cacheDescriptors
+          cache: this.overpass.bboxQueryCache.get(cacheDescriptor),
+          cacheDescriptor
         }
       })
 
@@ -314,7 +314,7 @@ class RequestBBox extends Request {
       this.loadFinish = true
 
       this.cacheDescriptors && this.cacheDescriptors.forEach(cache => {
-        cache.cache.add(this.bbox, cache.cacheDescriptors)
+        cache.cache.add(this.bbox, cache.cacheDescriptor)
       })
     }
 
@@ -337,7 +337,7 @@ class RequestBBox extends Request {
     }
 
     return !this.cacheDescriptors || !this.cacheDescriptors.every(cache => {
-      return cache.cache.check(this.bbox, cache.cacheDescriptors)
+      return cache.cache.check(this.bbox, cache.cacheDescriptor)
     })
   }
 
