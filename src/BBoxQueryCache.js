@@ -36,17 +36,13 @@ class BBoxQueryCacheItem {
   /**
    * make another part of the map known
    */
-  add (bbox, cacheDescriptors = null) {
+  add (cacheDescriptor) {
     // ignore requests for IDs
-    if (cacheDescriptors && cacheDescriptors.ids) {
+    if (cacheDescriptor.ids) {
       return
     }
 
-    bbox = new BoundingBox(bbox).toGeoJSON()
-
-    if (cacheDescriptors && cacheDescriptors.bounds) {
-      bbox = turf.intersect(bbox, cacheDescriptors.bounds)
-    }
+    const bbox = cacheDescriptor.bounds ?? new BoundingBox().toGeoJSON()
 
     if (this.area === null) {
       this.area = bbox
@@ -58,29 +54,25 @@ class BBoxQueryCacheItem {
   /**
    * is the whole area known?
    */
-  check (bbox, cacheDescriptors = null) {
-    if (cacheDescriptors && cacheDescriptors.invalid) {
+  check (cacheDescriptor) {
+    if (cacheDescriptor.invalid) {
       return true
     }
 
-    if (cacheDescriptors && cacheDescriptors.ids) {
-      let types = [cacheDescriptors.id.match(/^(node|way|relation|nwr)/)[1]]
+    if (cacheDescriptor && cacheDescriptor.ids) {
+      let types = [cacheDescriptor.id.match(/^(node|way|relation|nwr)/)[1]]
       if (types[0] === 'nwr') {
         types = ['node', 'way', 'relation']
       }
 
       return types.every(type =>
-        cacheDescriptors.ids.every(id =>
+        cacheDescriptor.ids.every(id =>
           (type.substr(0, 1) + id) in this.main.overpass.cacheElements
         )
       )
     }
 
-    bbox = new BoundingBox(bbox).toGeoJSON()
-
-    if (cacheDescriptors && cacheDescriptors.bounds) {
-      bbox = turf.intersect(bbox, cacheDescriptors.bounds)
-    }
+    const bbox = cacheDescriptor.bounds ?? new BoundingBox().toGeoJSON()
 
     if (this.area) {
       const remaining = turf.difference(bbox, this.area)

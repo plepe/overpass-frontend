@@ -311,7 +311,7 @@ class RequestBBox extends Request {
       this.loadFinish = true
 
       this.cacheDescriptors && this.cacheDescriptors.forEach(cache => {
-        cache.cache.add(this.bbox, cache.cacheDescriptor)
+        cache.cache.add(cache.cacheDescriptor)
       })
     }
 
@@ -334,7 +334,7 @@ class RequestBBox extends Request {
     }
 
     return !this.cacheDescriptors || !this.cacheDescriptors.every(cache => {
-      return cache.cache.check(this.bbox, cache.cacheDescriptor)
+      return cache.cache.check(cache.cacheDescriptor)
     })
   }
 

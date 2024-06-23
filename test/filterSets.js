@@ -3135,7 +3135,7 @@ describe("Filter sets with relations, apply base filter", function () {
           mode,
           query: 'relation(48.19798,16.33788,48.1988,16.33933)["route"="bus"];way(r)["highway"="secondary"];',
           expected: [ "w31275228", "w4583442" ],
-          expectedSubRequestCount: 1, // TODO: 0
+          expectedSubRequestCount: 0,
           expectedCacheDescriptors: [{
             id: 'relation["route"="bus"](properties:13)->._1;way["highway"="secondary"](r._1)(properties:1)',
             recurse: [{
