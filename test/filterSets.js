@@ -2785,7 +2785,7 @@ describe("Filter sets with relations, apply base filter", function () {
   })
 })
 
-;['via-file', 'via-server'].forEach(mode => {
+;['via-server', 'via-file'].forEach(mode => {
   describe('Test filter sets ' + mode, function () {
     describe('initalize', function () {
       if (mode === 'via-server') {
