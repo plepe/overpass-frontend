@@ -45,7 +45,7 @@ class RequestBBox extends Request {
         return this.finish(err)
       }
 
-      this.lokiQuery = new Filter(this.filterQuery)
+      this.lokiQuery = new Filter(this.filterQuery.toString() + 'nwr._(properties:' + this.options.properties + ');')
 
       if (!boundsIsFullWorld(this.bounds)) {
         if (this.bounds instanceof BoundingBox) {
@@ -60,10 +60,7 @@ class RequestBBox extends Request {
         }
       }
 
-      const cacheFilter = new Filter(this.filterQuery.toQl() + 'nwr._(properties:' + this.options.properties + ');')
-      this.options.properties = cacheFilter.properties()
-
-      this.cacheDescriptors = cacheFilter.cacheDescriptors().map(cacheDescriptor => {
+      this.cacheDescriptors = this.lokiQuery.cacheDescriptors().map(cacheDescriptor => {
         return {
           cache: this.overpass.bboxQueryCache.get(cacheDescriptor),
           cacheDescriptor

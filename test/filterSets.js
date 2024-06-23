@@ -3003,7 +3003,6 @@ describe("Filter sets with relations, apply base filter", function () {
           expected: [ "w175757214", "w175757217", "w175757222", "w175757225", "w199715277", "w199715278", "w199911273", "w86273643", "w86273649" ],
           ignoreMissing: [ "w199911274", "w199911275" ],
           expectedSubRequestCount: 1,
-          expectedSubRequestCount2nd: 1, // TODO: maybe we can push this to 0?
           expectedCacheDescriptors: [{
             id: 'relation["building"](properties:5)->._1;way(r._1)(properties:0)',
             recurse: [{
