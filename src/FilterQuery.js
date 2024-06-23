@@ -440,7 +440,7 @@ class FilterQuery extends FilterStatement {
   }
 
   _caches () {
-    let options = [{ filters: '', filtersRec: '', properties: 0 }]
+    let descriptors = [{ filters: '', filtersRec: '', properties: 0 }]
 
     if (this.inputSets) {
       const recursingInputSets = Object.values(this.inputSets)
@@ -448,7 +448,7 @@ class FilterQuery extends FilterStatement {
 
       recursingInputSets.forEach(inputSet => {
         if (!inputSet.set) {
-          options = []
+          descriptors = []
           return
         }
 
@@ -464,14 +464,14 @@ class FilterQuery extends FilterStatement {
           }
         })
 
-        const _options = options
-        options = []
-        _options.forEach(o => {
+        const _descriptors = descriptors
+        descriptors = []
+        _descriptors.forEach(o => {
           recurse.forEach(r => {
             r.filtersFwd = (r.filtersFwd ?? '') + (o.filtersFwd ?? '') + '(' + inputSet.recurse + setId + ('role' in inputSet ? ':' + qlQuoteString(inputSet.role) : '') + ')'
             r.filtersRec = (r.filtersRec ?? '') + '(' + reverseRecurse[inputSet.recurse] + setId + ('role' in inputSet ? ':' + qlQuoteString(inputSet.role) : '') + ')',
 
-            options.push({
+            descriptors.push({
               filters: o.filters,
               properties: ['bn', 'bw', 'br'].includes(inputSet.recurse) ? OverpassFrontend.MEMBERS : 0,
               recurse: o.recurse ? o.recurse.concat([r]) : [r]
@@ -482,20 +482,20 @@ class FilterQuery extends FilterStatement {
     }
 
     if (this.type !== 'nwr') {
-      options.forEach(o => {
+      descriptors.forEach(o => {
         o.type = this.type
       })
     }
 
     this.filters.forEach(part => {
       if (part.op) {
-        options = options.map(o => {
+        descriptors = descriptors.map(o => {
           o.filters += compileFilter(part)
           o.properties |= OverpassFrontend.TAGS
           return o
         })
       } else if (part instanceof qlFunction) {
-        part.cacheDescriptors(options)
+        part.cacheDescriptors(descriptors)
       } else {
         throw new Error('caches(): invalid entry')
       }
@@ -507,14 +507,14 @@ class FilterQuery extends FilterStatement {
 
       normalInputSets.reverse().forEach(inputSet => {
         if (!inputSet || !inputSet.set) {
-          options = []
+          descriptors = []
           return
         }
 
         const set = inputSet.set
         const result = []
         set._caches().forEach(a => {
-          options.forEach(b => {
+          descriptors.forEach(b => {
             const r = cacheMerge(a, b)
             if (r) {
               result.push(r)
@@ -522,12 +522,12 @@ class FilterQuery extends FilterStatement {
           })
         })
 
-        options = result
+        descriptors = result
       })
     } else if (this.filter.baseFilter) {
       const result = []
       this.filter.baseFilter._caches().forEach(a => {
-        options.forEach(b => {
+        descriptors.forEach(b => {
           const r = cacheMerge(a, b)
           if (r) {
             result.push(r)
@@ -535,10 +535,10 @@ class FilterQuery extends FilterStatement {
         })
       })
 
-      options = result
+      descriptors = result
     }
 
-    return options
+    return descriptors
   }
 
   match (ob) {
