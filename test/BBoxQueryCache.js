@@ -154,6 +154,22 @@ describe('BBoxQueryCache', function() {
       const result = cache2.check(descriptor2)
       assert.equal(result, false)
     })
+
+    it('superset', function () {
+      bboxQueryCache.clear()
+
+      const filter1 = new Filter('nwr(48,16,49,17)')
+      const descriptor1 = filter1.cacheDescriptors()[0]
+      const cache1 = bboxQueryCache.get(descriptor1)
+      cache1.add(descriptor1)
+
+      const filter2 = new Filter('way(48.2,16,48.4,17)')
+      const descriptor2 = filter2.cacheDescriptors()[0]
+      const cache2 = bboxQueryCache.get(descriptor2)
+
+      const result = cache2.check(descriptor2)
+      assert.equal(result, true)
+    })
   })
 })
 

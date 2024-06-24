@@ -87,8 +87,8 @@ class BBoxQueryCacheItem {
       if (cache.id === this.id) { return false }
 
       if (cache.filter.isSupersetOf(this.filter)) {
-        if (cache.area) {
-          return !turf.difference(bbox, cache.area)
+        if (cache.check(cacheDescriptor)) {
+          return true
         }
       }
 
