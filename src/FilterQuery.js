@@ -10,9 +10,9 @@ const andTypes = require('./andTypes')
 const turf = require('./turf')
 
 const reverseRecurse = {
-  'r': 'b', // bn or bw
+  'r': ['bn', 'bw', 'br'],
   'w': 'bn',
-  'bn': 'u', // r or w
+  'bn': ['r', 'w'],
   'bw': 'r',
   'br': 'r',
 }
@@ -469,13 +469,27 @@ class FilterQuery extends FilterStatement {
         _descriptors.forEach(o => {
           recurse.forEach(r => {
             r.filtersFwd = (r.filtersFwd ?? '') + (o.filtersFwd ?? '') + '(' + inputSet.recurse + setId + ('role' in inputSet ? ':' + qlQuoteString(inputSet.role) : '') + ')'
-            r.filtersRec = (r.filtersRec ?? '') + '(' + reverseRecurse[inputSet.recurse] + setId + ('role' in inputSet ? ':' + qlQuoteString(inputSet.role) : '') + ')',
+            const revRec = reverseRecurse[inputSet.recurse]
+            if (Array.isArray(revRec)) {
+              revRec.forEach((revRec, i) => {
+                const r1 = { ...r }
+                r1.filtersRec = (r.filtersRec ?? '') + '(' + revRec + setId + ('role' in inputSet ? ':' + qlQuoteString(inputSet.role) : '') + ')',
 
-            descriptors.push({
-              filters: o.filters,
-              properties: ['bn', 'bw', 'br'].includes(inputSet.recurse) ? OverpassFrontend.MEMBERS : 0,
-              recurse: o.recurse ? o.recurse.concat([r]) : [r]
-            })
+                descriptors.push({
+                  filters: o.filters,
+                  properties: ['bn', 'bw', 'br'].includes(inputSet.recurse) ? OverpassFrontend.MEMBERS : 0,
+                  recurse: o.recurse ? o.recurse.concat([r1]) : [r1]
+                })
+              })
+            } else {
+              r.filtersRec = (r.filtersRec ?? '') + '(' + revRec + setId + ('role' in inputSet ? ':' + qlQuoteString(inputSet.role) : '') + ')',
+
+              descriptors.push({
+                filters: o.filters,
+                properties: ['bn', 'bw', 'br'].includes(inputSet.recurse) ? OverpassFrontend.MEMBERS : 0,
+                recurse: o.recurse ? o.recurse.concat([r]) : [r]
+              })
+            }
           })
         })
       })
