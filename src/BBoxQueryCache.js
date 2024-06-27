@@ -49,6 +49,17 @@ class BBoxQueryCacheItem {
     } else {
       this.area = turf.union(bbox, this.area)
     }
+
+    if (cacheDescriptor.recurse) {
+      if (!this.recurse) {
+        this.recurse = new BBoxQueryCache(this.main.overpass)
+      }
+
+      cacheDescriptor.recurse.forEach(cd => {
+        const cache = this.recurse.get(cd)
+        cache.add(cd)
+      })
+    }
   }
 
   /**
@@ -77,7 +88,7 @@ class BBoxQueryCacheItem {
     if (this.area) {
       const remaining = turf.difference(bbox, this.area)
 
-      if (!remaining) {
+      if (!remaining && this.checkRecurses(cacheDescriptor)) {
         return true
       }
     }
@@ -94,6 +105,21 @@ class BBoxQueryCacheItem {
 
       return false
     })
+  }
+
+  checkRecurses (cacheDescriptor) {
+    if (cacheDescriptor.recurse) {
+      if (!this.recurse) {
+        return true
+      }
+
+      return cacheDescriptor.recurse.every(cd => {
+        const cache = this.recurse.get(cd)
+        return cache.check(cd)
+      })
+    }
+
+    return true
   }
 
   /**

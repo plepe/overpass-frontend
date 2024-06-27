@@ -170,6 +170,30 @@ describe('BBoxQueryCache', function() {
       const result = cache2.check(descriptor2)
       assert.equal(result, true)
     })
+
+    it('recurse 1', function () {
+      bboxQueryCache.clear()
+
+      const filter1 = new Filter('way(48,16,49,17);node(w);')
+      const descriptor1 = filter1.cacheDescriptors()[0]
+      console.log(descriptor1)
+      const cache1 = bboxQueryCache.get(descriptor1)
+      cache1.add(descriptor1)
+
+      const filter2 = new Filter('way(48.2,16.2,48.8,16.8);node(w);')
+      const descriptor2 = filter2.cacheDescriptors()[0]
+      const cache2 = bboxQueryCache.get(descriptor2)
+      const result2 = cache2.check(descriptor2)
+      assert.equal(result2, true)
+      console.log(3)
+
+      const filter3 = new Filter('way(47.2,16.2,47.8,16.8);node(w);')
+      const descriptor3 = filter3.cacheDescriptors()[0]
+      const cache3 = bboxQueryCache.get(descriptor3)
+      const result3 = cache3.check(descriptor3)
+      assert.equal(result3, false)
+    })
+
   })
 })
 
