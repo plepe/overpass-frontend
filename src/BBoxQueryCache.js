@@ -65,7 +65,7 @@ class BBoxQueryCacheItem {
   /**
    * is the whole area known?
    */
-  check (cacheDescriptor) {
+  check (cacheDescriptor, _done = []) {
     if (cacheDescriptor.invalid) {
       return true
     }
@@ -93,12 +93,13 @@ class BBoxQueryCacheItem {
       }
     }
 
+    _done.push(this.id)
     // check if a superset matches
     return Object.values(this.main.list).some(cache => {
-      if (cache.id === this.id) { return false }
+      if (_done.includes(cache.id)) { return false }
 
       if (cache.filter.isSupersetOf(this.filter)) {
-        if (cache.check(cacheDescriptor)) {
+        if (cache.check(cacheDescriptor, _done)) {
           return true
         }
       }
