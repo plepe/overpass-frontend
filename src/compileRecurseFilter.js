@@ -7,9 +7,9 @@ function compileRecurseFilter (script, outputId, inputId) {
     return ''
   }
 
-  const output = script.filter(e => e.id == outputId)[0]
+  const output = script.filter(e => e.id == outputId)[0] // eslint-disable-line eqeqeq
   result = output.recurse.map(input => {
-    if (input.id == inputId) {
+    if (input.id == inputId) { // eslint-disable-line eqeqeq
       return compileRecurseReverse(input, output)
     } else {
       return compileRecurseFilter(script, input.id, inputId)

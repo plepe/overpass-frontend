@@ -10,13 +10,12 @@ const andTypes = require('./andTypes')
 const turf = require('./turf')
 
 const reverseRecurse = {
-  'r': ['bn', 'bw', 'br'],
-  'w': 'bn',
-  'bn': ['r', 'w'],
-  'bw': 'r',
-  'br': 'r',
+  r: ['bn', 'bw', 'br'],
+  w: 'bn',
+  bn: ['r', 'w'],
+  bw: 'r',
+  br: 'r'
 }
-
 
 class FilterQuery extends FilterStatement {
   constructor (def, filter) {
@@ -473,7 +472,7 @@ class FilterQuery extends FilterStatement {
             if (Array.isArray(revRec)) {
               revRec.forEach((revRec, i) => {
                 const r1 = { ...r }
-                r1.filtersRec = (r.filtersRec ?? '') + '(' + revRec + setId + ('role' in inputSet ? ':' + qlQuoteString(inputSet.role) : '') + ')',
+                r1.filtersRec = (r.filtersRec ?? '') + '(' + revRec + setId + ('role' in inputSet ? ':' + qlQuoteString(inputSet.role) : '') + ')'
 
                 descriptors.push({
                   filters: o.filters,
@@ -482,7 +481,7 @@ class FilterQuery extends FilterStatement {
                 })
               })
             } else {
-              r.filtersRec = (r.filtersRec ?? '') + '(' + revRec + setId + ('role' in inputSet ? ':' + qlQuoteString(inputSet.role) : '') + ')',
+              r.filtersRec = (r.filtersRec ?? '') + '(' + revRec + setId + ('role' in inputSet ? ':' + qlQuoteString(inputSet.role) : '') + ')'
 
               descriptors.push({
                 filters: o.filters,
@@ -567,7 +566,7 @@ class FilterQuery extends FilterStatement {
         const r = sets[i].set.match(ob)
         if (r === false) { return false }
         if (r === null) { result = null }
-     }
+      }
     } else if (this.filter.baseFilter) {
       result = this.filter.baseFilter.match(ob)
       if (result === false) { return false }

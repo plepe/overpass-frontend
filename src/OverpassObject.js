@@ -360,7 +360,7 @@ class OverpassObject {
     }
 
     if (this.boundsPossibleMatch) {
-      let bboxGeoJSON = isGeoJSON(bbox) ? bbox : bbox.toGeoJSON()
+      const bboxGeoJSON = isGeoJSON(bbox) ? bbox : bbox.toGeoJSON()
       const remaining = turf.intersect(bboxGeoJSON, this.boundsPossibleMatch)
 
       if (!remaining || remaining.geometry.type !== 'Polygon') {

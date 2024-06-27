@@ -7,39 +7,39 @@ const cachesMapTypes = {
   '>': [
     [
       { type: 'way', properties: OverpassFrontend.MEMBERS },
-      { type: 'node', recurseType: 'w', recurseRecType: 'bn' },
+      { type: 'node', recurseType: 'w', recurseRecType: 'bn' }
     ],
     [
       { type: 'relation', properties: OverpassFrontend.MEMBERS },
-      { type: 'node', recurseType: 'r', recurseRecType: 'bn' },
+      { type: 'node', recurseType: 'r', recurseRecType: 'bn' }
     ],
     [
       { type: 'relation', properties: OverpassFrontend.MEMBERS },
-      { type: 'way', recurseType: 'r', recurseRecType: 'bw' },
+      { type: 'way', recurseType: 'r', recurseRecType: 'bw' }
     ],
     [
       { type: 'relation', properties: OverpassFrontend.MEMBERS },
       { type: 'way', recurseType: 'r', recurseRecType: 'bw', properties: OverpassFrontend.MEMBERS },
-      { type: 'node', recurseType: 'w', recurseRecType: 'bn' },
+      { type: 'node', recurseType: 'w', recurseRecType: 'bn' }
     ]
   ],
   '<': [
     [
       { type: 'node' },
-      { type: 'way', properties: OverpassFrontend.MEMBERS, recurseType: 'bn', recurseRecType: 'w' },
+      { type: 'way', properties: OverpassFrontend.MEMBERS, recurseType: 'bn', recurseRecType: 'w' }
     ],
     [
       { type: 'node' },
-      { type: 'relation', properties: OverpassFrontend.MEMBERS, recurseType: 'bn', recurseRecType: 'r' },
+      { type: 'relation', properties: OverpassFrontend.MEMBERS, recurseType: 'bn', recurseRecType: 'r' }
     ],
     [
       { type: 'way' },
-      { type: 'relation', properties: OverpassFrontend.MEMBERS, recurseType: 'bw', recurseRecType: 'r' },
+      { type: 'relation', properties: OverpassFrontend.MEMBERS, recurseType: 'bw', recurseRecType: 'r' }
     ],
     [
       { type: 'node' },
       { type: 'way', properties: OverpassFrontend.MEMBERS, recurseType: 'bn', recurseRecType: 'w' },
-      { type: 'relation', properties: OverpassFrontend.MEMBERS, recurseType: 'bw', recurseRecType: 'r' },
+      { type: 'relation', properties: OverpassFrontend.MEMBERS, recurseType: 'bw', recurseRecType: 'r' }
     ]
   ]
 }

@@ -236,7 +236,7 @@ class RequestBBox extends Request {
     }
 
     const script = this.lokiQuery.getScript()
-    let filter = this.lokiQuery.toQl({ setsUseStatementIds: true })
+    const filter = this.lokiQuery.toQl({ setsUseStatementIds: true })
     const reverseParts = {}
     script.reverse().forEach(e => {
       e.recurse.forEach(r => {
