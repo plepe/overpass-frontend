@@ -71,10 +71,8 @@ class BBoxQueryCacheItem {
     }
 
     if (cacheDescriptor && cacheDescriptor.ids) {
-      let types = [cacheDescriptor.id.match(/^(node|way|relation|nwr)/)[1]]
-      if (types[0] === 'nwr') {
-        types = ['node', 'way', 'relation']
-      }
+      const type = this.filter.getStatement().type
+      const types = type === 'nwr' ? ['node', 'way', 'relation'] : [type]
 
       return types.every(type =>
         cacheDescriptor.ids.every(id =>
