@@ -9,7 +9,7 @@ module.exports = function compileRecurseReverse (input, output) {
     case 'w':
       return `way${inputSet}(bn${outputSet})->${revSet};\n`
     case 'bn':
-      return `node${inputSet}(w${outputSet})->${revSet};\n`
+      return `(node${inputSet}(w${outputSet});node${inputSet}(r${outputSet});)->${revSet};\n`
     case 'bw':
       return `way${inputSet}(r${outputSet})->${revSet};\n`
     case 'br':
