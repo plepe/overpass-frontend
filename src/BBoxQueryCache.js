@@ -74,11 +74,19 @@ class BBoxQueryCacheItem {
       const type = this.filter.getStatement().type
       const types = type === 'nwr' ? ['node', 'way', 'relation'] : [type]
 
-      return types.every(type =>
+      const result = types.every(type =>
         cacheDescriptor.ids.every(id =>
           (type.substr(0, 1) + id) in this.main.overpass.cacheElements
         )
       )
+
+      if (!result) {
+        return false
+      }
+
+      if (this.checkRecurses(cacheDescriptor)) {
+        return true
+      }
     }
 
     const bbox = cacheDescriptor.bounds ?? new BoundingBox().toGeoJSON()

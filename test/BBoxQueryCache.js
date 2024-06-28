@@ -218,6 +218,34 @@ describe('BBoxQueryCache', function() {
       assert.equal(result3, false)
     })
 
+    it('recurse with id', function () {
+      bboxQueryCache.clear()
+      overpassFrontend.cacheElements.n1 = true
+
+      const filter1 = new Filter('relation[route=bus];nwr(r)(48,16,49,17)')
+      const descriptor1 = filter1.cacheDescriptors()[0]
+      const cache1 = bboxQueryCache.get(descriptor1)
+      cache1.add(descriptor1)
+
+      const filter2 = new Filter('relation[route=bus];node(r)(id:1)')
+      const descriptor2 = filter2.cacheDescriptors()[0]
+      const cache2 = bboxQueryCache.get(descriptor2)
+      const result2 = cache2.check(descriptor2)
+      assert.equal(result2, true)
+
+      const filter3 = new Filter('relation[route=bus];node(r)(id:2)')
+      const descriptor3 = filter3.cacheDescriptors()[0]
+      const cache3 = bboxQueryCache.get(descriptor3)
+      const result3 = cache3.check(descriptor3)
+      assert.equal(result3, false)
+
+      const filter4 = new Filter('relation[route=tram];node(r)(id:1)')
+      const descriptor4 = filter3.cacheDescriptors()[0]
+      const cache4 = bboxQueryCache.get(descriptor4)
+      const result4 = cache4.check(descriptor4)
+      assert.equal(result4, false)
+    })
+
   })
 })
 
