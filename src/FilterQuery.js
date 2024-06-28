@@ -10,9 +10,9 @@ const andTypes = require('./andTypes')
 const turf = require('./turf')
 
 const reverseRecurse = {
-  r: ['bn', 'bw', 'br'],
+  r: [['bn', 'node'], ['bw', 'way'], ['br', 'relation']],
   w: 'bn',
-  bn: ['r', 'w'],
+  bn: [['r', 'relation'], ['w', 'way']],
   bw: 'r',
   br: 'r'
 }
@@ -470,7 +470,11 @@ class FilterQuery extends FilterStatement {
             r.filtersFwd = (r.filtersFwd ?? '') + (o.filtersFwd ?? '') + '(' + inputSet.recurse + setId + ('role' in inputSet ? ':' + qlQuoteString(inputSet.role) : '') + ')'
             const revRec = reverseRecurse[inputSet.recurse]
             if (Array.isArray(revRec)) {
-              revRec.forEach((revRec, i) => {
+              revRec.forEach(([revRec, recType]) => {
+                if (!andTypes(this.type, recType)) {
+                  return
+                }
+
                 const r1 = { ...r }
                 r1.filtersRec = (r.filtersRec ?? '') + '(' + revRec + setId + ('role' in inputSet ? ':' + qlQuoteString(inputSet.role) : '') + ')'
 
