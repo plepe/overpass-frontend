@@ -1,11 +1,8 @@
-var fs = require('fs')
-var conf = JSON.parse(fs.readFileSync('test/conf.json', 'utf8'));
-
 var assert = require('assert')
 var async = require('async')
 
 var OverpassFrontend = require('../src/OverpassFrontend')
-var overpassFrontend = new OverpassFrontend(conf.url)
+var overpassFrontend = new OverpassFrontend()
 var BoundingBox = require('boundingbox')
 var Filter = require('../src/Filter')
 var BBoxQueryCache = require('../src/BBoxQueryCache')
