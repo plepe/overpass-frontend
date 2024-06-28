@@ -1,10 +1,15 @@
+var fs = require('fs')
+var conf = JSON.parse(fs.readFileSync('test/conf.json', 'utf8'));
+
 var assert = require('assert')
 var async = require('async')
 
+var OverpassFrontend = require('../src/OverpassFrontend')
+var overpassFrontend = new OverpassFrontend(conf.url)
 var BoundingBox = require('boundingbox')
 var Filter = require('../src/Filter')
 var BBoxQueryCache = require('../src/BBoxQueryCache')
-var bboxQueryCache = new BBoxQueryCache()
+var bboxQueryCache = new BBoxQueryCache(overpassFrontend)
 
 describe('BBoxQueryCache', function() {
   describe('add', function() {
@@ -153,6 +158,28 @@ describe('BBoxQueryCache', function() {
 
       const result = cache2.check(descriptor2)
       assert.equal(result, false)
+    })
+
+    it('id', function () {
+      bboxQueryCache.clear()
+      overpassFrontend.cacheElements.n1 = true
+
+      const filter1 = new Filter('nwr(48,16,49,17)')
+      const descriptor1 = filter1.cacheDescriptors()[0]
+      const cache1 = bboxQueryCache.get(descriptor1)
+      cache1.add(descriptor1)
+
+      const filter2 = new Filter('node(id:1)')
+      const descriptor2 = filter2.cacheDescriptors()[0]
+      const cache2 = bboxQueryCache.get(descriptor2)
+      const result2 = cache2.check(descriptor2)
+      assert.equal(result2, true)
+
+      const filter3 = new Filter('node(id:2)')
+      const descriptor3 = filter3.cacheDescriptors()[0]
+      const cache3 = bboxQueryCache.get(descriptor3)
+      const result3 = cache3.check(descriptor3)
+      assert.equal(result3, false)
     })
 
     it('superset', function () {
