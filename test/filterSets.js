@@ -3280,6 +3280,21 @@ describe("Filter sets with relations, apply base filter", function () {
           }]
         }, done)
       })
+      it('bus routes of a highway node (should be cached)', function (done) {
+        test({
+          mode,
+          query: 'node(id:2211384239);relation(bn)["route"="bus"];',
+          expected: [ 'r79466' ],
+          expectedSubRequestCount: 1, // TODO: 0
+          expectedCacheDescriptors: [{
+            id: 'node(properties:0)->._1;relation["route"="bus"](bn._1)(properties:5)',
+            recurse: [{
+              ids: ['2211384239'],
+              id: 'node(properties:0)->._1;relation["route"="bus"](bn._1)(properties:5)->._1;node(r._1)(properties:0)'
+            }]
+          }]
+        }, done)
+      })
 
 /*    TODO: cache descriptors creates bug
       it('or1', function (done) {
