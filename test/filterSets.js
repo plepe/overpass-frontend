@@ -3230,6 +3230,24 @@ describe("Filter sets with relations, apply base filter", function () {
           done()
         })
       })
+      it('bus routes (partly cached)', function (done) {
+        test({
+          mode,
+          query: 'relation["route"="bus"](48.19816,16.33403,48.19932,16.33721);',
+          expected: [],
+          expectedSubRequestCount: 1,
+          expectedSubRequestCount2nd: 1, // TODO: 0 - problem: not matching bbox. fix: update possibleBounds.
+          expectedCacheDescriptors: [{
+            id: 'relation["route"="bus"](properties:9)',
+            bounds: {
+              type: "Polygon",
+              coordinates: [ [ [ 16.33403, 48.19816 ], [ 16.33721, 48.19816 ], [ 16.33721, 48.19932 ], [ 16.33403, 48.19932 ], [ 16.33403, 48.19816 ] ] ]
+            }
+          }]
+        }, (err) => {
+          done()
+        })
+      })
       it('highways (partly cached from test before)', function (done) {
         test({
           mode,
