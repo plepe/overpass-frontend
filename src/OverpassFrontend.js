@@ -420,6 +420,7 @@ class OverpassFrontend {
     }
 
     const query = context.queryOptions + ';\n' + context.query
+    // console.log(query)
 
     setTimeout(function () {
       httpLoad(
@@ -933,6 +934,7 @@ class OverpassFrontend {
     const needMatch = !!query.needMatch
     delete query.needMatch
 
+    console.log(JSON.stringify(query, null, '  '))
     let list = db.find(query).data()
 
     if (needMatch) {

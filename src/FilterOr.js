@@ -26,16 +26,12 @@ class FilterOr extends FilterStatement {
   }
 
   toLokijs (options = {}) {
-    const allRecurse = this.parts.filter(p => p.recurse().length)
-    if (allRecurse.length) {
-      return {}
-    }
+    const nonRecurse = this.parts.filter(p => !p.recurse().length)
 
     let needMatch = false
 
     const r = {
-      $or:
-      this.parts.map(part => {
+      $or: nonRecurse.map(part => {
         const r = part.toLokijs(options)
         if (r.needMatch) {
           needMatch = true

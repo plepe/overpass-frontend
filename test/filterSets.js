@@ -2070,7 +2070,7 @@ describe("Filter sets with relations, compile", function () {
       ]}
     ])
     assert.equal(f.toQuery(), '(nwr._3;)->._2;')
-    assert.deepEqual(f.toLokijs(), {})
+    assert.deepEqual(f.toLokijs(), {$or: []})
     assert.deepEqual(f.toLokijs({ statement: 3 }), {
       'tags.highway': { $exists: true },
       'type': { $eq: 'node' }
@@ -2118,7 +2118,9 @@ describe("Filter sets with relations, compile", function () {
       ]}
     ])
     assert.equal(f.toQuery(), '(nwr._2;nwr._3;)->._1;')
-    assert.deepEqual(f.toLokijs(), {})
+    assert.deepEqual(f.toLokijs(), {$or: [
+      { 'tags.b': { $exists: true } }
+    ]})
     assert.deepEqual(f.derefSets(), [
       { "type": "nwr", "filters": [ { "key": "b", "op": "has_key" } ] },
       { "type": "nwr", "filters": [], "recurse": [
@@ -2256,9 +2258,9 @@ describe("Filter sets with relations, compile", function () {
     assert.deepEqual(f.getScript({ set: 'a' }), [])
     assert.deepEqual(f.compileQuery(), {
       query: '(node(w.foo););',
-      loki: {}
+      loki: {$or: []}
     })
-    assert.deepEqual(f.toLokijs(), {})
+    assert.deepEqual(f.toLokijs(), {$or: []})
     assert.deepEqual(f.derefSets(), [ ])
     var r = f.cacheDescriptors()
     assert.deepEqual(r, [])
@@ -2313,7 +2315,11 @@ describe("Filter sets with relations, compile", function () {
     assert.deepEqual(f.getScript({ set: 'a' }), [
       { id: 1, properties: 1, recurse: [] }
     ])
-    assert.deepEqual(f.toLokijs(), {}) // TODO: wrong (should include nwr[b])
+    assert.deepEqual(f.toLokijs(), {
+      $or: [
+        { 'tags.b': { $exists: true } }
+      ]
+    })
     assert.deepEqual(f.derefSets(), [
       { "type": "nwr", "filters": [ { "key": "b", "op": "has_key" } ] },
       { "type": "nwr", "filters": [], "recurse": [
@@ -2403,7 +2409,84 @@ describe("Filter sets with relations, compile", function () {
     ]
 )
   })
-})
+  it ('(way["highway"="secondary"];node(w););', function () {
+    var f = new Filter('(way["highway"="secondary"];node(w););')
+
+    assert.deepEqual(f.def, [{
+      or: [
+        [
+          { type: 'way' },
+          { key: 'highway', op: '=', value: 'secondary' }
+        ],
+        [
+          { type: 'node' },
+          { inputSet: '_', recurse: 'w' }
+        ]
+      ]
+    }])
+    assert.equal(f.toString(), '(way["highway"="secondary"];node(w););')
+    assert.equal(f.toQl(), '(way["highway"="secondary"];node(w););')
+    assert.equal(f.toQl({ setsUseStatementIds: true }), '(way["highway"="secondary"]->._2;node(w._2)->._3;)->._1;')
+    assert.equal(f.toQuery(), '(nwr._2;nwr._3;)->._1;')
+    assert.equal(f.toQuery({ statement: 3 }), 'node(w._2)->._3;')
+    assert.equal(f.toQuery({ statement: 2 }), 'way["highway"="secondary"]->._2;')
+    assert.equal(f.toQuery({ statement: 1 }), '(nwr._2;nwr._3;)->._1;')
+    assert.deepEqual(f.recurse(), [
+      { id: 2, properties: 5, type: 'w' },
+    ])
+    assert.deepEqual(f.recurse({ statement: 1 }), [
+      { id: 2, properties: 5, type: 'w' },
+    ])
+    assert.deepEqual(f.recurse({ statement: 3 }), [
+      { id: 2, properties: 5, type: 'w' },
+    ])
+    assert.deepEqual(f.recurse({ set: 'a' }), [])
+    assert.deepEqual(f.getScript(), [
+      { id: 2, properties: 1, recurse: [] },
+      { id: 1, properties: 1, recurse: [
+        { id: 2, properties: 5, type: 'w' }
+      ]}
+    ])
+    assert.deepEqual(f.derefSets(), [
+      {
+        filters: [
+          { key: 'highway', op: '=', value: 'secondary' }
+        ],
+        type: 'way'
+      },
+      {
+        filters: [],
+        recurse: [
+          {
+            filters: [
+              { key: 'highway', op: '=', value: 'secondary' }
+            ],
+            recurseType: 'w',
+            type: 'way'
+          }
+        ],
+        type: 'node'
+      }
+    ])
+    var r = f.cacheDescriptors()
+    assert.deepEqual(r, [
+      {
+        id: 'way["highway"="secondary"](properties:1)'
+      },
+      {
+        id: 'way["highway"="secondary"](properties:5)->._2;node(w._2)(properties:0)',
+        recurse: [{
+          id: 'way["highway"="secondary"](properties:5)->._2;node(w._2)(properties:0)->._2;way["highway"="secondary"](bn._2)(properties:5)'
+        }]
+      }
+    ])
+    assert.deepEqual(f.toLokijs(), {$or: [
+      {
+        'tags.highway': { $eq: 'secondary' },
+        type: { $eq: 'way' }
+      }
+    ]})
+  })})
 
 describe("Filter sets with relations, apply base filter", function () {
   it ('nwr[amenity]; - additional filter: nwr(46,16,47,17)', function () {
