@@ -89,9 +89,9 @@ class FilterOr extends FilterStatement {
       return []
     }
 
-    return this.parts.map(p => {
-      return { id: p.id, properties: p.properties(), type: 'or' }
-    })
+    return allRecurse.map(p => {
+      return p.recurse()
+    }).flat()
   }
 
   toQuery (options = {}) {

@@ -2057,7 +2057,7 @@ describe("Filter sets with relations, compile", function () {
     assert.equal(f.toQl(), 'way["highway"];(node(w)["highway"];);')
     assert.equal(f.toQl({ setsUseStatementIds: true }), 'way["highway"]->._1;(node(w._1)["highway"]->._3;)->._2;')
     assert.deepEqual(f.recurse(), [
-      { id: 3, properties: 1, type: 'or' }
+      { id: 1, properties: 5, type: 'w' }
     ])
     assert.deepEqual(f.recurse({ statement: 3 }), [
       { id: 1, properties: 5, type: 'w' }
@@ -2065,11 +2065,8 @@ describe("Filter sets with relations, compile", function () {
     assert.deepEqual(f.recurse({ statement: 1 }), [])
     assert.deepEqual(f.getScript(), [
       { id: 1, properties: 1, recurse: [] },
-      { id: 3, properties: 1, recurse: [
-        { id: 1, properties: 5, type: 'w' }
-      ]},
       { id: 2, properties: 1, recurse: [
-        { id: 3, properties: 1, type: 'or' }
+        { id: 1, properties: 5, type: 'w' }
       ]}
     ])
     assert.equal(f.toQuery(), '(nwr._3;)->._2;')
@@ -2108,8 +2105,7 @@ describe("Filter sets with relations, compile", function () {
     assert.equal(f.toQl(), '(nwr["b"];>;);')
     assert.equal(f.toQl({ setsUseStatementIds: true }), '(nwr["b"]->._2;._2 > ->._3;)->._1;')
     assert.deepEqual(f.recurse(), [
-      { id: 2, properties: 1, type: 'or' },
-      { id: 3, properties: 0, type: 'or' }
+      { id: 2, properties: 5, type: '>' },
     ])
     assert.deepEqual(f.recurse({ statement: 2 }), [])
     assert.deepEqual(f.recurse({ statement: 3 }), [
@@ -2117,12 +2113,8 @@ describe("Filter sets with relations, compile", function () {
     ])
     assert.deepEqual(f.getScript(), [
       { id: 2, properties: 1, recurse: [] },
-      { id: 3, properties: 0, recurse: [
-        { id: 2, properties: 5, type: '>' }
-      ]},
       { id: 1, properties: 1, recurse: [
-        { id: 2, properties: 1, type: 'or' },
-        { id: 3, properties: 0, type: 'or' }
+        { id: 2, properties: 5, type: '>' }
       ]}
     ])
     assert.equal(f.toQuery(), '(nwr._2;nwr._3;)->._1;')
@@ -2253,15 +2245,12 @@ describe("Filter sets with relations, compile", function () {
     assert.equal(f.toQuery(), '(nwr._3;)->._2;')
     assert.equal(f.toQuery({ statement: 1 }), 'nwr["amenity"]->._1;')
     assert.deepEqual(f.recurse(), [
-      { id: 3, properties: 0, type: 'or' }
+      { id: null, properties: 4, type: 'w' }
     ])
     assert.deepEqual(f.recurse({ statement: 1 }), [])
     assert.deepEqual(f.getScript(), [
-      { id: 3, properties: 0, recurse: [
-        { id: null, properties: 4, type: 'w' }
-      ]},
       { id: 2, properties: 0, recurse: [
-        { id: 3, properties: 0, type: 'or' }
+        { id: null, properties: 4, type: 'w' }
       ]}
     ])
     assert.deepEqual(f.getScript({ set: 'a' }), [])
@@ -2298,9 +2287,8 @@ describe("Filter sets with relations, compile", function () {
     assert.equal(f.toQuery({ statement: 6 }), '._1 > ->._6;')
     assert.equal(f.toQuery({ statement: 1 }), 'nwr["a"]->._1;')
     assert.deepEqual(f.recurse(), [
-      { id: 3, properties: 1, type: 'or' },
-      { id: 4, properties: 0, type: 'or' },
-      { id: 5, properties: 0, type: 'or' }
+      { id: 3, properties: 5, type: '>' },
+      { id: 1, properties: 5, type: '>' }
     ])
     assert.deepEqual(f.recurse({ statement: 1 }), [])
     assert.deepEqual(f.recurse({ statement: 3 }), [])
@@ -2308,7 +2296,7 @@ describe("Filter sets with relations, compile", function () {
       { id: 3, properties: 5, type: '>' }
     ])
     assert.deepEqual(f.recurse({ statement: 5 }), [
-      { id: 6, properties: 0, type: 'or' }
+      { id: 1, properties: 5, type: '>' }
     ])
     assert.deepEqual(f.recurse({ statement: 6 }), [
       { id: 1, properties: 5, type: '>' }
@@ -2316,20 +2304,10 @@ describe("Filter sets with relations, compile", function () {
     assert.deepEqual(f.recurse({ set: 'a' }), [])
     assert.deepEqual(f.getScript(), [
       { id: 3, properties: 1, recurse: [] },
-      { id: 4, properties: 0, recurse: [
-        { id: 3, properties: 5, type: '>' }
-      ]},
       { id: 1, properties: 1, recurse: [] },
-      { id: 6, properties: 0, recurse: [
-        { id: 1, properties: 5, type: '>' }
-      ]},
-      { id: 5, properties: 0, recurse: [
-        { id: 6, properties: 0, type: 'or' }
-      ]},
       { id: 2, properties: 1, recurse: [
-        { id: 3, properties: 1, type: 'or' },
-        { id: 4, properties: 0, type: 'or' },
-        { id: 5, properties: 0, type: 'or' }
+        { id: 3, properties: 5, type: '>' },
+        { id: 1, properties: 5, type: '>' }
       ]}
     ])
     assert.deepEqual(f.getScript({ set: 'a' }), [
@@ -3295,8 +3273,6 @@ describe("Filter sets with relations, apply base filter", function () {
           }]
         }, done)
       })
-
-/*    TODO: cache descriptors creates bug
       it('or1', function (done) {
         test({
           mode,
@@ -3308,14 +3284,17 @@ describe("Filter sets with relations, apply base filter", function () {
             maxlon: 16.33841
           },
           expected: [ 'w4583442', 'n378459', 'n378462', 'n270328331', 'n2208875391', 'n2213568001', 'n3037431653', 'n3037431688' ],
-          expectedSubRequestCount: 0,
+          expectedSubRequestCount: 1,
           expectedCacheDescriptors: [{
             "id": 'way["highway"="secondary"](properties:1)',
           }, {
-            "id": '-["highway"="secondary"](properties:1)', // TODO: WRONG!
+            "id": 'way["highway"="secondary"](properties:5)->._2;node(w._2)(properties:0)',
+            "recurse": [{
+              "id": 'way["highway"="secondary"](properties:5)->._2;node(w._2)(properties:0)->._2;way["highway"="secondary"](bn._2)(properties:5)'
+            }]
           }]
         }, done)
-      }) */
+      })
     })
   })
 })
