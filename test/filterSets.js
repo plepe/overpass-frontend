@@ -2844,6 +2844,111 @@ describe("Filter sets with relations, apply base filter", function () {
       }
     ])
   })
+  it ('way;node(w); - base filter: nwr(46,16,47,17)', function () {
+    var f = new Filter('way;node(w);')
+    f.setBaseFilter('nwr(46,16,47,17)')
+
+    assert.equal(f.toString(), 'nwr(46,16,47,17)->._base;way._base;node(w);')
+    assert.equal(f.toQl(), 'nwr(46,16,47,17)->._base;way._base;node(w);')
+    assert.equal(f.toQl({ setsUseStatementIds: true }), 'nwr(46,16,47,17)->._base;way._base->._1;node(w._1)->._2;')
+    assert.equal(f.toQuery(), 'node(w._1)->._2;')
+    assert.equal(f.toQuery({ statement: 1 }), '(nwr(46,16,47,17)->._1;)->._base;way._base->._1;')
+    assert.deepEqual(f.recurse(), [
+      { id: 1, properties: 12, type: 'w' }
+    ])
+    assert.deepEqual(f.recurse({ statement: 1 }), [])
+    assert.deepEqual(f.getScript(), [
+      { id: 1, properties: 8, recurse: [] },
+      { id: 2, properties: 0, recurse: [
+        { id: 1, properties: 12, type: 'w' }
+      ]}
+    ])
+    assert.deepEqual(f.compileQuery(), {
+      loki: { type: { '$eq': 'node' } },
+      query: 'node(w);',
+      recurse: [
+        {
+          inputSet: '_',
+          loki: { '$and': [ {
+              $and: [{
+                maxlat: { '$gte': 46 },
+                maxlon: { '$gte': 16 },
+                minlat: { '$lte': 47 },
+                minlon: { '$lte': 17 }
+              }],
+            }, {
+            type: { '$eq': 'way' }
+          } ], needMatch: true },
+          query: 'nwr(46,16,47,17)->._base;way._base;',
+          type: 'w'
+        }
+      ]
+    })
+    assert.deepEqual(f.toLokijs(), { type: { $eq: 'node' } })
+    var r = f.cacheDescriptors()
+    assert.deepEqual(r, [
+      {
+        id: 'way(properties:12)->._1;node(w._1)(properties:0)',
+        recurse: [
+          {
+            id: 'way(properties:12)->._1;node(w._1)(properties:0)->._1;way(bn._1)(properties:12)',
+            bounds: { type: 'Polygon', coordinates: [ [ [ 16, 46 ], [ 17, 46 ], [ 17, 47 ], [ 16, 47 ], [ 16, 46 ] ] ] },
+          }
+        ]
+      }
+    ])
+  })
+  it ('way(46,16,47,17);node(w);', function () {
+    var f = new Filter('way(46,16,47,17);node(w);')
+
+    assert.equal(f.toString(), 'way(46,16,47,17);node(w);')
+    assert.equal(f.toQl(), 'way(46,16,47,17);node(w);')
+    assert.equal(f.toQl({ setsUseStatementIds: true }), 'way(46,16,47,17)->._1;node(w._1)->._2;')
+    assert.equal(f.toQuery(), 'node(w._1)->._2;')
+    assert.equal(f.toQuery({ statement: 1 }), 'way(46,16,47,17)->._1;')
+    assert.deepEqual(f.recurse(), [
+      { id: 1, properties: 12, type: 'w' }
+    ])
+    assert.deepEqual(f.recurse({ statement: 1 }), [])
+    assert.deepEqual(f.getScript(), [
+      { id: 1, properties: 8, recurse: [] },
+      { id: 2, properties: 0, recurse: [
+        { id: 1, properties: 12, type: 'w' }
+      ]}
+    ])
+    assert.deepEqual(f.compileQuery(), {
+      loki: { type: { '$eq': 'node' } },
+      query: 'node(w);',
+      recurse: [
+        {
+          inputSet: '_',
+          loki: { '$and': [ {
+                maxlat: { '$gte': 46 },
+                maxlon: { '$gte': 16 },
+                minlat: { '$lte': 47 },
+                minlon: { '$lte': 17 },
+          } ], needMatch: true,
+            type: { '$eq': 'way' }
+          },
+          query: 'way(46,16,47,17);',
+          type: 'w'
+        }
+      ]
+    })
+    assert.deepEqual(f.toLokijs(), { type: { $eq: 'node' } })
+    var r = f.cacheDescriptors()
+    assert.deepEqual(r, [
+      {
+        id: 'way(properties:12)->._1;node(w._1)(properties:0)',
+        recurse: [
+          {
+            id: 'way(properties:12)->._1;node(w._1)(properties:0)->._1;way(bn._1)(properties:12)',
+            bounds: { type: 'Polygon', coordinates: [ [ [ 16, 46 ], [ 17, 46 ], [ 17, 47 ], [ 16, 47 ], [ 16, 46 ] ] ] },
+          }
+        ]
+      }
+    ])
+  })
 })
 
 ;['via-server', 'via-file'].forEach(mode => {
