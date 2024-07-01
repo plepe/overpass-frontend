@@ -837,7 +837,12 @@ describe("Filter sets with relations, compile", function () {
         type: '>'
       }]
     })
-    assert.deepEqual(f.toLokijs(), {})
+    assert.deepEqual(f.toLokijs(), {
+      $or: [
+        { type: { $eq: 'node' } },
+        { type: { $eq: 'way' } }
+      ]
+    })
     assert.deepEqual(f.derefSets(), [
       { type: 'nwr', filters: [], recurse:
         [
@@ -910,7 +915,12 @@ describe("Filter sets with relations, compile", function () {
         }
       }]
     })
-    assert.deepEqual(f.toLokijs(), {})
+    assert.deepEqual(f.toLokijs(), {
+      $or: [
+        { type: { $eq: 'node' } },
+        { type: { $eq: 'way' } }
+      ]
+    })
     assert.deepEqual(f.derefSets(), [
       { type: 'nwr', filters: [], recurse:
         [
@@ -963,7 +973,12 @@ describe("Filter sets with relations, compile", function () {
         }
       }]
     })
-    assert.deepEqual(f.toLokijs(), {})
+    assert.deepEqual(f.toLokijs(), {
+      $or: [
+        { type: { $eq: 'node' } },
+        { type: { $eq: 'way' } }
+      ]
+    })
     assert.deepEqual(f.derefSets(), [
       { type: 'nwr', filters: [], recurse:
         [
@@ -1034,7 +1049,12 @@ describe("Filter sets with relations, compile", function () {
         }
       }]
     })
-    assert.deepEqual(f.toLokijs(), {})
+    assert.deepEqual(f.toLokijs(), {
+      $or: [
+        { type: { $eq: 'way' } },
+        { type: { $eq: 'relation' } }
+      ]
+    })
     assert.deepEqual(f.derefSets(), [
       { type: 'nwr', filters: [], recurse:
         [
@@ -1106,6 +1126,11 @@ describe("Filter sets with relations, compile", function () {
       query: '>;node._["highway"];',
       loki: {
         $and: [{
+          $or: [
+            { type: { $eq: 'node' } },
+            { type: { $eq: 'way' } }
+          ]},
+        {
           'tags.highway': {$exists:true},
           'type': {$eq: 'node'}
         }]
@@ -1121,6 +1146,12 @@ describe("Filter sets with relations, compile", function () {
     })
     assert.deepEqual(f.toLokijs(), {
       $and: [{
+        $or: [
+          { type: { $eq: 'node' } },
+          { type: { $eq: 'way' } }
+        ]
+      },
+      {
         'tags.highway': {$exists:true},
         'type': {$eq: 'node'}
       }]
@@ -1191,6 +1222,10 @@ describe("Filter sets with relations, compile", function () {
       query: '<;relation._["highway"];',
       loki: {
         $and: [
+          { $or: [
+            { type: { $eq: 'way' } },
+            { type: { $eq: 'relation' } }
+          ]},
           {
             'tags.highway': { $exists: true },
             type: { $eq: 'relation' }
@@ -1209,6 +1244,10 @@ describe("Filter sets with relations, compile", function () {
     })
     assert.deepEqual(f.toLokijs(), {
       $and: [
+        { $or: [
+          { type: { $eq: 'way' } },
+          { type: { $eq: 'relation' } }
+        ]},
         {
           'tags.highway': { $exists: true },
           type: { $eq: 'relation' }
@@ -1275,6 +1314,10 @@ describe("Filter sets with relations, compile", function () {
       query: '<;way._["highway"];',
       loki: {
         $and: [
+          { $or: [
+            { type: { $eq: 'way' } },
+            { type: { $eq: 'relation' } }
+          ]},
           {
             'tags.highway': { $exists: true },
             type: { $eq: 'way' }
@@ -1293,6 +1336,10 @@ describe("Filter sets with relations, compile", function () {
     })
     assert.deepEqual(f.toLokijs(), {
       $and: [
+        { $or: [
+          { type: { $eq: 'way' } },
+          { type: { $eq: 'relation' } }
+        ]},
         {
           'tags.highway': { $exists: true },
           type: { $eq: 'way' }
@@ -1368,7 +1415,12 @@ describe("Filter sets with relations, compile", function () {
     assert.deepEqual(f.toLokijs({set: 'a'}), {
       "tags.amenity": { $exists: true }
     })
-    assert.deepEqual(f.toLokijs({set: 'b'}), {})
+    assert.deepEqual(f.toLokijs({set: 'b'}), {
+      $or: [
+        { type: { $eq: 'node' } },
+        { type: { $eq: 'way' } }
+      ]
+    })
     assert.deepEqual(f.derefSets(), [])
     assert.deepEqual(f.derefSets({ set: 'a' }), [
       { type: 'nwr', filters: [ { key: 'amenity', op: 'has_key' } ] }
@@ -2191,7 +2243,12 @@ describe("Filter sets with relations, compile", function () {
       loki: {},
       recurse: [null]
     })
-    assert.deepEqual(f.toLokijs(), {})
+    assert.deepEqual(f.toLokijs(), {
+      $or: [
+        { type: { $eq: 'node' } },
+        { type: { $eq: 'way' } }
+      ]
+    })
     assert.deepEqual(f.derefSets(), [])
     var r = f.cacheDescriptors()
     assert.deepEqual(r, [])
@@ -2544,7 +2601,12 @@ describe("Filter sets with relations, apply base filter", function () {
         }
       }]
     })
-    assert.deepEqual(f.toLokijs(), {})
+    assert.deepEqual(f.toLokijs(), {
+      $or: [
+        { type: { $eq: 'node' } },
+        { type: { $eq: 'way' } }
+      ]
+    })
     var r = f.cacheDescriptors()
     assert.deepEqual(r, [
       { recurse: [

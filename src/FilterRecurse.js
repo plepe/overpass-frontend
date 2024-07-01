@@ -56,6 +56,25 @@ class FilterRecurse extends FilterStatement {
   }
 
   toLokijs (options = {}) {
+    switch (this.type) {
+      case '>':
+        return {
+          $or: [
+            { type: { $eq: 'node' } },
+            { type: { $eq: 'way' } }
+          ]
+        }
+      case '<<':
+      case '<':
+        return {
+          $or: [
+            { type: { $eq: 'way' } },
+            { type: { $eq: 'relation' } }
+          ]
+        }
+      case '>>':
+        return {}
+    }
     return {}
   }
 
