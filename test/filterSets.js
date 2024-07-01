@@ -2980,9 +2980,15 @@ describe("Filter sets with relations, apply base filter", function () {
           expected: [ 'n378459', 'n3037431688', 'n3037431653', 'n2208875391', 'n270328331', 'n2213568001', 'n378462' ],
           expectedSubRequestCount: 1,
           expectedCacheDescriptors: [{
-            id: 'way["highway"="secondary"](properties:5)->._1;node(w._1)(properties:0)',
+            // TODO: node should have properties 0
+            id: 'way["highway"="secondary"](properties:13)->._1;node(w._1)(properties:13)',
             recurse: [{
-              id: 'way["highway"="secondary"](properties:5)->._1;node(w._1)(properties:0)->._1;way["highway"="secondary"](bn._1)(properties:5)'
+              id: 'way["highway"="secondary"](properties:13)->._1;node(w._1)(properties:13)->._1;way["highway"="secondary"](bn._1)(properties:13)',
+              bounds: {
+                "coordinates": [
+                  [ [ 16.33835, 48.19821 ], [ 16.33841, 48.19821 ], [ 16.33841, 48.19827 ], [ 16.33835, 48.19827 ], [ 16.33835, 48.19821 ] ] ],
+                "type": "Polygon"
+              }
             }]
           }]
         }, done)
@@ -3001,9 +3007,11 @@ describe("Filter sets with relations, apply base filter", function () {
           expected: [ "n2208875391", "n2213567988", "n2213567992", "n2213567995", "n2213567996", "n2213568000", "n2213568001", "n2213568003", "n270328331" , "n3037431653", "n3037431688", "n378459", "n378462", "n683894778" ],
           expectedSubRequestCount: 1,
           expectedCacheDescriptors: [{
-            id: 'way["highway"](properties:5)->._1;node(w._1)(properties:0)',
+            // TODO: node should have properties 0
+            id: 'way["highway"](properties:13)->._1;node(w._1)(properties:13)',
             recurse: [{
-              id: 'way["highway"](properties:5)->._1;node(w._1)(properties:0)->._1;way["highway"](bn._1)(properties:5)'
+              id: 'way["highway"](properties:13)->._1;node(w._1)(properties:13)->._1;way["highway"](bn._1)(properties:13)',
+              bounds:{"type":"Polygon","coordinates":[[[16.33833,48.19821],[16.33854,48.19821],[16.33854,48.1983],[16.33833,48.1983],[16.33833,48.19821]]]}
             }]
           }]
         }, done)
@@ -3022,9 +3030,11 @@ describe("Filter sets with relations, apply base filter", function () {
           expected: [ "n378459", "n378462" ],
           expectedSubRequestCount: 1,
           expectedCacheDescriptors: [{
-            "id": 'way["highway"](properties:5)->._1;node["highway"](w._1)(properties:1)',
+            // TODO: node properties 1
+            id: 'way["highway"](properties:13)->._1;node["highway"](w._1)(properties:13)',
             recurse: [{
-              id: 'way["highway"](properties:5)->._1;node["highway"](w._1)(properties:1)->._1;way["highway"](bn._1)(properties:5)'
+              id: 'way["highway"](properties:13)->._1;node["highway"](w._1)(properties:13)->._1;way["highway"](bn._1)(properties:13)',
+              bounds:{"type":"Polygon","coordinates":[[[16.33833,48.19821],[16.33854,48.19821],[16.33854,48.1983],[16.33833,48.1983],[16.33833,48.19821]]]}
             }]
           }]
         }, done)
@@ -3043,11 +3053,13 @@ describe("Filter sets with relations, apply base filter", function () {
           expected: [ 'n1001523589', 'n1198288962', 'n17322841', 'n1871276164', 'n1881459157', 'n1941351811', 'n2061395859', 'n2208875391', 'n2213568001', 'n2443294047', 'n252548482', 'n270328331', 'n277976046', 'n277976134', 'n298955272', 'n3037431653', 'n3037431688', 'n316634879', 'n347982837', 'n3592094592', 'n3765072046', 'n3767244949', 'n3767266723', 'n378459', 'n378462', 'n378463', 'n378464', 'n394761', 'n395262', 'n451666739', 'n46918704', 'n46918737', 'n46918752', 'n60586287', 'n69232202', 'n83517944', 'n83519448', 'n93279422', 'n93279423', 'n93279643', 'n93279646' ],
           expectedSubRequestCount: 1,
           expectedCacheDescriptors: [{
-            id: 'relation["route"="bus"](properties:5)->._1;way(r._1)(properties:4)->._2;node(w._2)(properties:0)',
+            // TODO: nodes should have properties 0
+            id: 'relation["route"="bus"](properties:13)->._1;way(r._1)(properties:4)->._2;node(w._2)(properties:13)',
             recurse: [{
-              id: 'relation["route"="bus"](properties:5)->._1;way(r._1)(properties:4)->._2;node(w._2)(properties:0)->._2;way(bn._2)(properties:4)',
+              id: 'relation["route"="bus"](properties:13)->._1;way(r._1)(properties:4)->._2;node(w._2)(properties:13)->._2;way(bn._2)(properties:4)',
               recurse: [{
-                id: 'relation["route"="bus"](properties:5)->._1;way(r._1)(properties:4)->._2;node(w._2)(properties:0)->._2;way(bn._2)(properties:4)->._1;relation["route"="bus"](bw._1)(properties:5)'
+                id: 'relation["route"="bus"](properties:13)->._1;way(r._1)(properties:4)->._2;node(w._2)(properties:13)->._2;way(bn._2)(properties:4)->._1;relation["route"="bus"](bw._1)(properties:13)',
+                bounds:{"type":"Polygon","coordinates":[[[16.33835,48.19821],[16.33841,48.19821],[16.33841,48.19827],[16.33835,48.19827],[16.33835,48.19821]]]}
               }]
             }]
           }]
@@ -3067,11 +3079,14 @@ describe("Filter sets with relations, apply base filter", function () {
           expected: [ 'n2208875391', 'n270328331' ],
           expectedSubRequestCount: 1,
           expectedCacheDescriptors: [{
-            "id": 'way["highway"](properties:5)->._1;way["railway"](properties:5)->._2;node(w._1)(w._2)(properties:0)',
+            // TODO: node properties 0
+            "id": 'way["highway"](properties:13)->._1;way["railway"](properties:13)->._2;node(w._1)(w._2)(properties:13)',
             recurse: [{
-              id: 'way["highway"](properties:5)->._1;way["railway"](properties:5)->._2;node(w._1)(w._2)(properties:0)->._1;way["highway"](bn._1)(properties:5)'
+              id: 'way["highway"](properties:13)->._1;way["railway"](properties:13)->._2;node(w._1)(w._2)(properties:13)->._1;way["highway"](bn._1)(properties:13)',
+              bounds: {"type":"Polygon","coordinates":[[[16.33833,48.19821],[16.33854,48.19821],[16.33854,48.1983],[16.33833,48.1983],[16.33833,48.19821]]]}
             }, {
-              id: 'way["highway"](properties:5)->._1;way["railway"](properties:5)->._2;node(w._1)(w._2)(properties:0)->._2;way["railway"](bn._2)(properties:5)'
+              id: 'way["highway"](properties:13)->._1;way["railway"](properties:13)->._2;node(w._1)(w._2)(properties:13)->._2;way["railway"](bn._2)(properties:13)',
+              bounds: {"type":"Polygon","coordinates":[[[16.33833,48.19821],[16.33854,48.19821],[16.33854,48.1983],[16.33833,48.1983],[16.33833,48.19821]]]}
             }]
           }]
         }, done)
@@ -3090,11 +3105,14 @@ describe("Filter sets with relations, apply base filter", function () {
           expected: [ 'n2208875391', 'n270328331' ],
           expectedSubRequestCount: 1,
           expectedCacheDescriptors: [{
-            id: 'way["highway"](properties:5)->._1;way["railway"](properties:5)->._3;node(w._1)(w._3)(properties:0)',
+            // TODO: nodes properties 0
+            id: 'way["highway"](properties:13)->._1;way["railway"](properties:13)->._3;node(w._1)(w._3)(properties:13)',
             recurse: [{
-              id: 'way["highway"](properties:5)->._1;way["railway"](properties:5)->._3;node(w._1)(w._3)(properties:0)->._1;way["highway"](bn._1)(properties:5)'
+              id: 'way["highway"](properties:13)->._1;way["railway"](properties:13)->._3;node(w._1)(w._3)(properties:13)->._1;way["highway"](bn._1)(properties:13)',
+              bounds: {"type":"Polygon","coordinates":[[[16.33833,48.19821],[16.33854,48.19821],[16.33854,48.1983],[16.33833,48.1983],[16.33833,48.19821]]]}
             }, {
-              id: 'way["highway"](properties:5)->._1;way["railway"](properties:5)->._3;node(w._1)(w._3)(properties:0)->._3;way["railway"](bn._3)(properties:5)'
+              id: 'way["highway"](properties:13)->._1;way["railway"](properties:13)->._3;node(w._1)(w._3)(properties:13)->._3;way["railway"](bn._3)(properties:13)',
+              bounds: {"type":"Polygon","coordinates":[[[16.33833,48.19821],[16.33854,48.19821],[16.33854,48.1983],[16.33833,48.1983],[16.33833,48.19821]]]}
             }]
           }]
         }, done)
@@ -3113,21 +3131,25 @@ describe("Filter sets with relations, apply base filter", function () {
           expected: [ 'r1306478', 'r1530340', 'r1980077', 'r207109', 'r207110', 'r3636229', 'r3967946', 'r5275276', 'w146678747', 'w162373026', 'w170141442', 'w26738920', 'w366446524', 'w4583442' ],
           expectedSubRequestCount: 1,
           expectedCacheDescriptors: [{
-            id: 'node["highway"](properties:1)->._1;way(bn._1)(properties:4)',
+            // TODO: way properties 4
+            id: 'node["highway"](properties:9)->._1;way(bn._1)(properties:13)',
             recurse: [{
-              id: 'node["highway"](properties:1)->._1;way(bn._1)(properties:4)->._1;node["highway"](w._1)(properties:1)'
+              id: 'node["highway"](properties:9)->._1;way(bn._1)(properties:13)->._1;node["highway"](w._1)(properties:9)',
+              bounds: {"type":"Polygon","coordinates":[[[16.33901,48.19839],[16.33902,48.19839],[16.33902,48.1984],[16.33901,48.1984],[16.33901,48.19839]]]}
             }]
           }, {
-            id: 'node["highway"](properties:1)->._1;relation(bn._1)(properties:4)',
+            id: 'node["highway"](properties:9)->._1;relation(bn._1)(properties:13)',
             recurse: [{
-              id: 'node["highway"](properties:1)->._1;relation(bn._1)(properties:4)->._1;node["highway"](r._1)(properties:1)'
+              id: 'node["highway"](properties:9)->._1;relation(bn._1)(properties:13)->._1;node["highway"](r._1)(properties:9)',
+              bounds: {"type":"Polygon","coordinates":[[[16.33901,48.19839],[16.33902,48.19839],[16.33902,48.1984],[16.33901,48.1984],[16.33901,48.19839]]]}
             }]
           },   {
-            id: 'node["highway"](properties:1)->._1;way(bn._1)(properties:4)->._1;relation(bw._1)(properties:4)',
+            id: 'node["highway"](properties:9)->._1;way(bn._1)(properties:4)->._1;relation(bw._1)(properties:13)',
             recurse: [{
-              id: 'node["highway"](properties:1)->._1;way(bn._1)(properties:4)->._1;relation(bw._1)(properties:4)->._1;way(r._1)(properties:4)',
+              id: 'node["highway"](properties:9)->._1;way(bn._1)(properties:4)->._1;relation(bw._1)(properties:13)->._1;way(r._1)(properties:4)',
               recurse: [{
-                id: 'node["highway"](properties:1)->._1;way(bn._1)(properties:4)->._1;relation(bw._1)(properties:4)->._1;way(r._1)(properties:4)->._1;node["highway"](w._1)(properties:1)'
+                id: 'node["highway"](properties:9)->._1;way(bn._1)(properties:4)->._1;relation(bw._1)(properties:13)->._1;way(r._1)(properties:4)->._1;node["highway"](w._1)(properties:9)',
+              bounds: {"type":"Polygon","coordinates":[[[16.33901,48.19839],[16.33902,48.19839],[16.33902,48.1984],[16.33901,48.1984],[16.33901,48.19839]]]}
               }],
             }]
           }]
@@ -3148,9 +3170,10 @@ describe("Filter sets with relations, apply base filter", function () {
           expected: [ "w175757214", "w175757217", "w175757222", "w175757225", "w199715278", "w86273649" ],
           expectedSubRequestCount: 1,
           expectedCacheDescriptors: [{
-            id: 'relation["building"](properties:5)->._1;way(r._1:"inner")(properties:0)',
+            id: 'relation["building"](properties:13)->._1;way(r._1:"inner")(properties:13)',
             recurse: [{
-              id: 'relation["building"](properties:5)->._1;way(r._1:"inner")(properties:0)->._1;relation["building"](bw._1:"inner")(properties:5)'
+              id: 'relation["building"](properties:13)->._1;way(r._1:"inner")(properties:13)->._1;relation["building"](bw._1:"inner")(properties:13)',
+              bounds: {"type":"Polygon","coordinates":[[[16.3399,48.19853],[16.34236,48.19853],[16.34236,48.19919],[16.3399,48.19919],[16.3399,48.19853]]]}
             }]
           }]
         }, done)
@@ -3171,9 +3194,10 @@ describe("Filter sets with relations, apply base filter", function () {
           ignoreMissing: [ "w199911274", "w199911275" ],
           expectedSubRequestCount: 1,
           expectedCacheDescriptors: [{
-            id: 'relation["building"](properties:5)->._1;way(r._1)(properties:0)',
+            id: 'relation["building"](properties:13)->._1;way(r._1)(properties:13)',
             recurse: [{
-              id: 'relation["building"](properties:5)->._1;way(r._1)(properties:0)->._1;relation["building"](bw._1)(properties:5)'
+              id: 'relation["building"](properties:13)->._1;way(r._1)(properties:13)->._1;relation["building"](bw._1)(properties:13)',
+              bounds: {"type":"Polygon","coordinates":[[[16.3399,48.19853],[16.34236,48.19853],[16.34236,48.19919],[16.3399,48.19919],[16.3399,48.19853]]]}
             }]
           }]
         }, done)
@@ -3193,7 +3217,8 @@ describe("Filter sets with relations, apply base filter", function () {
           expected: [ "r2681532", "r2681533", "r2684275" ],
           expectedSubRequestCount: 1,
           expectedCacheDescriptors: [{
-            id: 'relation["building"](properties:1)'
+            id: 'relation["building"](properties:13)',
+            bounds: {"type":"Polygon","coordinates":[[[16.34037,48.19817],[16.34191,48.19817],[16.34191,48.19881],[16.34037,48.19881],[16.34037,48.19817]]]}
           }]
         }, done)
       })
@@ -3212,7 +3237,8 @@ describe("Filter sets with relations, apply base filter", function () {
           expected: [ "r1283879", "r2681533", "r2684275" ],
           expectedSubRequestCount: 1,
           expectedCacheDescriptors: [{
-            id: 'relation["building"](properties:1)'
+            id: 'relation["building"](properties:13)',
+            bounds: {"type":"Polygon","coordinates":[[[16.3399,48.19853],[16.34236,48.19853],[16.34236,48.19919],[16.3399,48.19919],[16.3399,48.19853]]]}
           }]
         }, done)
       })
@@ -3231,9 +3257,10 @@ describe("Filter sets with relations, apply base filter", function () {
           expected: [ "r1283879", "r2681533" ],
           expectedSubRequestCount: 1,
           expectedCacheDescriptors: [{
-            id: 'way(properties:0)->._1;relation["building"](bw._1:"inner")(properties:5)',
+            id: 'way(properties:8)->._1;relation["building"](bw._1:"inner")(properties:13)',
             recurse: [{
-              id: 'way(properties:0)->._1;relation["building"](bw._1:"inner")(properties:5)->._1;way(r._1:"inner")(properties:0)'
+              id: 'way(properties:8)->._1;relation["building"](bw._1:"inner")(properties:13)->._1;way(r._1:"inner")(properties:8)',
+              bounds: {"type":"Polygon","coordinates":[[[16.3399,48.19853],[16.34236,48.19853],[16.34236,48.19919],[16.3399,48.19919],[16.3399,48.19853]]]}
             }]
           }]
         }, done)
@@ -3255,17 +3282,19 @@ describe("Filter sets with relations, apply base filter", function () {
           expectedSubRequestCount: 1,
           expectedCacheDescriptors: [
             {
-              id: 'node["highway"](properties:1)->._1;relation(bn._1)(properties:4)',
+              id: 'node["highway"](properties:9)->._1;relation(bn._1)(properties:13)',
               recurse: [{
-                id: 'node["highway"](properties:1)->._1;relation(bn._1)(properties:4)->._1;node["highway"](r._1)(properties:1)'
+                id: 'node["highway"](properties:9)->._1;relation(bn._1)(properties:13)->._1;node["highway"](r._1)(properties:9)',
+                bounds: {"type":"Polygon","coordinates":[[[16.33901,48.19839],[16.33902,48.19839],[16.33902,48.1984],[16.33901,48.1984],[16.33901,48.19839]]]}
               }]
             },
             {
-              id: 'node["highway"](properties:1)->._1;way(bn._1)(properties:4)->._1;relation(bw._1)(properties:4)',
+              id: 'node["highway"](properties:9)->._1;way(bn._1)(properties:4)->._1;relation(bw._1)(properties:13)',
               recurse: [{
-                id: 'node["highway"](properties:1)->._1;way(bn._1)(properties:4)->._1;relation(bw._1)(properties:4)->._1;way(r._1)(properties:4)',
+                id: 'node["highway"](properties:9)->._1;way(bn._1)(properties:4)->._1;relation(bw._1)(properties:13)->._1;way(r._1)(properties:4)',
                 recurse: [{
-                  id: 'node["highway"](properties:1)->._1;way(bn._1)(properties:4)->._1;relation(bw._1)(properties:4)->._1;way(r._1)(properties:4)->._1;node["highway"](w._1)(properties:1)'
+                  id: 'node["highway"](properties:9)->._1;way(bn._1)(properties:4)->._1;relation(bw._1)(properties:13)->._1;way(r._1)(properties:4)->._1;node["highway"](w._1)(properties:9)',
+                  bounds: {"type":"Polygon","coordinates":[[[16.33901,48.19839],[16.33902,48.19839],[16.33902,48.1984],[16.33901,48.1984],[16.33901,48.19839]]]}
                 }]
               }]
             }
@@ -3287,9 +3316,10 @@ describe("Filter sets with relations, apply base filter", function () {
           expected: [ "w31275228", "w4583442" ],
           expectedSubRequestCount: 1,
           expectedCacheDescriptors: [{
-            id: 'relation["route"="bus"](properties:5)->._1;way["highway"="secondary"](r._1)(properties:1)',
+            id: 'relation["route"="bus"](properties:13)->._1;way["highway"="secondary"](r._1)(properties:13)',
             recurse: [{
-              id: 'relation["route"="bus"](properties:5)->._1;way["highway"="secondary"](r._1)(properties:1)->._1;relation["route"="bus"](bw._1)(properties:5)'
+              id: 'relation["route"="bus"](properties:13)->._1;way["highway"="secondary"](r._1)(properties:13)->._1;relation["route"="bus"](bw._1)(properties:13)',
+              bounds: {"type":"Polygon","coordinates":[[[16.33788,48.19798],[16.33933,48.19798],[16.33933,48.1988],[16.33788,48.1988],[16.33788,48.19798]]]}
             }]
           }]
         }, (err) => {
@@ -3304,9 +3334,9 @@ describe("Filter sets with relations, apply base filter", function () {
           expected: [ "w31275228", "w4583442" ],
           expectedSubRequestCount: 0,
           expectedCacheDescriptors: [{
-            id: 'relation["route"="bus"](properties:13)->._1;way["highway"="secondary"](r._1)(properties:1)',
+            id: 'relation["route"="bus"](properties:13)->._1;way["highway"="secondary"](r._1)(properties:13)',
             recurse: [{
-              id: 'relation["route"="bus"](properties:13)->._1;way["highway"="secondary"](r._1)(properties:1)->._1;relation["route"="bus"](bw._1)(properties:13)',
+              id: 'relation["route"="bus"](properties:13)->._1;way["highway"="secondary"](r._1)(properties:13)->._1;relation["route"="bus"](bw._1)(properties:13)',
               bounds: {
                 type: "Polygon",
                 coordinates: [
@@ -3327,7 +3357,7 @@ describe("Filter sets with relations, apply base filter", function () {
           expected: [ "w4583442" ],
           expectedSubRequestCount: 1,
           expectedCacheDescriptors: [{
-            id: 'relation["route"="bus"](properties:5)->._1;way["highway"="secondary"](r._1)(properties:9)',
+            id: 'relation["route"="bus"](properties:5)->._1;way["highway"="secondary"](r._1)(properties:13)',
             bounds: {
               type: "Polygon",
               coordinates: [
@@ -3335,7 +3365,7 @@ describe("Filter sets with relations, apply base filter", function () {
               ]
             },
             recurse: [{
-              id: 'relation["route"="bus"](properties:5)->._1;way["highway"="secondary"](r._1)(properties:9)->._1;relation["route"="bus"](bw._1)(properties:5)'
+              id: 'relation["route"="bus"](properties:5)->._1;way["highway"="secondary"](r._1)(properties:13)->._1;relation["route"="bus"](bw._1)(properties:5)'
             }]
           }]
         }, (err) => {
@@ -3351,7 +3381,7 @@ describe("Filter sets with relations, apply base filter", function () {
           expectedSubRequestCount: 1,
           expectedSubRequestCount2nd: 1, // TODO: 0
           expectedCacheDescriptors: [{
-            id: 'relation["route"="bus"](properties:13)->._1;way["highway"="secondary"](r._1)(properties:9)',
+            id: 'relation["route"="bus"](properties:13)->._1;way["highway"="secondary"](r._1)(properties:13)',
             bounds: {
               type: "Polygon",
               coordinates: [
@@ -3359,7 +3389,7 @@ describe("Filter sets with relations, apply base filter", function () {
               ]
             },
             recurse: [{
-              id: 'relation["route"="bus"](properties:13)->._1;way["highway"="secondary"](r._1)(properties:9)->._1;relation["route"="bus"](bw._1)(properties:13)',
+              id: 'relation["route"="bus"](properties:13)->._1;way["highway"="secondary"](r._1)(properties:13)->._1;relation["route"="bus"](bw._1)(properties:13)',
               bounds: {
                 type: "Polygon",
                 coordinates: [ [ [ 16.33785, 48.19511 ], [ 16.34103, 48.19511 ], [ 16.34103, 48.19627 ], [ 16.33785, 48.19627 ], [ 16.33785, 48.19511 ] ] ]
@@ -3378,7 +3408,7 @@ describe("Filter sets with relations, apply base filter", function () {
           expectedSubRequestCount: 1,
           expectedSubRequestCount2nd: 1, // TODO: 0
           expectedCacheDescriptors: [{
-            id: 'relation["route"="bus"](properties:13)->._1;way["highway"="secondary"](r._1)(properties:9)',
+            id: 'relation["route"="bus"](properties:13)->._1;way["highway"="secondary"](r._1)(properties:13)',
             bounds: {
               type: "Polygon",
               coordinates: [
@@ -3386,7 +3416,7 @@ describe("Filter sets with relations, apply base filter", function () {
               ]
             },
             recurse: [{
-              id: 'relation["route"="bus"](properties:13)->._1;way["highway"="secondary"](r._1)(properties:9)->._1;relation["route"="bus"](bw._1)(properties:13)',
+              id: 'relation["route"="bus"](properties:13)->._1;way["highway"="secondary"](r._1)(properties:13)->._1;relation["route"="bus"](bw._1)(properties:13)',
               bounds: {
                 type: "Polygon",
                 coordinates: [ [ [ 16.33403, 48.19816 ], [ 16.33721, 48.19816 ], [ 16.33721, 48.19932 ], [ 16.33403, 48.19932 ], [ 16.33403, 48.19816 ] ] ]
@@ -3405,7 +3435,7 @@ describe("Filter sets with relations, apply base filter", function () {
           expectedSubRequestCount: 1,
           expectedSubRequestCount2nd: 1, // TODO: 0 - problem: not matching bbox. fix: update possibleBounds.
           expectedCacheDescriptors: [{
-            id: 'relation["route"="bus"](properties:9)',
+            id: 'relation["route"="bus"](properties:13)',
             bounds: {
               type: "Polygon",
               coordinates: [ [ [ 16.33403, 48.19816 ], [ 16.33721, 48.19816 ], [ 16.33721, 48.19932 ], [ 16.33403, 48.19932 ], [ 16.33403, 48.19816 ] ] ]
@@ -3428,7 +3458,8 @@ describe("Filter sets with relations, apply base filter", function () {
           expected: [ "w272668388", "w38279773", "w4583259", "w4583442" ],
           expectedSubRequestCount: 1,
           expectedCacheDescriptors: [{
-            id: 'way["highway"="secondary"](properties:1)',
+            id: 'way["highway"="secondary"](properties:13)',
+            bounds: {"type":"Polygon","coordinates":[[[16.33788,48.19798],[16.33933,48.19798],[16.33933,48.1988],[16.33788,48.1988],[16.33788,48.19798]]]}
           }]
         }, done)
       })
@@ -3440,9 +3471,9 @@ describe("Filter sets with relations, apply base filter", function () {
           expected: [ 'r1306478', 'r207109', 'r207110', 'r2446126', 'r5275276', 'r5333483', 'r79466' ],
           expectedSubRequestCount: 1,
           expectedCacheDescriptors: [{
-            id: 'node["highway"](properties:1)->._1;relation["route"="bus"](bn._1)(properties:5)',
+            id: 'node["highway"](properties:1)->._1;relation["route"="bus"](bn._1)(properties:13)',
             recurse: [{
-              id: 'node["highway"](properties:1)->._1;relation["route"="bus"](bn._1)(properties:5)->._1;node["highway"](r._1)(properties:1)'
+              id: 'node["highway"](properties:1)->._1;relation["route"="bus"](bn._1)(properties:13)->._1;node["highway"](r._1)(properties:1)'
             }]
           }]
         }, done)
@@ -3454,10 +3485,10 @@ describe("Filter sets with relations, apply base filter", function () {
           expected: [ 'r79466' ],
           expectedSubRequestCount: 1, // TODO: 0
           expectedCacheDescriptors: [{
-            id: 'node(properties:0)->._1;relation["route"="bus"](bn._1)(properties:5)',
+            id: 'node(properties:0)->._1;relation["route"="bus"](bn._1)(properties:13)',
             recurse: [{
               ids: ['2211384239'],
-              id: 'node(properties:0)->._1;relation["route"="bus"](bn._1)(properties:5)->._1;node(r._1)(properties:0)'
+              id: 'node(properties:0)->._1;relation["route"="bus"](bn._1)(properties:13)->._1;node(r._1)(properties:0)'
             }]
           }]
         }, done)
