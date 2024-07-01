@@ -3439,7 +3439,7 @@ function test (options, callback) {
   request.on('subrequest-compile', compileListener)
 
   if (request.filterQuery) {
-    const cacheDescriptors = request.filterQuery.cacheDescriptors()
+    const cacheDescriptors = request.cacheDescriptors.map(cd => cd.cacheDescriptor)
     if (options.expectedCacheDescriptors) {
       assert.deepEqual(cacheDescriptors, options.expectedCacheDescriptors, 'Expected cache info')
     }
