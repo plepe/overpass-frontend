@@ -117,7 +117,7 @@ class OverpassObject {
     }
 
     // geometry is known -> no need for this.boundsPossibleMatch
-    if (this.geometry) {
+    if (options.properties & OverpassFrontend.GEOM) {
       delete this.boundsPossibleMatch
     }
 
