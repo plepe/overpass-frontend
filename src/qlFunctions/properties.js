@@ -9,7 +9,7 @@ module.exports = class properties extends qlFunction {
   }
 
   test (ob) {
-    return !!(ob.properties & this.value)
+    return (ob.properties & this.value) === this.value ? true : null
   }
 
   toString (options) {

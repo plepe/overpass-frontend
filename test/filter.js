@@ -10,8 +10,8 @@ const objects = [
   { id: 3, osm_id: 3, type: 'node', tags: { name: 'test', amenity: 'cafe', cuisine: 'ice_cream;dessert' } },
   { id: 4, osm_id: 4, type: 'node', tags: { name: 'TESTER', amenity: 'cafe', cuisine: 'bagel;ice_cream' } },
   { id: 5, osm_id: 5, type: 'node', tags: { name: 'tester', amenity: 'cafe', cuisine: 'bagel;ice_cream;dessert' } },
-  { id: 6, osm_id: 6, type: 'node', tags: { name: 'Tester', amenity: 'cafe', cuisine: 'bagel;dessert' } },
-  { id: 7, osm_id: 7, type: 'node', tags: { name: 'Tëster', amenity: 'cafe' } }
+  { id: 6, osm_id: 6, type: 'node', properties: 13, tags: { name: 'Tester', amenity: 'cafe', cuisine: 'bagel;dessert' } },
+  { id: 7, osm_id: 7, type: 'node', properties: 4, tags: { name: 'Tëster', amenity: 'cafe' } }
 ]
 objects.forEach(ob => {
   ob.GeoJSON = () => {return {type: 'Feature', properties: ob.tags, geometry: {type: 'Point', coordinates: [ 0, 0 ]}}}
@@ -22,12 +22,19 @@ let db = new loki()
 let lokidb = db.addCollection('db')
 lokidb.insert(objects)
 
-function check(filter, expectedMatches) {
+function check(filter, expectedMatches, undecidedMatches=[]) {
   let r
 
   objects.forEach(
     ob => {
-      assert.equal(filter.match(ob), expectedMatches.includes(ob.id), 'Object ' + ob.id + ' should ' + (expectedMatches.includes(ob.id) ? 'not ' : '') + 'match')
+      const r = filter.match(ob)
+      if (expectedMatches.includes(ob.id)) {
+        assert.equal(r, true, 'Object ' + ob.id + ' should match')
+      } else if (undecidedMatches.includes(ob.id)) {
+        assert.equal(r, null, 'Object ' + ob.id + ' should be undecided')
+      } else {
+        assert.equal(r, false, 'Object ' + ob.id + ' should not match')
+      }
     }
   )
 
@@ -57,7 +64,7 @@ describe('Function "properties"', function () {
     ])
 
 
-    check(f, [])
+    check(f, [6, 7], [1, 2, 3, 4, 5])
 
     var r = f.cacheDescriptors()
     assert.deepEqual(r, [ { id: "node(properties:4)" }])
@@ -73,7 +80,7 @@ describe('Function "properties"', function () {
       { type: 'node', filters: [ { fun: 'properties', value: 11 }, { fun: 'properties', value: 4 } ] }
     ])
 
-    check(f, [])
+    check(f, [], [1, 2, 3, 4, 5, 6, 7])
 
     var r = f.cacheDescriptors()
     assert.deepEqual(r, [ { id: "node(properties:15)" }])
