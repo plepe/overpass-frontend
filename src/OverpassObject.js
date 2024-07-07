@@ -108,17 +108,22 @@ class OverpassObject {
       const bounds = options.filter.possibleBounds(this)
 
       if (bounds) {
-        if (typeof this.boundsPossibleMatch === 'undefined') {
-          this.boundsPossibleMatch = bounds
+        if (typeof this.boundsMatches === 'undefined') {
+          this.boundsMatches = [ bounds ]
         } else {
-          this.boundsPossibleMatch = turf.difference(this.boundsPossibleMatch, bounds)
+          this.boundsMatches.push(bounds)
         }
+      }
+
+      if (this.id === 'r910885') {
+        console.log(JSON.stringify(this.boundsMatches))
       }
     }
 
-    // geometry is known -> no need for this.boundsPossibleMatch
+    // geometry is known -> no need for .boundsMatches and .boundsPossibleMatch
     if (options.properties & OverpassFrontend.GEOM) {
       delete this.boundsPossibleMatch
+      delete this.boundsMatches
     }
 
     if (options.properties & OverpassFrontend.TAGS) {
@@ -373,6 +378,25 @@ class OverpassObject {
       }
 
       return 1
+    }
+
+    if (this.boundsMatches) {
+      const bboxGeoJSON = isGeoJSON(bbox) ? bbox : bbox.toGeoJSON()
+
+      return this.boundsMatches.some(bounds => {
+        const remaining = turf.intersect(bboxGeoJSON, bounds)
+
+        if (!remaining || remaining.geometry.type !== 'Polygon') {
+          // geometry.type != Polygon: bbox matches border of this.boundsMatches
+          return false
+        }
+
+        if (booleanWithin(bounds, bboxGeoJSON)) {
+          return true
+        }
+
+        return false
+      }) ? 2 : 1
     }
 
     return 1
