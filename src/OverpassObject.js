@@ -376,14 +376,12 @@ class OverpassObject {
       if (booleanWithin(this.boundsPossibleMatch, bboxGeoJSON)) {
         return 2
       }
-
-      return 1
     }
 
     if (this.boundsMatches) {
       const bboxGeoJSON = isGeoJSON(bbox) ? bbox : bbox.toGeoJSON()
 
-      return this.boundsMatches.some(bounds => {
+      if (this.boundsMatches.some(bounds => {
         const remaining = turf.intersect(bboxGeoJSON, bounds)
 
         if (!remaining || remaining.geometry.type !== 'Polygon') {
@@ -396,7 +394,9 @@ class OverpassObject {
         }
 
         return false
-      }) ? 2 : 1
+      })) {
+        return 2
+      }
     }
 
     return 1
