@@ -3470,7 +3470,8 @@ describe("Filter sets with relations, apply base filter", function () {
           expected: [ 'w4583442', 'n378459', 'n378462', 'n270328331', 'n2208875391', 'n2213568001', 'n3037431653', 'n3037431688' ],
           expectedSubRequestCount: 0,
           expectedCacheDescriptors: [{
-            "id": 'way["highway"="secondary"](properties:1)',
+            id: 'way["highway"="secondary"](properties:9)',
+            bounds: {"type":"Polygon","coordinates":[[[16.33835,48.19821],[16.33841,48.19821],[16.33841,48.19827],[16.33835,48.19827],[16.33835,48.19821]]]}
           }, {
             "id": '-["highway"="secondary"](properties:1)', // TODO: WRONG!
           }]
@@ -3484,6 +3485,8 @@ describe("Filter sets with relations, apply base filter", function () {
  * @param {string[]} [options.ignoreMissing] ids of items which are missing from the database. As they get created by references, they could appear in results nonetheless.
  */
 function test (options, callback) {
+  const origOptions = {...options}
+
   if (options.mode === 'via-server') {
     console.log(options.rek ? '2nd run' : '1st run')
   }
@@ -3528,9 +3531,9 @@ function test (options, callback) {
       request.off('subrequest-compile', compileListener)
 
       if (!options.noRecurse && !options.rek) {
-        options.rek = true
-        options.expectedSubRequestCount = options.expectedSubRequestCount2nd ?? 0
-        return test(options, callback)
+        origOptions.rek = true
+        origOptions.expectedSubRequestCount = options.expectedSubRequestCount2nd ?? 0
+        return test(origOptions, callback)
       }
 
       callback()
