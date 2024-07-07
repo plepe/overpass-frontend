@@ -24,7 +24,6 @@ class RequestBBox extends Request {
     if (typeof this.options.properties === 'undefined') {
       this.options.properties = defines.DEFAULT
     }
-    this.options.properties |= defines.BBOX
     this.options.minEffort = this.options.minEffort || 256
 
     // make sure the request ends with ';'

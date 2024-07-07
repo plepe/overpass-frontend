@@ -2980,9 +2980,9 @@ describe("Filter sets with relations, apply base filter", function () {
           expected: [ 'n378459', 'n3037431688', 'n3037431653', 'n2208875391', 'n270328331', 'n2213568001', 'n378462' ],
           expectedSubRequestCount: 1,
           expectedCacheDescriptors: [{
-            id: 'way["highway"="secondary"](properties:13)->._1;node(w._1)(properties:8)',
+            id: 'way["highway"="secondary"](properties:13)->._1;node(w._1)(properties:0)',
             recurse: [{
-              id: 'way["highway"="secondary"](properties:13)->._1;node(w._1)(properties:8)->._1;way["highway"="secondary"](bn._1)(properties:13)',
+              id: 'way["highway"="secondary"](properties:13)->._1;node(w._1)(properties:0)->._1;way["highway"="secondary"](bn._1)(properties:13)',
               bounds: {
                 "coordinates": [
                   [ [ 16.33835, 48.19821 ], [ 16.33841, 48.19821 ], [ 16.33841, 48.19827 ], [ 16.33835, 48.19827 ], [ 16.33835, 48.19821 ] ] ],
@@ -3006,9 +3006,9 @@ describe("Filter sets with relations, apply base filter", function () {
           expected: [ "n2208875391", "n2213567988", "n2213567992", "n2213567995", "n2213567996", "n2213568000", "n2213568001", "n2213568003", "n270328331" , "n3037431653", "n3037431688", "n378459", "n378462", "n683894778" ],
           expectedSubRequestCount: 1,
           expectedCacheDescriptors: [{
-            id: 'way["highway"](properties:13)->._1;node(w._1)(properties:8)',
+            id: 'way["highway"](properties:13)->._1;node(w._1)(properties:0)',
             recurse: [{
-              id: 'way["highway"](properties:13)->._1;node(w._1)(properties:8)->._1;way["highway"](bn._1)(properties:13)',
+              id: 'way["highway"](properties:13)->._1;node(w._1)(properties:0)->._1;way["highway"](bn._1)(properties:13)',
               bounds:{"type":"Polygon","coordinates":[[[16.33833,48.19821],[16.33854,48.19821],[16.33854,48.1983],[16.33833,48.1983],[16.33833,48.19821]]]}
             }]
           }]
@@ -3028,9 +3028,9 @@ describe("Filter sets with relations, apply base filter", function () {
           expected: [ "n378459", "n378462" ],
           expectedSubRequestCount: 1,
           expectedCacheDescriptors: [{
-            id: 'way["highway"](properties:13)->._1;node["highway"](w._1)(properties:9)',
+            id: 'way["highway"](properties:13)->._1;node["highway"](w._1)(properties:1)',
             recurse: [{
-              id: 'way["highway"](properties:13)->._1;node["highway"](w._1)(properties:9)->._1;way["highway"](bn._1)(properties:13)',
+              id: 'way["highway"](properties:13)->._1;node["highway"](w._1)(properties:1)->._1;way["highway"](bn._1)(properties:13)',
               bounds:{"type":"Polygon","coordinates":[[[16.33833,48.19821],[16.33854,48.19821],[16.33854,48.1983],[16.33833,48.1983],[16.33833,48.19821]]]}
             }]
           }]
@@ -3049,12 +3049,13 @@ describe("Filter sets with relations, apply base filter", function () {
           },
           expected: [ 'n1001523589', 'n1198288962', 'n17322841', 'n1871276164', 'n1881459157', 'n1941351811', 'n2061395859', 'n2208875391', 'n2213568001', 'n2443294047', 'n252548482', 'n270328331', 'n277976046', 'n277976134', 'n298955272', 'n3037431653', 'n3037431688', 'n316634879', 'n347982837', 'n3592094592', 'n3765072046', 'n3767244949', 'n3767266723', 'n378459', 'n378462', 'n378463', 'n378464', 'n394761', 'n395262', 'n451666739', 'n46918704', 'n46918737', 'n46918752', 'n60586287', 'n69232202', 'n83517944', 'n83519448', 'n93279422', 'n93279423', 'n93279643', 'n93279646' ],
           expectedSubRequestCount: 1,
+          expectedSubRequestCount2nd: 1, // TODO: 0
           expectedCacheDescriptors: [{
-            id: 'relation["route"="bus"](properties:13)->._1;way(r._1)(properties:4)->._2;node(w._2)(properties:8)',
+            id: 'relation["route"="bus"](properties:13)->._1;way(r._1)(properties:4)->._2;node(w._2)(properties:0)',
             recurse: [{
-              id: 'relation["route"="bus"](properties:13)->._1;way(r._1)(properties:4)->._2;node(w._2)(properties:8)->._2;way(bn._2)(properties:4)',
+              id: 'relation["route"="bus"](properties:13)->._1;way(r._1)(properties:4)->._2;node(w._2)(properties:0)->._2;way(bn._2)(properties:4)',
               recurse: [{
-                id: 'relation["route"="bus"](properties:13)->._1;way(r._1)(properties:4)->._2;node(w._2)(properties:8)->._2;way(bn._2)(properties:4)->._1;relation["route"="bus"](bw._1)(properties:13)',
+                id: 'relation["route"="bus"](properties:13)->._1;way(r._1)(properties:4)->._2;node(w._2)(properties:0)->._2;way(bn._2)(properties:4)->._1;relation["route"="bus"](bw._1)(properties:13)',
                 bounds:{"type":"Polygon","coordinates":[[[16.33835,48.19821],[16.33841,48.19821],[16.33841,48.19827],[16.33835,48.19827],[16.33835,48.19821]]]}
               }]
             }]
@@ -3075,12 +3076,12 @@ describe("Filter sets with relations, apply base filter", function () {
           expected: [ 'n2208875391', 'n270328331' ],
           expectedSubRequestCount: 1,
           expectedCacheDescriptors: [{
-            "id": 'way["highway"](properties:13)->._1;way["railway"](properties:13)->._2;node(w._1)(w._2)(properties:8)',
+            "id": 'way["highway"](properties:13)->._1;way["railway"](properties:13)->._2;node(w._1)(w._2)(properties:0)',
             recurse: [{
-              id: 'way["highway"](properties:13)->._1;way["railway"](properties:13)->._2;node(w._1)(w._2)(properties:8)->._1;way["highway"](bn._1)(properties:13)',
+              id: 'way["highway"](properties:13)->._1;way["railway"](properties:13)->._2;node(w._1)(w._2)(properties:0)->._1;way["highway"](bn._1)(properties:13)',
               bounds: {"type":"Polygon","coordinates":[[[16.33833,48.19821],[16.33854,48.19821],[16.33854,48.1983],[16.33833,48.1983],[16.33833,48.19821]]]}
             }, {
-              id: 'way["highway"](properties:13)->._1;way["railway"](properties:13)->._2;node(w._1)(w._2)(properties:8)->._2;way["railway"](bn._2)(properties:13)',
+              id: 'way["highway"](properties:13)->._1;way["railway"](properties:13)->._2;node(w._1)(w._2)(properties:0)->._2;way["railway"](bn._2)(properties:13)',
               bounds: {"type":"Polygon","coordinates":[[[16.33833,48.19821],[16.33854,48.19821],[16.33854,48.1983],[16.33833,48.1983],[16.33833,48.19821]]]}
             }]
           }]
@@ -3100,12 +3101,12 @@ describe("Filter sets with relations, apply base filter", function () {
           expected: [ 'n2208875391', 'n270328331' ],
           expectedSubRequestCount: 1,
           expectedCacheDescriptors: [{
-            id: 'way["highway"](properties:13)->._1;way["railway"](properties:13)->._3;node(w._1)(w._3)(properties:8)',
+            id: 'way["highway"](properties:13)->._1;way["railway"](properties:13)->._3;node(w._1)(w._3)(properties:0)',
             recurse: [{
-              id: 'way["highway"](properties:13)->._1;way["railway"](properties:13)->._3;node(w._1)(w._3)(properties:8)->._1;way["highway"](bn._1)(properties:13)',
+              id: 'way["highway"](properties:13)->._1;way["railway"](properties:13)->._3;node(w._1)(w._3)(properties:0)->._1;way["highway"](bn._1)(properties:13)',
               bounds: {"type":"Polygon","coordinates":[[[16.33833,48.19821],[16.33854,48.19821],[16.33854,48.1983],[16.33833,48.1983],[16.33833,48.19821]]]}
             }, {
-              id: 'way["highway"](properties:13)->._1;way["railway"](properties:13)->._3;node(w._1)(w._3)(properties:8)->._3;way["railway"](bn._3)(properties:13)',
+              id: 'way["highway"](properties:13)->._1;way["railway"](properties:13)->._3;node(w._1)(w._3)(properties:0)->._3;way["railway"](bn._3)(properties:13)',
               bounds: {"type":"Polygon","coordinates":[[[16.33833,48.19821],[16.33854,48.19821],[16.33854,48.1983],[16.33833,48.1983],[16.33833,48.19821]]]}
             }]
           }]
@@ -3126,23 +3127,23 @@ describe("Filter sets with relations, apply base filter", function () {
           expectedSubRequestCount: 1,
           expectedCacheDescriptors: [{
             // TODO: way properties 4
-            id: 'node["highway"](properties:9)->._1;way(bn._1)(properties:12)',
+            id: 'node["highway"](properties:9)->._1;way(bn._1)(properties:4)',
             recurse: [{
-              id: 'node["highway"](properties:9)->._1;way(bn._1)(properties:12)->._1;node["highway"](w._1)(properties:9)',
+              id: 'node["highway"](properties:9)->._1;way(bn._1)(properties:4)->._1;node["highway"](w._1)(properties:9)',
               bounds: {"type":"Polygon","coordinates":[[[16.33901,48.19839],[16.33902,48.19839],[16.33902,48.1984],[16.33901,48.1984],[16.33901,48.19839]]]}
             }]
           }, {
-            id: 'node["highway"](properties:9)->._1;relation(bn._1)(properties:12)',
+            id: 'node["highway"](properties:9)->._1;relation(bn._1)(properties:4)',
             recurse: [{
-              id: 'node["highway"](properties:9)->._1;relation(bn._1)(properties:12)->._1;node["highway"](r._1)(properties:9)',
+              id: 'node["highway"](properties:9)->._1;relation(bn._1)(properties:4)->._1;node["highway"](r._1)(properties:9)',
               bounds: {"type":"Polygon","coordinates":[[[16.33901,48.19839],[16.33902,48.19839],[16.33902,48.1984],[16.33901,48.1984],[16.33901,48.19839]]]}
             }]
           },   {
-            id: 'node["highway"](properties:9)->._1;way(bn._1)(properties:4)->._1;relation(bw._1)(properties:12)',
+            id: 'node["highway"](properties:9)->._1;way(bn._1)(properties:4)->._1;relation(bw._1)(properties:4)',
             recurse: [{
-              id: 'node["highway"](properties:9)->._1;way(bn._1)(properties:4)->._1;relation(bw._1)(properties:12)->._1;way(r._1)(properties:4)',
+              id: 'node["highway"](properties:9)->._1;way(bn._1)(properties:4)->._1;relation(bw._1)(properties:4)->._1;way(r._1)(properties:4)',
               recurse: [{
-                id: 'node["highway"](properties:9)->._1;way(bn._1)(properties:4)->._1;relation(bw._1)(properties:12)->._1;way(r._1)(properties:4)->._1;node["highway"](w._1)(properties:9)',
+                id: 'node["highway"](properties:9)->._1;way(bn._1)(properties:4)->._1;relation(bw._1)(properties:4)->._1;way(r._1)(properties:4)->._1;node["highway"](w._1)(properties:9)',
               bounds: {"type":"Polygon","coordinates":[[[16.33901,48.19839],[16.33902,48.19839],[16.33902,48.1984],[16.33901,48.1984],[16.33901,48.19839]]]}
               }],
             }]
@@ -3162,11 +3163,12 @@ describe("Filter sets with relations, apply base filter", function () {
             maxlon: 16.34236
           },
           expected: [ "w175757214", "w175757217", "w175757222", "w175757225", "w199715278", "w86273649" ],
+          ignoreMissing: [ "w199911274", "w199911275" ], // TODO: create when loading from file?
           expectedSubRequestCount: 1,
           expectedCacheDescriptors: [{
-            id: 'relation["building"](properties:13)->._1;way(r._1:"inner")(properties:8)',
+            id: 'relation["building"](properties:13)->._1;way(r._1:"inner")(properties:0)',
             recurse: [{
-              id: 'relation["building"](properties:13)->._1;way(r._1:"inner")(properties:8)->._1;relation["building"](bw._1:"inner")(properties:13)',
+              id: 'relation["building"](properties:13)->._1;way(r._1:"inner")(properties:0)->._1;relation["building"](bw._1:"inner")(properties:13)',
               bounds: {"type":"Polygon","coordinates":[[[16.3399,48.19853],[16.34236,48.19853],[16.34236,48.19919],[16.3399,48.19919],[16.3399,48.19853]]]}
             }]
           }]
@@ -3187,11 +3189,10 @@ describe("Filter sets with relations, apply base filter", function () {
           expected: [ "w175757214", "w175757217", "w175757222", "w175757225", "w199715277", "w199715278", "w199911273", "w86273643", "w86273649" ],
           ignoreMissing: [ "w199911274", "w199911275" ],
           expectedSubRequestCount: 1,
-          expectedSubRequestCount2nd: 1, // TODO: 0
           expectedCacheDescriptors: [{
-            id: 'relation["building"](properties:13)->._1;way(r._1)(properties:8)',
+            id: 'relation["building"](properties:13)->._1;way(r._1)(properties:0)',
             recurse: [{
-              id: 'relation["building"](properties:13)->._1;way(r._1)(properties:8)->._1;relation["building"](bw._1)(properties:13)',
+              id: 'relation["building"](properties:13)->._1;way(r._1)(properties:0)->._1;relation["building"](bw._1)(properties:13)',
               bounds: {"type":"Polygon","coordinates":[[[16.3399,48.19853],[16.34236,48.19853],[16.34236,48.19919],[16.3399,48.19919],[16.3399,48.19853]]]}
             }]
           }]
@@ -3252,9 +3253,9 @@ describe("Filter sets with relations, apply base filter", function () {
           expected: [ "r1283879", "r2681533" ],
           expectedSubRequestCount: 1,
           expectedCacheDescriptors: [{
-            id: 'way(properties:8)->._1;relation["building"](bw._1:"inner")(properties:13)',
+            id: 'way(properties:8)->._1;relation["building"](bw._1:"inner")(properties:5)',
             recurse: [{
-              id: 'way(properties:8)->._1;relation["building"](bw._1:"inner")(properties:13)->._1;way(r._1:"inner")(properties:8)',
+              id: 'way(properties:8)->._1;relation["building"](bw._1:"inner")(properties:5)->._1;way(r._1:"inner")(properties:8)',
               bounds: {"type":"Polygon","coordinates":[[[16.3399,48.19853],[16.34236,48.19853],[16.34236,48.19919],[16.3399,48.19919],[16.3399,48.19853]]]}
             }]
           }]
@@ -3277,18 +3278,18 @@ describe("Filter sets with relations, apply base filter", function () {
           expectedSubRequestCount: 1,
           expectedCacheDescriptors: [
             {
-              id: 'node["highway"](properties:9)->._1;relation(bn._1)(properties:12)',
+              id: 'node["highway"](properties:9)->._1;relation(bn._1)(properties:4)',
               recurse: [{
-                id: 'node["highway"](properties:9)->._1;relation(bn._1)(properties:12)->._1;node["highway"](r._1)(properties:9)',
+                id: 'node["highway"](properties:9)->._1;relation(bn._1)(properties:4)->._1;node["highway"](r._1)(properties:9)',
                 bounds: {"type":"Polygon","coordinates":[[[16.33901,48.19839],[16.33902,48.19839],[16.33902,48.1984],[16.33901,48.1984],[16.33901,48.19839]]]}
               }]
             },
             {
-              id: 'node["highway"](properties:9)->._1;way(bn._1)(properties:4)->._1;relation(bw._1)(properties:12)',
+              id: 'node["highway"](properties:9)->._1;way(bn._1)(properties:4)->._1;relation(bw._1)(properties:4)',
               recurse: [{
-                id: 'node["highway"](properties:9)->._1;way(bn._1)(properties:4)->._1;relation(bw._1)(properties:12)->._1;way(r._1)(properties:4)',
+                id: 'node["highway"](properties:9)->._1;way(bn._1)(properties:4)->._1;relation(bw._1)(properties:4)->._1;way(r._1)(properties:4)',
                 recurse: [{
-                  id: 'node["highway"](properties:9)->._1;way(bn._1)(properties:4)->._1;relation(bw._1)(properties:12)->._1;way(r._1)(properties:4)->._1;node["highway"](w._1)(properties:9)',
+                  id: 'node["highway"](properties:9)->._1;way(bn._1)(properties:4)->._1;relation(bw._1)(properties:4)->._1;way(r._1)(properties:4)->._1;node["highway"](w._1)(properties:9)',
                   bounds: {"type":"Polygon","coordinates":[[[16.33901,48.19839],[16.33902,48.19839],[16.33902,48.1984],[16.33901,48.1984],[16.33901,48.19839]]]}
                 }]
               }]
@@ -3313,9 +3314,9 @@ describe("Filter sets with relations, apply base filter", function () {
           expected: ["w219680833","w265532169","w122580925","w220270706","w220270708","w220270709","w220270714","w232881263","w232881441","w261111319","w122580876","w122580924","w141233631","w210848994","w26231341","w88093287","w146678770","w236000518","w25585625","w27999826","w27999830","w58993078","w58993079","w140549303","w140549310","w264935316","w264935317","w264935318","w265532639","w358479330","w25585623","w25585675","w25585676","w235853811","w235853813","w251163470","w251163471","w265532171","w243573842","w25585622","w243575581","w140994821","w140994822","w217210755","w217210756","w220270704","w220270712","w122504890","w122504891","w263674444","w219430764","w219431980","w220270696","w220270713","w383292582","w383292589","w263674442","w5004103","w26617432","w26617436","w30090106","w30090108","w138647474","w141233626","w141233628","w141233629","w148759704","w212471618","w219431979","w228788310","w228788312","w229818937","w141233627","w146985784","w232385437","w232385442","w20447121","w148759701","w211680460","w211680461","w211682606","w211685484","w232385434","w232385435","w232385436","w244147727","w244148096","w244148097","w24877453","w25585539","w125586439","w220270694","w220270705","w228707690","w228707696","w243704616","w243705593","w228707705","w228707706","w219652645","w228707687","w228707710","w243702669","w146836190","w243702668","w251518413","w251518415","w122729040","w122729041","w219652646","w239913341","w251518411","w251518414","w251518416","w384007076","w384007077","w384007078","w384007079","w25585540","w239913340","w251518410","w251518412","w384007081","w180696708","w232385441","w383292593","w383292591","w232372749","w232372750","w232381392","w232382707","w232382712","w380821195","w220063906","w232382706","w232382709","w250584757","w380935815","w23320744","w220063909","w220063912","w232884024","w232884025","w232884028","w232884029","w232884030","w232884207","w232884208","w380598626","w380598640","w175441902","w180696709","w232381393","w232382708","w232382710","w25452759","w25498434","w25498436","w47800671","w58993077","w417105647"],
           expectedSubRequestCount: 1,
           expectedCacheDescriptors: [{
-            id: 'relation["route"="tram"](properties:13)->._1;way["railway"](r._1)(properties:9)',
+            id: 'relation["route"="tram"](properties:13)->._1;way["railway"](r._1)(properties:1)',
             recurse: [{
-              id: 'relation["route"="tram"](properties:13)->._1;way["railway"](r._1)(properties:9)->._1;relation["route"="tram"](bw._1)(properties:13)',
+              id: 'relation["route"="tram"](properties:13)->._1;way["railway"](r._1)(properties:1)->._1;relation["route"="tram"](bw._1)(properties:13)',
               bounds: {"type":"Polygon","coordinates":[[[16.33427,48.19956],[16.33732,48.19956],[16.33732,48.20101],[16.33427,48.20101],[16.33427,48.19956]]]}
             }]
           }]
@@ -3331,9 +3332,9 @@ describe("Filter sets with relations, apply base filter", function () {
           expected: ["w219680833","w265532169","w122580925","w220270706","w220270708","w220270709","w220270714","w232881263","w232881441","w261111319","w122580876","w122580924","w141233631","w210848994","w26231341","w88093287","w146678770","w236000518","w25585625","w27999826","w27999830","w58993078","w58993079","w140549303","w140549310","w264935316","w264935317","w264935318","w265532639","w358479330","w25585623","w25585675","w25585676","w235853811","w235853813","w251163470","w251163471","w265532171","w243573842","w25585622","w243575581","w140994821","w140994822","w217210755","w217210756","w220270704","w220270712","w122504890","w122504891","w263674444","w219430764","w219431980","w220270696","w220270713","w383292582","w383292589","w263674442","w5004103","w26617432","w26617436","w30090106","w30090108","w138647474","w141233626","w141233628","w141233629","w148759704","w212471618","w219431979","w228788310","w228788312","w229818937","w141233627","w146985784","w232385437","w232385442","w20447121","w148759701","w211680460","w211680461","w211682606","w211685484","w232385434","w232385435","w232385436","w244147727","w244148096","w244148097","w24877453","w25585539","w125586439","w220270694","w220270705","w228707690","w228707696","w243704616","w243705593","w228707705","w228707706","w219652645","w228707687","w228707710","w243702669","w146836190","w243702668","w251518413","w251518415","w122729040","w122729041","w219652646","w239913341","w251518411","w251518414","w251518416","w384007076","w384007077","w384007078","w384007079","w25585540","w239913340","w251518410","w251518412","w384007081","w180696708","w232385441","w383292593","w383292591","w232372749","w232372750","w232381392","w232382707","w232382712","w380821195","w220063906","w232382706","w232382709","w250584757","w380935815","w23320744","w220063909","w220063912","w232884024","w232884025","w232884028","w232884029","w232884030","w232884207","w232884208","w380598626","w380598640","w175441902","w180696709","w232381393","w232382708","w232382710","w25452759","w25498434","w25498436","w47800671","w58993077","w417105647"],
           expectedSubRequestCount: 1, // TODO: 0
           expectedCacheDescriptors: [{
-            id: 'relation["route"="tram"](properties:13)->._1;way["railway"](r._1)(properties:9)',
+            id: 'relation["route"="tram"](properties:13)->._1;way["railway"](r._1)(properties:1)',
             recurse: [{
-              id: 'relation["route"="tram"](properties:13)->._1;way["railway"](r._1)(properties:9)->._1;relation["route"="tram"](bw._1)(properties:13)',
+              id: 'relation["route"="tram"](properties:13)->._1;way["railway"](r._1)(properties:1)->._1;relation["route"="tram"](bw._1)(properties:13)',
               bounds: {"type":"Polygon","coordinates":[[[16.33449,48.1997],[16.3358,48.1997],[16.3358,48.20035],[16.33449,48.20035],[16.33449,48.1997]]]}
             }]
           }]
@@ -3432,9 +3433,9 @@ describe("Filter sets with relations, apply base filter", function () {
           expected: [ 'r1306478', 'r207109', 'r207110', 'r2446126', 'r5275276', 'r5333483', 'r79466' ],
           expectedSubRequestCount: 1,
           expectedCacheDescriptors: [{
-            id: 'node["highway"](properties:1)->._1;relation["route"="bus"](bn._1)(properties:13)',
+            id: 'node["highway"](properties:1)->._1;relation["route"="bus"](bn._1)(properties:5)',
             recurse: [{
-              id: 'node["highway"](properties:1)->._1;relation["route"="bus"](bn._1)(properties:13)->._1;node["highway"](r._1)(properties:1)'
+              id: 'node["highway"](properties:1)->._1;relation["route"="bus"](bn._1)(properties:5)->._1;node["highway"](r._1)(properties:1)'
             }]
           }]
         }, done)
@@ -3446,10 +3447,10 @@ describe("Filter sets with relations, apply base filter", function () {
           expected: [ 'r79466' ],
           expectedSubRequestCount: 1, // TODO: 0
           expectedCacheDescriptors: [{
-            id: 'node(properties:0)->._1;relation["route"="bus"](bn._1)(properties:13)',
+            id: 'node(properties:0)->._1;relation["route"="bus"](bn._1)(properties:5)',
             recurse: [{
               ids: ['2211384239'],
-              id: 'node(properties:0)->._1;relation["route"="bus"](bn._1)(properties:13)->._1;node(r._1)(properties:0)'
+              id: 'node(properties:0)->._1;relation["route"="bus"](bn._1)(properties:5)->._1;node(r._1)(properties:0)'
             }]
           }]
         }, done)
