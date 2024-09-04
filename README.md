@@ -90,13 +90,13 @@ All files can be used raw or compressed with bzip2 (detected from the additional
 
 Supported file formats:
 
-ID | Example file name | Documentation
----+-------------------+---------------
-OSMXML | `export.osm` | https://wiki.openstreetmap.org/wiki/OSM_XML (including the JOSM and Overpass 'out geom' extensions).
-OSMJSON | `export.osm.json` | https://wiki.openstreetmap.org/wiki/OSM_JSON (including the Overpass 'out geom' extensions).
-GeoJSON | `export.geojson` | https://geojson.org/
+| ID | Example file name | Documentation
+|----|-------------------|---------------
+| OSMXML | `export.osm` | https://wiki.openstreetmap.org/wiki/OSM_XML (including the JOSM and Overpass 'out geom' extensions).
+| OSMJSON | `export.osm.json` | https://wiki.openstreetmap.org/wiki/OSM_JSON (including the Overpass 'out geom' extensions).
+| GeoJSON | `export.geojson` | https://geojson.org/
 
-Read [#Additional file formats](below) how to enable additional file formats.
+Read the section ["Additional file formats"](#additional-file-formats) to learn how to enable additional file formats.
 
 ## The following queries are supported:
 ### Type
