@@ -35,6 +35,7 @@ overpassFrontend.BBoxQuery(
   },
   function (err, result) {
     console.log('* ' + result.tags.name + ' (' + result.id + ')')
+    // console.log(result.GeoJSON()) // convert to GeoJSON
   },
   function (err) {
     if (err) { console.log(err) }
