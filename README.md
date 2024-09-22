@@ -55,6 +55,7 @@ const overpassFrontend = new OverpassFrontend('//overpass-api.de/api/interpreter
 overpassFrontend.get(
   ['n27365030', 'w5013364'],
   {
+    // only return tags of the items. See below under "'Properties' option" for an explanation. If impatient, use ALL.
     properties: OverpassFrontend.TAGS
   },
   function (err, result) {
@@ -183,6 +184,23 @@ Examples:
 node(if:count_tags() > 5 || t["name"] == "foo")
 node(if:debug(id()))
 ```
+
+### 'Properties' option
+In `.get()` or `.BBoxQuery()` requests, you can set which properties will be requested for the items (with the `options.properties` parameter). Further properties might be loaded as well, if necessary for caching or further checks. The ID (type, id) will always be loaded.
+
+The following properties are defined:
+
+| Property | Description |
+|----------|-------------|
+| ID_ONLY  | The ID (type, id) of the item. |
+| TAGS     | The tags of the item. |
+| META     | Meta information (version, user, userid, changeset, timestamp). |
+| MEMBERS  | Way nodes and Relation members with their roles. |
+| BBOX     | The bounding box of the items. |
+| GEOM     | Geometry of the items. The full geometry of relations will only be loaded, when MEMBERS are loaded as well. |
+| CENTER   | The centroid of the items. |
+| ALL      | All of the above. |
+| DEFAULT  | ID_ONLY, TAGS, MEMBERS and BBOX. |
 
 # DEVELOPMENT
 
