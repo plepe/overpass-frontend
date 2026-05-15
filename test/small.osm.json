@@ -3,6 +3,12 @@
   "generator": "Overpass API 0.7.55.4 3079d8ea",
   "timestamp_osm_base": "2018-09-29T15:06:02Z",
   "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.",
+  "bounds": {
+    "minlat": 48.2076584,
+    "minlon": 16.3382176,
+    "maxlat": 48.2089847,
+    "maxlon": 16.3395023
+  },
   "elements": [
     {
       "type": "relation",

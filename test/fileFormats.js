@@ -24,13 +24,6 @@ describe('Load OSM data from file', function () {
   })
 
   it ('.osm', function (done) {
-    parsedData.bounds = new BoundingBox({
-      "maxlat": 48.2089847,
-      "maxlon": 16.3395023,
-      "minlat": 48.2076584,
-      "minlon": 16.3382176
-    })
-
     loadFile('test/small.osm', {}, (err, content) => {
       fileFormatOSMXML.load(content, {}, (err, result) => {
         if (err) {
