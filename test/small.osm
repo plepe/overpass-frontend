@@ -98,4 +98,7 @@
     <tag k="building" v="yes"/>
     <tag k="name" v="Hot Dogs"/>
   </way>
+  <way id="810158847" version="2" timestamp="2021-06-16T18:18:48Z" changeset="106484339" uid="6752061" user="wonderb0lt">
+    <tag k="amenity" v="empty geometry"/>
+  </way>
 </osm>

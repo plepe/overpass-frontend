@@ -297,6 +297,20 @@
         "building": "yes",
         "name": "Hot Dogs"
       }
+    },
+    {
+      "type": "way",
+      "id": 810158847,
+      "timestamp": "2021-06-16T18:18:48Z",
+      "version": 2,
+      "changeset": 106484339,
+      "user": "wonderb0lt",
+      "uid": 6752061,
+      "nodes": [
+      ],
+      "tags": {
+        "amenity": "empty geometry"
+      }
     }
   ]
 }
