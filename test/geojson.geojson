@@ -1,5 +1,6 @@
 {
   "type": "FeatureCollection",
+  "copyright": "The data included in this document is from geowiki-net.",
   "features": [
     {
       "type": "Feature",

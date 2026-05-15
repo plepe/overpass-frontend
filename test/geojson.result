@@ -1,5 +1,6 @@
 {
   "version": 0.6,
+  "copyright": "The data included in this document is from geowiki-net.",
   "elements": [
     {
       "type": "node",
