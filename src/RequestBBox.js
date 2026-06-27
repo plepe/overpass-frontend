@@ -198,42 +198,19 @@ class RequestBBox extends Request {
       effortAvailable = Math.min(effortAvailable, efforts.maxEffort)
     }
 
-    let query; let resultSet = '.result'; let resultSetId = null
-
-    // if the context already has a bbox and it differs from this, we can't add
-    // ours
+    let resultSetId = null
     if (this.lokiQuery) {
-      query = this.lokiQuery.toQl({ setsUseStatementIds: true }) + '\n'
       this.options.properties |= this.lokiQuery.properties()
       resultSetId = this.lokiQuery.getStatement().id
-      resultSet = resultSetId ? '._' + resultSetId : '.result'
-    } else {
-      query = this.query.substr(0, this.query.length - 1) + '->.result;\n'
     }
 
-    let queryRemoveDoneFeatures = ''
-    let countRemoveDoneFeatures = 0
-    for (const id in this.doneFeatures) {
-      const ob = this.doneFeatures[id]
-
-      if (countRemoveDoneFeatures % 1000 === 999) {
-        query += '(' + queryRemoveDoneFeatures + ')->.done;\n'
-        queryRemoveDoneFeatures = '.done;'
-      }
-
-      queryRemoveDoneFeatures += ob.type + '(' + ob.osm_id + ');'
-      countRemoveDoneFeatures++
-    }
-
-    if (countRemoveDoneFeatures) {
-      query += '(' + queryRemoveDoneFeatures + ')->.done;\n'
-      query += '(' + resultSet + '; - .done;)->' + resultSet + ';\n'
-    }
-
-    if (!('split' in this.options)) {
-      this.options.effortSplit = Math.ceil(effortAvailable / this.overpass.options.effortBBoxFeature)
-    }
-    query += resultSet + ' out ' + overpassOutOptions(this.options) + ';\n'
+    const query = this.overpass.database.compile(this.lokiQuery ?? this.query, {
+      properties: this.options.properties,
+      // bounds: this.bounds,
+      doneFeatures: this.doneFeatures,
+      statementId: resultSetId,
+      context
+    })
 
     const subRequest = {
       query,
