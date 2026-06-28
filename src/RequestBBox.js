@@ -208,6 +208,7 @@ class RequestBBox extends Request {
       properties: this.options.properties,
       doneFeatures: this.doneFeatures,
       statementId: resultSetId,
+      requestId: context.requests.indexOf(this),
       context
     })
 
