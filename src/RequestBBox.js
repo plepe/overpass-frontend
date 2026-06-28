@@ -212,6 +212,10 @@ class RequestBBox extends Request {
       context
     })
 
+    if (!('split' in this.options)) {
+      this.options.effortSplit = Math.ceil(effortAvailable / this.overpass.options.effortBBoxFeature)
+    }
+
     const subRequest = {
       query,
       request: this,
