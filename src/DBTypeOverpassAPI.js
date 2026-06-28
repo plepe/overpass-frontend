@@ -1,21 +1,22 @@
 const httpLoad = require('./httpLoad')
 const boundsIsFullWorld = require('./boundsIsFullWorld')
 const overpassOutOptions = require('./overpassOutOptions')
+const Filter = require('./Filter')
 const DBTypeBase = require('./DBTypeBase')
 
 module.exports = class DBTypeOverpassAPI extends DBTypeBase {
-  compile (query, options) {
-    // let query;
+  compile (_query, options) {
+    let query;
     let resultSet = '.result'
 
     // if the context already has a bbox and it differs from this, we can't add
     // ours
-    if (this.lokiQuery) {
-      query = this.lokiQuery.toQl({ setsUseStatementIds: true }) + '\n'
-      this.options.properties |= this.lokiQuery.properties()
+    if (_query instanceof Filter) {
+      query = _query.toQl({ setsUseStatementIds: true }) + '\n'
+      this.options.properties |= _query.properties()
       resultSet = options.statementId ? '._' + options.statementId : '.result'
     } else {
-      query = this.query.substr(0, this.query.length - 1) + '->.result;\n'
+      query = _query.substr(0, this.query.length - 1) + '->.result;\n'
     }
 
     let queryRemoveDoneFeatures = ''
@@ -52,6 +53,24 @@ module.exports = class DBTypeOverpassAPI extends DBTypeBase {
 
     const query = queryOptions + ';\n' +
       context.subRequests.map(c => c.query).join('\nout count;\n')
+
+    httpLoad(
+      this.url,
+      null,
+      query,
+      callback
+    )
+  }
+
+  execute (context, callback) {
+    let queryOptions = ''
+
+    queryOptions = '[out:json]'
+    if (context.bbox && !boundsIsFullWorld(context.bbox)) {
+      queryOptions += '[bbox:' + context.bbox.toLatLonString() + ']'
+    }
+
+    const query = queryOptions + ';\n' + context.query
 
     httpLoad(
       this.url,
