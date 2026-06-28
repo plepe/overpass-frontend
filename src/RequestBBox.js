@@ -204,17 +204,26 @@ class RequestBBox extends Request {
       resultSetId = this.lokiQuery.getStatement().id
     }
 
-    const query = this.overpass.database.compile(this.lokiQuery, {
+    if (!('split' in this.options)) {
+      this.options.effortSplit = Math.ceil(effortAvailable / this.overpass.options.effortBBoxFeature)
+    }
+
+    const dbOptions = {
       properties: this.options.properties,
       doneFeatures: this.doneFeatures,
       statementId: resultSetId,
       requestId: context.requests.indexOf(this),
       context
-    })
-
-    if (!('split' in this.options)) {
-      this.options.effortSplit = Math.ceil(effortAvailable / this.overpass.options.effortBBoxFeature)
     }
+
+    if ('split' in this.options) {
+      dbOptions.split = this.options.split
+    }
+    else if ('effortSplit' in this.options) {
+      dbOptions.effortSplit = this.options.effortSplit
+    }
+
+    const query = this.overpass.database.compile(this.lokiQuery, dbOptions)
 
     const subRequest = {
       query,
