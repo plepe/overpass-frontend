@@ -13,7 +13,7 @@ module.exports = class DBTypeOverpassAPI extends DBTypeBase {
     // ours
     if (_query instanceof Filter) {
       query = _query.toQl({ setsUseStatementIds: true }) + '\n'
-      this.options.properties |= _query.properties()
+      options.properties |= _query.properties()
       resultSet = options.statementId ? '._' + options.statementId : '.result'
     } else {
       query = _query.substr(0, this.query.length - 1) + '->.result;\n'
@@ -38,7 +38,7 @@ module.exports = class DBTypeOverpassAPI extends DBTypeBase {
       query += '(' + resultSet + '; - .done;)->' + resultSet + ';\n'
     }
 
-    query += resultSet + ' out ' + overpassOutOptions(this.options) + ';\n'
+    query += resultSet + ' out ' + overpassOutOptions(options) + ';\n'
 
     return query
   }
