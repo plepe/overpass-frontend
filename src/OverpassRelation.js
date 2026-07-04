@@ -518,7 +518,7 @@ class OverpassRelation extends OverpassObject {
       })
     }
 
-    if (options.geom && ((!options.ids && !options.tags) || options.body || options.skel)) {
+    if (this.members && options.geom && ((!options.ids && !options.tags) || options.body || options.skel)) {
       this.members.forEach((member, i) => {
         if (member.type === 'node') {
           if (this.memberFeatures[i].geometry) {
