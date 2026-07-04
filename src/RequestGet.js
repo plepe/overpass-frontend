@@ -1,9 +1,9 @@
 const Request = require('./Request')
 const defines = require('./defines')
 const BoundingBox = require('boundingbox')
-const overpassOutOptions = require('./overpassOutOptions')
 const RequestGetMembers = require('./RequestGetMembers')
 const isGeoJSON = require('./isGeoJSON')
+const Filter = require('./Filter')
 
 /**
  * A get request (request list of map features by id)
@@ -156,7 +156,6 @@ class RequestGet extends Request {
     let relationQuery = ''
     let BBoxQuery = ''
     let effort = 0
-    let outOptions
 
     if (this.options.bounds) {
       BBoxQuery = '(' + this.options.bounds.toLatLonString() + ')'
@@ -164,7 +163,6 @@ class RequestGet extends Request {
 
     for (let i = 0; i < this.ids.length; i++) {
       const id = this.ids[i]
-      outOptions = overpassOutOptions(this.options)
 
       if (effort > context.maxEffort) {
         break
@@ -239,15 +237,29 @@ class RequestGet extends Request {
         boundsNoMatch: true
       })
     }
+
+    query += '('
     if (nodeQuery !== '') {
-      query += '.n out ' + outOptions + ';\n'
+      query += '.n;'
     }
     if (wayQuery !== '') {
-      query += '.w out ' + outOptions + ';\n'
+      query += '.w;'
     }
     if (relationQuery !== '') {
-      query += '.r out ' + outOptions + ';\n'
+      query += '.r;'
     }
+    query += ');'
+
+    const filter = new Filter(query)
+
+    const dbOptions = {
+      properties: this.options.properties,
+      statementId: filter.getStatement().id,
+      requestId: context.requests.indexOf(this),
+      context
+    }
+
+    query = this.overpass.database.compile(new Filter(query), dbOptions)
 
     if (query) {
       requestParts.push({
