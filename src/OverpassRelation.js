@@ -51,6 +51,11 @@ class OverpassRelation extends OverpassObject {
       this.properties |= OverpassFrontend.CENTER
     }
 
+    if (data.geometry) {
+      this.geometry = data.geometry
+      this.properties |= OverpassFrontend.GEOM
+    }
+
     if (data.members) {
       this.members = []
       this.properties |= OverpassFrontend.MEMBERS
@@ -97,6 +102,10 @@ class OverpassRelation extends OverpassObject {
   }
 
   updateGeometry () {
+    if (this.geometry && this.overpass.database.separateSkelGeom) {
+      return
+    }
+
     if (!this.members) {
       return
     }
