@@ -363,7 +363,17 @@ class OverpassRelation extends OverpassObject {
     }
 
     if (options.geom && this.members) {
-      if (this.geometry.features.length === 1) {
+      if (this.overpass.database.separateSkelGeom) {
+        const intermediaObject = {elements:[{
+          type: 'relation',
+          id: this.osm_id,
+          tags: { type: 'multipolygon' },
+          members: this.geometry
+        }]}
+        const resolved = osmtogeojson(intermediaObject)
+        ret.geometry = resolved.features[0].geometry
+      }
+      else if (this.geometry.features.length === 1) {
         ret.geometry = this.geometry.features[0].geometry
       } else {
         ret.geometry = {
@@ -374,8 +384,6 @@ class OverpassRelation extends OverpassObject {
             .filter(member => member.type !== 'GeometryCollection' || member.geometries.length)
         }
       }
-    } else if (options.geom && this.geometry) {
-      // TODO
     }
 
     if (this.members && ((!options.ids && !options.tags) || options.body || options.skel)) {
@@ -612,6 +620,38 @@ class OverpassRelation extends OverpassObject {
 
         result.appendChild(node)
       })
+
+      if (options.geom && this.overpass.database.separateSkelGeom) {
+        this.geometry.forEach(member => {
+          const blank = document.createTextNode('\n  ')
+          result.appendChild(blank)
+
+          const node = document.createElement('geometry')
+          node.setAttribute('type', member.type)
+          node.setAttribute('role', member.role)
+          result.appendChild(node)
+
+          if (member.type === 'node') {
+            node.setAttribute('lat', member.geometry.lat.toFixed(7))
+            node.setAttribute('lon', member.geometry.lon.toFixed(7))
+          } else if (member.type === 'way') {
+            member.geometry.forEach(g => {
+              const blank = document.createTextNode('\n    ')
+              node.appendChild(blank)
+
+              const nd = document.createElement('nd')
+              nd.setAttribute('lat', g.lat.toFixed(7))
+              nd.setAttribute('lon', g.lon.toFixed(7))
+              node.appendChild(nd)
+            })
+
+            if (member.geometry.length) {
+              const blank = document.createTextNode('\n  ')
+              node.appendChild(blank)
+            }
+          }
+        })
+      }
     }
   }
 }
