@@ -218,8 +218,7 @@ class RequestBBox extends Request {
 
     if ('split' in this.options) {
       dbOptions.split = this.options.split
-    }
-    else if ('effortSplit' in this.options) {
+    } else if ('effortSplit' in this.options) {
       dbOptions.effortSplit = this.options.effortSplit
     }
 

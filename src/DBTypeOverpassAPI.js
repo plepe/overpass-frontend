@@ -11,7 +11,7 @@ module.exports = class DBTypeOverpassAPI {
   }
 
   compile (_query, options) {
-    let query;
+    let query
     let resultSet = '.result'
 
     // if the context already has a bbox and it differs from this, we can't add
