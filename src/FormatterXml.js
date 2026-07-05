@@ -27,6 +27,9 @@ module.exports = class FormatterXml {
     this.osm.setAttribute('version', '0.6')
     this.osm.setAttribute('generator', '')
 
+    const blank = this.document.createTextNode('\n')
+    this.osm.appendChild(blank)
+
     this.updateMeta()
   }
 
