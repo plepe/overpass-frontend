@@ -546,6 +546,10 @@ class OverpassRelation extends OverpassObject {
       console.log('GEOM', this.data.geometry)
     }
 
+    if (options.geom && this.overpass.database.separateSkelGeom) {
+      result.geometry = this.geometry
+    }
+
     return result
   }
 
