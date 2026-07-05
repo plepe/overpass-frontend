@@ -4,9 +4,10 @@ const httpLoad = require('./httpLoad')
 const Filter = require('./Filter')
 
 module.exports = class DBTypeOverpassAPI {
-  constructor (url, options) {
+  constructor (url, geowiki, options) {
     this.type = 'OverpassAPI'
     this.url = url
+    this.geowiki = geowiki
     this.options = options
   }
 

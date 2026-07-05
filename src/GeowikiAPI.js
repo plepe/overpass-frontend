@@ -132,7 +132,7 @@ class OverpassFrontend {
       this.ready = true
 
       const DBTypeClass = OverpassFrontend.dbTypes[this.options.dbType ?? 'OverpassAPI']
-      this.database = new DBTypeClass(this.url, this.options)
+      this.database = new DBTypeClass(this.url, this, this.options)
     }
   }
 
