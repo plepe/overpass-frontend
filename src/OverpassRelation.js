@@ -364,15 +364,17 @@ class OverpassRelation extends OverpassObject {
 
     if (options.geom && this.members) {
       if (this.overpass.separateSkelGeom) {
-        const intermediaObject = {
+        const tmp = {
           elements: [{
             type: 'relation',
             id: this.osm_id,
-            tags: { type: 'multipolygon' },
-            members: this.geometry
+            tags: this.tags,
+            members: this.geometry.map((m, i) => {
+              return { ...m, ref: i }
+            })
           }]
         }
-        const resolved = osmtogeojson(intermediaObject)
+        const resolved = osmtogeojson(tmp)
         ret.geometry = resolved.features[0].geometry
       } else if (this.geometry.features.length === 1) {
         ret.geometry = this.geometry.features[0].geometry
