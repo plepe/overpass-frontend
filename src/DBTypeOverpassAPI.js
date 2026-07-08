@@ -61,22 +61,4 @@ module.exports = class DBTypeOverpassAPI extends DBTypeBase {
       callback
     )
   }
-
-  execute (context, callback) {
-    let queryOptions = ''
-
-    queryOptions = '[out:json]'
-    if (context.bbox && !boundsIsFullWorld(context.bbox)) {
-      queryOptions += '[bbox:' + context.bbox.toLatLonString() + ']'
-    }
-
-    const query = queryOptions + ';\n' + context.query
-
-    httpLoad(
-      this.url,
-      null,
-      query,
-      callback
-    )
-  }
 }
