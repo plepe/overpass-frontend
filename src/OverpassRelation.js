@@ -244,6 +244,16 @@ class OverpassRelation extends OverpassObject {
 
     if (!allKnown && this.databaseGeometry) {
       this.geometry = this.databaseGeometry
+
+      if (!this.bounds) {
+        this.bounds = new BoundingBox(this.geometry)
+      }
+
+      if (!this.center) {
+        this.center = this.bounds.getCenter()
+      }
+
+      this.properties = this.properties | OverpassFrontend.BBOX | OverpassFrontend.CENTER
     }
   }
 
