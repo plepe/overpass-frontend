@@ -16,13 +16,13 @@ module.exports = class DBTypeOverpassAPI extends DBTypeBase {
       options.properties |= _query.properties()
       resultSet = options.statementId ? '._' + options.statementId : '.result'
     } else {
-      query = _query.substr(0, this.query.length - 1) + '->.result;\n'
+      query = _query.substr(0, _query.length - 1) + '->.result;\n'
     }
 
     let queryRemoveDoneFeatures = ''
     let countRemoveDoneFeatures = 0
-    for (const id in this.doneFeatures) {
-      const ob = this.doneFeatures[id]
+    for (const id in options.doneFeatures) {
+      const ob = options.doneFeatures[id]
 
       if (countRemoveDoneFeatures % 1000 === 999) {
         query += '(' + queryRemoveDoneFeatures + ')->.done;\n'
