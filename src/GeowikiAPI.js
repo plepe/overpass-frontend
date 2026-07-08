@@ -4,7 +4,6 @@ const weightSort = require('weight-sort')
 const BoundingBox = require('boundingbox')
 const LokiJS = require('lokijs')
 
-const httpLoad = require('./httpLoad')
 const removeNullEntries = require('./removeNullEntries')
 
 const BBoxQueryCache = require('./BBoxQueryCache')
@@ -22,7 +21,6 @@ const readDbMeta = require('./readDbMeta')
 const timestamp = require('./timestamp')
 const Filter = require('./Filter')
 const isGeoJSON = require('./isGeoJSON')
-const boundsIsFullWorld = require('./boundsIsFullWorld')
 const isFileURL = require('./isFileURL')
 
 /**
@@ -421,35 +419,17 @@ class GeowikiAPI {
 
       context.subRequests.push(subRequest)
 
-      if (context.query !== '') {
-        context.query += '\nout count;\n'
-      }
-
       effortAvailable -= subRequest.effort
-      context.query += subRequest.query
 
       if (effortAvailable <= 0) {
         break
       }
     }
 
-    if (context.query === '') {
-      return this._next()
-    }
-
-    context.queryOptions = '[out:json]'
-    if (context.bbox && !boundsIsFullWorld(context.bbox)) {
-      context.queryOptions += '[bbox:' + context.bbox.toLatLonString() + ']'
-    }
-
-    const query = context.queryOptions + ';\n' + context.query
-
     setTimeout(function () {
-      httpLoad(
-        this.url,
-        null,
-        query,
-        this._handleResult.bind(this, context)
+      this.database.execute(
+        context,
+        (err, result) => this._handleResult(context, err, result)
       )
 
       this.emit('start', {}, context)

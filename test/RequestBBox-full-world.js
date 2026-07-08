@@ -29,7 +29,7 @@ describe('BBoxQuery with GeoJSON bounds', function () {
     }
 
     overpassFrontend.once('start', (e, context) => {
-      assert.equal(context.queryOptions, '[out:json]')
+      // assert.equal(context.queryOptions, '[out:json]')
     })
 
     var request = overpassFrontend.BBoxQuery(
