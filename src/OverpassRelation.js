@@ -51,6 +51,13 @@ class OverpassRelation extends OverpassObject {
       this.properties |= GeowikiAPI.CENTER
     }
 
+    // DB may save the geometry in 'databaseGeometry' if the member's
+    // geometries can not be re-constructed (e.g. merge lines of multipolygons)
+    if (data.databaseGeometry) {
+      this.databaseGeometry = data.databaseGeometry
+      this.properties |= GeowikiAPI.GEOM
+    }
+
     if (data.members) {
       this.members = []
       this.properties |= GeowikiAPI.MEMBERS
@@ -233,6 +240,10 @@ class OverpassRelation extends OverpassObject {
       if (this.bounds && allKnown) {
         this.properties = this.properties | GeowikiAPI.BBOX | GeowikiAPI.CENTER
       }
+    }
+
+    if (!allKnown && this.databaseGeometry) {
+      this.geometry = this.databaseGeometry
     }
   }
 
