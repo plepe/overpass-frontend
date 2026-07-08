@@ -125,13 +125,16 @@ class GeowikiAPI {
     this.pendingNotifyMemberUpdate = {}
     this.pendingUpdateEmit = {}
 
-    if (this.options.isFile ?? isFileURL(this.url)) {
+    if (!this.options.dbType && (this.options.isFile ?? isFileURL(this.url))) {
       this.options.isFile = true
       this.ready = false
       global.setTimeout(() => this._loadFile(), 0)
     } else {
       this.options.isFile = false
       this.ready = true
+
+      const DBTypeClass = GeowikiAPI.dbTypes[this.options.dbType ?? 'OverpassAPI']
+      this.database = new DBTypeClass(this.url, this, this.options)
     }
   }
 
@@ -1056,7 +1059,9 @@ ee(GeowikiAPI.prototype)
 GeowikiAPI.Filter = Filter
 GeowikiAPI.DBTypeBase = require('./DBTypeBase')
 
-GeowikiAPI.dbTypes = {}
+GeowikiAPI.dbTypes = {
+  OverpassAPI: require('./DBTypeOverpassAPI')
+}
 
 GeowikiAPI.registerDBType = (type, _class) => {
   GeowikiAPI.dbTypes[type] = _class
