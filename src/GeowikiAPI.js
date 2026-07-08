@@ -1054,5 +1054,12 @@ function isSeparator (el) {
 ee(OverpassFrontend.prototype)
 
 OverpassFrontend.Filter = Filter
+OverpassFrontend.DBTypeBase = require('./DBTypeBase')
+
+OverpassFrontend.dbTypes = {}
+
+OverpassFrontend.registerDBType = (type, _class) => {
+  OverpassFrontend.dbTypes[type] = _class
+}
 
 module.exports = OverpassFrontend

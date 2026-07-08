@@ -350,3 +350,21 @@ Example OSMJSON result:
 ```
 
 The supported OSMJSON format is quite flexible, it supports (almost?) all combinations of 'out' in the Overpass QL, e.g.: if meta data is present, it will be loaded, but it is not required. Geometry of ways and relations can be loaded inline, member ids may be present.
+
+## Alternative Databases
+GeowikiAPI can talk to alternative databases as well. You can register a database backend with:
+
+```js
+import GeowikiAPI from '@geowiki-net/geowiki-api'
+
+class DBTypeCustom extends GeowikiAPI.DBTypeBase {
+  // compiles a query of type Filter
+  compile (query, options) { ... }
+
+  // execute a list of queries. callback expects a result in OSMJSON format.
+  // The result of queries need to be separated by { type: 'count' } elements.
+  execute (context, callback) { ... }
+}
+
+GeowikiAPI.registerDBType('custom', DBTypeCustom)
+```
