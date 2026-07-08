@@ -248,6 +248,22 @@ class OverpassRelation extends OverpassObject {
     if (!allKnown && this.databaseGeometry) {
       this.geometry = this.databaseGeometry
     }
+
+    if (!this.bounds || (this.properties & OverpassFrontend.BBOX) === 0) {
+      const bounds = turf.bbox(this.geometry)
+      this.bounds = new BoundingBox({
+        minlon: bounds[0],
+        minlat: bounds[1],
+        maxlon: bounds[2],
+        maxlat: bounds[3]
+      })
+      console.log(this.bounds)
+    }
+
+    if (!this.center || (this.properties & OverpassFrontend.CENTER) === 0) {
+      this.center = this.bounds.getCenter()
+      this.properties = this.properties | OverpassFrontend.BBOX | OverpassFrontend.CENTER
+    }
   }
 
   notifyMemberUpdate (memberObs) {

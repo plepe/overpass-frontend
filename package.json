@@ -20,6 +20,7 @@
     "xmlhttprequest": "global:XMLHttpRequest"
   },
   "dependencies": {
+    "@turf/bbox": "^7.3.5",
     "@turf/bbox-clip": "^6.5.0",
     "@turf/boolean-intersects": "^6.5.0",
     "@turf/boolean-within": "^6.5.0",
