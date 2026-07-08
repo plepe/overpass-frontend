@@ -51,8 +51,13 @@ class OverpassRelation extends OverpassObject {
       this.properties |= OverpassFrontend.CENTER
     }
 
-    if (data.geometry) {
-      this.geometry = data.geometry
+    if (data.databaseGeometry) {
+      this.geometry = data.databaseGeometry
+      this.properties |= OverpassFrontend.GEOM
+    }
+
+    if (data.geometryMembers) {
+      this.geometryMembers = data.geometryMembers
       this.properties |= OverpassFrontend.GEOM
     }
 
@@ -102,7 +107,7 @@ class OverpassRelation extends OverpassObject {
   }
 
   updateGeometry () {
-    if (this.geometry && this.overpass.separateSkelGeom) {
+    if (this.databaseGeometry && this.overpass.separateSkelGeom) {
       return
     }
 
@@ -362,14 +367,14 @@ class OverpassRelation extends OverpassObject {
       }
     }
 
-    if (options.geom && this.members) {
+    if (options.geom && this.geometryMembers) {
       if (this.overpass.separateSkelGeom) {
         const tmp = {
           elements: [{
             type: 'relation',
             id: this.osm_id,
             tags: this.tags,
-            members: this.geometry.map((m, i) => {
+            members: this.geometryMembers.map((m, i) => {
               return { ...m, ref: i }
             })
           }]
@@ -625,7 +630,7 @@ class OverpassRelation extends OverpassObject {
       })
 
       if (options.geom && this.overpass.separateSkelGeom) {
-        this.geometry.forEach(member => {
+        this.geometryMembers.forEach(member => {
           const blank = document.createTextNode('\n  ')
           result.appendChild(blank)
 
