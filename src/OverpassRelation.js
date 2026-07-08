@@ -52,7 +52,7 @@ class OverpassRelation extends OverpassObject {
     }
 
     if (data.databaseGeometry) {
-      this.geometry = data.databaseGeometry
+      this.databaseGeometry = data.databaseGeometry
       this.properties |= OverpassFrontend.GEOM
     }
 
@@ -107,10 +107,6 @@ class OverpassRelation extends OverpassObject {
   }
 
   updateGeometry () {
-    if (this.databaseGeometry && this.overpass.separateSkelGeom) {
-      return
-    }
-
     if (!this.members) {
       return
     }
@@ -247,6 +243,10 @@ class OverpassRelation extends OverpassObject {
       if (this.bounds && allKnown) {
         this.properties = this.properties | OverpassFrontend.BBOX | OverpassFrontend.CENTER
       }
+    }
+
+    if (!allKnown && this.databaseGeometry) {
+      this.geometry = this.databaseGeometry
     }
   }
 
