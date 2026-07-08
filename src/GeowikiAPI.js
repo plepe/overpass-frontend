@@ -1054,5 +1054,12 @@ function isSeparator (el) {
 ee(GeowikiAPI.prototype)
 
 GeowikiAPI.Filter = Filter
+GeowikiAPI.DBTypeBase = require('./DBTypeBase')
+
+GeowikiAPI.dbTypes = {}
+
+GeowikiAPI.registerDBType = (type, _class) => {
+  GeowikiAPI.dbTypes[type] = _class
+}
 
 module.exports = GeowikiAPI
