@@ -6,6 +6,7 @@ const osmtogeojson = require('osmtogeojson')
 const OverpassObject = require('./OverpassObject')
 const OverpassFrontend = require('./defines')
 const geojsonShiftWorld = require('./geojsonShiftWorld')
+const geojson2elements = require('./geojson2elements')
 const turf = require('./turf')
 
 /**
@@ -392,8 +393,6 @@ class OverpassRelation extends OverpassObject {
             .filter(member => member.type !== 'GeometryCollection' || member.geometries.length)
         }
       }
-    } else if (options.geom && this.geometry) {
-      // TODO
     }
 
     if (this.members && ((!options.ids && !options.tags) || options.body || options.skel)) {
@@ -545,21 +544,31 @@ class OverpassRelation extends OverpassObject {
       })
     }
 
+    let allKnown = true
     if (this.members && options.geom && ((!options.ids && !options.tags) || options.body || options.skel)) {
       this.members.forEach((member, i) => {
         if (member.type === 'node') {
           if (this.memberFeatures[i].geometry) {
             result.members[i].lat = this.memberFeatures[i].geometry.lat
             result.members[i].lon = this.memberFeatures[i].geometry.lon
+          } else {
+            allKnown = false
           }
         } else if (member.type === 'way') {
           if (this.memberFeatures[i].geometry && this.memberFeatures[i].geometry.length) {
             result.members[i].geometry = this.memberFeatures[i].geometry
           } else {
             result.members[i].geometry = []
+            allKnown = false
           }
+        } else {
+          allKnown = false
         }
       })
+    }
+
+    if (options.geom && ((!options.ids && !options.tags) || options.body || options.skel) && (!this.members || !allKnown)) {
+      result.geometry = geometryFromGeoJSON(this.geometry)
     }
 
     return result
@@ -626,6 +635,27 @@ class OverpassRelation extends OverpassObject {
       })
     }
   }
+}
+
+function geometryFromGeoJSON (geometry) {
+  const elements = []
+  geojson2elements(geometry, elements, {})
+  let result = []
+
+  elements.forEach(el => {
+    if (el.type === 'relation') {
+      el.members.forEach(m => {
+        delete m.ref
+      })
+      result = result.concat(el.members)
+    } else {
+      delete el.id
+      delete el.tags
+      result.push(el)
+    }
+  })
+
+  return result
 }
 
 module.exports = OverpassRelation
