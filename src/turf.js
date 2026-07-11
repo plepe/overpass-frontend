@@ -1,5 +1,4 @@
 module.exports = {
-  bbox: require('@turf/bbox').default,
   booleanIntersects: require('@turf/boolean-intersects').default,
   booleanWithin: require('@turf/boolean-within').default,
   buffer: require('@turf/buffer').default,
