@@ -597,6 +597,7 @@ class OverpassRelation extends OverpassObject {
       result.appendChild(node)
     }
 
+    let allKnown = true
     if (this.members && ((!options.ids && !options.tags) || options.body || options.skel)) {
       this.members.forEach((member, i) => {
         const blank = document.createTextNode('\n  ')
@@ -608,29 +609,29 @@ class OverpassRelation extends OverpassObject {
         node.setAttribute('role', member.role)
 
         if (options.geom && this.geometry) {
-          if (member.type === 'node') {
-            if (this.memberFeatures[i].geometry) {
-              node.setAttribute('lat', this.memberFeatures[i].geometry.lat.toFixed(7))
-              node.setAttribute('lon', this.memberFeatures[i].geometry.lon.toFixed(7))
-            }
-          } else if (member.type === 'way' && this.memberFeatures[i].geometry) {
-            this.memberFeatures[i].geometry.forEach(g => {
-              const blank = document.createTextNode('\n    ')
-              node.appendChild(blank)
-
-              const nd = document.createElement('nd')
-              nd.setAttribute('lat', g.lat.toFixed(7))
-              nd.setAttribute('lon', g.lon.toFixed(7))
-              node.appendChild(nd)
-            })
-
-            if (this.memberFeatures[i].geometry.length) {
-              const blank = document.createTextNode('\n  ')
-              node.appendChild(blank)
-            }
+          if (!xmlAddGeometry(node, member, this.memberFeatures[i])) {
+            allKnown = false
           }
         }
 
+        result.appendChild(node)
+      })
+    }
+
+    if ((!this.members || !allKnown) && ((!options.ids && !options.tags) || options.body || options.skel)) {
+      const geometry = geometryFromGeoJSON(this.geometry)
+
+      geometry.forEach((member, i) => {
+        const blank = document.createTextNode('\n  ')
+        result.appendChild(blank)
+
+        const node = document.createElement('geometry')
+        node.setAttribute('type', member.type)
+        if (member.role) {
+          node.setAttribute('role', member.role)
+        }
+
+        xmlAddGeometry(node, member, member)
         result.appendChild(node)
       })
     }
@@ -656,6 +657,38 @@ function geometryFromGeoJSON (geometry) {
   })
 
   return result
+}
+
+function xmlAddGeometry (node, member, memberFeature) {
+  const document = node.ownerDocument
+  let found = false
+
+  if (member.type === 'node') {
+    if (memberFeature.geometry) {
+      node.setAttribute('lat', memberFeature.geometry.lat.toFixed(7))
+      node.setAttribute('lon', memberFeature.geometry.lon.toFixed(7))
+      found = true
+    }
+  } else if (member.type === 'way' && memberFeature.geometry) {
+    memberFeature.geometry.forEach(g => {
+      const blank = document.createTextNode('\n    ')
+      node.appendChild(blank)
+
+      const nd = document.createElement('nd')
+      nd.setAttribute('lat', g.lat.toFixed(7))
+      nd.setAttribute('lon', g.lon.toFixed(7))
+      node.appendChild(nd)
+    })
+
+    if (memberFeature.geometry.length) {
+      const blank = document.createTextNode('\n  ')
+      node.appendChild(blank)
+    }
+
+    found = true
+  }
+
+  return found
 }
 
 module.exports = OverpassRelation
