@@ -40,7 +40,7 @@ module.exports = class DBTypeOverpassAPI extends DBTypeBase {
 
     query += resultSet + ' out ' + overpassOutOptions(options) + ';\n'
 
-    return query
+    return [query, {}]
   }
 
   execute (context, callback) {
