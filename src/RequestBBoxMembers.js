@@ -154,10 +154,10 @@ class RequestBBoxMembers extends Request {
 
     this.loadFinish = true
 
-    if (subRequest.parts.length) {
-      subRequest.query += '\nout count;\n'
+    if (!subRequest.query) {
+      subRequest.query = []
     }
-    subRequest.query += query
+    subRequest.query.push(query)
     subRequest.parts.push(this.part)
 
     return subRequest

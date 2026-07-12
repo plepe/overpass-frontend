@@ -226,7 +226,7 @@ class RequestBBox extends Request {
     const query = this.overpass.database.compile(this.lokiQuery ?? this.query, dbOptions)
 
     const subRequest = {
-      query,
+      query: [query],
       request: this,
       parts: [
         {
@@ -250,7 +250,7 @@ class RequestBBox extends Request {
     const reverseParts = {}
     script.reverse().forEach(e => {
       e.recurse.forEach(r => {
-        subRequest.query += compileRecurseReverse(r, e)
+        subRequest.query[0] += compileRecurseReverse(r, e)
         if (!(r.id in reverseParts)) {
           reverseParts[r.id] = []
         }
@@ -267,10 +267,10 @@ class RequestBBox extends Request {
         options.properties |= e.properties
       })
 
-      subRequest.query += 'out count;\n(' +
+      subRequest.query.push('(' +
         from.map(e => 'nwr._' + rid + '._rev' + e.id + '_' + rid + ';')
           .join('') + ');\n' +
-        'out ' + overpassOutOptions(options) + ';'
+        'out ' + overpassOutOptions(options) + ';')
 
       const statementId = this.lokiQuery.getStatement().id
       subRequest.parts.push({

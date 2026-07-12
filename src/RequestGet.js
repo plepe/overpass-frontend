@@ -271,7 +271,7 @@ class RequestGet extends Request {
     }
 
     const subRequest = {
-      query,
+      query: [query],
       effort: effort,
       request: this,
       parts: requestParts

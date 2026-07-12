@@ -52,7 +52,7 @@ module.exports = class DBTypeOverpassAPI extends DBTypeBase {
     }
 
     const query = queryOptions + ';\n' +
-      context.subRequests.map(c => c.query).join('\nout count;\n')
+      context.subRequests.map(c => c.query.join('\nout count;\n')).join('\nout count;\n')
 
     httpLoad(
       this.url,
