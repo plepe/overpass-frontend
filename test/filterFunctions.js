@@ -8,6 +8,16 @@ var OverpassFrontend = require('..')
 var BoundingBox = require('boundingbox')
 var overpassFrontend
 
+OverpassFrontend.registerQlFunction('_test', class _Test extends OverpassFrontend.QlFunction {
+  test (ob) {
+    return (ob.osm_id % 2) === (this.value === 'true' ? 1 : 0)
+  }
+
+  isSupersetOf (other) {
+    console.log(other)
+  }
+})
+
 ;['via-server', 'via-file'].forEach(mode => {
   describe('Test filter functions ' + mode, function () {
     describe('initalize', function () {
@@ -102,6 +112,22 @@ var overpassFrontend
           expectedCacheDescriptors: [{
             id: 'node(properties:0)',
             ids: [1234]
+          }]
+        }, done)
+      })
+    })
+
+    describe('Custom filter function _test', function () {
+      it('single', function (done) {
+        test({
+          mode,
+          query: 'node(_test:true)',
+          expectedQuery: 'node;',
+          expectedString: 'node(_test:true);',
+          expected: [ 'n252548482', 'n286198749', 'n286198796' ],
+          expectedSubRequestCount: 1,
+          expectedCacheDescriptors: [{
+            id: 'node(_test:true)(properties:0)',
           }]
         }, done)
       })

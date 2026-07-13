@@ -368,3 +368,26 @@ class DBTypeCustom extends GeowikiAPI.DBTypeBase {
 
 GeowikiAPI.registerDBType('custom', DBTypeCustom)
 ```
+
+## Additional Filter Functions
+You can define additional filter functions, e.g. `nwr(odd:true)` to match only map items with an odd ID:
+
+```js
+import GeowikiAPI from '@geowiki-net/geowiki-api'
+
+GeowikiAPI.registerQlFunction('odd', class Odd extends GeowikiAPI.QlFunction {
+  test (ob) {
+    return (ob.osm_id % 2) === (this.value === 'true' ? 1 : 0)
+  }
+
+  /* optional methods */
+  // return the properties which are are needed for testing (see "'Properties' option" above)
+  properties () {
+    return GeowikiAPI.ID_ONLY
+  }
+
+  // how to query the internal LokiJS database
+  compileLokiJS () {
+  }
+})
+```

@@ -708,4 +708,9 @@ class Filter {
   }
 }
 
+Filter.registerQlFunction = function (fun, _class) {
+  _class.fun = fun
+  qlFunctions[fun] = _class
+}
+
 module.exports = Filter

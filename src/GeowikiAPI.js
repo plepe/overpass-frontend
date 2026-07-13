@@ -1051,4 +1051,8 @@ OverpassFrontend.registerDBType = (type, _class) => {
   OverpassFrontend.dbTypes[type] = _class
 }
 
+OverpassFrontend.QlFunction = require('./qlFunctions/qlFunction')
+console.log(OverpassFrontend.QlFunction)
+OverpassFrontend.registerQlFunction = Filter.registerQlFunction
+
 module.exports = OverpassFrontend
