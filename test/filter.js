@@ -845,6 +845,11 @@ describe('Filter', function () {
       assert.deepEqual(r, [ { id: 'nwr["cuisine"~"^(.*;|)asian(|;.*)$"](properties:1)' } ])
     })
 
+    it ('nwr[~"name"~"."][foo~"bar"]', function () {
+      var f = new Filter('nwr[~"name"~"."][foo~"bar"]')
+      assert.equal(f.toString(), 'nwr[~"name"~"."]["foo"~"bar"];')
+    })
+
     it ('nwr["amenity"=\'restaurant\']["sh\\"op"]', function () {
       var f = new Filter('nwr["amenity"=\'restaurant\']["sh\\"op"]')
       assert.equal(f.toString(), 'nwr["amenity"="restaurant"]["sh\\"op"];')

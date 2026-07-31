@@ -239,6 +239,7 @@ function parse (def, rek = 0) {
         current.push(entry)
         def = def.slice(m[0].length)
         notExists = null
+        keyRegexp = false
         mode = 10
       } else if (m) {
         if (notExists) {
@@ -289,6 +290,7 @@ function parse (def, rek = 0) {
         }
         current.push(entry)
         mode = 10
+        keyRegexp = false
         def = def.slice(m[0].length)
       } else {
         throw new Error("Can't parse query, expected ']': " + def)
