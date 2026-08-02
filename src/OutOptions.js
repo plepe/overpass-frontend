@@ -21,11 +21,12 @@ module.exports = class OutOptions {
   /**
    * @param {string|string[]} value A value, e.g. 'body tags geom'
    */
-  constructor (value) {
+  constructor (value, overpass) {
     if (typeof value === 'string') {
       value = value.split(' ')
     }
     this.def = { out: value }
+    this.overpass = overpass
   }
 
   /**
