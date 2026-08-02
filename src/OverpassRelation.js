@@ -52,10 +52,34 @@ class OverpassRelation extends OverpassObject {
       this.properties |= GeowikiAPI.CENTER
     }
 
-    // DB may save the geometry in 'databaseGeometry' if the member's
+    // DB may save the geometry in 'geometry' if the member's
     // geometries can not be re-constructed (e.g. merge lines of multipolygons)
-    if (data.databaseGeometry) {
-      this.databaseGeometry = data.databaseGeometry
+    if (data.geometry) {
+      if (data.geometry.type) {
+        // is this GeoJSON?
+        this.databaseGeometry = data.geometry
+      } else {
+        // no, it is OSMJSON with separated geometry
+        const object = {
+          id: this.osm_id,
+          type: 'relation',
+          tags: this.tags,
+          members: data.geometry
+        }
+
+        let fakeId = 1
+        data.geometry.forEach(geom => {
+          if (!geom.ref) {
+            geom.ref = fakeId++
+          }
+          if (!geom.role && this.tags.type === 'multipolygon') {
+            geom.role = 'outer'
+          }
+        })
+
+        this.databaseGeometry = osmtogeojson({ elements: [object] }).features[0]
+      }
+
       this.properties |= GeowikiAPI.GEOM
     }
 

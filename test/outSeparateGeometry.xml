@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<osm version="0.6" generator="Overpass API 0.7.62.2 58ef4056 via @geowiki-net/geowiki-api 4.0.0-rc.0" timestamp_osm_base="" copyright="The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.">
+<relation id="6412377">
+  <bounds minlat="48.1982834" minlon="16.3353110" maxlat="48.1986018" maxlon="16.3358099"/>
+  <member type="way" ref="431041605" role="outer"/>
+  <member type="way" ref="431041609" role="inner"/>
+  <geometry type="way" role="outer">
+    <nd lat="48.1985820" lon="16.3356926"/>
+    <nd lat="48.1985604" lon="16.3356179"/>
+    <nd lat="48.1985165" lon="16.3354660"/>
+    <nd lat="48.1984998" lon="16.3354768"/>
+    <nd lat="48.1984806" lon="16.3354103"/>
+    <nd lat="48.1984965" lon="16.3353999"/>
+    <nd lat="48.1984708" lon="16.3353110"/>
+    <nd lat="48.1982834" lon="16.3354329"/>
+    <nd lat="48.1983258" lon="16.3355798"/>
+    <nd lat="48.1983520" lon="16.3355628"/>
+    <nd lat="48.1983616" lon="16.3355958"/>
+    <nd lat="48.1983370" lon="16.3356118"/>
+    <nd lat="48.1983942" lon="16.3358099"/>
+    <nd lat="48.1985318" lon="16.3357203"/>
+    <nd lat="48.1985528" lon="16.3357929"/>
+    <nd lat="48.1986018" lon="16.3357611"/>
+    <nd lat="48.1985820" lon="16.3356926"/>
+  </geometry>
+  <geometry type="way" role="inner">
+    <nd lat="48.1984864" lon="16.3355638"/>
+    <nd lat="48.1984103" lon="16.3356153"/>
+    <nd lat="48.1983964" lon="16.3355692"/>
+    <nd lat="48.1984602" lon="16.3355261"/>
+    <nd lat="48.1984677" lon="16.3355511"/>
+    <nd lat="48.1984801" lon="16.3355427"/>
+    <nd lat="48.1984864" lon="16.3355638"/>
+  </geometry>
+  <tag k="addr:city" v="Wien"/>
+  <tag k="addr:country" v="AT"/>
+  <tag k="addr:housenumber" v="8"/>
+  <tag k="addr:postcode" v="1150"/>
+  <tag k="addr:street" v="Zinckgasse"/>
+  <tag k="building" v="yes"/>
+  <tag k="type" v="multipolygon"/>
+</relation>
+<relation id="3237099">
+  <bounds minlat="65.8635488" minlon="179.9918953" maxlat="65.8660500" maxlon="-179.9872242"/>
+  <member type="way" ref="31254026" role="outer"/>
+  <member type="way" ref="239992354" role="outer"/>
+  <member type="way" ref="43019950" role="outer"/>
+  <member type="way" ref="240006043" role="outer"/>
+  <geometry type="way">
+    <nd lat="65.8660500" lon="-180.0000000"/>
+    <nd lat="65.8637000" lon="-180.0000000"/>
+    <nd lat="65.8637649" lon="-179.9979505"/>
+    <nd lat="65.8635833" lon="-179.9913137"/>
+    <nd lat="65.8640706" lon="-179.9884861"/>
+    <nd lat="65.8645484" lon="-179.9872242"/>
+    <nd lat="65.8652460" lon="-179.9872476"/>
+    <nd lat="65.8654657" lon="-179.9882992"/>
+    <nd lat="65.8655804" lon="-179.9932066"/>
+    <nd lat="65.8659435" lon="-179.9965016"/>
+    <nd lat="65.8660295" lon="-179.9978336"/>
+    <nd lat="65.8660500" lon="-180.0000000"/>
+  </geometry>
+  <geometry type="way">
+    <nd lat="65.8637000" lon="180.0000000"/>
+    <nd lat="65.8660500" lon="180.0000000"/>
+    <nd lat="65.8656870" lon="179.9993428"/>
+    <nd lat="65.8654192" lon="179.9985171"/>
+    <nd lat="65.8654691" lon="179.9980514"/>
+    <nd lat="65.8656684" lon="179.9976924"/>
+    <nd lat="65.8656932" lon="179.9967600"/>
+    <nd lat="65.8657772" lon="179.9961839"/>
+    <nd lat="65.8655057" lon="179.9950898"/>
+    <nd lat="65.8650905" lon="179.9939821"/>
+    <nd lat="65.8645748" lon="179.9933531"/>
+    <nd lat="65.8642209" lon="179.9918953"/>
+    <nd lat="65.8639992" lon="179.9919931"/>
+    <nd lat="65.8638760" lon="179.9926604"/>
+    <nd lat="65.8639219" lon="179.9938773"/>
+    <nd lat="65.8638153" lon="179.9949714"/>
+    <nd lat="65.8635867" lon="179.9961186"/>
+    <nd lat="65.8635488" lon="179.9975700"/>
+    <nd lat="65.8636742" lon="179.9987296"/>
+    <nd lat="65.8637000" lon="180.0000000"/>
+  </geometry>
+  <tag k="natural" v="water"/>
+  <tag k="type" v="multipolygon"/>
+</relation>
+</osm>

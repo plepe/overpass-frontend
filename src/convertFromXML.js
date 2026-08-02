@@ -98,8 +98,38 @@ module.exports = function convertFromXML (xml) {
               lon: parseFloat(child.getAttribute('lon'))
             })
           }
-        }
+        } else if (child.nodeName === 'geometry') {
+          const member = {
+            type: child.getAttribute('type'),
+            role: child.getAttribute('role')
+          }
 
+          if (child.hasAttribute('lat')) {
+            member.lat = parseFloat(child.getAttribute('lat'))
+            member.lon = parseFloat(child.getAttribute('lon'))
+          }
+
+          let memberChild = child.firstChild
+          if (member.type === 'way' && memberChild) {
+            member.geometry = []
+            while (memberChild) {
+              if (memberChild.nodeName === 'nd') {
+                member.geometry.push({
+                  lat: parseFloat(memberChild.getAttribute('lat')),
+                  lon: parseFloat(memberChild.getAttribute('lon'))
+                })
+              }
+
+              memberChild = memberChild.nextSibling
+            }
+          }
+
+          if (!element.geometry) {
+            element.geometry = []
+          }
+
+          element.geometry.push(member)
+        }
         child = child.nextSibling
       }
 
