@@ -14,7 +14,8 @@ const outOtherParams = {
   asc: 0, // TODO
   qt: 0, // TODO
   count: 0,
-  noids: 0
+  noids: 0,
+  separateGeometry: 0
 }
 
 module.exports = class OutOptions {
@@ -56,6 +57,10 @@ module.exports = class OutOptions {
 
     if (!hasParams) {
       result.body = true
+    }
+
+    if (this.overpass && this.overpass.options.separateGeometry) {
+      result.separateGeometry = true
     }
 
     return result
