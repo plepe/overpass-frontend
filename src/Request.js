@@ -47,7 +47,7 @@ class Request {
 
     this.output = this.overpass.getOutputFormatter(this.options.out)
     if (this.options.outOptions) {
-      const outOptions = new OutOptions(this.options.outOptions)
+      const outOptions = new OutOptions(this.options.outOptions, this.overpass)
       this.outOptions = outOptions.outOptions()
       this.options.properties |= outOptions.properties()
     } else {
