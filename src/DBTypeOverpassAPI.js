@@ -1,27 +1,28 @@
 const httpLoad = require('./httpLoad')
 const boundsIsFullWorld = require('./boundsIsFullWorld')
 const overpassOutOptions = require('./overpassOutOptions')
+const Filter = require('./Filter')
 const DBTypeBase = require('./DBTypeBase')
 
 module.exports = class DBTypeOverpassAPI extends DBTypeBase {
-  compile (query, options) {
-    // let query;
+  compile (_query, options) {
+    let query
     let resultSet = '.result'
 
     // if the context already has a bbox and it differs from this, we can't add
     // ours
-    if (this.lokiQuery) {
-      query = this.lokiQuery.toQl({ setsUseStatementIds: true }) + '\n'
-      this.options.properties |= this.lokiQuery.properties()
+    if (_query instanceof Filter) {
+      query = _query.toQl({ setsUseStatementIds: true }) + '\n'
+      options.properties |= _query.properties()
       resultSet = options.statementId ? '._' + options.statementId : '.result'
     } else {
-      query = this.query.substr(0, this.query.length - 1) + '->.result;\n'
+      query = _query.substr(0, _query.length - 1) + '->.result;\n'
     }
 
     let queryRemoveDoneFeatures = ''
     let countRemoveDoneFeatures = 0
-    for (const id in this.doneFeatures) {
-      const ob = this.doneFeatures[id]
+    for (const id in options.doneFeatures) {
+      const ob = options.doneFeatures[id]
 
       if (countRemoveDoneFeatures % 1000 === 999) {
         query += '(' + queryRemoveDoneFeatures + ')->.done;\n'
@@ -37,10 +38,7 @@ module.exports = class DBTypeOverpassAPI extends DBTypeBase {
       query += '(' + resultSet + '; - .done;)->' + resultSet + ';\n'
     }
 
-    if (!('split' in this.options)) {
-      this.options.effortSplit = Math.ceil(options.effortAvailable / this.overpass.options.effortBBoxFeature)
-    }
-    query += resultSet + ' out ' + overpassOutOptions(this.options) + ';\n'
+    query += resultSet + ' out ' + overpassOutOptions(options) + ';\n'
 
     return query
   }
