@@ -57,7 +57,13 @@ class OverpassRelation extends OverpassObject {
     if (data.geometry) {
       if (data.geometry.type) {
         // is this GeoJSON?
-        this.databaseGeometry = data.geometry
+        if (data.geometry.type === 'FeatureCollection') {
+          this.databaseGeometry = data.geometry
+        } else if (data.geometry.type === 'Feature') {
+          this.databaseGeometry = { type: 'FeatureCollection', features: data.geometry }
+        } else {
+          this.databaseGeometry = { type: 'FeatureCollection', features: [{ type: 'Feature', geometry: data.geometry }] }
+        }
       } else {
         // no, it is OSMJSON with separated geometry
         const object = {
@@ -77,7 +83,10 @@ class OverpassRelation extends OverpassObject {
           }
         })
 
-        this.databaseGeometry = osmtogeojson({ elements: [object] }).features[0]
+        this.databaseGeometry = {
+          type: 'FeatureCollection',
+          features: [osmtogeojson({ elements: [object] }).features[0]]
+        }
       }
 
       this.properties |= GeowikiAPI.GEOM
