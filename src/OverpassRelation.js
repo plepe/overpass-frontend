@@ -81,6 +81,9 @@ class OverpassRelation extends OverpassObject {
       }
 
       this.properties |= OverpassFrontend.GEOM
+
+      // dataset with separated geometries detected -> switch output to 'separateGeometry' mode
+      this.overpass.options.separateGeometry = true
     }
 
     if (data.members) {

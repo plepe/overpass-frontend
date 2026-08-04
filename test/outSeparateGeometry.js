@@ -93,7 +93,7 @@ describe('Load data from JSON file with separated geometry', function () {
     it('json ' + id, function (done) {
       overpassFrontend.get(id, {
           out: 'json',
-          outOptions: 'geom separateGeometry',
+          outOptions: 'geom',
           each: (actual) => {
             const reference = JSON.parse(fs.readFileSync('test/reference/' + id + '.json'))
             // ignore order of geometry
@@ -117,7 +117,7 @@ describe('Load data from JSON file with separated geometry', function () {
     it('xml ' + id, function (done) {
       overpassFrontend.get(id, {
           out: 'xml',
-          outOptions: 'geom separateGeometry',
+          outOptions: 'geom',
           each: (actual) => {
             const reference = fs.readFileSync('test/reference/' + id + '.xml').toString()
             assert.deepEqual(actual, reference)
