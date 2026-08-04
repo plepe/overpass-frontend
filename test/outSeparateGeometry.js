@@ -70,6 +70,24 @@ describe('Overpass out of Relations with separate geometry as option', function 
           done()
         })
     })
+
+    it('geojson ' + id, function (done) {
+      overpassFrontend.get(id, {
+          out: 'geojson',
+          outOptions: 'geom',
+          each: (actual) => {
+            // fs.writeFileSync('test/reference/' + id + '.geojson', JSON.stringify(actual, null, '  '))
+            const reference = JSON.parse(fs.readFileSync('test/reference/' + id + '.geojson'))
+            assert.deepEqual(actual, reference)
+          }
+        }, (err, list) => {
+          if (err) {
+            assert.fail('Should not fail with ' + err.message)
+          }
+
+          done()
+        })
+    })
   })
 })
 
@@ -82,7 +100,7 @@ describe('Load data from JSON file with separated geometry', function () {
     })
     overpassFrontend.once('load', () => {
       reverseGeometryOnFileLoad.forEach(id => {
-        overpassFrontend.cacheElements[id].geometry.geometry.coordinates.reverse()
+        overpassFrontend.cacheElements[id].geometry.features[0].geometry.coordinates.reverse()
       })
 
       done()
@@ -130,6 +148,23 @@ describe('Load data from JSON file with separated geometry', function () {
           done()
         })
     })
+
+    it('geojson ' + id, function (done) {
+      overpassFrontend.get(id, {
+          out: 'geojson',
+          outOptions: 'geom',
+          each: (actual) => {
+            const reference = JSON.parse(fs.readFileSync('test/reference/' + id + '.geojson'))
+            assert.deepEqual(actual, reference)
+          }
+        }, (err, list) => {
+          if (err) {
+            assert.fail('Should not fail with ' + err.message)
+          }
+
+          done()
+        })
+    })
   })
 })
 
@@ -142,7 +177,7 @@ describe('Load data from XML file with separated geometry', function () {
     })
     overpassFrontend.once('load', () => {
       reverseGeometryOnFileLoad.forEach(id => {
-        overpassFrontend.cacheElements[id].geometry.geometry.coordinates.reverse()
+        overpassFrontend.cacheElements[id].geometry.features[0].geometry.coordinates.reverse()
       })
 
       done()
@@ -173,6 +208,23 @@ describe('Load data from XML file with separated geometry', function () {
           outOptions: 'geom separateGeometry',
           each: (actual) => {
             const reference = fs.readFileSync('test/reference/' + id + '.xml').toString()
+            assert.deepEqual(actual, reference)
+          }
+        }, (err, list) => {
+          if (err) {
+            assert.fail('Should not fail with ' + err.message)
+          }
+
+          done()
+        })
+    })
+
+    it('geojson ' + id, function (done) {
+      overpassFrontend.get(id, {
+          out: 'geojson',
+          outOptions: 'geom',
+          each: (actual) => {
+            const reference = JSON.parse(fs.readFileSync('test/reference/' + id + '.geojson'))
             assert.deepEqual(actual, reference)
           }
         }, (err, list) => {
