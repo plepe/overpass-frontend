@@ -259,11 +259,13 @@ class RequestGet extends Request {
       context
     }
 
-    query = this.overpass.database.compile(new Filter(query), dbOptions)
+    let queryOptions
+    [query, queryOptions] = this.overpass.database.compile(new Filter(query), dbOptions)
 
     if (query) {
       requestParts.push({
         properties: this.options.properties,
+        options: queryOptions,
         receiveObject: this.receiveObject.bind(this),
         checkFeatureCallback: this.checkFeatureCallback.bind(this),
         featureCallback: this._featureCallback.bind(this, this.featureCallback)
@@ -271,7 +273,7 @@ class RequestGet extends Request {
     }
 
     const subRequest = {
-      query,
+      query: query,
       effort: effort,
       request: this,
       parts: requestParts
