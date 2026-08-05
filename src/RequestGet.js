@@ -259,7 +259,8 @@ class RequestGet extends Request {
       context
     }
 
-    query = this.overpass.database.compile(new Filter(query), dbOptions)
+    let queryOptions
+    [query, queryOptions] = this.overpass.database.compile(new Filter(query), dbOptions)
 
     if (query) {
       requestParts.push({
@@ -271,7 +272,8 @@ class RequestGet extends Request {
     }
 
     const subRequest = {
-      query,
+      query: query,
+      ...queryOptions,
       effort: effort,
       request: this,
       parts: requestParts

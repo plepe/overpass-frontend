@@ -223,10 +223,11 @@ class RequestBBox extends Request {
       dbOptions.effortSplit = this.options.effortSplit
     }
 
-    const query = this.overpass.database.compile(this.lokiQuery ?? this.query, dbOptions)
+    const [query, queryOptions] = this.overpass.database.compile(this.lokiQuery ?? this.query, dbOptions)
 
     const subRequest = {
-      query,
+      query: query,
+      ...queryOptions,
       request: this,
       parts: [
         {
