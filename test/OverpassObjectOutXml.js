@@ -74,7 +74,7 @@ describe('Overpass Object Structures', function () {
 
       function receive (results) {
         results = results.split('\n  ').join('\n') // remove the first 2 spaces on each line
-        data = parser.parseFromString(results, 'text/xml')
+        const data = parser.parseFromString(results, 'text/xml')
 
         let osmPoi = 0
         let osmId = toTest[osmPoi]

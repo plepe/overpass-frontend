@@ -85,7 +85,7 @@
     "prepublish": "npm run lint && npm run build && npm run doc",
     "preversion": "npm run lint && npm run test",
     "version": "node update-version.js && npm run doc && git add doc/ version.json ",
-    "lint": "eslint --fix src/*.js src/qlFunctions/*.js src/evaluator/* index.js server.js",
+    "lint": "eslint --fix src/*.js src/qlFunctions/*.js src/evaluator/* index.js server.js cli.js",
     "demo": "http-server ./ -p 8000",
     "start": "node server.js",
     "doc": "jsdoc -d doc/ src/*.js"
