@@ -1,5 +1,6 @@
-const OverpassFrontend = require('./')
+const GeowikiAPI = require('./')
 
 if (typeof window !== 'undefined') {
-  window.OverpassFrontend = OverpassFrontend
+  window.GeowikiAPI = GeowikiAPI
+  window.OverpassFrontend = GeowikiAPI // backwards compatibility
 }
