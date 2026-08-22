@@ -2,21 +2,9 @@ var assert = require('assert')
 var async = require('async')
 
 var OverpassFrontend = require('..')
+const dom = require('./src/dom')
 
-/* setup fake DOM on NodeJS */
-if (!global.window) {
-  const JSDOM = require("jsdom").JSDOM
-  const dom = new JSDOM(`<!DOCTYPE html><p>Hello world</p>`)
-  global.window = dom.window
-  global.document = dom.window.document
-  global.navigator = {
-    userAgent: 'node',
-    platform: ''
-  }
-}
-/* done */
 global.L = require('leaflet')
-
 
 describe('test leaflet functions', function() {
   let overpassFrontend

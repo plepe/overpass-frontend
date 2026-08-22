@@ -71,6 +71,9 @@
   "resolutions": {
     "martinez-polygon-clipping": "^0.5.0"
   },
+  "browser": {
+    "./test/src/dom.js": "./test/src/dom-browser.js"
+  },
   "bin": {
     "geowiki-api": "cli.js",
     "geowiki-api-server": "server.js"
