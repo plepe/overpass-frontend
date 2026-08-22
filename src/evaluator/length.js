@@ -1,11 +1,11 @@
 const turf = require('../turf')
 const EvaluatorFunction = require('../EvaluatorFunction')
-const OverpassFrontend = require('../defines')
+const GeowikiAPI = require('../defines')
 
 module.exports = class EvaluatorFunctionLength extends EvaluatorFunction {
   constructor (fun, parameters) {
     super(fun, parameters)
-    this.requestProperties = OverpassFrontend.GEOM
+    this.requestProperties = GeowikiAPI.GEOM
   }
 
   eval (context) {

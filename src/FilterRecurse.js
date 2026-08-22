@@ -1,45 +1,45 @@
 const filterPart = require('./filterPart')
-const OverpassFrontend = require('./defines')
+const GeowikiAPI = require('./defines')
 const FilterStatement = require('./FilterStatement')
 const andTypes = require('./andTypes')
 
 const cachesMapTypes = {
   '>': [
     [
-      { type: 'way', properties: OverpassFrontend.MEMBERS },
+      { type: 'way', properties: GeowikiAPI.MEMBERS },
       { type: 'node', recurseType: 'w', recurseRecType: 'bn' }
     ],
     [
-      { type: 'relation', properties: OverpassFrontend.MEMBERS },
+      { type: 'relation', properties: GeowikiAPI.MEMBERS },
       { type: 'node', recurseType: 'r', recurseRecType: 'bn' }
     ],
     [
-      { type: 'relation', properties: OverpassFrontend.MEMBERS },
+      { type: 'relation', properties: GeowikiAPI.MEMBERS },
       { type: 'way', recurseType: 'r', recurseRecType: 'bw' }
     ],
     [
-      { type: 'relation', properties: OverpassFrontend.MEMBERS },
-      { type: 'way', recurseType: 'r', recurseRecType: 'bw', properties: OverpassFrontend.MEMBERS },
+      { type: 'relation', properties: GeowikiAPI.MEMBERS },
+      { type: 'way', recurseType: 'r', recurseRecType: 'bw', properties: GeowikiAPI.MEMBERS },
       { type: 'node', recurseType: 'w', recurseRecType: 'bn' }
     ]
   ],
   '<': [
     [
       { type: 'node' },
-      { type: 'way', properties: OverpassFrontend.MEMBERS, recurseType: 'bn', recurseRecType: 'w' }
+      { type: 'way', properties: GeowikiAPI.MEMBERS, recurseType: 'bn', recurseRecType: 'w' }
     ],
     [
       { type: 'node' },
-      { type: 'relation', properties: OverpassFrontend.MEMBERS, recurseType: 'bn', recurseRecType: 'r' }
+      { type: 'relation', properties: GeowikiAPI.MEMBERS, recurseType: 'bn', recurseRecType: 'r' }
     ],
     [
       { type: 'way' },
-      { type: 'relation', properties: OverpassFrontend.MEMBERS, recurseType: 'bw', recurseRecType: 'r' }
+      { type: 'relation', properties: GeowikiAPI.MEMBERS, recurseType: 'bw', recurseRecType: 'r' }
     ],
     [
       { type: 'node' },
-      { type: 'way', properties: OverpassFrontend.MEMBERS, recurseType: 'bn', recurseRecType: 'w' },
-      { type: 'relation', properties: OverpassFrontend.MEMBERS, recurseType: 'bw', recurseRecType: 'r' }
+      { type: 'way', properties: GeowikiAPI.MEMBERS, recurseType: 'bn', recurseRecType: 'w' },
+      { type: 'relation', properties: GeowikiAPI.MEMBERS, recurseType: 'bw', recurseRecType: 'r' }
     ]
   ]
 }
@@ -110,7 +110,7 @@ class FilterRecurse extends FilterStatement {
 
   recurse (options = {}) {
     let properties = this.inputSetRef ? this.inputSetRef.properties() : 0
-    properties |= ['>', '>>'].includes(this.type) ? OverpassFrontend.MEMBERS : 0
+    properties |= ['>', '>>'].includes(this.type) ? GeowikiAPI.MEMBERS : 0
 
     return [{
       type: this.type,
@@ -189,7 +189,7 @@ class FilterRecurse extends FilterStatement {
 
         c.setId = setId
         if (thisFilter.properties) {
-          c.properties |= OverpassFrontend.MEMBERS
+          c.properties |= GeowikiAPI.MEMBERS
         }
 
         let inBetween = c
@@ -248,7 +248,7 @@ class FilterRecurse extends FilterStatement {
   }
 
   properties () {
-    return ['<', '<<'].includes(this.type) ? OverpassFrontend.MEMBERS : 0
+    return ['<', '<<'].includes(this.type) ? GeowikiAPI.MEMBERS : 0
   }
 
   possibleBounds (ob) {

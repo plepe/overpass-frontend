@@ -1,5 +1,5 @@
 const turf = require('../turf')
-const OverpassFrontend = require('../defines')
+const GeowikiAPI = require('../defines')
 const arrayToCoords = require('../arrayToCoords')
 const qlFunction = require('./qlFunction')
 
@@ -44,7 +44,7 @@ module.exports = class poly extends qlFunction {
         d.invalid = true
       } else {
         d.bounds = newBounds.geometry
-        d.properties |= OverpassFrontend.GEOM
+        d.properties |= GeowikiAPI.GEOM
       }
     })
   }
@@ -71,6 +71,6 @@ module.exports = class poly extends qlFunction {
   }
 
   properties () {
-    return OverpassFrontend.GEOM
+    return GeowikiAPI.GEOM
   }
 }

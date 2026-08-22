@@ -14,7 +14,7 @@ const compileRecurseFilter = require('./compileRecurseFilter')
  */
 class RequestBBox extends Request {
   /**
-   * @param {OverpassFrontend} overpass
+   * @param {GeowikiAPI} overpass
    * @param {object} options
    */
   constructor (overpass, data) {
@@ -140,7 +140,7 @@ class RequestBBox extends Request {
 
   /**
    * shall this Request be included in the current call?
-   * @param {OverpassFrontend#Context} context - Current context
+   * @param {GeowikiAPI#Context} context - Current context
    * @return {boolean|int[]} - yes|no - or [ minEffort, maxEffort ]
    */
   willInclude (context) {
@@ -179,7 +179,7 @@ class RequestBBox extends Request {
 
   /**
    * compile the query
-   * @param {OverpassFrontend#Context} context - Current context
+   * @param {GeowikiAPI#Context} context - Current context
    * @return {Request#SubRequest|false} - the compiled query or false if the bbox does not match
    */
   _compileQuery (context) {
@@ -295,7 +295,7 @@ class RequestBBox extends Request {
   }
 
   /**
-   * receive an object from OverpassFrontend -> enter to cache, return to caller
+   * receive an object from GeowikiAPI -> enter to cache, return to caller
    * @param {OverpassObject} ob - Object which has been received
    * @param {Request#SubRequest} subRequest - sub request which is being handled right now
    * @param {int} partIndex - Which part of the subRequest is being received

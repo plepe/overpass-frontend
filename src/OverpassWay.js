@@ -3,7 +3,7 @@
 const async = require('async')
 const BoundingBox = require('boundingbox')
 const OverpassObject = require('./OverpassObject')
-const OverpassFrontend = require('./defines')
+const GeowikiAPI = require('./defines')
 const turf = require('./turf')
 
 /**
@@ -35,14 +35,14 @@ class OverpassWay extends OverpassObject {
 
     if (data.geometry) {
       this.geometry = data.geometry
-      this.properties |= OverpassFrontend.GEOM
+      this.properties |= GeowikiAPI.GEOM
     }
 
     super.updateData(data, options)
 
     if (typeof this.data.nodes !== 'undefined') {
       this.members = []
-      this.properties |= OverpassFrontend.MEMBERS
+      this.properties |= GeowikiAPI.MEMBERS
 
       for (let i = 0; i < this.data.nodes.length; i++) {
         this.members.push({
@@ -51,14 +51,14 @@ class OverpassWay extends OverpassObject {
           type: 'node'
         })
 
-        let obProperties = OverpassFrontend.ID_ONLY
+        let obProperties = GeowikiAPI.ID_ONLY
         const ob = {
           id: this.data.nodes[i],
           type: 'node'
         }
 
         if (data.geometry && data.geometry[i]) {
-          obProperties = obProperties | OverpassFrontend.GEOM
+          obProperties = obProperties | GeowikiAPI.GEOM
           ob.lat = data.geometry[i].lat
           ob.lon = data.geometry[i].lon
         }
@@ -81,7 +81,7 @@ class OverpassWay extends OverpassObject {
   }
 
   checkGeometry () {
-    if (this.members && (this.properties & OverpassFrontend.GEOM) === 0) {
+    if (this.members && (this.properties & GeowikiAPI.GEOM) === 0) {
       this.geometry = this.members.map(
         member => {
           const node = this.overpass.cacheElements[member.id]
@@ -95,21 +95,21 @@ class OverpassWay extends OverpassObject {
       }
 
       if (this.geometry.length === this.members.length) {
-        this.properties = this.properties | OverpassFrontend.GEOM
+        this.properties = this.properties | GeowikiAPI.GEOM
       }
     }
 
-    if (this.geometry && (this.properties & OverpassFrontend.BBOX) === 0) {
+    if (this.geometry && (this.properties & GeowikiAPI.BBOX) === 0) {
       this.bounds = new BoundingBox(this.geometry[0])
       this.geometry.slice(1).forEach(geom => this.bounds.extend(geom))
     }
 
-    if (this.bounds && (this.properties & OverpassFrontend.CENTER) === 0) {
+    if (this.bounds && (this.properties & GeowikiAPI.CENTER) === 0) {
       this.center = this.bounds.getCenter()
     }
 
-    if ((this.properties & OverpassFrontend.GEOM) === OverpassFrontend.GEOM) {
-      this.properties = this.properties | OverpassFrontend.BBOX | OverpassFrontend.CENTER
+    if ((this.properties & GeowikiAPI.GEOM) === GeowikiAPI.GEOM) {
+      this.properties = this.properties | GeowikiAPI.BBOX | GeowikiAPI.CENTER
     }
   }
 

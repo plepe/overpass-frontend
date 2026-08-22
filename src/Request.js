@@ -16,7 +16,7 @@ const OutOptions = require('./OutOptions')
 
 /**
  * An unspecified request
- * @param {OverpassFrontend} overpass
+ * @param {GeowikiAPI} overpass
  * @param {object} options
  */
 class Request {
@@ -93,7 +93,7 @@ class Request {
 
   /**
    * shall this Request be included in the current call?
-   * @param {OverpassFrontend#Context} context - Current context
+   * @param {GeowikiAPI#Context} context - Current context
    * @return {boolean} - yes|no
    */
   willInclude (context) {
@@ -122,7 +122,7 @@ class Request {
 
   /**
    * compile the query
-   * @param {OverpassFrontend#Context} context - Current context
+   * @param {GeowikiAPI#Context} context - Current context
    * @return {Request#SubRequest} - the compiled query
    */
   compileQuery (context) {

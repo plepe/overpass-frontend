@@ -2,7 +2,7 @@
 
 const OverpassObject = require('./OverpassObject')
 const BoundingBox = require('boundingbox')
-const OverpassFrontend = require('./defines')
+const GeowikiAPI = require('./defines')
 const turf = require('./turf')
 
 /**
@@ -87,10 +87,10 @@ class OverpassNode extends OverpassObject {
       this.bounds = new BoundingBox(data)
       this.center = this.bounds.getCenter()
 
-      this.properties = this.properties | OverpassFrontend.GEOM | OverpassFrontend.BBOX | OverpassFrontend.CENTER
+      this.properties = this.properties | GeowikiAPI.GEOM | GeowikiAPI.BBOX | GeowikiAPI.CENTER
     }
 
-    this.properties |= OverpassFrontend.MEMBERS // node does not have members, so it always known all of them
+    this.properties |= GeowikiAPI.MEMBERS // node does not have members, so it always known all of them
   }
 
   /**

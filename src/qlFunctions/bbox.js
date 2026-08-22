@@ -1,6 +1,6 @@
 const BoundingBox = require('boundingbox')
 const turf = require('../turf')
-const OverpassFrontend = require('../defines')
+const GeowikiAPI = require('../defines')
 const qlFunction = require('./qlFunction')
 const boundsToLokiQuery = require('../boundsToLokiQuery')
 
@@ -50,7 +50,7 @@ module.exports = class bbox extends qlFunction {
         d.invalid = true
       } else {
         d.bounds = newBounds.geometry
-        d.properties |= OverpassFrontend.BBOX
+        d.properties |= GeowikiAPI.BBOX
       }
     })
   }
@@ -70,7 +70,7 @@ module.exports = class bbox extends qlFunction {
   }
 
   properties () {
-    return OverpassFrontend.BBOX
+    return GeowikiAPI.BBOX
   }
 
   possibleBounds (ob) {

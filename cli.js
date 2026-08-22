@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 const ArgumentParser = require('argparse').ArgumentParser
 const fs = require('fs')
-const OverpassFrontend = require('.')
+const GeowikiAPI = require('.')
 
 const defaultConfig = {
   db: 'https://overpass-api.de/api/interpreter'
@@ -19,12 +19,12 @@ parser.add_argument('--db', {
 
 const config = { ...parser.parse_args() }
 
-const overpassFrontend = new OverpassFrontend(config.db)
+const geowikiAPI = new GeowikiAPI(config.db)
 
 const query = fs.readFileSync(0, 'utf-8')
 
 try {
-  overpassFrontend.query(query, handleResult)
+  geowikiAPI.query(query, handleResult)
 } catch (e) {
   handleResult(e)
 }

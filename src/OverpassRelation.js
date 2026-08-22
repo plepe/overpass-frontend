@@ -4,7 +4,7 @@ const async = require('async')
 const BoundingBox = require('boundingbox')
 const osmtogeojson = require('osmtogeojson')
 const OverpassObject = require('./OverpassObject')
-const OverpassFrontend = require('./defines')
+const GeowikiAPI = require('./defines')
 const geojsonShiftWorld = require('./geojsonShiftWorld')
 const turf = require('./turf')
 
@@ -43,17 +43,17 @@ class OverpassRelation extends OverpassObject {
     if (data.bounds) {
       this.bounds = new BoundingBox(data.bounds)
       this.center = this.bounds.getCenter()
-      this.properties |= OverpassFrontend.BBOX | OverpassFrontend.CENTER
+      this.properties |= GeowikiAPI.BBOX | GeowikiAPI.CENTER
     }
 
     if (data.center) {
       this.center = data.center
-      this.properties |= OverpassFrontend.CENTER
+      this.properties |= GeowikiAPI.CENTER
     }
 
     if (data.members) {
       this.members = []
-      this.properties |= OverpassFrontend.MEMBERS
+      this.properties |= GeowikiAPI.MEMBERS
 
       const membersKnown = !!this.memberFeatures
       this.memberFeatures = data.members.map(
@@ -74,11 +74,11 @@ class OverpassRelation extends OverpassObject {
           ob.id = ob.ref
           delete ob.ref
           delete ob.role
-          let memberProperties = OverpassFrontend.ID_ONLY
+          let memberProperties = GeowikiAPI.ID_ONLY
 
           if ((member.type === 'node' && 'lat' in member) ||
               (member.type === 'way' && 'geometry' in member)) {
-            memberProperties |= OverpassFrontend.GEOM
+            memberProperties |= GeowikiAPI.GEOM
           }
 
           const memberOb = this.overpass.createOrUpdateOSMObject(ob, { properties: memberProperties })
@@ -120,7 +120,7 @@ class OverpassRelation extends OverpassObject {
 
         const ob = this.overpass.cacheElements[member.id]
 
-        if ((ob.properties & OverpassFrontend.GEOM) === 0) {
+        if ((ob.properties & GeowikiAPI.GEOM) === 0) {
           allKnown = false
         }
 
@@ -147,7 +147,7 @@ class OverpassRelation extends OverpassObject {
 
     this.geometry = osmtogeojson({ elements })
     if (allKnown) {
-      this.properties = this.properties | OverpassFrontend.GEOM
+      this.properties = this.properties | GeowikiAPI.GEOM
     }
 
     this.members.forEach(
@@ -215,7 +215,7 @@ class OverpassRelation extends OverpassObject {
       }
     )
 
-    if (!(this.properties & OverpassFrontend.BBOX)) {
+    if (!(this.properties & GeowikiAPI.BBOX)) {
       this.members.forEach(member => {
         const ob = this.overpass.cacheElements[member.id]
         if (ob.bounds) {
@@ -231,7 +231,7 @@ class OverpassRelation extends OverpassObject {
       })
 
       if (this.bounds && allKnown) {
-        this.properties = this.properties | OverpassFrontend.BBOX | OverpassFrontend.CENTER
+        this.properties = this.properties | GeowikiAPI.BBOX | GeowikiAPI.CENTER
       }
     }
   }
@@ -321,7 +321,7 @@ class OverpassRelation extends OverpassObject {
     // features will update geometry
     this.memberFeatures.forEach(
       (member, index) => {
-        if (!(member.properties & OverpassFrontend.GEOM)) {
+        if (!(member.properties & GeowikiAPI.GEOM)) {
           const updFun = member => {
             feature.clearLayers()
             feature.addData(this.geometry)
@@ -480,7 +480,7 @@ class OverpassRelation extends OverpassObject {
       }
 
       // if there's no relation member and the geometry is complete we can be sure there's no intersection
-      return this.properties & OverpassFrontend.GEOM ? 0 : 1
+      return this.properties & GeowikiAPI.GEOM ? 0 : 1
     } else if (this.members) {
       for (i in this.members) {
         const memberId = this.members[i].id

@@ -1,10 +1,10 @@
 const EvaluatorFunction = require('../EvaluatorFunction')
-const OverpassFrontend = require('../defines')
+const GeowikiAPI = require('../defines')
 
 module.exports = class EvaluatorFunctionCountTags extends EvaluatorFunction {
   constructor (fun, parameters) {
     super(fun, parameters)
-    this.requestProperties = OverpassFrontend.MEMBERS
+    this.requestProperties = GeowikiAPI.MEMBERS
   }
 
   eval (context) {

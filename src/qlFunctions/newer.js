@@ -1,4 +1,4 @@
-const OverpassFrontend = require('../defines')
+const GeowikiAPI = require('../defines')
 const qlFunction = require('./qlFunction')
 const parseString = require('../parseString')
 
@@ -37,6 +37,6 @@ module.exports = class newer extends qlFunction {
   }
 
   properties () {
-    return OverpassFrontend.META
+    return GeowikiAPI.META
   }
 }

@@ -10,7 +10,7 @@ const BoundingBox = require('boundingbox')
  */
 module.exports = class RequestQuery extends Request {
   /**
-   * @param {OverpassFrontend} overpass
+   * @param {GeowikiAPI} overpass
    * @param {string} query
    * @param {object} [options]
    * @parma {function} callback

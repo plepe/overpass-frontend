@@ -1,6 +1,6 @@
 const ee = require('event-emitter')
 const BoundingBox = require('boundingbox')
-const OverpassFrontend = require('./defines')
+const GeowikiAPI = require('./defines')
 const isGeoJSON = require('./isGeoJSON')
 const turf = require('./turf')
 
@@ -88,7 +88,7 @@ class OverpassObject {
       if (!this.bounds || options.bounds.intersects(this.bounds)) {
         this.properties = this.properties | options.properties
       } else {
-        this.properties = this.properties | OverpassFrontend.BBOX | OverpassFrontend.CENTER
+        this.properties = this.properties | GeowikiAPI.BBOX | GeowikiAPI.CENTER
       }
     } else {
       this.properties = this.properties | options.properties
@@ -104,7 +104,7 @@ class OverpassObject {
       this.boundsPossibleMatch = turf.difference(this.boundsPossibleMatch, options.bounds.toGeoJSON())
     }
 
-    if (options.filter && !(this.properties & OverpassFrontend.GEOM)) {
+    if (options.filter && !(this.properties & GeowikiAPI.GEOM)) {
       const bounds = options.filter.possibleBounds(this)
 
       if (bounds) {
@@ -121,12 +121,12 @@ class OverpassObject {
     }
 
     // geometry is known -> no need for .boundsMatches and .boundsPossibleMatch
-    if (options.properties & OverpassFrontend.GEOM) {
+    if (options.properties & GeowikiAPI.GEOM) {
       delete this.boundsPossibleMatch
       delete this.boundsMatches
     }
 
-    if (options.properties & OverpassFrontend.TAGS) {
+    if (options.properties & GeowikiAPI.TAGS) {
       if (typeof data.tags === 'undefined') {
         this.tags = {}
       } else {
@@ -134,7 +134,7 @@ class OverpassObject {
       }
     } else if (data.tags) {
       this.tags = data.tags
-      this.properties |= OverpassFrontend.TAGS
+      this.properties |= GeowikiAPI.TAGS
     }
     this.errors = []
 
@@ -146,7 +146,7 @@ class OverpassObject {
         user: data.user,
         uid: data.uid
       }
-      this.properties |= OverpassFrontend.META
+      this.properties |= GeowikiAPI.META
     }
   }
 
@@ -222,7 +222,7 @@ class OverpassObject {
     this.overpass.get(
       this.id,
       {
-        properties: OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.META | OverpassFrontend.GEOM
+        properties: GeowikiAPI.TAGS | GeowikiAPI.MEMBERS | GeowikiAPI.META | GeowikiAPI.GEOM
       },
       () => {},
       (err) => {
@@ -250,11 +250,11 @@ class OverpassObject {
     }
     parentNode._alreadyIncluded[this.id] = true
 
-    if ((this.properties & (OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.META)) !== (OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.META)) {
+    if ((this.properties & (GeowikiAPI.TAGS | GeowikiAPI.MEMBERS | GeowikiAPI.META)) !== (GeowikiAPI.TAGS | GeowikiAPI.MEMBERS | GeowikiAPI.META)) {
       return this.overpass.get(
         this.id,
         {
-          properties: OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.META
+          properties: GeowikiAPI.TAGS | GeowikiAPI.MEMBERS | GeowikiAPI.META
         },
         () => {},
         (err) => {
@@ -309,11 +309,11 @@ class OverpassObject {
     }
     elements[this.id] = {}
 
-    if ((this.properties & (OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.META)) !== (OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.META)) {
+    if ((this.properties & (GeowikiAPI.TAGS | GeowikiAPI.MEMBERS | GeowikiAPI.META)) !== (GeowikiAPI.TAGS | GeowikiAPI.MEMBERS | GeowikiAPI.META)) {
       return this.overpass.get(
         this.id,
         {
-          properties: OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.META
+          properties: GeowikiAPI.TAGS | GeowikiAPI.MEMBERS | GeowikiAPI.META
         },
         () => {},
         (err) => {

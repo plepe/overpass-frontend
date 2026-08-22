@@ -1,14 +1,14 @@
-const OverpassFrontend = require('./defines')
+const GeowikiAPI = require('./defines')
 
 const outParams = {
-  ids: OverpassFrontend.ID_ONLY,
-  skel: OverpassFrontend.MEMBERS,
-  body: OverpassFrontend.MEMBERS | OverpassFrontend.TAGS,
-  tags: OverpassFrontend.TAGS,
-  meta: OverpassFrontend.MEMBERS | OverpassFrontend.TAGS | OverpassFrontend.META,
-  geom: OverpassFrontend.GEOM | OverpassFrontend.MEMBERS | OverpassFrontend.TAGS,
-  bb: OverpassFrontend.BBOX | OverpassFrontend.TAGS | OverpassFrontend.MEMBERS,
-  center: OverpassFrontend.CENTER | OverpassFrontend.TAGS | OverpassFrontend.MEMBERS
+  ids: GeowikiAPI.ID_ONLY,
+  skel: GeowikiAPI.MEMBERS,
+  body: GeowikiAPI.MEMBERS | GeowikiAPI.TAGS,
+  tags: GeowikiAPI.TAGS,
+  meta: GeowikiAPI.MEMBERS | GeowikiAPI.TAGS | GeowikiAPI.META,
+  geom: GeowikiAPI.GEOM | GeowikiAPI.MEMBERS | GeowikiAPI.TAGS,
+  bb: GeowikiAPI.BBOX | GeowikiAPI.TAGS | GeowikiAPI.MEMBERS,
+  center: GeowikiAPI.CENTER | GeowikiAPI.TAGS | GeowikiAPI.MEMBERS
 }
 const outOtherParams = {
   asc: 0, // TODO
@@ -82,12 +82,12 @@ module.exports = class OutOptions {
     })
 
     if (otherParams.count) {
-      result |= OverpassFrontend.ID_ONLY
+      result |= GeowikiAPI.ID_ONLY
       hasParams = true
     }
 
     if (!hasParams) {
-      result = OverpassFrontend.MEMBERS | OverpassFrontend.TAGS
+      result = GeowikiAPI.MEMBERS | GeowikiAPI.TAGS
     }
 
     return result

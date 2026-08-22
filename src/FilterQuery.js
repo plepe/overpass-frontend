@@ -1,7 +1,7 @@
 const filterPart = require('./filterPart')
 const compileFilter = require('./compileFilter')
 const qlFunction = require('./qlFunctions/qlFunction')
-const OverpassFrontend = require('./defines')
+const GeowikiAPI = require('./defines')
 const cacheMerge = require('./cacheMerge')
 const strsearch2regexp = require('strsearch2regexp')
 const FilterStatement = require('./FilterStatement')
@@ -245,7 +245,7 @@ class FilterQuery extends FilterStatement {
     if (inputSets) {
       Object.values(inputSets).forEach(inputSet => {
         if (inputSet.recurse) {
-          properties |= ['bn', 'bw', 'br'].includes(inputSet.recurse) ? OverpassFrontend.MEMBERS : 0
+          properties |= ['bn', 'bw', 'br'].includes(inputSet.recurse) ? GeowikiAPI.MEMBERS : 0
         } else if (inputSet.set) {
           properties |= inputSet.set.properties()
         }
@@ -254,7 +254,7 @@ class FilterQuery extends FilterStatement {
 
     this.filters.forEach(part => {
       if (part.op) {
-        properties |= OverpassFrontend.TAGS
+        properties |= GeowikiAPI.TAGS
       } else if (part instanceof qlFunction) {
         properties |= part.properties()
       } else {
@@ -280,7 +280,7 @@ class FilterQuery extends FilterStatement {
 
           const r = {
             type: s[1].recurse,
-            properties: p | (['r', 'w'].includes(s[1].recurse) ? OverpassFrontend.MEMBERS : 0),
+            properties: p | (['r', 'w'].includes(s[1].recurse) ? GeowikiAPI.MEMBERS : 0),
             id: s[1].set ? s[1].set.id : null
           }
 
@@ -456,7 +456,7 @@ class FilterQuery extends FilterStatement {
         const recurse = inputSet.set._caches(options)
         recurse.forEach(r => {
           r.setId = setId
-          r.properties |= ['r', 'w'].includes(inputSet.recurse) ? OverpassFrontend.MEMBERS : 0
+          r.properties |= ['r', 'w'].includes(inputSet.recurse) ? GeowikiAPI.MEMBERS : 0
           r.recurseType = inputSet.recurse
           if (inputSet.role !== undefined) {
             r.role = inputSet.role
@@ -480,7 +480,7 @@ class FilterQuery extends FilterStatement {
 
                 descriptors.push({
                   filters: o.filters,
-                  properties: ['bn', 'bw', 'br'].includes(inputSet.recurse) ? OverpassFrontend.MEMBERS : 0,
+                  properties: ['bn', 'bw', 'br'].includes(inputSet.recurse) ? GeowikiAPI.MEMBERS : 0,
                   recurse: o.recurse ? o.recurse.concat([r1]) : [r1]
                 })
               })
@@ -489,7 +489,7 @@ class FilterQuery extends FilterStatement {
 
               descriptors.push({
                 filters: o.filters,
-                properties: ['bn', 'bw', 'br'].includes(inputSet.recurse) ? OverpassFrontend.MEMBERS : 0,
+                properties: ['bn', 'bw', 'br'].includes(inputSet.recurse) ? GeowikiAPI.MEMBERS : 0,
                 recurse: o.recurse ? o.recurse.concat([r]) : [r]
               })
             }
@@ -508,7 +508,7 @@ class FilterQuery extends FilterStatement {
       if (part.op) {
         descriptors = descriptors.map(o => {
           o.filters += compileFilter(part)
-          o.properties |= OverpassFrontend.TAGS
+          o.properties |= GeowikiAPI.TAGS
           return o
         })
       } else if (part instanceof qlFunction) {

@@ -1,5 +1,5 @@
 var map
-var overpass
+var geowikiAPI
 var downloadResult
 var templateSelector
 var request
@@ -29,9 +29,9 @@ function check_update_map () {
   }
 
   // Query all trees in the current view
-  request = overpass.BBoxQuery(form.elements.query.value, bounds,
+  request = geowikiAPI.BBoxQuery(form.elements.query.value, bounds,
     {
-      properties: OverpassFrontend.ALL
+      properties: GeowikiAPI.ALL
     },
     function (err, ob) {
       if (!ob.feature) {
@@ -59,7 +59,7 @@ function check_update_map () {
   const codeDisplay = document.getElementById('result')
   if (codeDisplay) {
     const options = {
-      properties: OverpassFrontend.ALL
+      properties: GeowikiAPI.ALL
     }
 
     compileTemplate(
@@ -128,7 +128,7 @@ window.onload = function() {
     form.elements.lng.value = center.lng.toFixed(5)
     form.elements.zoom.value = map.getZoom()
 
-    if (overpass) {
+    if (geowikiAPI) {
       check_update_map()
     }
   })
@@ -151,11 +151,11 @@ function update () {
   if (form.elements.file.value !== formValues.file) {
     var reader = new FileReader()
     reader.onload = (e) => {
-      overpass = new OverpassFrontend(e.target.result, {
+      geowikiAPI = new GeowikiAPI(e.target.result, {
         filename: form.elements.file.value
       })
 
-      overpass.once('load', (data) => {
+      geowikiAPI.once('load', (data) => {
         if (data.bounds) {
           map.fitBounds(data.bounds.toLeaflet())
           check_update_map()
@@ -163,9 +163,9 @@ function update () {
       })
     }
     reader.readAsDataURL(form.elements.file.files[0])
-  } else if (!overpass || form.elements.url.value !== formValues.url) {
-    overpass = new OverpassFrontend(form.elements.url.value)
-    overpass.once('load', (data) => {
+  } else if (!geowikiAPI || form.elements.url.value !== formValues.url) {
+    geowikiAPI = new GeowikiAPI(form.elements.url.value)
+    geowikiAPI.once('load', (data) => {
       if (data.bounds) {
         map.fitBounds(data.bounds.toLeaflet())
       }
@@ -177,7 +177,7 @@ function update () {
     file: form.elements.file.value
   }
 
-  if (overpass) {
+  if (geowikiAPI) {
     check_update_map()
   }
 

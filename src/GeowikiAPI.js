@@ -27,28 +27,28 @@ const isFileURL = require('./isFileURL')
 
 /**
  * An error occured
- * @event OverpassFrontend#error
+ * @event GeowikiAPI#error
  * @param {Error} error
- * @param {OverpassFrontend#Context} [context] - context of the request
+ * @param {GeowikiAPI#Context} [context] - context of the request
  */
 
 /**
  * A request to Overpass API is started
- * @event OverpassFrontend#start
+ * @event GeowikiAPI#start
  * @param {object} reserved
- * @param {OverpassFrontend#Context} context - context of the request
+ * @param {GeowikiAPI#Context} context - context of the request
  */
 
 /**
  * A request to Overpass API was rejected
- * @event OverpassFrontend#reject
- * @param {OverpassFrontend#QueryStatus} queryStatus
- * @param {OverpassFrontend#Context} context - context of the request
+ * @event GeowikiAPI#reject
+ * @param {GeowikiAPI#QueryStatus} queryStatus
+ * @param {GeowikiAPI#Context} context - context of the request
  */
 
 /**
  * Status of a query to Overpass API
- * @typedef {Object} OverpassFrontend#QueryStatus
+ * @typedef {Object} GeowikiAPI#QueryStatus
  * @property {int} [status] - result status (e.g. 429 for reject, ...)
  * @property {int} [errorCount] - the nth error in a row
  * @property {boolean} [retry] - true, if the request will be retried (after a 429 error)
@@ -57,19 +57,19 @@ const isFileURL = require('./isFileURL')
 
 /**
  * When a file is specified as URL, this event notifies, that the file has been completely loaded. When a Overpass API is used, every time when data has been received.
- * @event OverpassFrontend#load
+ * @event GeowikiAPI#load
  * @param {object} dbMeta Meta data (not all properties of meta data might be set)
  * @param {number} dbMeta.version OpenStreetMap API version (currently 0.6)
  * @param {string} dbMeta.generator Data generator
  * @param {string} dbMeta.timestamp_osm_base RFC8601 timestamp of OpenStreetMap data
  * @param {string} dbMeta.copyright Copyright statement
  * @param {BoundingBox} [dbMeta.bounds] Bounding Box (only when loading from file)
- * @param {OverpassFrontend#Context} [context] - context of the request
+ * @param {GeowikiAPI#Context} [context] - context of the request
  */
 
 /**
  * When an object is updated (e.g. when loaded; additional information loaded; when a member object got loaded)
- * @event OverpassFrontend#update
+ * @event GeowikiAPI#update
  * @param {OverpassNode|OverpassWay|OverpassRelation} object The object which got updated.
  */
 
@@ -94,7 +94,7 @@ const isFileURL = require('./isFileURL')
  * @property {boolean} hasStretchLon180=false Are there any map features in the cache which stretch over lon=180/-180?
  * @property {object} meta Database meta information (copyright, attribution, license)
  */
-class OverpassFrontend {
+class GeowikiAPI {
   constructor (url, options) {
     this.url = url
     this.options = {
@@ -162,9 +162,9 @@ class OverpassFrontend {
 
       let handler
       if (this.options.fileFormat) {
-        handler = OverpassFrontend.fileFormats.filter(format => format.id === this.options.fileFormat)
+        handler = GeowikiAPI.fileFormats.filter(format => format.id === this.options.fileFormat)
       } else {
-        handler = OverpassFrontend.fileFormats.filter(format => format.willLoad(filename, content, this.options.fileFormatOptions ?? {}))
+        handler = GeowikiAPI.fileFormats.filter(format => format.willLoad(filename, content, this.options.fileFormatOptions ?? {}))
       }
 
       if (!handler.length) {
@@ -203,7 +203,7 @@ class OverpassFrontend {
           (element) => {
             const ob = this.createOrUpdateOSMObject(element, {
               dbMeta,
-              properties: OverpassFrontend.TAGS | OverpassFrontend.META | OverpassFrontend.MEMBERS
+              properties: GeowikiAPI.TAGS | GeowikiAPI.META | GeowikiAPI.MEMBERS
             })
 
             obs.push(ob)
@@ -217,7 +217,7 @@ class OverpassFrontend {
 
         // Set objects to fully known, as no more data can be loaded from the file
         obs.forEach(ob => {
-          ob.properties |= OverpassFrontend.ALL
+          ob.properties |= GeowikiAPI.ALL
         })
 
         if (err) {
@@ -255,7 +255,7 @@ class OverpassFrontend {
    * @param {BoundingBox|GeoJSON} [options.bounds] - Only return items which intersect these bounds. Boundaries is a BoundingBox, or a Leaflet Bounds object (e.g. from map.getBounds()) or a GeoJSON Polygon/Multipolygon.
    * @param {boolean} [options.members=false] Query relation members of. Default: false
    * @param {function} [options.memberCallback] For every member, call this callback function. (Requires options.members=true)
-   * @param {bit_array} [options.memberProperties] Which properties should be loaded for the members. Default: OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.BBOX
+   * @param {bit_array} [options.memberProperties] Which properties should be loaded for the members. Default: GeowikiAPI.TAGS | GeowikiAPI.MEMBERS | GeowikiAPI.BBOX
    * @param {BoundingBox|GeoJSON} [options.memberBounds] - Only return members which intersect these bounds. Boundaries is a BoundingBox, or a Leaflet Bounds object (e.g. from map.getBounds()) or a GeoJSON Polygon/Multipolygon.
    * @param {function} [featureCallback] Will be called for each object which is passed in parameter 'ids'. Will be passed: 1. err (if an error occured, otherwise null), 2. the object or null, 3. index of the item in parameter ids.
    * @param {function} finalCallback Will be called after the last feature. Will be passed: 1. err (if an error occured, otherwise null).
@@ -285,7 +285,7 @@ class OverpassFrontend {
    * return an OSM object, if it is already in the cache
    * @param {string} id - Id of an OSM map feature
    * @param {object} options
-   * @param {int} [options.properties] - Which properties have to be known (default: OverpassFrontend.DEFAULT)
+   * @param {int} [options.properties] - Which properties have to be known (default: GeowikiAPI.DEFAULT)
    * @return {null|false|OverpassObject} - null: does not exist in the database; false: may exist, but has not been loaded yet (or not enough properties known); OverpassObject: sucessful object
    */
   getCached (id, options) {
@@ -316,7 +316,7 @@ class OverpassFrontend {
 
   /**
    * Current request context
-   * @typedef {Object} OverpassFrontend#Context
+   * @typedef {Object} GeowikiAPI#Context
    * @property {string} query - The compiled code of all sub requests
    * @property {string} queryOptions - The compiled queryOptions which will be sent to Overpass API
    * @property {Request[]} requests - List of all requests in the context
@@ -582,7 +582,7 @@ class OverpassFrontend {
         ob.id = id
         ob.type = { n: 'node', w: 'way', r: 'relation' }[id.substr(0, 1)]
         ob.osm_id = id.substr(1)
-        ob.properties = OverpassFrontend.ALL
+        ob.properties = GeowikiAPI.ALL
         ob.missingObject = true
         this.cacheElements[id] = ob
         this.db.insert(ob.dbInsert())
@@ -610,12 +610,12 @@ class OverpassFrontend {
    * @param {function} [options.each] - A function which will be called for each found object, formatted as specified with 'out'.
    * @param {number} [options.priority=0] - Priority for loading these objects. The lower the sooner they will be requested.
    * @param {boolean|string} [options.sort=false] - If false, it will be called as soon as the features are availabe (e.g. immediately when cached).
-   * @param {bit_array} [options.properties] Which properties of the features should be downloaded: OVERPASS_ID_ONLY, OVERPASS_BBOX, OVERPASS_TAGS, OVERPASS_GEOM, OVERPASS_META. Combine by binary OR: ``OVERPASS_ID | OVERPASS_BBOX``. Default: OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.BBOX
+   * @param {bit_array} [options.properties] Which properties of the features should be downloaded: OVERPASS_ID_ONLY, OVERPASS_BBOX, OVERPASS_TAGS, OVERPASS_GEOM, OVERPASS_META. Combine by binary OR: ``OVERPASS_ID | OVERPASS_BBOX``. Default: GeowikiAPI.TAGS | GeowikiAPI.MEMBERS | GeowikiAPI.BBOX
    * @param {string} [options.boundsRecurseSelector] should the 'bounds' parameter be applied to the "input" (default) set or the "result" set? This is important for recurse statements: if you have a query like "relation;node(r);", the relation would be the input set, the node part would be the result set.
    * @param {number} [options.split=0] If more than 'split' elements would be returned, split into several smaller requests, with 'split' elements each. Default: 0 (do not split)
    * @param {boolean} [options.members=false] Query relation members of. Default: false
    * @param {function} [options.memberCallback] For every member, call this callback function. (Requires options.members=true)
-   * @param {bit_array} [options.memberProperties] Which properties should be loaded for the members. Default: OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.BBOX
+   * @param {bit_array} [options.memberProperties] Which properties should be loaded for the members. Default: GeowikiAPI.TAGS | GeowikiAPI.MEMBERS | GeowikiAPI.BBOX
    * @param {BoundingBox|GeoJSON} [options.memberBounds] - Only return members which intersect these bounds. Boundaries is a BoundingBox, or a Leaflet Bounds object (e.g. from map.getBounds()) or a GeoJSON Polygon/Multipolygon.
    * @param {number} [options.memberSplit=0] If more than 'memberSplit' member elements would be returned, split into smaller requests (see 'split'). 0 = do not split.
    * @param {string|Filter} [options.filter] Additional filter.
@@ -1014,45 +1014,45 @@ class OverpassFrontend {
       format = 'json'
     }
 
-    if (format in OverpassFrontend.outputFormats) {
-      return new OverpassFrontend.outputFormats[format](this)
+    if (format in GeowikiAPI.outputFormats) {
+      return new GeowikiAPI.outputFormats[format](this)
     }
 
     throw new Error('Formatter "' + format + '" unknown')
   }
 }
 
-OverpassFrontend.fileFormats = [
+GeowikiAPI.fileFormats = [
   require('./fileFormatOSMXML'),
   require('./fileFormatOSMJSON'),
   require('./fileFormatGeoJSON')
 ]
 
-OverpassFrontend.registerFileFormat = (format) => {
-  OverpassFrontend.fileFormats.push(format)
+GeowikiAPI.registerFileFormat = (format) => {
+  GeowikiAPI.fileFormats.push(format)
 }
 
-OverpassFrontend.outputFormats = {
+GeowikiAPI.outputFormats = {
   json: require('./FormatterJson'),
   xml: require('./FormatterXml'),
   object: require('./FormatterObject'),
   geojson: require('./FormatterGeoJson')
 }
 
-OverpassFrontend.registerOutputFormat = (format, formatter) => {
-  OverpassFrontend.outputFormats[format] = formatter
+GeowikiAPI.registerOutputFormat = (format, formatter) => {
+  GeowikiAPI.outputFormats[format] = formatter
 }
 
 for (const k in defines) {
-  OverpassFrontend[k] = defines[k]
+  GeowikiAPI[k] = defines[k]
 }
 
 function isSeparator (el) {
   return ('count' in el || ('type' in el && el.type === 'count'))
 }
 
-ee(OverpassFrontend.prototype)
+ee(GeowikiAPI.prototype)
 
-OverpassFrontend.Filter = Filter
+GeowikiAPI.Filter = Filter
 
-module.exports = OverpassFrontend
+module.exports = GeowikiAPI

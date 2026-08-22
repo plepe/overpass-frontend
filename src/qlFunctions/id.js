@@ -1,4 +1,4 @@
-const OverpassFrontend = require('../defines')
+const GeowikiAPI = require('../defines')
 const qlFunction = require('./qlFunction')
 
 module.exports = class id extends qlFunction {
@@ -37,7 +37,7 @@ module.exports = class id extends qlFunction {
       }
 
       o.ids = v.sort()
-      o.properties |= OverpassFrontend.ID_ONLY
+      o.properties |= GeowikiAPI.ID_ONLY
     })
   }
 
@@ -48,6 +48,6 @@ module.exports = class id extends qlFunction {
   }
 
   properties () {
-    return OverpassFrontend.ID_ONLY
+    return GeowikiAPI.ID_ONLY
   }
 }

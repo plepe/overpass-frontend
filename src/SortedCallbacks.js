@@ -1,6 +1,6 @@
 const async = require('async')
 const weightSort = require('weight-sort')
-const OverpassFrontend = require('./defines')
+const GeowikiAPI = require('./defines')
 
 class SortedCallbacks {
   constructor (options, featureCallback, finalCallback) {
@@ -21,7 +21,7 @@ class SortedCallbacks {
     }
 
     if (this.options.sort === 'BBoxDiagonalLength') {
-      this.options.properties |= OverpassFrontend.BBOX
+      this.options.properties |= GeowikiAPI.BBOX
     }
   }
 

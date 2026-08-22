@@ -1,13 +1,13 @@
 const EvaluatorFunction = require('../EvaluatorFunction')
-const OverpassFrontend = require('../defines')
+const GeowikiAPI = require('../defines')
 
 module.exports = class EvaluatorFunctionMeta extends EvaluatorFunction {
   constructor (fun, parameters) {
     super(fun, parameters)
     if (['id', 'type'].includes(this.fun)) {
-      this.requestProperties = OverpassFrontend.ID_ONLY
+      this.requestProperties = GeowikiAPI.ID_ONLY
     } else {
-      this.requestProperties = OverpassFrontend.META
+      this.requestProperties = GeowikiAPI.META
     }
   }
 

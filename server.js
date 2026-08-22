@@ -2,7 +2,7 @@
 const ArgumentParser = require('argparse').ArgumentParser
 const http = require('http')
 
-const OverpassFrontend = require('.')
+const GeowikiAPI = require('.')
 
 const defaultConfig = {
   port: 8080,
@@ -32,7 +32,7 @@ parser.add_argument('--ip', {
 
 const config = { ...parser.parse_args() }
 
-const overpassFrontend = new OverpassFrontend(config.db)
+const geowikiAPI = new GeowikiAPI(config.db)
 
 const server = http.createServer(handleRequest)
 
@@ -75,7 +75,7 @@ function handleRequest (request, response) {
 
     let overpassRequest
     try {
-      overpassRequest = overpassFrontend.query(body, handleResult)
+      overpassRequest = geowikiAPI.query(body, handleResult)
     } catch (e) {
       handleResult(e)
     }

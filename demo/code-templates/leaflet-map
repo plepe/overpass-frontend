@@ -14,7 +14,7 @@
   </head><body>
     <div id='map'>
     <script>
-      const overpassFrontend = new OverpassFrontend(__URL__)
+      const geowikiAPI = new GeowikiAPI(__URL__)
 
       const map = L.map('map').fitBounds(__BBOX_LEAFLET__)
 
@@ -23,7 +23,7 @@
           attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
       }).addTo(map)
 
-      const request = overpassFrontend.BBoxQuery(
+      const request = geowikiAPI.BBoxQuery(
         __BBOXQUERY_PARAMS__
         (err, feature) => feature.leafletFeature().addTo(map),
         (err) => console.error(err)

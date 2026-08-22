@@ -11,7 +11,7 @@ const isGeoJSON = require('./isGeoJSON')
  */
 class RequestGet extends Request {
   /**
-   * @param {OverpassFrontend} overpass
+   * @param {GeowikiAPI} overpass
    * @param {data} data
    */
   constructor (overpass, data) {
@@ -39,7 +39,7 @@ class RequestGet extends Request {
     } else if (this.options.bbox) {
       this.options.bounds = new BoundingBox(this.options.bbox)
       delete this.options.bbox
-      console.error('OverpassFrontend.get(): option "bbox" is deprecated, use "bounds" instead')
+      console.error('GeowikiAPI.get(): option "bbox" is deprecated, use "bounds" instead')
     }
     // option 'split' not available for get requests -> use effort instead
     delete this.options.split
@@ -146,7 +146,7 @@ class RequestGet extends Request {
 
   /**
    * compile the query
-   * @param {OverpassFrontend#Context} context - Current context
+   * @param {GeowikiAPI#Context} context - Current context
    * @return {Request#SubRequest} - the compiled query
    */
   _compileQuery (context) {
