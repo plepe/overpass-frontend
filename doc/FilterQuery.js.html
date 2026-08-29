@@ -29,7 +29,7 @@
             <pre class="prettyprint source linenums"><code>const filterPart = require('./filterPart')
 const compileFilter = require('./compileFilter')
 const qlFunction = require('./qlFunctions/qlFunction')
-const OverpassFrontend = require('./defines')
+const GeowikiAPI = require('./defines')
 const cacheMerge = require('./cacheMerge')
 const strsearch2regexp = require('strsearch2regexp')
 const FilterStatement = require('./FilterStatement')
@@ -273,7 +273,7 @@ class FilterQuery extends FilterStatement {
     if (inputSets) {
       Object.values(inputSets).forEach(inputSet => {
         if (inputSet.recurse) {
-          properties |= ['bn', 'bw', 'br'].includes(inputSet.recurse) ? OverpassFrontend.MEMBERS : 0
+          properties |= ['bn', 'bw', 'br'].includes(inputSet.recurse) ? GeowikiAPI.MEMBERS : 0
         } else if (inputSet.set) {
           properties |= inputSet.set.properties()
         }
@@ -282,7 +282,7 @@ class FilterQuery extends FilterStatement {
 
     this.filters.forEach(part => {
       if (part.op) {
-        properties |= OverpassFrontend.TAGS
+        properties |= GeowikiAPI.TAGS
       } else if (part instanceof qlFunction) {
         properties |= part.properties()
       } else {
@@ -308,7 +308,7 @@ class FilterQuery extends FilterStatement {
 
           const r = {
             type: s[1].recurse,
-            properties: p | (['r', 'w'].includes(s[1].recurse) ? OverpassFrontend.MEMBERS : 0),
+            properties: p | (['r', 'w'].includes(s[1].recurse) ? GeowikiAPI.MEMBERS : 0),
             id: s[1].set ? s[1].set.id : null
           }
 
@@ -484,7 +484,7 @@ class FilterQuery extends FilterStatement {
         const recurse = inputSet.set._caches(options)
         recurse.forEach(r => {
           r.setId = setId
-          r.properties |= ['r', 'w'].includes(inputSet.recurse) ? OverpassFrontend.MEMBERS : 0
+          r.properties |= ['r', 'w'].includes(inputSet.recurse) ? GeowikiAPI.MEMBERS : 0
           r.recurseType = inputSet.recurse
           if (inputSet.role !== undefined) {
             r.role = inputSet.role
@@ -508,7 +508,7 @@ class FilterQuery extends FilterStatement {
 
                 descriptors.push({
                   filters: o.filters,
-                  properties: ['bn', 'bw', 'br'].includes(inputSet.recurse) ? OverpassFrontend.MEMBERS : 0,
+                  properties: ['bn', 'bw', 'br'].includes(inputSet.recurse) ? GeowikiAPI.MEMBERS : 0,
                   recurse: o.recurse ? o.recurse.concat([r1]) : [r1]
                 })
               })
@@ -517,7 +517,7 @@ class FilterQuery extends FilterStatement {
 
               descriptors.push({
                 filters: o.filters,
-                properties: ['bn', 'bw', 'br'].includes(inputSet.recurse) ? OverpassFrontend.MEMBERS : 0,
+                properties: ['bn', 'bw', 'br'].includes(inputSet.recurse) ? GeowikiAPI.MEMBERS : 0,
                 recurse: o.recurse ? o.recurse.concat([r]) : [r]
               })
             }
@@ -536,7 +536,7 @@ class FilterQuery extends FilterStatement {
       if (part.op) {
         descriptors = descriptors.map(o => {
           o.filters += compileFilter(part)
-          o.properties |= OverpassFrontend.TAGS
+          o.properties |= GeowikiAPI.TAGS
           return o
         })
       } else if (part instanceof qlFunction) {
@@ -890,13 +890,13 @@ filterPart.register('default', FilterQuery)
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Filter.html">Filter</a></li><li><a href="OverpassFrontend.html">OverpassFrontend</a></li><li><a href="OverpassNode.html">OverpassNode</a></li><li><a href="OverpassObject.html">OverpassObject</a></li><li><a href="OverpassRelation.html">OverpassRelation</a></li><li><a href="OverpassWay.html">OverpassWay</a></li><li><a href="Request.html">Request</a></li><li><a href="RequestBBox.html">RequestBBox</a></li><li><a href="RequestGet.html">RequestGet</a></li><li><a href="RequestMulti.html">RequestMulti</a></li><li><a href="module.exports.html">exports</a></li><li><a href="module.exports_module.exports.html">exports</a></li></ul><h3>Events</h3><ul><li><a href="OverpassFrontend.html#event:error">error</a></li><li><a href="OverpassFrontend.html#event:load">load</a></li><li><a href="OverpassFrontend.html#event:reject">reject</a></li><li><a href="OverpassFrontend.html#event:start">start</a></li><li><a href="OverpassFrontend.html#event:update">update</a></li><li><a href="Request.html#event:abort">abort</a></li><li><a href="Request.html#event:finish">finish</a></li><li><a href="Request.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="Request.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestBBox.html#event:abort">abort</a></li><li><a href="RequestBBox.html#event:finish">finish</a></li><li><a href="RequestBBox.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestBBox.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestGet.html#event:abort">abort</a></li><li><a href="RequestGet.html#event:finish">finish</a></li><li><a href="RequestGet.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestGet.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestMulti.html#event:abort">abort</a></li><li><a href="RequestMulti.html#event:finish">finish</a></li><li><a href="RequestMulti.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestMulti.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="module.exports.html#event:abort">abort</a></li><li><a href="module.exports.html#event:finish">finish</a></li><li><a href="module.exports.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="module.exports.html#event:subrequest-finished">subrequest-finished</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Filter.html">Filter</a></li><li><a href="GeowikiAPI.html">GeowikiAPI</a></li><li><a href="OverpassNode.html">OverpassNode</a></li><li><a href="OverpassObject.html">OverpassObject</a></li><li><a href="OverpassRelation.html">OverpassRelation</a></li><li><a href="OverpassWay.html">OverpassWay</a></li><li><a href="Request.html">Request</a></li><li><a href="RequestBBox.html">RequestBBox</a></li><li><a href="RequestGet.html">RequestGet</a></li><li><a href="RequestMulti.html">RequestMulti</a></li><li><a href="module.exports.html">exports</a></li><li><a href="module.exports_module.exports.html">exports</a></li></ul><h3>Events</h3><ul><li><a href="GeowikiAPI.html#event:error">error</a></li><li><a href="GeowikiAPI.html#event:load">load</a></li><li><a href="GeowikiAPI.html#event:reject">reject</a></li><li><a href="GeowikiAPI.html#event:start">start</a></li><li><a href="GeowikiAPI.html#event:update">update</a></li><li><a href="Request.html#event:abort">abort</a></li><li><a href="Request.html#event:finish">finish</a></li><li><a href="Request.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="Request.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestBBox.html#event:abort">abort</a></li><li><a href="RequestBBox.html#event:finish">finish</a></li><li><a href="RequestBBox.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestBBox.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestGet.html#event:abort">abort</a></li><li><a href="RequestGet.html#event:finish">finish</a></li><li><a href="RequestGet.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestGet.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestMulti.html#event:abort">abort</a></li><li><a href="RequestMulti.html#event:finish">finish</a></li><li><a href="RequestMulti.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestMulti.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="module.exports.html#event:abort">abort</a></li><li><a href="module.exports.html#event:finish">finish</a></li><li><a href="module.exports.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="module.exports.html#event:subrequest-finished">subrequest-finished</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Sat Aug 22 2026 08:32:46 GMT+0200 (Central European Summer Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Sat Aug 29 2026 08:49:54 GMT+0200 (Central European Summer Time)
 </footer>
 
 <script> prettyPrint(); </script>

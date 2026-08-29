@@ -28,7 +28,7 @@
         <article>
             <pre class="prettyprint source linenums"><code>const ee = require('event-emitter')
 const BoundingBox = require('boundingbox')
-const OverpassFrontend = require('./defines')
+const GeowikiAPI = require('./defines')
 const isGeoJSON = require('./isGeoJSON')
 const turf = require('./turf')
 
@@ -116,7 +116,7 @@ class OverpassObject {
       if (!this.bounds || options.bounds.intersects(this.bounds)) {
         this.properties = this.properties | options.properties
       } else {
-        this.properties = this.properties | OverpassFrontend.BBOX | OverpassFrontend.CENTER
+        this.properties = this.properties | GeowikiAPI.BBOX | GeowikiAPI.CENTER
       }
     } else {
       this.properties = this.properties | options.properties
@@ -132,7 +132,7 @@ class OverpassObject {
       this.boundsPossibleMatch = turf.difference(this.boundsPossibleMatch, options.bounds.toGeoJSON())
     }
 
-    if (options.filter &amp;&amp; !(this.properties &amp; OverpassFrontend.GEOM)) {
+    if (options.filter &amp;&amp; !(this.properties &amp; GeowikiAPI.GEOM)) {
       const bounds = options.filter.possibleBounds(this)
 
       if (bounds) {
@@ -149,12 +149,12 @@ class OverpassObject {
     }
 
     // geometry is known -> no need for .boundsMatches and .boundsPossibleMatch
-    if (options.properties &amp; OverpassFrontend.GEOM) {
+    if (options.properties &amp; GeowikiAPI.GEOM) {
       delete this.boundsPossibleMatch
       delete this.boundsMatches
     }
 
-    if (options.properties &amp; OverpassFrontend.TAGS) {
+    if (options.properties &amp; GeowikiAPI.TAGS) {
       if (typeof data.tags === 'undefined') {
         this.tags = {}
       } else {
@@ -162,7 +162,7 @@ class OverpassObject {
       }
     } else if (data.tags) {
       this.tags = data.tags
-      this.properties |= OverpassFrontend.TAGS
+      this.properties |= GeowikiAPI.TAGS
     }
     this.errors = []
 
@@ -174,7 +174,7 @@ class OverpassObject {
         user: data.user,
         uid: data.uid
       }
-      this.properties |= OverpassFrontend.META
+      this.properties |= GeowikiAPI.META
     }
   }
 
@@ -250,7 +250,7 @@ class OverpassObject {
     this.overpass.get(
       this.id,
       {
-        properties: OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.META | OverpassFrontend.GEOM
+        properties: GeowikiAPI.TAGS | GeowikiAPI.MEMBERS | GeowikiAPI.META | GeowikiAPI.GEOM
       },
       () => {},
       (err) => {
@@ -278,11 +278,11 @@ class OverpassObject {
     }
     parentNode._alreadyIncluded[this.id] = true
 
-    if ((this.properties &amp; (OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.META)) !== (OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.META)) {
+    if ((this.properties &amp; (GeowikiAPI.TAGS | GeowikiAPI.MEMBERS | GeowikiAPI.META)) !== (GeowikiAPI.TAGS | GeowikiAPI.MEMBERS | GeowikiAPI.META)) {
       return this.overpass.get(
         this.id,
         {
-          properties: OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.META
+          properties: GeowikiAPI.TAGS | GeowikiAPI.MEMBERS | GeowikiAPI.META
         },
         () => {},
         (err) => {
@@ -337,11 +337,11 @@ class OverpassObject {
     }
     elements[this.id] = {}
 
-    if ((this.properties &amp; (OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.META)) !== (OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.META)) {
+    if ((this.properties &amp; (GeowikiAPI.TAGS | GeowikiAPI.MEMBERS | GeowikiAPI.META)) !== (GeowikiAPI.TAGS | GeowikiAPI.MEMBERS | GeowikiAPI.META)) {
       return this.overpass.get(
         this.id,
         {
-          properties: OverpassFrontend.TAGS | OverpassFrontend.MEMBERS | OverpassFrontend.META
+          properties: GeowikiAPI.TAGS | GeowikiAPI.MEMBERS | GeowikiAPI.META
         },
         () => {},
         (err) => {
@@ -575,13 +575,13 @@ module.exports = OverpassObject
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Filter.html">Filter</a></li><li><a href="OverpassFrontend.html">OverpassFrontend</a></li><li><a href="OverpassNode.html">OverpassNode</a></li><li><a href="OverpassObject.html">OverpassObject</a></li><li><a href="OverpassRelation.html">OverpassRelation</a></li><li><a href="OverpassWay.html">OverpassWay</a></li><li><a href="Request.html">Request</a></li><li><a href="RequestBBox.html">RequestBBox</a></li><li><a href="RequestGet.html">RequestGet</a></li><li><a href="RequestMulti.html">RequestMulti</a></li><li><a href="module.exports.html">exports</a></li><li><a href="module.exports_module.exports.html">exports</a></li></ul><h3>Events</h3><ul><li><a href="OverpassFrontend.html#event:error">error</a></li><li><a href="OverpassFrontend.html#event:load">load</a></li><li><a href="OverpassFrontend.html#event:reject">reject</a></li><li><a href="OverpassFrontend.html#event:start">start</a></li><li><a href="OverpassFrontend.html#event:update">update</a></li><li><a href="Request.html#event:abort">abort</a></li><li><a href="Request.html#event:finish">finish</a></li><li><a href="Request.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="Request.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestBBox.html#event:abort">abort</a></li><li><a href="RequestBBox.html#event:finish">finish</a></li><li><a href="RequestBBox.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestBBox.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestGet.html#event:abort">abort</a></li><li><a href="RequestGet.html#event:finish">finish</a></li><li><a href="RequestGet.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestGet.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestMulti.html#event:abort">abort</a></li><li><a href="RequestMulti.html#event:finish">finish</a></li><li><a href="RequestMulti.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestMulti.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="module.exports.html#event:abort">abort</a></li><li><a href="module.exports.html#event:finish">finish</a></li><li><a href="module.exports.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="module.exports.html#event:subrequest-finished">subrequest-finished</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Filter.html">Filter</a></li><li><a href="GeowikiAPI.html">GeowikiAPI</a></li><li><a href="OverpassNode.html">OverpassNode</a></li><li><a href="OverpassObject.html">OverpassObject</a></li><li><a href="OverpassRelation.html">OverpassRelation</a></li><li><a href="OverpassWay.html">OverpassWay</a></li><li><a href="Request.html">Request</a></li><li><a href="RequestBBox.html">RequestBBox</a></li><li><a href="RequestGet.html">RequestGet</a></li><li><a href="RequestMulti.html">RequestMulti</a></li><li><a href="module.exports.html">exports</a></li><li><a href="module.exports_module.exports.html">exports</a></li></ul><h3>Events</h3><ul><li><a href="GeowikiAPI.html#event:error">error</a></li><li><a href="GeowikiAPI.html#event:load">load</a></li><li><a href="GeowikiAPI.html#event:reject">reject</a></li><li><a href="GeowikiAPI.html#event:start">start</a></li><li><a href="GeowikiAPI.html#event:update">update</a></li><li><a href="Request.html#event:abort">abort</a></li><li><a href="Request.html#event:finish">finish</a></li><li><a href="Request.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="Request.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestBBox.html#event:abort">abort</a></li><li><a href="RequestBBox.html#event:finish">finish</a></li><li><a href="RequestBBox.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestBBox.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestGet.html#event:abort">abort</a></li><li><a href="RequestGet.html#event:finish">finish</a></li><li><a href="RequestGet.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestGet.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestMulti.html#event:abort">abort</a></li><li><a href="RequestMulti.html#event:finish">finish</a></li><li><a href="RequestMulti.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestMulti.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="module.exports.html#event:abort">abort</a></li><li><a href="module.exports.html#event:finish">finish</a></li><li><a href="module.exports.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="module.exports.html#event:subrequest-finished">subrequest-finished</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Sat Aug 22 2026 08:32:46 GMT+0200 (Central European Summer Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Sat Aug 29 2026 08:49:54 GMT+0200 (Central European Summer Time)
 </footer>
 
 <script> prettyPrint(); </script>

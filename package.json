@@ -1,7 +1,7 @@
 {
   "name": "@geowiki-net/geowiki-api",
   "description": "A JavaScript (NodeJS/Browser) library to easily access data from OpenStreetMap via Overpass API or from an OSM File. The objects can directly be used with LeafletJS or exported to GeoJSON. Data will be cached in the browser memory.",
-  "version": "4.0.0-rc.0",
+  "version": "4.0.0-rc.1",
   "main": "src/GeowikiAPI.js",
   "directories": {
     "test": "test"

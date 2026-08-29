@@ -26,17 +26,17 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>const OverpassFrontend = require('./defines')
+            <pre class="prettyprint source linenums"><code>const GeowikiAPI = require('./defines')
 
 const outParams = {
-  ids: OverpassFrontend.ID_ONLY,
-  skel: OverpassFrontend.MEMBERS,
-  body: OverpassFrontend.MEMBERS | OverpassFrontend.TAGS,
-  tags: OverpassFrontend.TAGS,
-  meta: OverpassFrontend.MEMBERS | OverpassFrontend.TAGS | OverpassFrontend.META,
-  geom: OverpassFrontend.GEOM | OverpassFrontend.MEMBERS | OverpassFrontend.TAGS,
-  bb: OverpassFrontend.BBOX | OverpassFrontend.TAGS | OverpassFrontend.MEMBERS,
-  center: OverpassFrontend.CENTER | OverpassFrontend.TAGS | OverpassFrontend.MEMBERS
+  ids: GeowikiAPI.ID_ONLY,
+  skel: GeowikiAPI.MEMBERS,
+  body: GeowikiAPI.MEMBERS | GeowikiAPI.TAGS,
+  tags: GeowikiAPI.TAGS,
+  meta: GeowikiAPI.MEMBERS | GeowikiAPI.TAGS | GeowikiAPI.META,
+  geom: GeowikiAPI.GEOM | GeowikiAPI.MEMBERS | GeowikiAPI.TAGS,
+  bb: GeowikiAPI.BBOX | GeowikiAPI.TAGS | GeowikiAPI.MEMBERS,
+  center: GeowikiAPI.CENTER | GeowikiAPI.TAGS | GeowikiAPI.MEMBERS
 }
 const outOtherParams = {
   asc: 0, // TODO
@@ -110,12 +110,12 @@ module.exports = class OutOptions {
     })
 
     if (otherParams.count) {
-      result |= OverpassFrontend.ID_ONLY
+      result |= GeowikiAPI.ID_ONLY
       hasParams = true
     }
 
     if (!hasParams) {
-      result = OverpassFrontend.MEMBERS | OverpassFrontend.TAGS
+      result = GeowikiAPI.MEMBERS | GeowikiAPI.TAGS
     }
 
     return result
@@ -131,13 +131,13 @@ module.exports = class OutOptions {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Filter.html">Filter</a></li><li><a href="OverpassFrontend.html">OverpassFrontend</a></li><li><a href="OverpassNode.html">OverpassNode</a></li><li><a href="OverpassObject.html">OverpassObject</a></li><li><a href="OverpassRelation.html">OverpassRelation</a></li><li><a href="OverpassWay.html">OverpassWay</a></li><li><a href="Request.html">Request</a></li><li><a href="RequestBBox.html">RequestBBox</a></li><li><a href="RequestGet.html">RequestGet</a></li><li><a href="RequestMulti.html">RequestMulti</a></li><li><a href="module.exports.html">exports</a></li><li><a href="module.exports_module.exports.html">exports</a></li></ul><h3>Events</h3><ul><li><a href="OverpassFrontend.html#event:error">error</a></li><li><a href="OverpassFrontend.html#event:load">load</a></li><li><a href="OverpassFrontend.html#event:reject">reject</a></li><li><a href="OverpassFrontend.html#event:start">start</a></li><li><a href="OverpassFrontend.html#event:update">update</a></li><li><a href="Request.html#event:abort">abort</a></li><li><a href="Request.html#event:finish">finish</a></li><li><a href="Request.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="Request.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestBBox.html#event:abort">abort</a></li><li><a href="RequestBBox.html#event:finish">finish</a></li><li><a href="RequestBBox.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestBBox.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestGet.html#event:abort">abort</a></li><li><a href="RequestGet.html#event:finish">finish</a></li><li><a href="RequestGet.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestGet.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestMulti.html#event:abort">abort</a></li><li><a href="RequestMulti.html#event:finish">finish</a></li><li><a href="RequestMulti.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestMulti.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="module.exports.html#event:abort">abort</a></li><li><a href="module.exports.html#event:finish">finish</a></li><li><a href="module.exports.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="module.exports.html#event:subrequest-finished">subrequest-finished</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Filter.html">Filter</a></li><li><a href="GeowikiAPI.html">GeowikiAPI</a></li><li><a href="OverpassNode.html">OverpassNode</a></li><li><a href="OverpassObject.html">OverpassObject</a></li><li><a href="OverpassRelation.html">OverpassRelation</a></li><li><a href="OverpassWay.html">OverpassWay</a></li><li><a href="Request.html">Request</a></li><li><a href="RequestBBox.html">RequestBBox</a></li><li><a href="RequestGet.html">RequestGet</a></li><li><a href="RequestMulti.html">RequestMulti</a></li><li><a href="module.exports.html">exports</a></li><li><a href="module.exports_module.exports.html">exports</a></li></ul><h3>Events</h3><ul><li><a href="GeowikiAPI.html#event:error">error</a></li><li><a href="GeowikiAPI.html#event:load">load</a></li><li><a href="GeowikiAPI.html#event:reject">reject</a></li><li><a href="GeowikiAPI.html#event:start">start</a></li><li><a href="GeowikiAPI.html#event:update">update</a></li><li><a href="Request.html#event:abort">abort</a></li><li><a href="Request.html#event:finish">finish</a></li><li><a href="Request.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="Request.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestBBox.html#event:abort">abort</a></li><li><a href="RequestBBox.html#event:finish">finish</a></li><li><a href="RequestBBox.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestBBox.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestGet.html#event:abort">abort</a></li><li><a href="RequestGet.html#event:finish">finish</a></li><li><a href="RequestGet.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestGet.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="RequestMulti.html#event:abort">abort</a></li><li><a href="RequestMulti.html#event:finish">finish</a></li><li><a href="RequestMulti.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="RequestMulti.html#event:subrequest-finished">subrequest-finished</a></li><li><a href="module.exports.html#event:abort">abort</a></li><li><a href="module.exports.html#event:finish">finish</a></li><li><a href="module.exports.html#event:subrequest-compiile">subrequest-compiile</a></li><li><a href="module.exports.html#event:subrequest-finished">subrequest-finished</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Sat Aug 22 2026 08:32:46 GMT+0200 (Central European Summer Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Sat Aug 29 2026 08:49:54 GMT+0200 (Central European Summer Time)
 </footer>
 
 <script> prettyPrint(); </script>
