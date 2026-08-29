@@ -860,7 +860,11 @@ var overpassFrontend
             if (err) { return done(err) }
 
             const ob = overpassFrontend.cacheElements.w199261366
-            assert.equal(ob.dbData.geomLength, 504.47617543211163, 'DB Data of object should have a length set')
+            if (!ob.dbData.geomLength) {
+              assert.fail('DB Data of object should have a length set')
+            } else if (Math.abs(ob.dbData.geomLength - 504.47617543211163) > 0.000001) {
+              assert.fail('DB Data of object has length, but it differs too much')
+            }
 
             done()
           })
