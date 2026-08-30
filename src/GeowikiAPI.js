@@ -546,6 +546,10 @@ class GeowikiAPI {
         }
       }
 
+      if (part.options && part.options.needFilter && !part.filter.match(ob)) {
+        continue
+      }
+
       part.count++
       if (part.receiveObject) {
         part.receiveObject(ob, subRequest, partIndex)
