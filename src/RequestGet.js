@@ -225,8 +225,9 @@ class RequestGet extends Request {
 
     if (query) {
       requestParts.push({
-        properties: this.options.properties,
+        query: query,
         options: queryOptions,
+        properties: this.options.properties,
         receiveObject: this.receiveObject.bind(this),
         checkFeatureCallback: this.checkFeatureCallback.bind(this),
         featureCallback: this._featureCallback.bind(this, this.featureCallback)
@@ -235,10 +236,11 @@ class RequestGet extends Request {
 
     if (BBoxQuery) {
       const id = queryFilter.getStatement({ set: '_all' }).id
-      query += '\nout count;\n(nwr._' + id + '; - nwr._' + id + BBoxQuery + ';);out ids bb qt;'
+      query = '(nwr._' + id + '; - nwr._' + id + BBoxQuery + ';);out ids bb qt;'
 
       // additional separator to separate objects outside bbox from inside bbox
       requestParts.push({
+        query,
         properties: defines.BBOX,
         bounds: this.options.bounds,
         boundsNoMatch: true
@@ -246,7 +248,6 @@ class RequestGet extends Request {
     }
 
     const subRequest = {
-      query: query,
       effort: effort,
       request: this,
       parts: requestParts

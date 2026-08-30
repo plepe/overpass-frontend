@@ -372,7 +372,6 @@ class GeowikiAPI {
       todo: {},
       requests: [],
       subRequests: [],
-      query: '',
       minPriority: this.requests[0].priority,
       minEffort: 0,
       maxEffort: 0

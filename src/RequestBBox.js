@@ -226,11 +226,11 @@ class RequestBBox extends Request {
     const [query, queryOptions] = this.overpass.database.compile(this.lokiQuery ?? this.query, dbOptions)
 
     const subRequest = {
-      query: query,
       request: this,
       parts: [
         {
           filter: this.lokiQuery,
+          query: query,
           options: queryOptions,
           statementId: resultSetId,
           properties: this.options.properties,
@@ -249,9 +249,11 @@ class RequestBBox extends Request {
     const script = this.lokiQuery.getScript()
     const filter = this.lokiQuery.toQl({ setsUseStatementIds: true })
     const reverseParts = {}
+    let revquery = ''
     script.reverse().forEach(e => {
       e.recurse.forEach(r => {
-        subRequest.query += compileRecurseReverse(r, e)
+        revquery += compileRecurseReverse(r, e)
+
         if (!(r.id in reverseParts)) {
           reverseParts[r.id] = []
         }
@@ -268,13 +270,14 @@ class RequestBBox extends Request {
         options.properties |= e.properties
       })
 
-      subRequest.query += 'out count;\n(' +
+      revquery += '\n(' +
         from.map(e => 'nwr._' + rid + '._rev' + e.id + '_' + rid + ';')
           .join('') + ');\n' +
         'out ' + overpassOutOptions(options) + ';'
 
       const statementId = this.lokiQuery.getStatement().id
       subRequest.parts.push({
+        query: revquery,
         statementId: rid,
         filter: new Filter(filter + compileRecurseFilter(script, statementId, rid) + 'nwr._rev' + statementId + '_' + rid),
         properties: options.properties,

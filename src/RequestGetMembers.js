@@ -170,11 +170,9 @@ class RequestGetMembers extends Request {
     }
 
     query += '.resultMembers out ' + overpassOutOptions(this.part) + ';'
+    this.part.query = query
+    console.log(query)
 
-    if (subRequest.parts.length) {
-      subRequest.query += '\nout count;\n'
-    }
-    subRequest.query += query
     subRequest.parts.push(this.part)
 
     return subRequest
