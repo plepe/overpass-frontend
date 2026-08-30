@@ -151,9 +151,6 @@ class RequestGet extends Request {
    */
   _compileQuery (context) {
     let query = ''
-    let nodeQuery = ''
-    let wayQuery = ''
-    let relationQuery = ''
     let BBoxQuery = ''
     let effort = 0
 
@@ -189,15 +186,15 @@ class RequestGet extends Request {
 
       switch (id.substr(0, 1)) {
         case 'n':
-          nodeQuery += 'node(' + id.substr(1) + ');\n'
+          query += 'node(' + id.substr(1) + ');\n'
           effort += this.overpass.options.effortNode
           break
         case 'w':
-          wayQuery += 'way(' + id.substr(1) + ');\n'
+          query += 'way(' + id.substr(1) + ');\n'
           effort += this.overpass.options.effortWay
           break
         case 'r':
-          relationQuery += 'relation(' + id.substr(1) + ');\n'
+          query += 'relation(' + id.substr(1) + ');\n'
           effort += this.overpass.options.effortRelation
           break
       }
@@ -205,51 +202,14 @@ class RequestGet extends Request {
       context.todo[id] = true
     }
 
-    if (nodeQuery !== '') {
-      query += '((' + nodeQuery + ');)->.n;\n'
-      if (BBoxQuery) {
-        query += '(node.n; - node.n' + BBoxQuery + '->.n;);\nout ids bb qt;\n'
-      }
-    }
-
-    if (wayQuery !== '') {
-      query += '((' + wayQuery + ');)->.w;\n'
-      if (BBoxQuery) {
-        query += '(way.w; - way.w' + BBoxQuery + '->.w;);\nout ids bb qt;\n'
-      }
-    }
-
-    if (relationQuery !== '') {
-      query += '((' + relationQuery + ');)->.r;\n'
-      if (BBoxQuery) {
-        query += '(relation.r; - relation.r' + BBoxQuery + '->.r;);\nout ids bb qt;\n'
-      }
+    if (BBoxQuery) {
+      query = '(' + query + ')->._all;\n'
+      query += 'nwr._all' + BBoxQuery + ';\n'
+    } else {
+      query = '(' + query + ');\n'
     }
 
     const requestParts = []
-    if (BBoxQuery && (nodeQuery !== '' || wayQuery !== '' || relationQuery !== '')) {
-      // additional separator to separate objects outside bbox from inside bbox
-      query += 'out count;\n'
-
-      requestParts.push({
-        properties: defines.BBOX,
-        bounds: this.options.bounds,
-        boundsNoMatch: true
-      })
-    }
-
-    query += '('
-    if (nodeQuery !== '') {
-      query += '.n;'
-    }
-    if (wayQuery !== '') {
-      query += '.w;'
-    }
-    if (relationQuery !== '') {
-      query += '.r;'
-    }
-    query += ');'
-
     const filter = new Filter(query)
 
     const dbOptions = {
@@ -260,7 +220,8 @@ class RequestGet extends Request {
     }
 
     let queryOptions
-    [query, queryOptions] = this.overpass.database.compile(new Filter(query), dbOptions)
+    const queryFilter = new Filter(query)
+    ;[query, queryOptions] = this.overpass.database.compile(queryFilter, dbOptions)
 
     if (query) {
       requestParts.push({
@@ -269,6 +230,18 @@ class RequestGet extends Request {
         receiveObject: this.receiveObject.bind(this),
         checkFeatureCallback: this.checkFeatureCallback.bind(this),
         featureCallback: this._featureCallback.bind(this, this.featureCallback)
+      })
+    }
+
+    if (BBoxQuery) {
+      const id = queryFilter.getStatement({ set: '_all' }).id
+      query += '\nout count;\n(nwr._' + id + '; - nwr._' + id + BBoxQuery + ';);out ids bb qt;'
+
+      // additional separator to separate objects outside bbox from inside bbox
+      requestParts.push({
+        properties: defines.BBOX,
+        bounds: this.options.bounds,
+        boundsNoMatch: true
       })
     }
 
