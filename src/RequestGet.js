@@ -236,11 +236,15 @@ class RequestGet extends Request {
 
     if (BBoxQuery) {
       const id = queryFilter.getStatement({ set: '_all' }).id
-      query = '(nwr._' + id + '; - nwr._' + id + BBoxQuery + ';);out ids bb qt;'
+      const lastId = queryFilter.getStatement().id
+      const bboxFilter = new Filter(queryFilter.toQl({ setsUseStatementIds: true, set: '_all' }) + '(nwr._' + id + '; - nwr._' + id + BBoxQuery + ';);out ids bb qt;')
+
+      const [query, queryOptions] = this.overpass.database.compile(bboxFilter, {...dbOptions, fromStatementId: lastId})
 
       // additional separator to separate objects outside bbox from inside bbox
       requestParts.push({
         query,
+        options: queryOptions,
         properties: defines.BBOX,
         bounds: this.options.bounds,
         boundsNoMatch: true
