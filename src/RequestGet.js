@@ -215,7 +215,7 @@ class RequestGet extends Request {
     const dbOptions = {
       properties: this.options.properties,
       statementId: filter.getStatement().id,
-      requestId: context.requests.indexOf(this),
+      requestId: context.partsCount,
       context
     }
 
@@ -239,7 +239,8 @@ class RequestGet extends Request {
       const lastId = queryFilter.getStatement().id
       const bboxFilter = new Filter(queryFilter.toQl({ setsUseStatementIds: true, set: '_all' }) + '(nwr._' + id + '; - nwr._' + id + BBoxQuery + ';);out ids bb qt;')
 
-      const [query, queryOptions] = this.overpass.database.compile(bboxFilter, {...dbOptions, fromStatementId: lastId})
+      dbOptions.requestId++
+      const [query, queryOptions] = this.overpass.database.compile(bboxFilter, { ...dbOptions, fromStatementId: lastId })
 
       // additional separator to separate objects outside bbox from inside bbox
       requestParts.push({

@@ -405,11 +405,13 @@ class GeowikiAPI {
 
     let effortAvailable = this.options.effortPerRequest
 
+    context.partsCount = 0
     for (j = 0; j < context.requests.length; j++) {
       request = context.requests[j]
       const remainingRequestsAtPriority = context.requests.slice(j).filter(r => r.priority === request.priority)
       context.maxEffort = Math.ceil(effortAvailable / remainingRequestsAtPriority.length)
       const subRequest = request.compileQuery(context)
+      context.partsCount += subRequest.parts.length
 
       if (subRequest.parts.length === 0) {
         console.log('subRequest has no parts! Why was willInclude true?', subRequest)

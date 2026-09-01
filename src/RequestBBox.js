@@ -209,7 +209,7 @@ class RequestBBox extends Request {
       // bounds: this.bounds,
       doneFeatures: this.doneFeatures,
       statementId: resultSetId,
-      requestId: context.requests.indexOf(this),
+      requestId: context.partsCount,
       context
     }
 
