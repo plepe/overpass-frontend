@@ -37,6 +37,10 @@ class FilterDiff extends FilterStatement {
   }
 
   toQl (options = {}) {
+    if ('fromStatementId' in options && options.fromStatementId >= this.id) {
+      return ''
+    }
+
     let hasOutputSet = false
     const subOptions = JSON.parse(JSON.stringify(options))
     subOptions.inputSet = options.inputSet

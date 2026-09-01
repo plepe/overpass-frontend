@@ -490,6 +490,7 @@ class Filter {
    * @param {object} [options] Additional options
    * @param {string} [options.inputSet=''] Specify input set (e.g.'.foo').
    * @param {string} [options.outputSet=''] Specify output set (e.g.'.foo').
+   * @param {number} [options.fromStatementId] Only include statements after this id.
    * @return {string}
    */
   toQl (options = {}, def) {

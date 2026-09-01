@@ -79,6 +79,10 @@ class FilterRecurse extends FilterStatement {
   }
 
   toQl (options = {}) {
+    if ('fromStatementId' in options && options.fromStatementId >= this.id) {
+      return ''
+    }
+
     let result = ''
 
     if (options.setsUseStatementIds) {
