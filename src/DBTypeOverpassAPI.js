@@ -12,7 +12,11 @@ module.exports = class DBTypeOverpassAPI extends DBTypeBase {
     // if the context already has a bbox and it differs from this, we can't add
     // ours
     if (_query instanceof Filter) {
-      query = _query.toQl({ setsUseStatementIds: true }) + '\n'
+      const compileOptions = { setsUseStatementIds: true }
+      if ('fromStatementId' in options) {
+        compileOptions.fromStatementId = options.fromStatementId
+      }
+      query = _query.toQl(compileOptions) + '\n'
       options.properties |= _query.properties()
       resultSet = options.statementId ? '._' + options.statementId : '.result'
     } else {
