@@ -51,6 +51,10 @@ class FilterAnd extends FilterStatement {
   }
 
   toQl (options = {}) {
+    if ('fromStatementId' in options && options.fromStatementId === this.id) {
+      return ''
+    }
+
     const first = this.parts[0]
     const last = this.parts[this.parts.length - 1]
     const others = this.parts.concat().slice(1, this.parts.length - 1)

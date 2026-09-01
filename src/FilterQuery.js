@@ -195,6 +195,10 @@ class FilterQuery extends FilterStatement {
   }
 
   toQl (options = {}) {
+    if ('fromStatementId' in options && options.fromStatementId === this.id) {
+      return ''
+    }
+
     let result = ''
 
     result += this.type
