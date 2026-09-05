@@ -11,6 +11,10 @@ const addTests = [
   {
     input: "nwr;",
     add: "node._[amenity]",
+  },
+  {
+    input: "(node[amenity];way[highway];)",
+    add: "node._[amenity]",
   }
 ]
 

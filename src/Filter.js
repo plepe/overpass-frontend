@@ -378,6 +378,11 @@ class Filter {
       this.def = []
       return
     } else if (typeof def === 'object' && def instanceof Filter) {
+      Object.entries(def.statements).forEach(([id, stmt]) => {
+        console.log(id, stmt.toString())
+      })
+      def.statements
+      console.log(def.script)
       const result = parse(def.toString())
       if (result[1].trim()) {
         throw new Error("Can't parse query, trailing characters: " + result[1])
