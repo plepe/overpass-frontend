@@ -491,6 +491,7 @@ class Filter {
    * @param {string} [options.inputSet=''] Specify input set (e.g.'.foo').
    * @param {string} [options.outputSet=''] Specify output set (e.g.'.foo').
    * @param {number} [options.fromStatementId] Only include statements after this id.
+   * @param {Filter} [options.from] Only include statements not included in the the filter 'from'.
    * @return {string}
    */
   toQl (options = {}, def) {
@@ -498,6 +499,11 @@ class Filter {
 
     if (this.baseFilter) {
       result += this.baseFilter.toQl({ outputSet: '._base' })
+    }
+
+    if (options.from) {
+      // TODO: check that this is a descendant of options.from
+      options.fromStatementId = options.from._statementId
     }
 
     return result + this.script.map(s => s.toQl(options)).join('')
