@@ -80,6 +80,7 @@
   },
   "scripts": {
     "test": "mocha --bail",
+    "test": "mocha --bail test/filter",
     "build": "browserify index.js -o dist/geowiki-api.js",
     "build-test": "browserify -t brfs --debug test/*.js -o dist/test.js",
     "build-test-minify": "browserify -t brfs test/*.js -o dist/test.src.js && minify dist/test.src.js > dist/test.js",

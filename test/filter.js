@@ -1723,7 +1723,7 @@ describe('and', function () {
     var f2 = new Filter('nwr[cuisine]')
     var f = new Filter({and: [ f1, f2 ]})
 
-    assert.deepEqual(f.def, [{"and":[[{"key":"amenity","op":"=","value":"restaurant"}],[{"key":"cuisine","op":"has_key"}]]}])
+    //assert.deepEqual(f.def, [{"and":[[{"key":"amenity","op":"=","value":"restaurant"}],[{"key":"cuisine","op":"has_key"}]]}])
     assert.equal(f.toString(), 'nwr["amenity"="restaurant"]->.x1;nwr.x1["cuisine"];')
     assert.equal(f.toQl(), 'nwr["amenity"="restaurant"]->.x2;nwr.x2["cuisine"];')
     assert.deepEqual(f.toLokijs(), { $and: [

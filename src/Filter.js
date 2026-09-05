@@ -368,6 +368,10 @@ class Filter {
   }
 
   constructor (def) {
+    this.baseFilter = null
+    this.statements = {}
+    this.sets = {}
+
     if (!def) {
       this.def = []
       return
@@ -376,13 +380,10 @@ class Filter {
       if (result[1].trim()) {
         throw new Error("Can't parse query, trailing characters: " + result[1])
       }
-      return result[0]
+      this.def = result[0]
+    } else {
+      this.def = check(def)
     }
-
-    this.baseFilter = null
-    this.def = check(def)
-    this.statements = {}
-    this.sets = {}
 
     if (typeof def === 'string') {
       this.script = this.convertToFilterScript(this.def)
