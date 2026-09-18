@@ -156,6 +156,41 @@ describe('Filter', function () {
       assert.deepEqual(r, [ { id: 'node(properties:0)' } ])
     })
 
+    it('node->._5;', function () {
+      var f = new Filter('node->._5;', {clone: true})
+
+      assert.equal(f._statementId, 5)
+      assert.deepEqual(f.def, [[{"type":"node"},{"outputSet":"_5"}]])
+      assert.equal(f.toString(), 'node->._5;')
+      assert.equal(f.toQl(), 'node->._5;')
+      assert.deepEqual(f.toLokijs(), {$not:true})
+      assert.deepEqual(f.derefSets(), [
+      ])
+
+      check(f, [])
+
+      var r = f.cacheDescriptors()
+      assert.deepEqual(r, [])
+    })
+
+    it('(node;)->._5;', function () {
+      var f = new Filter('(node;)->._5;', {clone: true})
+
+      assert.deepEqual(f.def, [{"or":[[{"type":"node"}],{"outputSet":"_5"}]}])
+      assert.equal(f._statementId, 6)
+      assert.equal(f.toString(), '(node;)->._5;')
+      assert.equal(f.toQl(), '(node;)->._5;')
+      assert.deepEqual(f.toLokijs(), {type:{$eq:'node'}})
+      assert.deepEqual(f.derefSets(), [
+        { type: 'node', filters: [] }
+      ])
+
+      check(f, [ 1, 2, 3, 4, 5, 6, 7 ])
+
+      var r = f.cacheDescriptors()
+      assert.deepEqual(r, [ { id: 'node(properties:0)' } ])
+    })
+
     it ('nwr[amenity]', function () {
       var f = new Filter('nwr[amenity]')
       assert.deepEqual(f.def, [[{"key":"amenity","op":"has_key"}]])

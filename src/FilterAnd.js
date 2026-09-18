@@ -3,8 +3,8 @@ const cacheMerge = require('./cacheMerge')
 const FilterStatement = require('./FilterStatement')
 
 class FilterAnd extends FilterStatement {
-  constructor (def, filter) {
-    super(def, filter)
+  constructor (def, filter, options) {
+    super(def, filter, options)
     this.outputSet = '_'
     this.filter = filter
     this.parts = []
@@ -19,7 +19,7 @@ class FilterAnd extends FilterStatement {
         this.outputSet = part.outputSet
         hasOutputSet = true
       } else {
-        this.parts.push(filterPart.get(part, filter))
+        this.parts.push(filterPart.get(part, filter, options))
       }
     })
 
@@ -51,6 +51,10 @@ class FilterAnd extends FilterStatement {
   }
 
   toQl (options = {}) {
+    if ('fromStatementId' in options && options.fromStatementId >= this.id) {
+      return ''
+    }
+
     const first = this.parts[0]
     const last = this.parts[this.parts.length - 1]
     const others = this.parts.concat().slice(1, this.parts.length - 1)

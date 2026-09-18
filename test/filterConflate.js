@@ -54,6 +54,10 @@ const list = {
     str: '(node["amenity"="restaurant"]["cuisine"](48.195,16.335,48.2,16.345)(properties:13);way["amenity"="restaurant"]["cuisine"](48.195,16.335,48.2,16.345)(properties:13);relation["amenity"="restaurant"]["cuisine"](48.195,16.335,48.2,16.345)(properties:13););',
     loki: {"$or":[{"type":{"$eq":"node"},"tags.amenity":{"$eq":"restaurant"},"tags.cuisine":{"$exists":true},"$and":[{"minlat":{"$lte":48.2},"minlon":{"$lte":16.345},"maxlat":{"$gte":48.195},"maxlon":{"$gte":16.335}}]},{"type":{"$eq":"way"},"tags.amenity":{"$eq":"restaurant"},"tags.cuisine":{"$exists":true},"$and":[{"minlat":{"$lte":48.2},"minlon":{"$lte":16.345},"maxlat":{"$gte":48.195},"maxlon":{"$gte":16.335}}]},{"type":{"$eq":"relation"},"tags.amenity":{"$eq":"restaurant"},"tags.cuisine":{"$exists":true},"$and":[{"minlat":{"$lte":48.2},"minlon":{"$lte":16.345},"maxlat":{"$gte":48.195},"maxlon":{"$gte":16.335}}]}],"needMatch":true},
   },
+  'nwr(48.1990347,16.3384616,48.1991437,16.3386118)->._1;(nwr._1[~"amenity"~"."]->._3;)->._2;nwr._2': {
+    str: 'nwr[~"amenity"~"."](48.1990347,16.3384616,48.1991437,16.3386118)->._3;nwr._2;',
+    loki: { '$and': [ { '$and': [ { maxlat: { '$gte': 48.1990347 }, maxlon: { '$gte': 16.3384616 }, minlat: { '$lte': 48.1991437 }, minlon: { '$lte': 16.3386118 } } ] } ], needMatch: true }
+  }
 }
 
 describe('Filter.conflate()', function () {

@@ -6,8 +6,8 @@ const compileCacheDescriptors = require('./compileCacheDescriptors.js')
 // TODO: concerning recurses in the subtrahend, the cache descriptors might still be wrong, as they recurse to 'r;(node;node(r)->.1);r(bn.1);' <- why would we be interested in 'r(bn.1);'?
 
 class FilterDiff extends FilterStatement {
-  constructor (def, filter) {
-    super(def, filter)
+  constructor (def, filter, options) {
+    super(def, filter, options)
     this.outputSet = '_'
     this.parts = []
     this.filter = filter
@@ -22,7 +22,7 @@ class FilterDiff extends FilterStatement {
         this.outputSet = part.outputSet
         hasOutputSet = true
       } else {
-        this.parts.push(filterPart.get(part, filter))
+        this.parts.push(filterPart.get(part, filter, options))
       }
     })
 
@@ -37,6 +37,10 @@ class FilterDiff extends FilterStatement {
   }
 
   toQl (options = {}) {
+    if ('fromStatementId' in options && options.fromStatementId >= this.id) {
+      return ''
+    }
+
     let hasOutputSet = false
     const subOptions = JSON.parse(JSON.stringify(options))
     subOptions.inputSet = options.inputSet

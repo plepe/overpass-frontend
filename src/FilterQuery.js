@@ -18,8 +18,8 @@ const reverseRecurse = {
 }
 
 class FilterQuery extends FilterStatement {
-  constructor (def, filter) {
-    super(def, filter)
+  constructor (def, filter, options) {
+    super(def, filter, options)
     this.filter = filter
 
     if (!Array.isArray(def)) {
@@ -195,6 +195,10 @@ class FilterQuery extends FilterStatement {
   }
 
   toQl (options = {}) {
+    if ('fromStatementId' in options && options.fromStatementId >= this.id) {
+      return ''
+    }
+
     let result = ''
 
     result += this.type

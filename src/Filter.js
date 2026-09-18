@@ -368,12 +368,30 @@ class Filter {
     return this._uniqId
   }
 
-  createStatementId () {
+  createStatementId (stmt) {
     this._statementId = (this._statementId || 0) + 1
+    this.statements[this._statementId] = stmt
     return this._statementId
   }
 
-  constructor (def) {
+  registerStatementId (stmt, id) {
+    if (id in this.statements) {
+      throw new Error('Statement ID ' + id + ' already in use')
+    }
+
+    if (this._statementId === undefined || id > this._statementId) {
+      this._statementId = id
+    }
+
+    this.statements[id] = stmt
+    return id
+  }
+
+  /**
+   * @param {object} [options] Additional options
+   * @param {boolean} [options.clone=false] When clone is true, use the same statement ids.
+   */
+  constructor (def, options={}) {
     if (!def) {
       this.def = []
       return
@@ -382,9 +400,10 @@ class Filter {
     this.baseFilter = null
     this.def = check(def)
     this.statements = {}
+    this.sets = {}
 
     if (typeof def === 'string') {
-      this.script = this.convertToFilterScript(this.def)
+      this.script = this.convertToFilterScript(this.def, options)
     } else {
       def = this.def
       if (!Array.isArray(def)) {
@@ -397,8 +416,18 @@ class Filter {
 
       def = this.expandOr(def)
 
-      this.script = this.convertToFilterScript(def)
+      this.script = this.convertToFilterScript(def, options)
     }
+  }
+
+  /**
+   * add additional filters to the filter
+   * @param {string|object} query
+   * @param {object} [options] Additional options
+   */
+  add (def, options) {
+    def = check(def)
+    this.script = this.script.concat(this.convertToFilterScript(def, options))
   }
 
   /**
@@ -480,6 +509,8 @@ class Filter {
    * @param {object} [options] Additional options
    * @param {string} [options.inputSet=''] Specify input set (e.g.'.foo').
    * @param {string} [options.outputSet=''] Specify output set (e.g.'.foo').
+   * @param {number} [options.fromStatementId] Only include statements after this id.
+   * @param {Filter} [options.from] Only include statements not included in the the filter 'from'.
    * @return {string}
    */
   toQl (options = {}, def) {
@@ -487,6 +518,11 @@ class Filter {
 
     if (this.baseFilter) {
       result += this.baseFilter.toQl({ outputSet: '._base' })
+    }
+
+    if (options.from) {
+      // TODO: check that this is a descendant of options.from
+      options.fromStatementId = options.from._statementId
     }
 
     return result + this.script.map(s => s.toQl(options)).join('')
@@ -596,9 +632,8 @@ class Filter {
     return def
   }
 
-  convertToFilterScript (def) {
-    this.sets = {}
-    const r = def.map(d => filterPart.get(d, this))
+  convertToFilterScript (def, options={}) {
+    const r = def.map(d => filterPart.get(d, this, options))
 
     return r
   }
