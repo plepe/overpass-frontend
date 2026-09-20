@@ -276,10 +276,13 @@ class RequestBBox extends Request {
         'out ' + overpassOutOptions(options) + ';'
 
       const statementId = this.lokiQuery.getStatement().id
+      const f = new Filter(filter + compileRecurseFilter(script, statementId, rid) + 'nwr._rev' + statementId + '_' + rid)
+      const [q, queryOptions] = this.overpass.database.compile(new Filter(query + revquery), dbOptions)
       subRequest.parts.push({
-        query: revquery,
+        query: q,
+        options: queryOptions,
         statementId: rid,
-        filter: new Filter(filter + compileRecurseFilter(script, statementId, rid) + 'nwr._rev' + statementId + '_' + rid),
+        filter: f,
         properties: options.properties,
         receiveObject: this.receiveRevObject.bind(this)
       })
